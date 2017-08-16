@@ -40,7 +40,7 @@ $(document).ready(function(){
 		$('form').submit(function() {
 			$('.popup').remove();
 			if(!$('.email').val() || $('.email').val() == 'jesze@forestbear.net') {
-				$('form').append('<p class="popup">Please fill out this field.</p>');
+				$('form').append('<p class="popup">Sent!</p>');
 				$('.email').focus();
 				return false;
 			}
