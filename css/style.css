@@ -211,3 +211,22 @@ body{
 		width: 77%;
 	}
 }
+
+
+.model{
+  position:relative;
+  margin:0 auto;
+  background: url('../images/nonwireframe.jpg');
+  width:893px;
+  height:425px;
+  overflow:hidden;
+}
+.gray{
+  position:absolute;
+  top:0;
+  left:0;
+  width:200px;
+  height:200px;
+  background: url('../images/wireframe.jpg');
+  border-radius:50%;
+}
