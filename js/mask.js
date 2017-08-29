@@ -1,8 +1,11 @@
+var startsize = 100;
 var xsize = 100, ysize = 100;
 var leavex, leavey;
 var shrink;
+var clicked = false;
 
-$('.model')
+
+$('#image1')
 .mousemove(function(e)
 {
 	var offs = $(this).offset(),
@@ -11,7 +14,7 @@ $('.model')
 		x    = mPos.x - p.x - xsize,
 		y    = mPos.y - p.y - ysize;
 
-	$('.gray', this).css({left:x, top:y, backgroundPosition: -x+'px '+-y+'px', width:xsize*2, height:ysize*2});
+	$('#image2', this).css({left:x, top:y, backgroundPosition: -x+'px '+-y+'px', width:xsize*2, height:ysize*2});
     
 })
 .mouseleave(function(p)
@@ -21,22 +24,33 @@ $('.model')
 	shrink = setInterval(shrinkCircle,5);
 })
 
-.mouseenter(function(p)
+.mouseenter(function()
 {
 	clearInterval(shrink);
-	xsize = 100;
-	ysize = 100;
+	xsize = startsize;
+	ysize = startsize;
+})
+.mousedown(function()
+{	
+	clicked = !clicked;
+	if(clicked)
+		this.style.backgroundImage = "url('images/wireframe.jpg')";
+	else
+		this.style.backgroundImage = "url('images/nonwireframe.jpg')";
 });
 
 function shrinkCircle()
 {
 	xsize--;
 	ysize--;
-	var offs = $('.model').offset(),
+	console.log(xsize);
+	var offs = $('#image1').offset(),
 		p    = {x:offs.left, y:offs.top},
 		mPos = {x:leavex, y:leavey},
 		x    = mPos.x - p.x - xsize,
 		y    = mPos.y - p.y - ysize;
 
-	$('.gray', '.model').css({left:x, top:y, backgroundPosition: -x+'px '+-y+'px', width:xsize*2, height:ysize*2});	
+	$('#image2', '#image1').css({left:x, top:y, backgroundPosition: -x+'px '+-y+'px', width:xsize*2, height:ysize*2});	
+	if(xsize == 0 || ysize == 0)
+		clearInterval(shrink);
 }

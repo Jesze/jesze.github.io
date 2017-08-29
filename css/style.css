@@ -213,7 +213,7 @@ body{
 }
 
 
-.model{
+#image1{
   position:relative;
   margin:0 auto;
   background: url('../images/nonwireframe.jpg');
@@ -221,7 +221,7 @@ body{
   height:425px;
   overflow:hidden;
 }
-.gray{
+#image2{
   position:absolute;
   top:0;
   left:0;
@@ -229,5 +229,4 @@ body{
   height:200px;
   background: url('../images/wireframe.jpg');
   border-radius:50%;
-  
 }
