@@ -43,7 +43,6 @@ function shrinkCircle()
 {
 	xsize--;
 	ysize--;
-	console.log(xsize);
 	var offs = $('#image1').offset(),
 		p    = {x:offs.left, y:offs.top},
 		mPos = {x:leavex, y:leavey},
