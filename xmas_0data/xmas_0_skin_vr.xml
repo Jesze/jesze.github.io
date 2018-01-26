@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<krpano version="1.19">
+
+    
+  <!-- Spot Style - Load panorama -->
+  <style name="IconLoadpanorama"
+         url="%FIRSTXML%/spots/hotspot_direction_user_defaultpoint5.png"
+         visible="false"
+
+
+         />
+
+
+
+
+
+
+</krpano>

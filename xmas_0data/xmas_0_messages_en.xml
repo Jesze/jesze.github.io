@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<krpano>
+
+<!-- ************************ -->
+<!--         Messages         -->
+<!-- ************************ -->
+
+  <data name="en_project_title"><![CDATA[New Project]]></data>
+
+
+
+  <data name="en_pano38_title"><![CDATA[Entryway]]></data>
+  <data name="en_spotpoint58_tooltip"><![CDATA[Stairwell]]></data>
+
+
+  <data name="en_pano44_title"><![CDATA[Stairwell]]></data>
+  <data name="en_spotpoint71_tooltip"><![CDATA[Entryway]]></data>
+  <data name="en_spotpoint72_tooltip"><![CDATA[Dining Room]]></data>
+
+
+  <data name="en_pano45_title"><![CDATA[Dining Room]]></data>
+  <data name="en_spotpoint73_tooltip"><![CDATA[Kitchen]]></data>
+  <data name="en_spotpoint74_tooltip"><![CDATA[Stairwell]]></data>
+  <data name="en_spotpoint77_tooltip"><![CDATA[Sitting Room]]></data>
+
+
+  <data name="en_pano56_title"><![CDATA[Kitchen]]></data>
+  <data name="en_spotpoint75_tooltip"><![CDATA[Dining Room]]></data>
+  <data name="en_spotpoint76_tooltip"><![CDATA[Stairwell]]></data>
+  <data name="en_spotpoint94_tooltip"><![CDATA[Sitting Room]]></data>
+
+
+  <data name="en_pano47_title"><![CDATA[Sitting Room]]></data>
+  <data name="en_spotpoint78_tooltip"><![CDATA[Living Room (Middle)]]></data>
+  <data name="en_spotpoint79_tooltip"><![CDATA[Master Bedroom]]></data>
+  <data name="en_spotpoint80_tooltip"><![CDATA[Bathroom]]></data>
+
+
+  <data name="en_pano42_title"><![CDATA[Master Bedroom]]></data>
+  <data name="en_spotpoint83_tooltip"><![CDATA[Sitting Room]]></data>
+  <data name="en_spotpoint84_tooltip"><![CDATA[Bathroom]]></data>
+
+
+  <data name="en_pano43_title"><![CDATA[Bathroom]]></data>
+  <data name="en_spotpoint81_tooltip"><![CDATA[Master Bedroom]]></data>
+  <data name="en_spotpoint82_tooltip"><![CDATA[Sitting Room]]></data>
+
+
+  <data name="en_pano40_title"><![CDATA[Living Room (Middle)]]></data>
+  <data name="en_spotpoint85_tooltip"><![CDATA[Sitting Room]]></data>
+  <data name="en_spotpoint86_tooltip"><![CDATA[Living Room (East)]]></data>
+  <data name="en_spotpoint87_tooltip"><![CDATA[Living Room (West)]]></data>
+
+
+  <data name="en_pano41_title"><![CDATA[Living Room (West)]]></data>
+  <data name="en_spotpoint88_tooltip"><![CDATA[Living Room (Middle)]]></data>
+  <data name="en_spotpoint91_tooltip"><![CDATA[Living Room (East)]]></data>
+  <data name="en_spotpoint92_tooltip"><![CDATA[Sitting Room]]></data>
+
+
+  <data name="en_pano18_title"><![CDATA[Living Room (East)]]></data>
+  <data name="en_spotpoint89_tooltip"><![CDATA[Sitting Room]]></data>
+  <data name="en_spotpoint90_tooltip"><![CDATA[Living Room (West)]]></data>
+
+
+
+
+
+
+
+
+  <data name="en_vr_setup_hmd0"><![CDATA[SELECT YOUR HMD]]></data>
+  <data name="en_vr_setup_advanced"><![CDATA[ADVANCED SETTINGS]]></data>
+  <data name="en_vr_setup_title"><![CDATA[WEB VR SETTINGS]]></data>
+  <data name="en_vr_setup_dvn1"><![CDATA[Device:]]></data>
+  <data name="en_vr_setup_siz1"><![CDATA[Screen size:]]></data>
+  <data name="en_vr_setup_ipd1"><![CDATA[IPD:]]></data>
+  <data name="en_vr_setup_hmd1"><![CDATA[HMD:]]></data>
+  <data name="en_vr_setup_hmd3"><![CDATA[Customize]]></data>
+  <data name="en_vr_setup_cal"><![CDATA[Calibrate gyroscope]]></data>
+  <data name="en_vr_setup_sav"><![CDATA[SAVE]]></data>
+  <data name="en_vr_setup_rst"><![CDATA[RESET]]></data>
+  <data name="en_vr_setup_simple"><![CDATA[SIMPLE]]></data>
+  <data name="en_vr_setup_cls"><![CDATA[CLOSE]]></data>
+  <data name="en_vr_setup_m31"><![CDATA[HMD SETTINGS]]></data>
+  <data name="en_vr_setup_fov1"><![CDATA[FOV:]]></data>
+  <data name="en_vr_setup_dst1"><![CDATA[Distortion:]]></data>
+  <data name="en_vr_setup_d2tx"><![CDATA[Distortion 2:]]></data>
+  <data name="en_vr_setup_vig1"><![CDATA[Vignette:]]></data>
+  <data name="en_vr_setup_cac1"><![CDATA[Chromatic aberration:]]></data>
+  <data name="en_vr_setup_olp1"><![CDATA[Overlap:]]></data>
+  <data name="en_vr_setup_m35"><![CDATA[RETURN]]></data>
+  <data name="en_vr_setup_cb1"><![CDATA[GYROSCOPE]]></data>
+  <data name="en_vr_setup_cb2"><![CDATA[Place the device on a flat and[br]stable surface and tab CALIBRATE[br]to correct a gyroscope drifting.]]></data>
+  <data name="en_vr_setup_cb3"><![CDATA[CALIBRATE]]></data>
+  <data name="en_vr_setup_cb4"><![CDATA[RESET]]></data>
+  <data name="en_vr_setup_cb5"><![CDATA[RETURN]]></data>
+  <data name="en_vr_setup_cb6"><![CDATA[Calibrating...]]></data>
+  <data name="en_vr_setup_cb7"><![CDATA[Successful calibration]]></data>
+  <data name="en_vr_setup_cb8"><![CDATA[Calibration failed]]></data>
+  <data name="en_vr_setup_unavailable"><![CDATA[VR mode[br]is unavailable on your device]]></data>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</krpano>
