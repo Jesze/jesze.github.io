@@ -5,8 +5,7 @@ var shrink;
 var clicked = false;
 
 
-$('#image1')
-.mousemove(function(e)
+$('#image1').mousemove(function(e)
 {
 	var offs = $(this).offset(),
 		p    = {x:offs.left, y:offs.top},
