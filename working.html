@@ -4,7 +4,27 @@
 		<link href="css/main.css" rel="stylesheet" type="text/css"  media="all" /><!-- Add icon library -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">	
 		<script src="js/jquery.min.js"></script>
-		<script src="js/scroll.js"></script>
+		<!-- SMOOTH SCROLL -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script>
+		$(function() {
+		  $('a[href*=#]:not([href=#])').click(function() {
+			console.log("Hello");
+			if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+			  var target = $(this.hash);
+			  target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+			  if (target.length) {
+				$('html,body').animate({
+				  scrollTop: target.offset().top
+				}, 1000);
+				return false;
+			  }
+			}
+		  });
+		});
+		</script>
+		<!-- End of SMOOTH SCROLL -->
+		
 		<!-- Add font awesome icons -->
 		<title>Simulacrum Interactive</title>
 	</head>
@@ -28,7 +48,7 @@
 				
 				<li class="navlistitem_right"><a href="#contact">CONTACT</a></li>
 				<li class="navlistitem_right"><a href="#services">SERVICES</a></li>
-				<li class="navlistitem_right"><a href="#About" >ABOUT</a></li>
+				<li class="navlistitem_right"><a href="#About" class="smoothScroll" >ABOUT</a></li>
 				<li class="navlistitem_right"><a class="active" href="#home">HOME</a></li>
 				<img src="./images/Simulacrum_header_logo.png" style="width:auto;height:100px;margin:4px 0px 0px 5px">
 			</ul>
@@ -37,14 +57,17 @@
 		
 			<section class="section parallax bg1"></section>
 			
-			<section class="section static" id="#About">
+			<section class="section static" id="About">
 			<center>
+				<div  name="About">
 				<h1>ABOUT US</h1>
 				<hr style="width:50%;color:#F68A20">
 				<h3 style="width:50%">Simulacrum Interactive is a company of content creators based in Lethbridge, Alberta who know that the future waits for no one, and that the future of digital media is in the changing ways that we interact with it. Experiencing is the new believing, and at Simulacrum Interactive we use cutting edge technology to hand craft immersive, creative, and exciting experiences. </h3>
 				<br>
 				<h3 style="width:50%">From marketing and promotional applications, to education, prototyping, entertainment and more- we work with you to make your ideas a reality! </h3>
-				</center>
+				</div>
+			</center>
+				
 			</section>
 			
 			
