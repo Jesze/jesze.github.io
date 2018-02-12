@@ -1,0 +1,237 @@
+body 
+{
+	margin:0;padding:0;
+	background-color:#424242;
+}
+html
+{
+	//overflow-y: scroll;
+}
+h1,h2,h3,h4
+{
+	font-family: "Myriad Pro", "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+}
+h1
+{
+	font-size: 42px;
+}
+/**********************************************************************
+*  CREATE TOP BAR                                                     *
+*   - Includes Home, About, Services, Contact and Social Media Icons  *
+*   - Stationary                                                      *
+**********************************************************************/
+
+
+/* List item declaration */
+
+.navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #5C5C5C;
+    top: 0;
+    width: 100%;
+	z-index:0;
+}
+
+.endbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #5C5C5C;
+    width: 100%;
+	z-index:0;
+}
+/* Style list items */
+.navlistitem_right {
+    float: right;
+    line-height: 104px;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0;
+}
+.navlistitem_left {
+    float: left;
+    line-height: 104px;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0;
+}
+.endlistitem_left {
+    float: left;
+    line-height: 108px;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0;
+}
+.endlistitem_right {
+    float: right;
+    line-height: 108px;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0;
+}
+
+/* Set custom spacer for space between social media and text links */
+.navbar li:nth-child(5){
+
+    width: 10px;
+}
+.endbar li:nth-child(1){
+
+    width: 48px;
+}
+.endbar li:nth-child(5){
+
+    width: 480px;
+}
+
+
+/* Set custom spacer for space between social media icons and right edge */
+.navbar li:nth-child(1){
+
+    width: 48px;
+}
+
+/* Style text links */
+a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 0px 20px;
+    text-decoration: none;
+	font-size: 20px;
+	font-family: "Myriad Pro", "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+}
+
+/* Style all social media icons */
+li .fa {
+    padding: 0px;
+    font-size: 28px;
+    width: 42px;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    color: white;
+}
+
+/* Hover over non-active link */
+a:hover:not(.active) {
+    color:#F68A20;
+}
+
+/* Sets up active link */
+.active {
+    color:#F68A20;
+}
+/* Tiny reset thingy */
+body,html{margin:0;padding:0;}
+
+.wrapper {
+  /* The height needs to be set to a fixed value for the effect to work.
+   * 100vh is the full height of the viewport. */
+  height: 100vh;
+  /* The scaling of the images would add a horizontal scrollbar, so disable x overflow. */
+  overflow-x: hidden;
+  position:relative;
+  /* Enable scrolling on the page. */
+  overflow-y: auto;
+  /* Set the perspective to 2px. This is essentailly the simulated distance from the viewport to transformed objects.*/
+  perspective: 2px;
+  margin:0px;
+  border:0px;
+}
+
+.section {
+  /* Needed for children to be absolutely positioned relative to the parent. */
+  position: relative;
+  /* The height of the container. Must be set, but it doesn't really matter what the value is. */
+  height: 100vh;
+  
+  /* For text formatting. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-shadow: 0 0 5px #000;
+}
+
+.parallax::after {
+  /* Display and position the pseudo-element */
+  content: " ";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  
+  /* Move the pseudo-element back away from the camera,
+   * then scale it back up to fill the viewport.
+   * Because the pseudo-element is further away, it appears to move more slowly, like in real life. */
+  transform: translateZ(-1px) scale(1.5);
+  /* Force the background image to fill the whole element. */
+  background-size: 120%;
+  /* Keep the image from overlapping sibling elements. */ 
+  z-index: -1;
+}
+
+/* Static divider */
+.static {
+  background: #424242;
+}
+
+
+/* Sets the background image for parallax effect */
+.bg1::after {
+  background-image: url('../images/nonwireframe.jpg');
+}
+
+
+
+
+.fixedwrapper
+{
+	position:absolute;
+}
+.fixed
+{ 
+position:fixed;
+}
+
+
+table
+{
+	table-layout:fixed;
+    border-collapse: collapse;
+}
+#contact_form
+{
+	width:100%;
+}
+
+#contact_name
+{
+	width:100vh;
+    background-color: #5C5C5C;
+	color:white;
+}
+#contact_email
+{
+	width:100vh;
+    background-color: #5C5C5C;
+	color:white;
+}
+#contact_message
+{
+	width:100vh;
+	height:30vh;
+    background-color: #5C5C5C;
+	color:white;
+}
+#About
+{}
+.AboutLink{}
+
+

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="css/main.css" rel="stylesheet" type="text/css"  media="all" /><!-- Add icon library -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+		<script type="text/javascript" src="./js/jquery.scrollTo.min.js"></script>
+		<script type="text/javascript">
+		jQuery(
+			function( $ )
+			{
+				$.easing.elasout = function(x, t, b, c, d) {
+					var s=1.70158;var p=0;var a=c;
+					if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+					if (a < Math.abs(c)) { a=c; var s=p/4; }
+					else var s = p/(2*Math.PI) * Math.asin (c/a);
+					return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
+				};
+				
+				$('#AboutLink a').hover(function() {
+					$.scrollTo('#About', 2500, { easing:'elasout' });
+					console.log('Here');
+				});
+			}
+		);
+		</script>
+		<!-- Add font awesome icons -->
+		<title>Simulacrum Interactive</title>
+	</head>
+	<body>
+
+
+
+
+		<main>
+		<section class="wrapper">				
+		
+			<!--  Top Navigation Bar -->
+			<section class="navbar">
+			<ul>
+				<li class="navlistitem_right"><br></li>
+				<li class="navlistitem_right"><a href="#" class="fa fa-youtube"></a></li>
+				<li class="navlistitem_right"><a href="#" class="fa fa-instagram"></a></li>
+				<li class="navlistitem_right"><a href="#" class="fa fa-facebook"></a></li>
+				
+				<li class="navlistitem_right" style="width:50px"><br></li>
+				
+				<li class="navlistitem_right"><a href="#contact">CONTACT</a></li>
+				<li class="navlistitem_right"><a href="#services">SERVICES</a></li>
+				<li class="navlistitem_right" id="#AboutLink"><a href="#About" >ABOUT</a></li>
+				<li class="navlistitem_right"><a class="active" href="#home">HOME</a></li>
+				<img src="./images/Simulacrum_header_logo.png" style="width:auto;height:100px;margin:4px 0px 0px 5px">
+			</ul>
+			</section>
+		
+		
+			<section class="section parallax bg1"></section>
+			
+			<section class="section static" id="#About">
+			<center>
+				<h1>ABOUT US</h1>
+				<hr style="width:50%;color:#F68A20">
+				<h3 style="width:50%">Simulacrum Interactive is a company of content creators based in Lethbridge, Alberta who know that the future waits for no one, and that the future of digital media is in the changing ways that we interact with it. Experiencing is the new believing, and at Simulacrum Interactive we use cutting edge technology to hand craft immersive, creative, and exciting experiences. </h3>
+				<br>
+				<h3 style="width:50%">From marketing and promotional applications, to education, prototyping, entertainment and more- we work with you to make your ideas a reality! </h3>
+				</center>
+			</section>
+			
+			
+			<section class="section static">
+
+				<table style="width:100%; border-color:#F68A20" rules="cols">
+					<tr>
+					<td> <center><h2 style="color:#F68A20">Virtual Reality</h2></center></td>
+					<td> <center><h2 style="color:#F68A20">360 Photography & Virtual Tours</h2></center></td>
+					<td> <center><h2 style="color:#F68A20">Visualization & Interactive Media</h2></center></td>
+					</tr>
+					
+					<tr>
+					<td> <center><h3 style="width:60%">Using the latest in VR technology and peripherals, we create tailor-made immersive experiences.</h3></center></td>
+					<td> <center><h3 style="width:60%">Think outside of the frame with 360 degrees of view.</h3></center></td>
+					<td> <center><h3 style="width:60%">From interactable 3D models to full-scale game development and more, we can bring your ideas to life.</h3></center></td>
+					</tr>
+					
+					<tr>
+					<td> <center><iframe width="420" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe></center></td>
+					<td> <center><iframe width="420" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe></center></td>
+					<td> <center><iframe width="420" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe></center></td>
+					</table>
+			</section>
+			
+			<section class="section static">
+			<center>
+				<h1>Contact Us</h1>
+					<form id=contact_form action=#>
+						<p>
+							<input id=contact_name type=text onfocus="if(this.value=='Your Full Name')this.value=''" placeholder="Your Full Name" value="Your Full Name" name=name />
+						</p>
+						<p>
+							<input id=contact_email type=text onfocus="if(this.value=='Your Email Address')this.value=''" placeholder="Your Email Address" value="Your Email Address" name=email />
+						</p>
+						<p>
+							<textarea id=contact_message onfocus="if(this.value=='Your Message')this.value=''" placeholder="Your Message" name=message rows=8>Your Message</textarea>
+						</p>
+						
+						<div id=response></div>
+						<p class=contact-submit>
+							
+							<h2><a id=contact-submit class=submit href=#>Send</a></h2>
+						</p>
+					</form>
+			</center>
+			
+			</section>
+			
+			<section class="endbar">
+				<ul style="height:108px">
+					<li class="endlistitem_right"><br></li>
+					<li class="endlistitem_right"><a href="#" class="fa fa-youtube"></a></li>
+					<li class="endlistitem_right"><a href="#" class="fa fa-instagram"></a></li>
+					<li class="endlistitem_right"><a href="#" class="fa fa-facebook"></a></li>
+					<li class="endlistitem_left"><img style="height:100px;margin:4px 0px 0px 12px;float:left" src="./images/Logo_Footer.png"></li>
+					<li class="endlistitem_left"><br></li>
+					<a href=# class=".AboutLink" style="float: right;line-height: 104px;vertical-align: middle;text-align: center;margin:0">info@simulacruminteractive.ca</a>
+				</ul>
+			</section>
+			<section style="background-color: #424242;height:32px"><br></section>
+
+		</section>	
+
+		
+		</main>
+	</body>
+</html>
