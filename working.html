@@ -4,25 +4,7 @@
 		<link href="css/main.css" rel="stylesheet" type="text/css"  media="all" /><!-- Add icon library -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">	
 		<script src="js/jquery.min.js"></script>
-		<!-- SMOOTH SCROLL -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script>
-		$(function() {
-		  $('a[href*=#]:not([href=#])').click(function() {
-			console.log("Hello");
-			if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
-			  var target = $(this.hash);
-			  target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
-			  if (target.length) {
-				$('html,body').animate({
-				  scrollTop: target.offset().top
-				}, 1000);
-				return false;
-			  }
-			}
-		  });
-		});
-		</script>
+
 		<!-- End of SMOOTH SCROLL -->
 		
 		<!-- Add font awesome icons -->
@@ -37,7 +19,7 @@
 		<section class="wrapper">				
 		
 			<!--  Top Navigation Bar -->
-			<section class="navbar">
+			<section class="navbar" id="Home">
 			<ul>
 				<li class="navlistitem_right"><br></li>
 				<li class="navlistitem_right"><a href="#" class="fa fa-youtube"></a></li>
@@ -46,32 +28,30 @@
 				
 				<li class="navlistitem_right" style="width:50px"><br></li>
 				
-				<li class="navlistitem_right"><a href="#contact">CONTACT</a></li>
-				<li class="navlistitem_right"><a href="#services">SERVICES</a></li>
-				<li class="navlistitem_right"><a href="#About" class="smoothScroll" >ABOUT</a></li>
-				<li class="navlistitem_right"><a class="active" href="#home">HOME</a></li>
+				<li class="navlistitem_right"><a href="#Contact">CONTACT</a></li>
+				<li class="navlistitem_right"><a href="#Services">SERVICES</a></li>
+				<li class="navlistitem_right"><a href="#About">ABOUT</a></li>
+				<li class="navlistitem_right"><a class="active" href="#Home">HOME</a></li>
 				<img src="./images/Simulacrum_header_logo.png" style="width:auto;height:100px;margin:4px 0px 0px 5px">
 			</ul>
 			</section>
 		
 		
-			<section class="section parallax bg1"></section>
+			<section class="section parallax bg1" ></section>
 			
 			<section class="section static" id="About">
 			<center>
-				<div  name="About">
 				<h1>ABOUT US</h1>
 				<hr style="width:50%;color:#F68A20">
 				<h3 style="width:50%">Simulacrum Interactive is a company of content creators based in Lethbridge, Alberta who know that the future waits for no one, and that the future of digital media is in the changing ways that we interact with it. Experiencing is the new believing, and at Simulacrum Interactive we use cutting edge technology to hand craft immersive, creative, and exciting experiences. </h3>
 				<br>
 				<h3 style="width:50%">From marketing and promotional applications, to education, prototyping, entertainment and more- we work with you to make your ideas a reality! </h3>
-				</div>
 			</center>
 				
 			</section>
 			
 			
-			<section class="section static">
+			<section class="section static" id="Services">
 
 				<table style="width:100%; border-color:#F68A20" rules="cols">
 					<tr>
@@ -117,7 +97,7 @@
 			
 			</section>
 			
-			<section class="endbar">
+			<section class="endbar"  id="Contact">
 				<ul style="height:108px">
 					<li class="endlistitem_right"><br></li>
 					<li class="endlistitem_right"><a href="#" class="fa fa-youtube"></a></li>
@@ -134,5 +114,7 @@
 
 		
 		</main>
+		  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+		  <script  src="js/scroll.js"></script>
 	</body>
 </html>
