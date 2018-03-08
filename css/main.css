@@ -1,3 +1,5 @@
+
+
 body 
 {
 	margin:0;padding:0;
@@ -23,7 +25,6 @@ h1
 
 
 /* List item declaration */
-
 .navbar ul {
     list-style-type: none;
     margin: 0;
@@ -35,6 +36,15 @@ h1
 	z-index:0;
 }
 
+@media only screen and (max-width: 1024px) {
+	.navbar ul {display: none;}
+}
+.navbar img {
+	width:auto;
+	height:100px;
+	margin:4px 0px 0px 5px;
+}
+
 .endbar ul {
     list-style-type: none;
     margin: 0;
@@ -44,7 +54,10 @@ h1
     width: 100%;
 	z-index:0;
 }
+
+
 /* Style list items */
+@media only screen and (min-width: 600px) {
 .navlistitem_right {
     float: right;
     line-height: 104px;
@@ -72,20 +85,20 @@ h1
     vertical-align: middle;
     text-align: center;
     margin: 0;
-}
+}}
 
 /* Set custom spacer for space between social media and text links */
 .navbar li:nth-child(5){
 
-    width: 10px;
+    width: 0.78%;
 }
 .endbar li:nth-child(1){
 
-    width: 48px;
+    width: 3.75%;
 }
 .endbar li:nth-child(5){
 
-    width: 480px;
+    width: 37.5%;
 }
 
 
@@ -158,10 +171,32 @@ body,html{margin:0;padding:0;}
   text-shadow: 0 0 5px #000;
 }
 
+
+@media only screen and (max-width: 600px) {
+
+
+.section  table td {
+    border-bottom: 1px solid #ddd;
+    display: block;
+    font-size: .8em;
+    text-align: right;
+  }
+  .section table{
+	display:block;
+  }
+  #About{ 
+	height:100vh;
+  }
+  #Services{
+	  height:256vh;
+  }
+}
+
 .parallax::after {
   /* Display and position the pseudo-element */
   content: " ";
   position: absolute;
+  box-sizing:border-box;
   top: 0;
   right: 0;
   bottom: 0;
@@ -172,15 +207,48 @@ body,html{margin:0;padding:0;}
    * Because the pseudo-element is further away, it appears to move more slowly, like in real life. */
   transform: translateZ(-1px) scale(1.5);
   /* Force the background image to fill the whole element. */
-  background-size: 120%;
+  background-size: 256vh;
   /* Keep the image from overlapping sibling elements. */ 
   z-index: -1;
+}
+
+@media only screen and (max-width: 600px) {  
+	.parallax::after {
+		 left: -150%;
+	}
+}
+
+
+@media only screen and (max-width: 1024px) {
+	#DesktopServices
+	{
+		display:none;
+	}
+}
+
+@media only screen and (min-width: 1024px) {
+	#MobileServices
+	{
+		display:none;
+	}
+}
+
+
+@media only screen and (min-width: 256vh) {
+	
+.parallax::after {
+	background-size: 100%;
+}
 }
 
 /* Static divider */
 .static {
   background: #424242;
 }
+
+
+
+
 
 
 /* Sets the background image for parallax effect */
@@ -206,29 +274,19 @@ table
 	table-layout:fixed;
     border-collapse: collapse;
 }
-#contact_form
-{
-	width:100%;
+#ContactUs input
+{	width:60vh;
+    background-color: #5C5C5C;
+	color:white;
+	
 }
 
-#contact_name
-{
-	width:100vh;
-    background-color: #5C5C5C;
-	color:white;
-}
-#contact_email
-{
-	width:100vh;
-    background-color: #5C5C5C;
-	color:white;
-}
 #contact_message
 {
-	width:100vh;
-	height:30vh;
+	width:60vh;
     background-color: #5C5C5C;
 	color:white;
+	height:30vh;
 }
 #About
 {}
