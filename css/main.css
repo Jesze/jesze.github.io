@@ -13,9 +13,29 @@ h1,h2,h3,h4
 {
 	font-family: "Myriad Pro", "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
 }
+@media only screen and (max-width: 1000px) {
+
+h1
+{
+	font-size: 160px;
+}
+#About h3
+{
+	font-size: 40px;
+	width:80%;
+}
+}
+@media only screen and (min-width: 1000px) {
+
 h1
 {
 	font-size: 42px;
+}
+#About h3
+{
+	font-size: 24px;
+	width:50%;
+}
 }
 /**********************************************************************
 *  CREATE TOP BAR                                                     *
@@ -36,7 +56,7 @@ h1
 	z-index:0;
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 1000px) {
 	.navbar ul {display: none;}
 }
 .navbar img {
@@ -119,6 +139,7 @@ a {
 	font-family: "Myriad Pro", "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
 }
 
+
 /* Style all social media icons */
 li .fa {
     padding: 0px;
@@ -172,20 +193,19 @@ body,html{margin:0;padding:0;}
 }
 
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 1000px) {
 
 
 .section  table td {
-    border-bottom: 1px solid #ddd;
     display: block;
-    font-size: .8em;
+    font-size: 2.0em;
     text-align: right;
   }
   #About{ 
 	height:100vh;
   }
   #Services{
-	  height:256vh;
+	  height:120vh;
   }
 }
 
@@ -209,21 +229,21 @@ body,html{margin:0;padding:0;}
   z-index: -1;
 }
 
-@media only screen and (max-width: 600px) {  
+@media only screen and (max-width: 1280px) {  
 	.parallax::after {
 		 left: -150%;
 	}
 }
 
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 1000px) {
 	#DesktopServices
 	{
 		display:none;
 	}
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 1000px) {
 	#MobileServices
 	{
 		display:none;
@@ -231,7 +251,7 @@ body,html{margin:0;padding:0;}
 }
 
 
-@media only screen and (min-width: 256vh) {
+@media only screen and (min-width: 2560px) {
 	
 .parallax::after {
 	background-size: 100%;
@@ -272,7 +292,8 @@ table
     border-collapse: collapse;
 }
 #ContactUs input
-{	width:60vh;
+{	
+	width:60vh;
     background-color: #5C5C5C;
 	color:white;
 	
@@ -285,6 +306,32 @@ table
 	color:white;
 	height:30vh;
 }
+
+@media only screen and (max-width: 1000px) {
+
+#ContactUs input
+{	
+	width:50vh;	
+	height:4vh;
+	font-size:2.2em;
+	text-align:center;
+	color:gray;
+}
+
+
+#contact_message
+{
+	width:50vh;
+	color:gray;
+	text-align:center;
+}
+#contact-submit
+{
+	font-size:2.2em;
+}
+
+}
+
 #About
 {}
 .AboutLink{}
