@@ -219,13 +219,15 @@ body,html{margin:0;padding:0;}
 
 	
 @media all and (max-width: 1000px) {
-	#DesktopServices
+
+	.DesktopServices
 	{
 		display:none;
 	}
 }
 
 @media all and (min-width: 1000px) {
+	
 	#MobileServices
 	{
 		display:none;
@@ -235,7 +237,6 @@ body,html{margin:0;padding:0;}
 
 /* Static divider */
 .static {
-  background: #424242;
   min-height:80vh;
 }
 
@@ -244,9 +245,8 @@ body,html{margin:0;padding:0;}
 /* Sets the background image for parallax effect */
 .bg1::after {
   background-image: url('../images/nonwireframe.jpg');
+  height:200vh;
 }
-
-
 
 
 .fixedwrapper
@@ -289,13 +289,18 @@ table
 	{
 		display:none;
 	}
+	.bg1 img
+	{
+		display:none;
+	}
 }
+table, th, td {
+    border: none;
+}
+
 
 @media all and (max-width: 1000px) {
 
-table, th, td {
-    border: 0px solid black;
-}
 	#contact_form
 	{
 		width:150vh;
@@ -351,20 +356,23 @@ table, th, td {
 		#About
 		{ 
 			min-height:110vh;
+			background:#424242;
 		}
 		#Services
 		{
 			min-height:100%;
+			background: #424242;
 		}
 		h1
 		{
-			font-size: 100px;
+			font-size: 90px;
 		}
 		#About h3
 		{
 			font-size: 40px;
 			width:80%;
 		}
+		
 	}
 	 
 	@media all and (orientation: landscape) 
@@ -373,11 +381,13 @@ table, th, td {
 		{ 
 			height:100%;
 			min-height:110vh;
-
+			background-size: 100vw 110vh;
+			background-image: url('../images/test.png');
 		}
 		#Services
 		{
 			height:100%;
+			background: #424242;
 		}
 		h1
 		{
@@ -388,9 +398,21 @@ table, th, td {
 			font-size: 24px;
 			width:80%;
 		}
+
 	}
-#About
-{}
+
+		.bg1 img
+		{
+			width:90vw;
+			height:auto;
+		}
+#About h3
+{
+	width:70%;
+}
 .AboutLink{}
 
-
+.vl {
+    border-left: 2px solid #F68A20;
+    height: 70vh;
+}
