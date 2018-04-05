@@ -4,10 +4,14 @@ body
 {
 	margin:0;padding:0;
 	background-color:#424242;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 html
 {
 	//overflow-y: scroll;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 h1,h2,h3,h4
 {
@@ -217,10 +221,34 @@ body,html{margin:0;padding:0;}
   z-index: -1;
 }
 
+.parallax2::after {
+  /* Display and position the pseudo-element */
+  content: " ";
+  position: absolute;
+  box-sizing:border-box;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  /* Move the pseudo-element back away from the camera,
+   * then scale it back up to fill the viewport.
+   * Because the pseudo-element is further away, it appears to move more slowly, like in real life. */
+  transform: translateZ(-1.5px) scale(1.75);
+  /* Force the background image to fill the whole element. */
+		background-size:cover;
+		background-position:center;
+  /* Keep the image from overlapping sibling elements. */ 
+  z-index: -2;
+}
+
 	
 @media all and (max-width: 1000px) {
 
 	.DesktopServices
+	{
+		display:none;
+	}
+	#DesktopForeground
 	{
 		display:none;
 	}
@@ -229,6 +257,10 @@ body,html{margin:0;padding:0;}
 @media all and (min-width: 1000px) {
 	
 	#MobileServices
+	{
+		display:none;
+	}
+	#MobileForeground
 	{
 		display:none;
 	}
@@ -244,7 +276,12 @@ body,html{margin:0;padding:0;}
 
 /* Sets the background image for parallax effect */
 .bg1::after {
-  background-image: url('../images/nonwireframe.jpg');
+  background-image: url('../images/foreground.png');
+  height:200vh;
+}
+
+.bg2::after {
+  background-image: url('../images/background.jpg');
   height:200vh;
 }
 
@@ -289,10 +326,7 @@ table
 	{
 		display:none;
 	}
-	.bg1 img
-	{
-		display:none;
-	}
+
 }
 table, th, td {
     border: none;
@@ -401,11 +435,16 @@ table, th, td {
 
 	}
 
-		.bg1 img
-		{
-			width:90vw;
-			height:auto;
-		}
+#MobileForeground img
+{
+	width:90vw;
+	height:auto;
+}
+#DesktopForeground img
+{
+	width:100vw;
+	height:auto;
+}
 #About h3
 {
 	width:70%;
