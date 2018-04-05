@@ -248,10 +248,6 @@ body,html{margin:0;padding:0;}
 	{
 		display:none;
 	}
-	#DesktopForeground
-	{
-		display:none;
-	}
 }
 
 @media all and (min-width: 1000px) {
@@ -389,7 +385,7 @@ table, th, td {
 	{
 		#About
 		{ 
-			min-height:110vh;
+			min-height:100vh;
 			background:#424242;
 		}
 		#Services
@@ -414,7 +410,7 @@ table, th, td {
 		#About
 		{ 
 			height:100%;
-			min-height:110vh;
+			min-height:100vh;
 			background-size: 100vw 110vh;
 			background-image: url('../images/test.png');
 		}
@@ -429,7 +425,7 @@ table, th, td {
 		}
 		#About h3
 		{
-			font-size: 24px;
+			font-size: 20px;
 			width:80%;
 		}
 
