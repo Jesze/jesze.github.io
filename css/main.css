@@ -428,6 +428,10 @@ table, th, td {
 			font-size: 20px;
 			width:80%;
 		}
+		#MobileSpacer
+		{
+			display:none;
+		}
 
 	}
 
