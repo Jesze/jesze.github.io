@@ -3,7 +3,7 @@
 body 
 {
 	margin:0;padding:0;
-	background-color:#424242;
+	background-color:#262525;
     max-width: 100%;
     overflow-x: hidden;
 }
@@ -43,7 +43,7 @@ h1,h2,h3,h4
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #5C5C5C;
+    background-color: #262525;
     top: 0;
     width: 100%;
 	z-index:0;
@@ -58,8 +58,8 @@ h1,h2,h3,h4
     list-style-type: none;
     margin: 0;
     padding: 0;
+    background-color: #424242;
     overflow: hidden;
-    background-color: #5C5C5C;
     width: 100%;
 	z-index:0;
 }
@@ -381,59 +381,59 @@ table, th, td {
 
 }
  
-	@media all and (orientation: portrait) 
+@media all and (orientation: portrait) 
+{
+	#About
+	{ 
+		min-height:100vh;
+		background:#262525;
+	}
+	#Services
 	{
-		#About
-		{ 
-			min-height:100vh;
-			background:#424242;
-		}
-		#Services
-		{
-			min-height:100%;
-			background: #424242;
-		}
-		h1
-		{
-			font-size: 90px;
-		}
-		#About h3
-		{
-			font-size: 40px;
-			width:80%;
-		}
+		min-height:100%;
+		background: #262525;
+	}
+	h1
+	{
+		font-size: 90px;
+	}
+	#About h3
+	{
+		font-size: 40px;
+		width:80%;
+	}
 		
-	}
+}
 	 
-	@media all and (orientation: landscape) 
-	{
-		#About
-		{ 
-			height:100%;
-			min-height:100vh;
-			background-size: 100vw 110vh;
-			background-image: url('../images/test.png');
-		}
-		#Services
-		{
-			height:100%;
-			background: #424242;
-		}
-		h1
-		{
-			font-size: 48px;
-		}
-		#About h3
-		{
-			font-size: 20px;
-			width:80%;
-		}
-		#MobileSpacer
-		{
-			display:none;
-		}
-
+@media all and (orientation: landscape) 
+{
+	#About
+	{ 
+		height:100%;
+		min-height:100vh;
+		background-size: 100vw 110vh;
+		background-image: url('../images/test.png');
 	}
+	#Services
+	{
+		height:100%;
+		background: #262525;
+	}
+	h1
+	{
+		font-size: 48px;
+	}
+	#About h3
+	{
+		font-size: 20px;
+		width:50%;
+	}
+	#MobileSpacer
+	{
+		display:none;
+	}
+
+}
 
 #MobileForeground img
 {
@@ -444,10 +444,6 @@ table, th, td {
 {
 	width:100vw;
 	height:auto;
-}
-#About h3
-{
-	width:70%;
 }
 .AboutLink{}
 
