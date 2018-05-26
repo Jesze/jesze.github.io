@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Simulacrum Interactive Press Kit -->
+
+<game>	
+	<title>Simulacrum Interactive</title>
+	<founding-date>September 1, 2017</founding-date>
+	<website>http://www.simulacruminteractive.ca</website>
+	<based-in>Lethbridge, Alberta</based-in>
+	
+	<press-contact>info@simulacruminteractive.ca</press-contact>
+	<phone>+1 403.393.0377</phone>
+
+	<socials>
+		<social>
+			<name>Facebook</name>
+			<link>https://www.facebook.com/simulacruminteractive</link>
+		</social>
+	</socials>
+
+	<description>	
+	 	From games to commercial applications, we make virtual reality content that you have to experience to believe.
+	</description>
+		
+	<histories>
+		<history>
+			<text>Through the grainy screen of the early Oculus Rift DK1 prototype, the two founders of Simulacrum Interactive, Allyson Cikor and Jesze Kaszas, found their love for virtual reality while studying at the University of Lethbridge. Eager to be a part of the exciting new wave of technology as content creators, it wasn't long after graduation that they began work on their first full release game for the HTC Vive while always dreaming up potential new possibilites. Naturally, what followed was the creation of a unique startup which would not only be a game development studio, but would use the skills and design ideas to create immersive VR experiences for commercial, experiemental, and creative applications. 
+			</text>
+		</history>
+	</histories>
+		
+	<trailers>
+		<trailer>
+			<youtube>CeDoKlk8jpE</youtube>
+		</trailer>
+		<trailer>
+			<name>Etherian</name>
+			<youtube>f1XcuUs06lQ</youtube>
+		</trailer>
+	</trailers>
+	
+	<press-can-request-copy>TRUE</press-can-request-copy> <!-- can be true or false -->
+	<monetization-permission>monetize</monetization-permission> <!-- can be: 	false (no video allowed),
+																			 	ask (permission on case-per-case basis),
+																			 	non-commercial (no monetization allowed),
+																			 	monetize (full permission) -->	
+	<additionals>
+		<additional>
+			<title>Etherian</title>
+			<description>SteamVR game for the HTC Vive</description>
+			<link>https://store.steampowered.com/app/836460/Etherian/</link>
+		</additional>
+	</additionals>
+	
+	<credits>
+		<credit>
+			<person>Allyson Cikor</person>
+			<role>Co-Founder</role>
+		</credit>
+		<credit>
+			<person>Jesze Kaszas</person>
+			<role>Co-Founder</role>
+		</credit>
+	</credits>
+	
+	<contacts>
+		<contact>
+			<name>Inquiries</name>
+			<mail>info@simulacruminteractive.ca</mail>
+		</contact>
+
+	</contacts>
+</game>
