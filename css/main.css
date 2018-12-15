@@ -414,6 +414,14 @@ table, th, td {
 		background-size: 100vw 110vh;
 		background-image: url('../images/test.png');
 	}
+	#XMAS
+	{
+		height:100%;
+		min-height:100vh;
+		background-size: 100vw 110vh;
+		background-image: url('../images/xmasfg.png');
+		
+	}
 	#Services
 	{
 		height:100%;
