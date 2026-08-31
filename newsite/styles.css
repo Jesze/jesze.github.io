@@ -1,0 +1,263 @@
+/* ---------------------------------------------------------
+   Simulacrum Interactive — responsive header shell
+   Step 1: five-piece frame with TWO independent stretch zones
+
+   This version avoids breakpoint "pops".
+   The frame height, padding, and right stretch width all change
+   continuously with viewport width.
+   --------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #474847;
+  color: #f0f0f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   Fixed header wrapper
+   ========================================================= */
+
+.site-header {
+  /*
+    These values now scale continuously instead of jumping at
+    media-query breakpoints.
+
+    frame-height:
+      76px minimum on narrow screens
+      grows with viewport width
+      120px maximum on large desktop
+
+    padding also eases continuously between mobile and desktop.
+  */
+  --frame-height: 120px;
+  --frame-pad-x: clamp(6px, 1vw, 14px);
+  --frame-pad-y: clamp(6px, 0.7vw, 10px);
+
+  /*
+    This is the important one.
+
+    The right stretch zone:
+      - is effectively 0px around ~420px viewport width
+      - grows continuously as the viewport gets wider
+      - tops out at 520px
+
+    Increase 0.58 to make it grow faster.
+    Decrease it to keep it more compressed for longer.
+    Change 420px to control when it reaches its fully-collapsed state.
+  */
+  --right-stretch-width:
+    clamp(0px, calc((100vw - 420px) * 0.33), 520px);
+
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  padding:
+    var(--frame-pad-y)
+    var(--frame-pad-x);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   Five-piece raster frame
+   ========================================================= */
+
+.banner-frame {
+  width: 100%;
+  height: var(--frame-height);
+
+  display: grid;
+  align-items: stretch;
+
+  /*
+    Piece order:
+
+    1. fixed left
+    2. flexible left stretch
+    3. fixed center diagonal
+    4. continuously-fluid right stretch
+    5. fixed right
+
+    Only the left stretch uses 1fr.
+    The right stretch gets an explicit fluid width based on 100vw,
+    which is what removes the abrupt media-query resize.
+  */
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto
+    minmax(0, var(--right-stretch-width))
+    auto;
+
+  overflow: visible;
+}
+
+
+/* All pieces share the same height. */
+
+.banner-piece {
+  min-width: 0;
+  height: 100%;
+}
+
+
+/* ---------------------------------------------------------
+   Fixed pieces
+
+   Because these use aspect-ratio and inherit the continuously
+   changing frame height, their widths also scale smoothly.
+   --------------------------------------------------------- */
+
+.banner-left {
+  aspect-ratio: 459 / 386;
+
+  background:
+    url("assets/header/banner-left.webp")
+    center / 100% 100%
+    no-repeat;
+}
+
+.banner-center {
+  aspect-ratio: 696 / 386;
+
+  background:
+    url("assets/header/banner-center.webp")
+    center / 100% 100%
+    no-repeat;
+
+  /*
+    One-pixel overlap helps prevent anti-aliased seams.
+  */
+  margin-left: -1px;
+  margin-right: -1px;
+}
+
+.banner-right {
+  aspect-ratio: 289 / 386;
+
+  background:
+    url("assets/header/banner-right.webp")
+    center / 100% 100%
+    no-repeat;
+}
+
+
+/* ---------------------------------------------------------
+   Left stretch zone
+
+   The source is only 33px wide, so it tiles horizontally.
+   It simply absorbs whatever width remains after all other
+   pieces have been laid out.
+   --------------------------------------------------------- */
+
+.banner-left-stretch {
+  background-image:
+    url("assets/header/banner-leftstretch.webp");
+
+  background-repeat: repeat-x;
+  background-position: left center;
+  background-size: auto 100%;
+
+  margin-left: -1px;
+}
+
+
+/* ---------------------------------------------------------
+   Right stretch zone
+
+   Its actual grid column width is controlled by
+   --right-stretch-width above, so it smoothly compresses
+   all the way toward zero as the viewport gets narrower.
+   --------------------------------------------------------- */
+
+.banner-right-stretch {
+  background-image:
+    url("assets/header/banner-rightstretch.webp");
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+
+  margin-right: -1px;
+
+  /*
+    Optional: this makes visual changes feel slightly softer during
+    manual browser resizing or scripted width changes.
+    The fluid vw calculation already removes breakpoint popping.
+  */
+  transition: opacity 180ms ease;
+}
+
+
+/* =========================================================
+   Foreground content layer
+   ========================================================= */
+
+.header-content {
+  position: absolute;
+  z-index: 1;
+
+  top: var(--frame-pad-y);
+  right: var(--frame-pad-x);
+  bottom: var(--frame-pad-y);
+  left: var(--frame-pad-x);
+
+  pointer-events: auto;
+}
+
+
+/* =========================================================
+   Temporary demo page content
+   ========================================================= */
+
+.page-demo {
+  padding-top:
+    calc(var(--frame-height) + (var(--frame-pad-y) * 2) + 42px);
+
+  padding-right: clamp(24px, 6vw, 100px);
+  padding-bottom: 80px;
+  padding-left: clamp(24px, 6vw, 100px);
+}
+
+.page-demo h1 {
+  margin-top: 0;
+}
+
+.spacer {
+  height: 1400px;
+}
+
+
+/* =========================================================
+   Very narrow safety behavior
+
+   This isn't a new visual state. It only prevents the demo
+   from overflowing at extremely small widths.
+
+   The right stretch has already reached ~0px before this point.
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .site-header {
+    --frame-height: 72px;
+    --frame-pad-x: 4px;
+    --frame-pad-y: 5px;
+  }
+}
