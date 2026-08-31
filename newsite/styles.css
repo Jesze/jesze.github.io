@@ -42,7 +42,7 @@ body {
 
     padding also eases continuously between mobile and desktop.
   */
-  --frame-height: 120px;
+  --frame-height: clamp(82px, calc(64px + 3.9vw), 120px);
   --frame-pad-x: clamp(6px, 1vw, 14px);
   --frame-pad-y: clamp(6px, 0.7vw, 10px);
 
