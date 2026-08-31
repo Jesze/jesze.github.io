@@ -117,16 +117,34 @@ body {
   height: 100%;
 }
 
+/*
+  Do not let the three fixed artwork slices shrink as grid items.
+  Their widths are explicitly calculated below.
+*/
+.banner-left,
+.banner-center,
+.banner-right {
+  flex-shrink: 0;
+}
+
 
 /* ---------------------------------------------------------
    Fixed pieces
 
-   Because these use aspect-ratio and inherit the continuously
-   changing frame height, their widths also scale smoothly.
+   IMPORTANT:
+   These widths are calculated explicitly from the fixed frame height.
+   This avoids relying on an auto grid column + aspect-ratio combination,
+   which can behave inconsistently on some mobile browsers.
+
+   At --frame-height: 120px these resolve to roughly:
+     left   = 143px
+     center = 216px
+     right  = 90px
    --------------------------------------------------------- */
 
 .banner-left {
-  aspect-ratio: 459 / 386;
+  width: calc(var(--frame-height) * 459 / 386);
+  height: var(--frame-height);
 
   background:
     url("assets/header/banner-left.webp")
@@ -135,7 +153,8 @@ body {
 }
 
 .banner-center {
-  aspect-ratio: 696 / 386;
+  width: calc(var(--frame-height) * 696 / 386);
+  height: var(--frame-height);
 
   background:
     url("assets/header/banner-center.webp")
@@ -150,7 +169,8 @@ body {
 }
 
 .banner-right {
-  aspect-ratio: 289 / 386;
+  width: calc(var(--frame-height) * 289 / 386);
+  height: var(--frame-height);
 
   background:
     url("assets/header/banner-right.webp")
@@ -248,15 +268,12 @@ body {
 /* =========================================================
    Very narrow safety behavior
 
-   This isn't a new visual state. It only prevents the demo
-   from overflowing at extremely small widths.
-
-   The right stretch has already reached ~0px before this point.
+   Keep the banner height fixed even on narrow screens.
+   Only the outer padding is reduced.
    ========================================================= */
 
 @media (max-width: 380px) {
   .site-header {
-    --frame-height: 72px;
     --frame-pad-x: 4px;
     --frame-pad-y: 5px;
   }
