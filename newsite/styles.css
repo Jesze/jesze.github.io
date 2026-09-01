@@ -45,6 +45,13 @@ body {
     clamp(46px, calc((100vw - 420px) * 0.33), 520px);
 
   /*
+    Horizontal alignment for the hamburger control.
+    Matching the nav's -20px offset keeps the hamburger aligned with
+    the collapsing icon-button group during the transition.
+  */
+  --menu-toggle-offset-x: -20px;
+
+  /*
     Button geometry:
     35px shear at 48px height ~= 0.73 ratio.
   */
@@ -53,6 +60,17 @@ body {
 
   --button-shear:
     calc(var(--button-height) * 0.73);
+
+  /*
+    Master diagonal angle.
+
+    This controls the nav buttons and hamburger directly.
+    header-menu.js also reads this same value and rebuilds the
+    mobile dropdown SVG shell corners so all diagonals stay matched.
+
+    More negative = stronger slant.
+  */
+  --button-shear-angle: -40deg;
 
   /*
     Minimum usable horizontal face width AFTER the diagonal cut.
@@ -88,23 +106,47 @@ body {
   --button-gradient-mid-intensity: 0.75;
   --button-gradient-bottom-intensity: 0.22;
 
-  --button-border-color: rgba(240, 240, 240, 0.92);
+  --button-border-color: rgba(240, 240, 240, 0.2);
 
   --button-hover-color: rgba(255, 114, 2, 0.25);
-  --button-hover-border-color: rgba(255, 210, 165, 0.98);
+  --button-hover-border-color: rgba(255, 210, 165, 0.4);
 
   /*
     Mobile menu visual controls.
   */
-  --mobile-menu-shell-color: rgba(28, 30, 32, 0.86);
-  --mobile-menu-shell-border-color: rgba(232, 236, 240, 0.78);
-  --mobile-menu-shell-inner-border-color: rgba(120, 126, 132, 0.34);
+
+  /*
+    Dropdown height controls.
+
+    --mobile-menu-base-height is the design's full-height reference.
+    --mobile-menu-height-scale compresses the overall menu vertically.
+
+    The menu container itself changes height, while JavaScript redraws
+    the SVG corner geometry in real rendered pixels so the corner cuts
+    do NOT get squashed with the box.
+
+      1    = 420px
+      0.8  = 336px
+      0.66 = 277.2px
+  */
+  --mobile-menu-base-height: 420px;
+  --mobile-menu-height-scale: 0.75;
+
+  --mobile-menu-height:
+    calc(
+      var(--mobile-menu-base-height)
+      * var(--mobile-menu-height-scale)
+    );
+
+  --mobile-menu-shell-color: rgba(28, 30, 32, 0.3);
+  --mobile-menu-shell-border-color: rgba(232, 236, 240, 0.2);
+  --mobile-menu-shell-inner-border-color: rgba(120, 126, 132, 0.3);
 
   --mobile-menu-accent-color: rgba(255, 114, 2, 0.95);
   --mobile-menu-accent-soft: rgba(255, 114, 2, 0.42);
 
-  --mobile-menu-link-color: rgba(38, 40, 42, 0.68);
-  --mobile-menu-link-border-color: rgba(236, 238, 240, 0.88);
+  --mobile-menu-link-color: rgba(38, 40, 42, 0.9);
+  --mobile-menu-link-border-color: rgba(236, 238, 240, 0.2);
 
   /*
     MERGE TRANSITION
@@ -350,7 +392,7 @@ body {
   transform-origin: right center;
 
   transition:
-    opacity 170ms ease,
+    opacity 280ms ease,
     transform 240ms ease;
 }
 
@@ -391,7 +433,7 @@ body {
   transition:
     padding 160ms ease,
     gap 160ms ease,
-    opacity 120ms ease,
+    opacity 280ms ease,
     transform 140ms ease;
 }
 
@@ -432,7 +474,7 @@ body {
 
   z-index: -1;
 
-  transform: skewX(-36.13deg);
+  transform: skewX(var(--button-shear-angle));
   transform-origin: center;
 
   border:
@@ -601,12 +643,12 @@ body {
     Keep the hidden version at full scale. That way the crossfade
     doesn't introduce a second size change at the swap point.
   */
-  transform: translateX(-15px) scale(1);
+  transform: translateX(var(--menu-toggle-offset-x)) scale(1);
 
   pointer-events: none;
 
   transition:
-    opacity 120ms ease,
+    opacity 280ms ease,
     transform 140ms ease;
 }
 
@@ -625,7 +667,7 @@ body {
 
   z-index: -1;
 
-  transform: skewX(-36.13deg);
+  transform: skewX(var(--button-shear-angle));
   transform-origin: center;
 
   border:
@@ -718,7 +760,7 @@ body {
       as the viewport narrows.
     */
     opacity: 1;
-    transform: translateX(-15px) scale(1);
+    transform: translateX(var(--menu-toggle-offset-x)) scale(1);
     pointer-events: auto;
   }
 }
@@ -770,6 +812,7 @@ body {
   right: 0;
 
   width: clamp(236px, 48vw, 330px);
+  height: var(--mobile-menu-height);
 
   padding: 0;
 
@@ -789,7 +832,7 @@ body {
   pointer-events: none;
 
   transition:
-    opacity 120ms ease,
+    opacity 280ms ease,
     transform 160ms ease;
 }
 
@@ -818,19 +861,19 @@ body {
 .mobile-menu-shell-path--outer {
   fill: var(--mobile-menu-shell-color);
   stroke: var(--mobile-menu-shell-border-color);
-  stroke-width: 1.5;
+  stroke-width: 3;
 }
 
 .mobile-menu-shell-path--inner {
   fill: none;
   stroke: var(--mobile-menu-shell-inner-border-color);
-  stroke-width: 1;
+  stroke-width: 2;
 }
 
 .mobile-menu-shell-accent {
   fill: none;
   stroke: var(--mobile-menu-accent-color);
-  stroke-width: 2;
+  stroke-width: 3;
 
   vector-effect: non-scaling-stroke;
   stroke-linecap: square;
@@ -867,15 +910,22 @@ body {
   position: relative;
   z-index: 1;
 
+  width: 100%;
+  height: 100%;
+
   padding:
-    clamp(34px, 5vw, 46px)
+    calc(clamp(34px, 5vw, 46px) * var(--mobile-menu-height-scale))
     clamp(22px, 4vw, 34px)
-    clamp(28px, 4vw, 38px);
+    calc(clamp(28px, 4vw, 38px) * var(--mobile-menu-height-scale));
 
   display: flex;
   flex-direction: column;
 
-  gap: clamp(10px, 1.8vw, 16px);
+  gap:
+    calc(
+      clamp(10px, 1.8vw, 16px)
+      * var(--mobile-menu-height-scale)
+    );
 }
 
 
@@ -887,7 +937,13 @@ body {
   position: relative;
   isolation: isolate;
 
-  min-height: clamp(50px, 8vw, 62px);
+  /*
+    All five items divide the available inner height evenly.
+    min-height: 0 is important: it allows them to shrink enough to
+    remain inside the frame even at smaller menu-height scales.
+  */
+  flex: 1 1 0;
+  min-height: 0;
 
   display: flex;
   align-items: center;
@@ -950,7 +1006,7 @@ body {
   top: 2px;
   right: 12%;
   bottom: 2px;
-  left: 42%;
+  left: 62%;
 
   background:
     linear-gradient(
@@ -959,7 +1015,7 @@ body {
       rgba(255,255,255,0)
     );
 
-  transform: skewX(-20deg);
+  transform: skewX(var(--button-shear-angle));
 
   pointer-events: none;
 }
@@ -1079,16 +1135,11 @@ body {
    ------------------------- */
 
 @media (max-width: 520px) {
-  .mobile-menu {
-    width: min(86vw, 310px);
-  }
-
-  .mobile-menu-links {
-    padding:
-      32px
-      22px
-      26px;
-  }
+  /*
+    Width continues to use the same smooth rule.
+    Vertical fitting is handled by --mobile-menu-height-scale and the
+    flex layout above, so no second height/padding system is needed here.
+  */
 }
 
 
