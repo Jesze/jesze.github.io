@@ -218,7 +218,7 @@ body {
   /*
     Crossfade speeds between the temporary SVG menu and the real menu.
   */
-  --menu-morph-real-menu-fade-duration: 350ms;
+  --menu-morph-real-menu-fade-duration: 850ms;
   --menu-morph-fake-menu-fade-duration: 850ms;
 
   /*
@@ -835,6 +835,56 @@ body {
     opacity: 1;
     transform: translateX(var(--menu-toggle-offset-x)) scale(1);
     pointer-events: auto;
+  }
+}
+
+
+/* =========================================================
+   Uniform header scaling below 485px
+   ========================================================= */
+
+/*
+  485px is the minimum designed width of the header.
+
+  Below this point the internal layout stops adapting. We freeze the
+  composition at its 485px state, then uniformly scale the complete
+  header — frame, logo, hamburger, dropdown and all — to the viewport.
+*/
+@media (max-width: 485px) {
+  .site-header {
+    /*
+      Freeze responsive values at their 485px results.
+    */
+    --frame-height: 82.915px;
+    --frame-pad-x: 6px;
+    --frame-pad-y: 6px;
+    --right-stretch-width: 46px;
+    --button-spacing: 0px;
+
+    /*
+      Layout stays 485px wide; rendering scales uniformly.
+    */
+    width: 485px;
+
+    transform:
+      scale(calc(100vw / 485px));
+
+    transform-origin: top left;
+  }
+
+  /*
+    This normally contains a vw term, so freeze it at the value it has
+    at the 485px breakpoint.
+  */
+  .menu-toggle {
+    width: 100.78px;
+  }
+
+  /*
+    The dropdown has already reached its minimum width by 485px.
+  */
+  .mobile-menu {
+    width: 236px;
   }
 }
 

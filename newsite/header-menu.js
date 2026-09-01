@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pointerEvents: "none",
       visibility: "hidden",
       opacity: "0",
-      zIndex: "-1"
+      zIndex: "999"
     }
   );
 
@@ -98,7 +98,14 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
 
-  headerContent.appendChild(
+  /*
+    Keep the temporary morph SVG at document level.
+
+    Below 485px .site-header is uniformly transformed. A fixed SVG
+    inside that transformed ancestor would inherit the scale and would
+    effectively scale viewport-coordinate geometry twice.
+  */
+  document.body.appendChild(
     menuMorph
   );
 
@@ -1057,31 +1064,66 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    /*
+      offset* values are pre-transform layout coordinates.
+      getBoundingClientRect() is post-transform screen coordinates.
+
+      Below 485px the complete header is uniformly scaled, so convert
+      the menu's layout offsets and size by the offset parent's rendered
+      scale before using them as viewport SVG coordinates.
+    */
     const parentRect =
       offsetParent.getBoundingClientRect();
 
 
+    const layoutWidth =
+      offsetParent.offsetWidth;
+
+
+    const layoutHeight =
+      offsetParent.offsetHeight;
+
+
+    const scaleX =
+      layoutWidth > 0
+        ? parentRect.width /
+          layoutWidth
+        : 1;
+
+
+    const scaleY =
+      layoutHeight > 0
+        ? parentRect.height /
+          layoutHeight
+        : scaleX;
+
+
     const left =
       parentRect.left +
-      mobileMenu.offsetLeft;
+      mobileMenu.offsetLeft *
+      scaleX;
 
 
     const top =
       parentRect.top +
-      mobileMenu.offsetTop;
+      mobileMenu.offsetTop *
+      scaleY;
 
 
     const width =
-      mobileMenu.offsetWidth;
+      mobileMenu.offsetWidth *
+      scaleX;
 
 
     const height =
-      mobileMenu.offsetHeight;
+      mobileMenu.offsetHeight *
+      scaleY;
 
 
     return {
       left,
       top,
+
       right:
         left + width,
 
