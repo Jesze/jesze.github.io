@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pointerEvents: "none",
       visibility: "hidden",
       opacity: "0",
-      zIndex: "999"
+      zIndex: "1001"
     }
   );
 
