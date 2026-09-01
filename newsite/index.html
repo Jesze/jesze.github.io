@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 
-<body> 
+<body>
 
 <header class="site-header">
 
@@ -22,7 +22,11 @@
   <div class="header-content">
 
     <a class="brand" href="#">
-      <img class="brand-logo" src="assets/header/simulacrum-logo.png" alt="Simulacrum Interactive">
+      <img
+        class="brand-logo"
+        src="assets/header/simulacrum-logo.png"
+        alt="Simulacrum Interactive"
+      >
     </a>
 
     <nav class="main-nav" aria-label="Main navigation">
@@ -52,9 +56,313 @@
       </a>
     </nav>
 
-    <button class="menu-toggle" type="button" aria-label="Open menu">
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
       <span class="menu-toggle-lines" aria-hidden="true"></span>
     </button>
+
+    <nav
+      class="mobile-menu"
+      id="mobile-menu"
+      aria-label="Mobile navigation"
+    >
+      <svg
+        class="mobile-menu-shell"
+        viewBox="0 0 320 420"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          class="mobile-menu-shell-path mobile-menu-shell-path--outer"
+          d="
+            M 28 1
+            H 319
+            V 389
+            L 287 419
+            H 1
+            V 29
+            Z
+          "
+        />
+
+        <path
+          class="mobile-menu-shell-path mobile-menu-shell-path--inner"
+          d="
+            M 36 11
+            H 309
+            V 383
+            L 281 409
+            H 11
+            V 35
+            Z
+          "
+        />
+
+        <path
+          class="mobile-menu-shell-accent mobile-menu-shell-accent--top"
+          d="M 35 11 H 132"
+        />
+
+        <path
+          class="mobile-menu-shell-accent mobile-menu-shell-accent--bottom"
+          d="M 11 408 H 122"
+        />
+
+        <path
+          class="mobile-menu-shell-accent mobile-menu-shell-accent--corner"
+          d="M 282 408 L 309 382"
+        />
+      </svg>
+
+      <div class="mobile-menu-links">
+
+        <a class="mobile-menu-link" href="#about">
+          <svg
+            class="mobile-menu-link-shell"
+            viewBox="0 0 280 62"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              class="mobile-menu-link-shell-path"
+              d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "
+            />
+          </svg>
+
+          <span class="mobile-menu-link-motif" aria-hidden="true">
+            <svg viewBox="0 0 34 30">
+              <circle cx="17" cy="4" r="1.5" />
+
+              <circle cx="13" cy="9" r="1.5" />
+              <circle cx="21" cy="9" r="1.5" />
+
+              <circle cx="9" cy="14" r="1.5" />
+              <circle cx="17" cy="14" r="1.5" />
+              <circle cx="25" cy="14" r="1.5" />
+
+              <circle cx="5" cy="19" r="1.5" />
+              <circle cx="13" cy="19" r="1.5" />
+              <circle cx="21" cy="19" r="1.5" />
+              <circle cx="29" cy="19" r="1.5" />
+
+              <circle cx="1.5" cy="24" r="1.5" />
+              <circle cx="9" cy="24" r="1.5" />
+              <circle cx="17" cy="24" r="1.5" />
+              <circle cx="25" cy="24" r="1.5" />
+              <circle cx="32.5" cy="24" r="1.5" />
+            </svg>
+          </span>
+
+          <span class="mobile-menu-link-text">About</span>
+        </a>
+
+        <a class="mobile-menu-link" href="#brobots">
+          <svg
+            class="mobile-menu-link-shell"
+            viewBox="0 0 280 62"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              class="mobile-menu-link-shell-path"
+              d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "
+            />
+          </svg>
+
+          <span class="mobile-menu-link-text">Brobots</span>
+
+          <span class="mobile-menu-link-motif" aria-hidden="true">
+            <svg viewBox="0 0 34 30">
+              <circle cx="17" cy="4" r="1.5" />
+
+              <circle cx="13" cy="9" r="1.5" />
+              <circle cx="21" cy="9" r="1.5" />
+
+              <circle cx="9" cy="14" r="1.5" />
+              <circle cx="17" cy="14" r="1.5" />
+              <circle cx="25" cy="14" r="1.5" />
+
+              <circle cx="5" cy="19" r="1.5" />
+              <circle cx="13" cy="19" r="1.5" />
+              <circle cx="21" cy="19" r="1.5" />
+              <circle cx="29" cy="19" r="1.5" />
+
+              <circle cx="1.5" cy="24" r="1.5" />
+              <circle cx="9" cy="24" r="1.5" />
+              <circle cx="17" cy="24" r="1.5" />
+              <circle cx="25" cy="24" r="1.5" />
+              <circle cx="32.5" cy="24" r="1.5" />
+            </svg>
+          </span>
+        </a>
+
+        <a class="mobile-menu-link" href="#etherian">
+          <svg
+            class="mobile-menu-link-shell"
+            viewBox="0 0 280 62"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              class="mobile-menu-link-shell-path"
+              d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "
+            />
+          </svg>
+
+          <span class="mobile-menu-link-text">Etherian</span>
+
+          <span class="mobile-menu-link-motif" aria-hidden="true">
+            <svg viewBox="0 0 34 30">
+              <circle cx="17" cy="4" r="1.5" />
+
+              <circle cx="13" cy="9" r="1.5" />
+              <circle cx="21" cy="9" r="1.5" />
+
+              <circle cx="9" cy="14" r="1.5" />
+              <circle cx="17" cy="14" r="1.5" />
+              <circle cx="25" cy="14" r="1.5" />
+
+              <circle cx="5" cy="19" r="1.5" />
+              <circle cx="13" cy="19" r="1.5" />
+              <circle cx="21" cy="19" r="1.5" />
+              <circle cx="29" cy="19" r="1.5" />
+
+              <circle cx="1.5" cy="24" r="1.5" />
+              <circle cx="9" cy="24" r="1.5" />
+              <circle cx="17" cy="24" r="1.5" />
+              <circle cx="25" cy="24" r="1.5" />
+              <circle cx="32.5" cy="24" r="1.5" />
+            </svg>
+          </span>
+        </a>
+
+        <a class="mobile-menu-link" href="#halodoom">
+          <svg
+            class="mobile-menu-link-shell"
+            viewBox="0 0 280 62"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              class="mobile-menu-link-shell-path"
+              d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "
+            />
+          </svg>
+
+          <span class="mobile-menu-link-text">Halodoom</span>
+
+          <span class="mobile-menu-link-motif" aria-hidden="true">
+            <svg viewBox="0 0 34 30">
+              <circle cx="17" cy="4" r="1.5" />
+
+              <circle cx="13" cy="9" r="1.5" />
+              <circle cx="21" cy="9" r="1.5" />
+
+              <circle cx="9" cy="14" r="1.5" />
+              <circle cx="17" cy="14" r="1.5" />
+              <circle cx="25" cy="14" r="1.5" />
+
+              <circle cx="5" cy="19" r="1.5" />
+              <circle cx="13" cy="19" r="1.5" />
+              <circle cx="21" cy="19" r="1.5" />
+              <circle cx="29" cy="19" r="1.5" />
+
+              <circle cx="1.5" cy="24" r="1.5" />
+              <circle cx="9" cy="24" r="1.5" />
+              <circle cx="17" cy="24" r="1.5" />
+              <circle cx="25" cy="24" r="1.5" />
+              <circle cx="32.5" cy="24" r="1.5" />
+            </svg>
+          </span>
+        </a>
+
+        <a class="mobile-menu-link" href="#contact">
+          <svg
+            class="mobile-menu-link-shell"
+            viewBox="0 0 280 62"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              class="mobile-menu-link-shell-path"
+              d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "
+            />
+          </svg>
+
+          <span class="mobile-menu-link-text">Contact</span>
+
+          <span class="mobile-menu-link-motif" aria-hidden="true">
+            <svg viewBox="0 0 34 30">
+              <circle cx="17" cy="4" r="1.5" />
+
+              <circle cx="13" cy="9" r="1.5" />
+              <circle cx="21" cy="9" r="1.5" />
+
+              <circle cx="9" cy="14" r="1.5" />
+              <circle cx="17" cy="14" r="1.5" />
+              <circle cx="25" cy="14" r="1.5" />
+
+              <circle cx="5" cy="19" r="1.5" />
+              <circle cx="13" cy="19" r="1.5" />
+              <circle cx="21" cy="19" r="1.5" />
+              <circle cx="29" cy="19" r="1.5" />
+
+              <circle cx="1.5" cy="24" r="1.5" />
+              <circle cx="9" cy="24" r="1.5" />
+              <circle cx="17" cy="24" r="1.5" />
+              <circle cx="25" cy="24" r="1.5" />
+              <circle cx="32.5" cy="24" r="1.5" />
+            </svg>
+          </span>
+        </a>
+
+      </div>
+    </nav>
 
   </div>
 
@@ -62,5 +370,8 @@
 
 <main class="page-demo">
 </main>
+
+<script src="header-menu.js"></script>
+
 </body>
 </html>
