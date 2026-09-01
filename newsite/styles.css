@@ -1,10 +1,9 @@
 /* ---------------------------------------------------------
    Simulacrum Interactive — responsive header shell
-   Step 1: five-piece frame with TWO independent stretch zones
 
-   This version avoids breakpoint "pops".
-   The frame height, padding, and right stretch width all change
-   continuously with viewport width.
+   This pass fixes the foreground layout so the logo, nav row,
+   and hamburger all occupy ONE grid row and stay attached to
+   the intended frame regions.
    --------------------------------------------------------- */
 
 *,
@@ -31,35 +30,17 @@ body {
    ========================================================= */
 
 .site-header {
-  /*
-    These values now scale continuously instead of jumping at
-    media-query breakpoints.
-
-    frame-height:
-      76px minimum on narrow screens
-      grows with viewport width
-      120px maximum on large desktop
-
-    padding also eases continuously between mobile and desktop.
-  */
   --frame-height: clamp(82px, calc(64px + 3.9vw), 120px);
   --frame-pad-x: clamp(6px, 1vw, 14px);
   --frame-pad-y: clamp(6px, 0.7vw, 10px);
 
   /*
-    This is the important one.
-
-    The right stretch zone:
-      - is effectively 0px around ~420px viewport width
-      - grows continuously as the viewport gets wider
-      - tops out at 520px
-
-    Increase 0.58 to make it grow faster.
-    Decrease it to keep it more compressed for longer.
-    Change 420px to control when it reaches its fully-collapsed state.
+    Now that the mobile state needs to contain a hamburger,
+    leave a small minimum amount of right-stretch space instead
+    of allowing it to collapse literally to zero.
   */
   --right-stretch-width:
-    clamp(0px, calc((100vw - 420px) * 0.33), 520px);
+    clamp(46px, calc((100vw - 420px) * 0.33), 520px);
 
   position: fixed;
   z-index: 1000;
@@ -67,6 +48,7 @@ body {
   left: 0;
 
   width: 100%;
+
   padding:
     var(--frame-pad-y)
     var(--frame-pad-x);
@@ -86,61 +68,25 @@ body {
   display: grid;
   align-items: stretch;
 
-  /*
-    Piece order:
-
-    1. fixed left
-    2. flexible left stretch
-    3. fixed center diagonal
-    4. continuously-fluid right stretch
-    5. fixed right
-
-    Only the left stretch uses 1fr.
-    The right stretch gets an explicit fluid width based on 100vw,
-    which is what removes the abrupt media-query resize.
-  */
   grid-template-columns:
-    auto
+    calc(var(--frame-height) * 459 / 386)
     minmax(0, 1fr)
-    auto
+    calc(var(--frame-height) * 696 / 386)
     minmax(0, var(--right-stretch-width))
-    auto;
+    calc(var(--frame-height) * 289 / 386);
 
   overflow: visible;
 }
-
-
-/* All pieces share the same height. */
 
 .banner-piece {
   min-width: 0;
   height: 100%;
 }
 
-/*
-  Do not let the three fixed artwork slices shrink as grid items.
-  Their widths are explicitly calculated below.
-*/
-.banner-left,
-.banner-center,
-.banner-right {
-  flex-shrink: 0;
-}
 
-
-/* ---------------------------------------------------------
-   Fixed pieces
-
-   IMPORTANT:
-   These widths are calculated explicitly from the fixed frame height.
-   This avoids relying on an auto grid column + aspect-ratio combination,
-   which can behave inconsistently on some mobile browsers.
-
-   At --frame-height: 120px these resolve to roughly:
-     left   = 143px
-     center = 216px
-     right  = 90px
-   --------------------------------------------------------- */
+/* =========================================================
+   Fixed raster pieces
+   ========================================================= */
 
 .banner-left {
   width: calc(var(--frame-height) * 459 / 386);
@@ -160,12 +106,6 @@ body {
     url("assets/header/banner-center.webp")
     center / 100% 100%
     no-repeat;
-
-  /*
-    One-pixel overlap helps prevent anti-aliased seams.
-  */
-  margin-left: -1px;
-  margin-right: -1px;
 }
 
 .banner-right {
@@ -179,13 +119,9 @@ body {
 }
 
 
-/* ---------------------------------------------------------
-   Left stretch zone
-
-   The source is only 33px wide, so it tiles horizontally.
-   It simply absorbs whatever width remains after all other
-   pieces have been laid out.
-   --------------------------------------------------------- */
+/* =========================================================
+   Stretch zones
+   ========================================================= */
 
 .banner-left-stretch {
   background-image:
@@ -198,15 +134,6 @@ body {
   margin-left: -1px;
 }
 
-
-/* ---------------------------------------------------------
-   Right stretch zone
-
-   Its actual grid column width is controlled by
-   --right-stretch-width above, so it smoothly compresses
-   all the way toward zero as the viewport gets narrower.
-   --------------------------------------------------------- */
-
 .banner-right-stretch {
   background-image:
     url("assets/header/banner-rightstretch.webp");
@@ -216,13 +143,6 @@ body {
   background-size: 100% 100%;
 
   margin-right: -1px;
-
-  /*
-    Optional: this makes visual changes feel slightly softer during
-    manual browser resizing or scripted width changes.
-    The fluid vw calculation already removes breakpoint popping.
-  */
-  transition: opacity 180ms ease;
 }
 
 
@@ -239,12 +159,407 @@ body {
   bottom: var(--frame-pad-y);
   left: var(--frame-pad-x);
 
+  display: grid;
+
+  /*
+    CRITICAL FIX:
+    Force all foreground elements into one single row.
+    Previously the nav and menu-toggle could create implicit
+    extra grid rows, which changed the brand's available height
+    and made the logo jump when those elements were added.
+  */
+  grid-template-rows: 1fr;
+
+  grid-template-columns:
+    calc(var(--frame-height) * 459 / 386)
+    minmax(0, 1fr)
+    calc(var(--frame-height) * 696 / 386)
+    minmax(0, var(--right-stretch-width))
+    calc(var(--frame-height) * 289 / 386);
+
+  align-items: center;
+
   pointer-events: auto;
 }
 
 
 /* =========================================================
-   Temporary demo page content
+   Brand / logo
+   ========================================================= */
+
+.brand {
+  grid-column: 1 / 3;
+  grid-row: 1;
+
+  align-self: stretch;
+  justify-self: stretch;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  padding-left:
+    clamp(65px, calc(var(--frame-height) * 0.32), 80px);
+
+  padding-right: 12px;
+  padding-bottom: 8px;
+
+  min-width: 0;
+  overflow: visible;
+
+  text-decoration: none;
+}
+
+.brand-logo {
+  display: block;
+
+  /*
+    Scales exactly with the frame height and keeps its own
+    natural width/height ratio.
+  */
+  height: calc(var(--frame-height) * 0.72);
+  width: auto;
+
+  max-width: none;
+  max-height: none;
+
+  flex: none;
+
+  object-fit: contain;
+}
+
+
+/* =========================================================
+   Main navigation
+   ========================================================= */
+
+.main-nav {
+  /*
+    CRITICAL ALIGNMENT FIX:
+    Put the five-button strip ONLY inside the right-stretch
+    panel (column 4). Column 5 is the decorative triangular
+    end-cap and should not be treated as button space.
+  */
+
+  grid-column: 4;
+  grid-row: 1;
+
+  align-self: stretch;
+  justify-self: stretch;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding-top: 0;
+  padding-bottom: 0;
+
+  padding-left: 0px;
+  padding-right: clamp(4px, calc(var(--frame-height) * 0.055), 7px);
+
+  gap: clamp(3px, 0.35vw, 7px);
+
+  min-width: 0;
+  overflow: hidden;
+
+  opacity: 1;
+  transform: translateX(-20px) scale(1);
+  transform-origin: right center;
+
+  transition:
+    opacity 170ms ease,
+    transform 240ms ease;
+
+
+}
+
+
+/* =========================================================
+   Sheared nav buttons
+   ========================================================= */
+
+.nav-button {
+  position: relative;
+  isolation: isolate;
+
+  /*
+    Five equal buttons across whatever width column 4 currently has.
+  */
+  flex: 1 1 0;
+
+  min-width: 0;
+  max-width: none;
+
+  height:
+    clamp(34px, calc(var(--frame-height) * 0.44), 48px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: clamp(4px, 0.35vw, 7px);
+
+  padding-inline: clamp(5px, 0.55vw, 10px);
+
+  color: #f0f0f0;
+  text-decoration: none;
+
+  font-size: clamp(10px, 0.68vw, 14px);
+  line-height: 1;
+  white-space: nowrap;
+
+  transition:
+    width 280ms ease,
+    flex-basis 280ms ease,
+    max-width 280ms ease,
+    padding 280ms ease,
+    gap 280ms ease,
+    opacity 180ms ease,
+    transform 240ms ease;
+}
+
+.nav-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.11),
+      rgba(0,0,0,0.17) 38%,
+      rgba(0,0,0,0.42)
+    );
+
+  /*
+    Use an inset outline instead of CSS border here.
+    A normal border is clipped somewhat awkwardly by clip-path.
+  */
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 240, 240, 0.62);
+
+  clip-path: polygon(
+    11% 0,
+    100% 0,
+    89% 100%,
+    0 100%
+  );
+
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.nav-button:hover::before,
+.nav-button:focus-visible::before {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.17),
+      rgba(255,114,2,0.10) 42%,
+      rgba(0,0,0,0.46)
+    );
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 180, 110, 0.95);
+}
+
+.nav-button:focus-visible {
+  outline: 2px solid rgba(255, 114, 2, 0.9);
+  outline-offset: 2px;
+}
+
+
+/* Placeholder symbols until final icons are created. */
+
+.nav-icon {
+  flex: 0 0 auto;
+
+  width: 1em;
+  height: 1em;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 0.9em;
+  line-height: 1;
+}
+
+.nav-label {
+  display: inline-block;
+
+  max-width: 90px;
+  opacity: 1;
+
+  overflow: hidden;
+  white-space: nowrap;
+
+  transition:
+    max-width 280ms ease,
+    opacity 170ms ease,
+    margin 280ms ease;
+}
+
+
+/* =========================================================
+   Compact state
+   ========================================================= */
+
+/*
+  At this size the SAME five controls remain, but text collapses
+  smoothly and the available panel is divided into icon buttons.
+*/
+@media (max-width: 1400px) {
+  .main-nav {
+    gap: clamp(2px, 0.3vw, 5px);
+  }
+
+  .nav-button {
+    padding-inline: 4px;
+    gap: 0;
+  }
+
+  .nav-label {
+    max-width: 0;
+    opacity: 0;
+    margin: 0;
+  }
+
+  .nav-icon {
+    font-size: 1em;
+  }
+}
+
+
+/* =========================================================
+   Mobile hamburger
+   ========================================================= */
+
+.menu-toggle {
+  /*
+    Same row as everything else.
+    It occupies the right-stretch panel rather than creating
+    another grid row below the header.
+  */
+  grid-column: 4;
+  grid-row: 1;
+
+  justify-self: center;
+  align-self: center;
+
+  position: relative;
+  isolation: isolate;
+
+  width:
+    min(
+      54px,
+      calc(var(--right-stretch-width) - 6px)
+    );
+
+  min-width: 38px;
+
+  height:
+    clamp(34px, calc(var(--frame-height) * 0.44), 46px);
+
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  background: transparent;
+  color: #f0f0f0;
+
+  opacity: 0;
+  transform: translateX(-20px) scale(0.78);
+
+  pointer-events: none;
+
+  transition:
+    opacity 180ms ease,
+    transform 240ms ease;
+}
+
+.menu-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.11),
+      rgba(0,0,0,0.18) 38%,
+      rgba(0,0,0,0.43)
+    );
+
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 240, 240, 0.62);
+
+  clip-path: polygon(
+    14% 0,
+    100% 0,
+    86% 100%,
+    0 100%
+  );
+}
+
+.menu-toggle-lines,
+.menu-toggle-lines::before,
+.menu-toggle-lines::after {
+  display: block;
+
+  width: 18px;
+  height: 2px;
+
+  background: currentColor;
+
+  content: "";
+}
+
+.menu-toggle-lines {
+  position: relative;
+}
+
+.menu-toggle-lines::before {
+  position: absolute;
+  top: -6px;
+  left: 0;
+}
+
+.menu-toggle-lines::after {
+  position: absolute;
+  top: 6px;
+  left: 0;
+}
+
+
+/*
+  The five icon buttons fade into a single hamburger before the
+  right-stretch panel becomes too narrow to hold all five.
+*/
+@media (max-width: 760px) {
+  .main-nav {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.82);
+    pointer-events: none;
+  }
+
+  .menu-toggle {
+    opacity: 1;
+    transform: translateX(-15px) scale(1);
+    pointer-events: auto;
+  }
+}
+
+
+/* =========================================================
+   Temporary demo page
    ========================================================= */
 
 .page-demo {
@@ -256,20 +571,9 @@ body {
   padding-left: clamp(24px, 6vw, 100px);
 }
 
-.page-demo h1 {
-  margin-top: 0;
-}
-
-.spacer {
-  height: 1400px;
-}
-
 
 /* =========================================================
    Very narrow safety behavior
-
-   Keep the banner height fixed even on narrow screens.
-   Only the outer padding is reduced.
    ========================================================= */
 
 @media (max-width: 380px) {
