@@ -149,6 +149,79 @@ body {
   --mobile-menu-link-border-color: rgba(236, 238, 240, 0.2);
 
   /*
+    Mobile menu animation controls.
+
+    These are read by header-menu.js so the animation can be tuned
+    from CSS without editing the JavaScript.
+  */
+
+  /*
+    Overall open / close timing.
+  */
+  --menu-morph-duration: 1050ms;
+  --menu-morph-close-duration: 895ms;
+
+  /*
+    Neck extrusion distance, measured in hamburger-button heights.
+  */
+  --menu-morph-extension-multiplier: 1.5;
+
+  /*
+    Animation timeline positions.
+
+    Separate start/end values make it easy to create or remove delays.
+
+    Example:
+      neck ends at 13%
+      parallelogram starts at 16%
+
+    = 3% pause between those stages.
+  */
+  --menu-morph-neck-end: 13%;
+
+  --menu-morph-parallelogram-start: 13%;
+  --menu-morph-parallelogram-end: 27%;
+
+  --menu-morph-reshape-start: 27%;
+
+  /*
+    Stage easing.
+
+    Supported by header-menu.js:
+      linear
+      ease-in
+      ease-out
+      ease-in-out
+  */
+  --menu-morph-neck-ease: ease-out;
+  --menu-morph-parallelogram-ease: ease-in-out;
+  --menu-morph-reshape-ease: ease-out;
+
+  /*
+    Hamburger -> X timing, measured across the whole morph.
+  */
+  --menu-morph-icon-switch-at: 5%;
+  --menu-morph-close-icon-switch-at: 5%;
+
+  /*
+    Real-menu handoff.
+
+    80% means the real menu begins appearing during the final 20%
+    of the fake-menu animation.
+
+    Lower = earlier.
+    Higher = later.
+  */
+  --menu-morph-real-menu-reveal-at: 55%;
+  --menu-morph-fake-menu-fade-start: 45%;
+
+  /*
+    Crossfade speeds between the temporary SVG menu and the real menu.
+  */
+  --menu-morph-real-menu-fade-duration: 350ms;
+  --menu-morph-fake-menu-fade-duration: 850ms;
+
+  /*
     MERGE TRANSITION
 
     Normal spacing is 10px.
