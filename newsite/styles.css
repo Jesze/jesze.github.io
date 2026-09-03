@@ -89,7 +89,7 @@ body {
     frame around the video.
   */
   --background-video-frame-width:
-    clamp(8px, 0.9vw, 14px);
+    clamp(16px, 1.4vw, 24px);
 
   --background-video-frame-color:
     rgb(18, 20, 22);
@@ -106,10 +106,13 @@ body {
   background:
     var(--background-video-frame-color);
 
-  border:
-    var(--background-video-frame-width)
-    solid
-    var(--background-video-frame-color);
+  /*
+    Keep the OUTSIDE perfectly square to the viewport. The dark background
+    itself becomes the visible border, so there are no rounded outer corners
+    where the body/background can bleed through.
+  */
+  border: 0;
+  border-radius: 0;
 
   box-shadow:
     inset 0 0 10px rgba(0, 0, 0, 0.34);
@@ -118,12 +121,51 @@ body {
 
 .site-background-video {
   position: absolute;
-  inset: 0;
 
-  width: 100%;
-  height: 100%;
+  /*
+    Keep a modest opaque dark-grey margin around the video, but make the
+    video explicitly fill the remaining rectangle. Using width:auto /
+    height:auto here allowed the replaced video element to fall back toward
+    its intrinsic dimensions, which caused the huge empty area.
+  */
+  top:
+    var(--background-video-frame-width);
+
+  right:
+    var(--background-video-frame-width);
+
+  bottom:
+    var(--background-video-frame-width);
+
+  left:
+    var(--background-video-frame-width);
+
+  width:
+    calc(
+      100%
+      -
+      (var(--background-video-frame-width) * 2)
+    );
+
+  height:
+    calc(
+      100%
+      -
+      (var(--background-video-frame-width) * 2)
+    );
 
   object-fit: cover;
+
+  /*
+    Round ONLY the inner edge of the video opening.
+
+    The parent .site-background remains perfectly square to the viewport,
+    so the outside corners never expose the page background. This radius
+    only clips the video itself, letting the opaque dark-grey backing show
+    through in the tiny corner wedges underneath the decorative frame.
+  */
+  border-radius:
+    clamp(10px, 0.9vw, 16px);
 
   opacity: 0.62;
 
@@ -1371,7 +1413,15 @@ body {
       + var(--page-frame-shift-y)
     );
 
-  right: clamp(18px, 2vw, 30px);
+  /*
+    Tablet frame horizontal breathing room.
+    Increase/decrease this single value to move both sides inward.
+  */
+  --page-frame-side-padding:
+    clamp(28px, 3vw, 46px);
+
+  right:
+    var(--page-frame-side-padding);
 
   /*
     Increase the bottom clearance by the same amount the frame moves upward,
@@ -1383,7 +1433,8 @@ body {
       - var(--page-frame-shift-y)
     );
 
-  left: clamp(18px, 2vw, 30px);
+  left:
+    var(--page-frame-side-padding);
 
   /*
     The frame itself fades in. The center is genuinely transparent;
@@ -1994,12 +2045,19 @@ body {
       var(--desktop-page-height);
 
     /*
-      Center horizontally inside the left 50vw.
+      Center horizontally inside the left 50vw, then add a little extra
+      clearance from the viewport's left frame.
     */
+    --desktop-page-left-padding:
+      clamp(18px, 1.6vw, 30px);
+
     left:
       calc(
-        25vw -
+        25vw
+        -
         (var(--desktop-page-width) / 2)
+        +
+        var(--desktop-page-left-padding)
       );
 
     right: auto;
@@ -2200,12 +2258,20 @@ body {
     top:
       var(--secondary-panel-top-inset);
 
+    --desktop-popout-right-padding:
+      clamp(18px, 1.6vw, 30px);
+
     width:
       calc(
-        50vw -
+        50vw
+        -
         var(--desktop-page-gap)
         +
         var(--secondary-panel-overlap)
+        -
+        var(--desktop-page-left-padding)
+        -
+        var(--desktop-popout-right-padding)
       );
 
     bottom:
@@ -2505,12 +2571,20 @@ body {
   top:
     var(--secondary-panel-top-inset);
 
+  --desktop-popout-right-padding:
+    clamp(18px, 1.6vw, 30px);
+
   width:
     calc(
-      50vw -
+      50vw
+      -
       var(--desktop-page-gap)
       +
       var(--secondary-panel-overlap)
+      -
+      var(--desktop-page-left-padding, 0px)
+      -
+      var(--desktop-popout-right-padding)
     );
 
   bottom:
