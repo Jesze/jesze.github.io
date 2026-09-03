@@ -9,199 +9,6 @@
 */
 
 document.addEventListener("DOMContentLoaded", () => {
-
-  /* =======================================================
-     Decorative background video autoplay
-     ======================================================= */
-
-  const backgroundVideo =
-    document.querySelector(
-      ".site-background-video"
-    );
-
-
-  if (backgroundVideo) {
-    /*
-      iOS is stricter about the DOM property state than the HTML
-      attributes alone in some autoplay situations.
-    */
-    backgroundVideo.muted = true;
-    backgroundVideo.defaultMuted = true;
-    backgroundVideo.playsInline = true;
-
-
-    if (
-      "disablePictureInPicture" in
-      backgroundVideo
-    ) {
-      backgroundVideo.disablePictureInPicture =
-        true;
-    }
-
-
-    if (
-      "disableRemotePlayback" in
-      backgroundVideo
-    ) {
-      backgroundVideo.disableRemotePlayback =
-        true;
-    }
-
-
-    let backgroundVideoPlaying =
-      false;
-
-
-    const markBackgroundVideoPlaying = () => {
-      backgroundVideoPlaying =
-        true;
-
-      backgroundVideo.classList.remove(
-        "is-autoplay-blocked"
-      );
-    };
-
-
-    const markBackgroundVideoBlocked = () => {
-      if (
-        !backgroundVideoPlaying &&
-        backgroundVideo.paused
-      ) {
-        backgroundVideo.classList.add(
-          "is-autoplay-blocked"
-        );
-      }
-    };
-
-
-    const tryBackgroundVideoPlayback = () => {
-      /*
-        Keep these set immediately before play(). Safari can re-evaluate
-        autoplay eligibility after page restore / visibility changes.
-      */
-      backgroundVideo.muted = true;
-      backgroundVideo.defaultMuted = true;
-      backgroundVideo.playsInline = true;
-
-
-      const playAttempt =
-        backgroundVideo.play();
-
-
-      if (
-        playAttempt &&
-        typeof playAttempt.then ===
-          "function"
-      ) {
-        playAttempt
-          .then(() => {
-            markBackgroundVideoPlaying();
-          })
-          .catch(() => {
-            markBackgroundVideoBlocked();
-          });
-      }
-
-      else if (!backgroundVideo.paused) {
-        markBackgroundVideoPlaying();
-      }
-    };
-
-
-    backgroundVideo.addEventListener(
-      "playing",
-      markBackgroundVideoPlaying
-    );
-
-
-    backgroundVideo.addEventListener(
-      "pause",
-      markBackgroundVideoBlocked
-    );
-
-
-    /*
-      First attempt immediately. If iOS blocks it, the page continues
-      normally with the static background beneath the video.
-    */
-    tryBackgroundVideoPlayback();
-
-
-    /*
-      A normal user gesture unlocks media playback on iOS. Listen at the
-      document level so the user does not need to interact with the
-      decorative background itself.
-    */
-    const unlockBackgroundVideo = () => {
-      if (
-        backgroundVideoPlaying ||
-        !backgroundVideo.paused
-      ) {
-        return;
-      }
-
-
-      tryBackgroundVideoPlayback();
-    };
-
-
-    document.addEventListener(
-      "pointerdown",
-      unlockBackgroundVideo,
-      {
-        passive: true
-      }
-    );
-
-
-    document.addEventListener(
-      "touchstart",
-      unlockBackgroundVideo,
-      {
-        passive: true
-      }
-    );
-
-
-    document.addEventListener(
-      "click",
-      unlockBackgroundVideo,
-      {
-        passive: true
-      }
-    );
-
-
-    /*
-      Safari may suspend media when the tab/app backgrounds. Retry when
-      the page becomes visible again or is restored from the back/forward
-      cache.
-    */
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-        if (
-          document.visibilityState ===
-            "visible" &&
-          backgroundVideo.paused
-        ) {
-          tryBackgroundVideoPlayback();
-        }
-      }
-    );
-
-
-    window.addEventListener(
-      "pageshow",
-      () => {
-        if (backgroundVideo.paused) {
-          tryBackgroundVideoPlayback();
-        }
-      }
-    );
-  }
-
-
   const setActivePageButtonState = (
     name = null,
     preserveName = null
@@ -7851,6 +7658,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /*
+      Page switching now uses the SAME complete reverse animation as
+      clicking the currently-open page a second time.
+
+      The incoming page is still allowed to begin during the tail end of
+      this reverse, using the already-existing independent overlap path.
+    */
+    const styles =
+      getComputedStyle(
+        siteHeader
+      );
+
+
+    const overlapDuration =
+      nextPageName
+        ? Math.min(
+            duration,
+            Math.max(
+              0,
+              parseCssTime(
+                styles.getPropertyValue(
+                  "--page-switch-overlap"
+                ),
+                0
+              )
+            )
+          )
+        : 0;
+
+
+    const overlapStartRaw =
+      overlapDuration > 0
+        ? clamp(
+            1 -
+            (
+              overlapDuration /
+              Math.max(1, duration)
+            ),
+            0,
+            1
+          )
+        : 1;
+
+
+    cancelIncomingPageOverlap();
+
+
+    /*
       Bring the fake frame back at the exact current geometry so the real
       frame can crossfade into the reverse morph cleanly.
     */
@@ -7887,10 +7741,29 @@ document.addEventListener("DOMContentLoaded", () => {
       runId,
 
       onProgress: (
-        progress
+        progress,
+        rawProgress
       ) => {
         pageFrameProgress =
           progress;
+
+
+        /*
+          When switching pages, start the requested page near the end of
+          the outgoing FULL reverse sequence. This preserves the overlap
+          we liked without needing the special quick-return geometry.
+        */
+        if (
+          nextPageName &&
+          !incomingOverlapStarted &&
+          overlapDuration > 0 &&
+          rawProgress >= overlapStartRaw
+        ) {
+          startIncomingPageOverlap(
+            nextPageName,
+            overlapDuration
+          );
+        }
       },
 
       onComplete: () => {
@@ -7916,12 +7789,17 @@ document.addEventListener("DOMContentLoaded", () => {
           "";
 
 
-        hideMorph();
+        /*
+          If an incoming overlap is running, only clear the outgoing path.
+          Otherwise the shared morph SVG can be hidden normally.
+        */
+        hideMorphIfIdle();
 
         morphEngine.clearActive();
 
 
         const next =
+          selectedPageName ||
           queuedPageName;
 
 
@@ -7929,36 +7807,63 @@ document.addEventListener("DOMContentLoaded", () => {
           null;
 
 
+        /*
+          Keep the outgoing button visually active for the ENTIRE reverse
+          morph. Only release it after the morph has completely disappeared.
+        */
         if (
           next &&
           next !== name
         ) {
-          activePageName =
-            next;
-
           setActivePageButtonState(
-            next
+            next,
+            name
           );
 
-          pageFrameProgress = 0;
-
-          startPageOpen(
-            next
+          releasePageButtonState(
+            name
           );
+
+
+          /*
+            If overlap is disabled, open sequentially now.
+            If overlap is already running, let that independent morph finish.
+          */
+          if (!incomingOverlapStarted) {
+            activePageName =
+              next;
+
+            setActivePageButtonState(
+              next
+            );
+
+            pageFrameProgress = 0;
+
+            startPageOpen(
+              next
+            );
+          }
         }
 
         else {
+          /*
+            Ordinary toggle-off close:
+            release the pressed colour only AFTER the full reverse morph
+            reaches the button and disappears.
+          */
+          releasePageButtonState(
+            name
+          );
+
           activePageName =
             null;
 
-          setActivePageButtonState(
-            null
-          );
+          selectedPageName =
+            null;
         }
       }
     });
   };
-
 
   const requestPage = (
     name
@@ -8008,12 +7913,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (name === activePageName) {
       if (pageFrameIsAnimating) {
         if (pageFrameTargetOpen) {
+          /*
+            Keep the current button pressed while its full reverse morph
+            plays. startPageClose() releases it only at the very end.
+          */
           selectedPageName =
             null;
-
-          setActivePageButtonState(
-            null
-          );
 
 
           startPageClose(
@@ -8040,12 +7945,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       if (pageFrameProgress >= 1) {
+        /*
+          Keep the current button pressed until the reverse morph has been
+          completely absorbed back into it.
+        */
         selectedPageName =
           null;
-
-        setActivePageButtonState(
-          null
-        );
 
 
         startPageClose(
@@ -8091,13 +7996,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /*
-      current page
-        -> its own detached parallelogram
-        -> directly absorbed into its own home button
-      then:
-        requested page opens normally
+      Different-page switches now use the exact same COMPLETE reverse
+      sequence as clicking the current page button a second time:
+
+        page -> parallelogram -> neck -> home button
+
+      The incoming page begins during the final overlap window, so the
+      handoff can still feel continuous rather than strictly sequential.
     */
-    startQuickPageReturn(
+    startPageClose(
       activePageName,
       name
     );

@@ -1348,6 +1348,18 @@ body {
   the animation target, while the richer border is layered inside it.
 */
 .prototype-page-frame {
+  /*
+    Shared vertical composition adjustment for tablet + desktop.
+
+    Negative = move the page frame upward.
+    Positive = move it downward.
+
+    This changes the actual layout rectangle rather than using transform,
+    so the morph target geometry and desktop popout continue to measure the
+    correct position.
+  */
+  --page-frame-shift-y: -18px;
+
   position: fixed;
   z-index: 20;
 
@@ -1356,10 +1368,21 @@ body {
       clamp(82px, calc(64px + 3.9vw), 120px)
       + (clamp(6px, 0.7vw, 10px) * 2)
       + 20px
+      + var(--page-frame-shift-y)
     );
 
   right: clamp(18px, 2vw, 30px);
-  bottom: clamp(18px, 2vw, 30px);
+
+  /*
+    Increase the bottom clearance by the same amount the frame moves upward,
+    preserving its existing tablet height.
+  */
+  bottom:
+    calc(
+      clamp(18px, 2vw, 30px)
+      - var(--page-frame-shift-y)
+    );
+
   left: clamp(18px, 2vw, 30px);
 
   /*
@@ -1994,6 +2017,8 @@ body {
           -
           var(--desktop-page-height)
         ) / 2
+        +
+        var(--page-frame-shift-y)
       );
   }
 }
@@ -3088,16 +3113,6 @@ body {
 */
 .banner-frame {
   overflow: hidden;
-}
-
-
-/*
-  Hint that these fixed decorative layers are expected to change size often.
-  This helps browsers keep them on a stable compositing path during resize.
-*/
-.site-header,
-.viewport-frame {
-  will-change: transform;
 }
 
 
