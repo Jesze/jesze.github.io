@@ -9,6 +9,106 @@
 
 <body>
 
+  <!-- =====================================================
+       Fixed viewport-frame anchor pieces
+       =====================================================
+
+       These eight anchor WebP pieces are intentionally rendered at their
+       intrinsic aspect ratios. The four stretch strips underneath them
+       use one reusable horizontal strip asset that can be rotated for
+       the other three sides.
+  -->
+  <div class="viewport-frame" aria-hidden="true">
+    <!-- Stretchable border fill strips.
+         Put the provided strip asset at: assets/header/border-stretch.webp -->
+    <img
+      class="viewport-frame-stretch viewport-frame-stretch--top"
+      src="assets/header/border-stretch.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-stretch viewport-frame-stretch--right"
+      src="assets/header/border-stretch.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-stretch viewport-frame-stretch--bottom"
+      src="assets/header/border-stretch.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-stretch viewport-frame-stretch--left"
+      src="assets/header/border-stretch.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-piece viewport-frame-piece--top-left"
+      src="assets/header/border-topleft.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-piece viewport-frame-piece--top"
+      src="assets/header/border-top.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-piece viewport-frame-piece--top-right"
+      src="assets/header/border-topright.webp"
+      alt=""
+      draggable="false"
+    >
+
+
+    <img
+      class="viewport-frame-piece viewport-frame-piece--left-center"
+      src="assets/header/border-centerleft.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-piece viewport-frame-piece--right-center"
+      src="assets/header/border-centerright.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-piece viewport-frame-piece--bottom-left"
+      src="assets/header/border-bottomleft.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-piece viewport-frame-piece--bottom"
+      src="assets/header/border-bottom.webp"
+      alt=""
+      draggable="false"
+    >
+
+    <img
+      class="viewport-frame-piece viewport-frame-piece--bottom-right"
+      src="assets/header/border-bottomright.webp"
+      alt=""
+      draggable="false"
+    >
+  </div>
+
+
+
   <!-- Global blurred looping background video -->
   <div class="site-background" aria-hidden="true">
     <video

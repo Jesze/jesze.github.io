@@ -76,6 +76,24 @@ body {
    ========================================================= */
 
 .site-background {
+  /*
+    The video bezel is now the ACTUAL border around the video.
+
+    Previously the element itself was inset from the viewport, so most of
+    the visible grey area was really the BODY background behind it. That is
+    why changing --background-video-frame-color barely appeared to do
+    anything.
+
+    Now the background fills the viewport and the border supplies the full
+    bezel thickness, so this color variable directly controls the visible
+    frame around the video.
+  */
+  --background-video-frame-width:
+    clamp(8px, 0.9vw, 14px);
+
+  --background-video-frame-color:
+    rgb(18, 20, 22);
+
   position: fixed;
   inset: 0;
 
@@ -85,7 +103,16 @@ body {
 
   pointer-events: none;
 
-  background: #474847;
+  background:
+    var(--background-video-frame-color);
+
+  border:
+    var(--background-video-frame-width)
+    solid
+    var(--background-video-frame-color);
+
+  box-shadow:
+    inset 0 0 10px rgba(0, 0, 0, 0.34);
 }
 
 
@@ -3026,3 +3053,346 @@ body {
     display: none;
   }
 }
+
+
+/* =========================================================
+   Structural resize tracking
+   ========================================================= */
+
+/*
+  Important distinction:
+
+  The apparent smoothness of the banner/frame while resizing comes from
+  viewport-driven clamp()/calc() values updating continuously — NOT from a
+  CSS transition.
+
+  So the structural geometry should follow the viewport immediately. We
+  explicitly disable transitions only on the decorative frame/banner
+  geometry, while leaving button fades, hover lerps, menu morphs, etc.
+  completely untouched.
+*/
+.site-header,
+.banner-frame,
+.banner-piece,
+.viewport-frame,
+.viewport-frame-piece,
+.viewport-frame-stretch {
+  transition: none !important;
+}
+
+
+/*
+  The raster banner is decorative only, so clip it to its own box. This
+  prevents a transient overshoot from becoming visible during very fast
+  window drags without clipping the nav/menu layer that sits above it.
+*/
+.banner-frame {
+  overflow: hidden;
+}
+
+
+/*
+  Hint that these fixed decorative layers are expected to change size often.
+  This helps browsers keep them on a stable compositing path during resize.
+*/
+.site-header,
+.viewport-frame {
+  will-change: transform;
+}
+
+
+/* =========================================================
+   Viewport frame — fixed/non-stretchable anchor pieces
+   ========================================================= */
+
+/*
+  The outer border now follows the SAME size curve as the title banner.
+
+  Desktop/tablet:
+    banner frame height = clamp(82px, 64px + 3.9vw, 120px)
+    border scale        = banner frame height / 120px
+
+  Below 485px:
+    the banner freezes at its 485px layout size, then the entire header
+    uniformly scales by 100vw / 485px.
+
+    The border mirrors that exact second-stage scale as well.
+
+  The pieces themselves are never stretched independently in X/Y:
+  their width and height are both multiplied by the same scalar.
+*/
+.viewport-frame {
+  --viewport-frame-banner-height:
+    clamp(82px, calc(64px + 3.9vw), 120px);
+
+  --viewport-frame-scale:
+    calc(
+      var(--viewport-frame-banner-height)
+      / 120px
+    );
+
+  position: fixed;
+  inset: 0;
+
+  z-index: 1100;
+
+  overflow: hidden;
+
+  pointer-events: none;
+
+  user-select: none;
+}
+
+
+.viewport-frame-piece {
+  position: absolute;
+
+  display: block;
+
+  max-width: none;
+  max-height: none;
+
+  object-fit: contain;
+
+  pointer-events: none;
+
+  -webkit-user-drag: none;
+}
+
+
+.viewport-frame-stretch {
+  position: absolute;
+
+  display: block;
+
+  max-width: none;
+  max-height: none;
+
+  object-fit: fill;
+
+  pointer-events: none;
+
+  -webkit-user-drag: none;
+
+  z-index: 0;
+}
+
+.viewport-frame-piece {
+  z-index: 1;
+}
+
+/*
+  Shared thickness for the stretchable frame fill.
+  This follows the exact same scale system as the fixed anchors.
+*/
+.viewport-frame {
+  --viewport-frame-stretch-thickness:
+    calc(21px * var(--viewport-frame-scale));
+}
+
+
+/* -------------------------
+   Stretchable fill strips
+   ------------------------- */
+
+.viewport-frame-stretch--top {
+  top: 0;
+  left: 0;
+
+  width: 100vw;
+  height: var(--viewport-frame-stretch-thickness);
+}
+
+.viewport-frame-stretch--bottom {
+  left: 5vw;
+  bottom: 0;
+
+  width: 90vw;
+  height: var(--viewport-frame-stretch-thickness);
+
+  transform: rotate(180deg);
+}
+
+.viewport-frame-stretch--right {
+  top: 50%;
+  left: calc(100% - (var(--viewport-frame-stretch-thickness) / 2));
+
+  width: 90vh;
+  height: var(--viewport-frame-stretch-thickness);
+
+  transform:
+    translate(-50%, -50%)
+    rotate(90deg);
+}
+
+.viewport-frame-stretch--left {
+  top: 50%;
+  left: calc(var(--viewport-frame-stretch-thickness) / 2);
+
+  width: 90vh;
+  height: var(--viewport-frame-stretch-thickness);
+
+  transform:
+    translate(-50%, -50%)
+    rotate(270deg);
+}
+
+
+/* -------------------------
+   Top anchors
+   ------------------------- */
+
+.viewport-frame-piece--top-left {
+  top: 0;
+  left: 0;
+
+  width:
+    calc(97px * var(--viewport-frame-scale));
+
+  height:
+    calc(151px * var(--viewport-frame-scale));
+}
+
+
+.viewport-frame-piece--top {
+  top: 0;
+  left: 50%;
+
+  width:
+    calc(403px * var(--viewport-frame-scale));
+
+  height:
+    calc(49px * var(--viewport-frame-scale));
+
+  transform:
+    translateX(-50%);
+}
+
+
+.viewport-frame-piece--top-right {
+  top: 0;
+  right: 0;
+
+  width:
+    calc(96px * var(--viewport-frame-scale));
+
+  height:
+    calc(151px * var(--viewport-frame-scale));
+}
+
+
+/* -------------------------
+   Side-center anchors
+   ------------------------- */
+
+/*
+  Scaling is applied to width/height rather than through transform:scale().
+  That leaves translateY(-50%) completely independent from scale, so these
+  pieces remain mathematically centered at every viewport size.
+*/
+.viewport-frame-piece--left-center {
+  top: 50%;
+  left: 0;
+
+  width:
+    calc(35px * var(--viewport-frame-scale));
+
+  height:
+    calc(153px * var(--viewport-frame-scale));
+
+  transform:
+    translateY(-50%);
+}
+
+
+.viewport-frame-piece--right-center {
+  top: 50%;
+  right: 0;
+
+  width:
+    calc(35px * var(--viewport-frame-scale));
+
+  height:
+    calc(153px * var(--viewport-frame-scale));
+
+  transform:
+    translateY(-50%);
+}
+
+
+/*
+  The blue side-center ornaments are intended to visually sit on TOP of
+  the rest of the frame when the viewport gets extremely short/narrow.
+  Giving only these two pieces a higher local z-index makes the overlap
+  look intentional without changing the normal desktop composition.
+*/
+.viewport-frame-piece--left-center,
+.viewport-frame-piece--right-center {
+  z-index: 3;
+}
+
+
+/* -------------------------
+   Bottom anchors
+   ------------------------- */
+
+.viewport-frame-piece--bottom-left {
+  bottom: 0;
+  left: 0;
+
+  width:
+    calc(267px * var(--viewport-frame-scale));
+
+  height:
+    calc(129px * var(--viewport-frame-scale));
+}
+
+
+.viewport-frame-piece--bottom {
+  bottom: 0;
+  left: 50%;
+
+  width:
+    calc(128px * var(--viewport-frame-scale));
+
+  height:
+    calc(29px * var(--viewport-frame-scale));
+
+  transform:
+    translateX(-50%);
+}
+
+
+.viewport-frame-piece--bottom-right {
+  right: 0;
+  bottom: 0;
+
+  width:
+    calc(266px * var(--viewport-frame-scale));
+
+  height:
+    calc(131px * var(--viewport-frame-scale));
+}
+
+
+/*
+  Below 485px the existing header stops recomputing its internal layout
+  and uniformly scales its frozen 485px composition.
+
+  Mirror that exact behavior here:
+    scale at 485px = 82.915 / 120
+    then multiply by the same 100vw / 485px factor used by .site-header.
+*/
+@media (max-width: 485px) {
+  .viewport-frame {
+    --viewport-frame-banner-height: 82.915px;
+
+    --viewport-frame-scale:
+      calc(
+        (82.915 / 120)
+        *
+        (100vw / 485px)
+      );
+  }
+}
+
