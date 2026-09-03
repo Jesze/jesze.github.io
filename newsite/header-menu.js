@@ -1,4 +1,141 @@
+/*
+  Simulacrum Interactive header morph system
+
+  Refactor stage 1:
+  The existing hamburger animation now runs through a reusable morph
+  target registry/controller. Visual behavior and timing are intentionally
+  unchanged. Future nav buttons/page frames can register additional
+  targets instead of duplicating this animation code.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
+  const setActivePageButtonState = (
+    name = null,
+    preserveName = null
+  ) => {
+    const applyState = (
+      button,
+      isActive
+    ) => {
+      if (!button) {
+        return;
+      }
+
+
+      button.classList.toggle(
+        "is-page-active",
+        isActive
+      );
+
+
+      if (isActive) {
+        button.setAttribute(
+          "aria-current",
+          "page"
+        );
+      }
+
+      else {
+        button.removeAttribute(
+          "aria-current"
+        );
+      }
+    };
+
+
+    pageNames.forEach((pageName) => {
+      const isActive =
+        pageName === name ||
+        pageName === preserveName;
+
+
+      applyState(
+        pageNavButtons.get(
+          pageName
+        ),
+        isActive
+      );
+
+
+      applyState(
+        mobilePageNavButtons.get(
+          pageName
+        ),
+        isActive
+      );
+    });
+  };
+
+
+  const releasePageButtonState = (
+    name
+  ) => {
+    if (!name) {
+      return;
+    }
+
+
+    const buttons = [
+      pageNavButtons.get(
+        name
+      ),
+
+      mobilePageNavButtons.get(
+        name
+      )
+    ].filter(Boolean);
+
+
+    buttons.forEach((button) => {
+      button.classList.add(
+        "is-page-releasing"
+      );
+
+      button.classList.remove(
+        "is-page-active"
+      );
+
+      button.removeAttribute(
+        "aria-current"
+      );
+    });
+
+
+    /*
+      Read the CSS variable from the document root so this cleanup stays in
+      sync with whatever release duration is tuned in styles.css.
+    */
+    const rootStyles =
+      getComputedStyle(
+        document.documentElement
+      );
+
+
+    const releaseDuration =
+      parseCssTime(
+        rootStyles.getPropertyValue(
+          "--active-page-release-duration"
+        ),
+        280
+      );
+
+
+    setTimeout(
+      () => {
+        buttons.forEach((button) => {
+          button.classList.remove(
+            "is-page-releasing"
+          );
+        });
+      },
+      Math.max(
+        0,
+        releaseDuration
+      ) + 40
+    );
+  };
+
+
   const menuToggle =
     document.querySelector(".menu-toggle");
 
@@ -11,6 +148,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const headerContent =
     document.querySelector(".header-content");
+
+
+  const pageNames = [
+    "about",
+    "brobots",
+    "etherian",
+    "halodoom",
+    "contact"
+  ];
+
+
+  const pageNavButtons =
+    new Map();
+
+
+  const mobilePageNavButtons =
+    new Map();
+
+
+  const pageFrames =
+    new Map();
+
+
+  pageNames.forEach((name) => {
+    const button =
+      document.querySelector(
+        `.main-nav .nav-button[href="#${name}"]`
+      );
+
+
+    const mobileButton =
+      document.querySelector(
+        `.mobile-menu-link[href="#${name}"]`
+      );
+
+
+    const frame =
+      document.querySelector(
+        `#${name}-page-frame`
+      );
+
+
+    if (button) {
+      pageNavButtons.set(
+        name,
+        button
+      );
+    }
+
+
+    if (mobileButton) {
+      mobilePageNavButtons.set(
+        name,
+        mobileButton
+      );
+    }
+
+
+    if (frame) {
+      pageFrames.set(
+        name,
+        frame
+      );
+    }
+  });
 
 
   if (
@@ -56,6 +258,21 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
+  /*
+    Independent temporary path for the INCOMING page during a
+    page-to-page overlap.
+
+    The outgoing quick-return keeps ownership of menuMorphPath.
+    The incoming page uses this second path, so the two animations can
+    coexist without cancelling or corrupting each other's geometry.
+  */
+  const incomingPageMorphPath =
+    document.createElementNS(
+      svgNamespace,
+      "path"
+    );
+
+
   menuMorph.setAttribute(
     "aria-hidden",
     "true"
@@ -93,8 +310,24 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
 
+  Object.assign(
+    incomingPageMorphPath.style,
+    {
+      vectorEffect: "non-scaling-stroke",
+      strokeLinejoin: "miter",
+      visibility: "hidden",
+      opacity: "1"
+    }
+  );
+
+
   menuMorph.appendChild(
     menuMorphPath
+  );
+
+
+  menuMorph.appendChild(
+    incomingPageMorphPath
   );
 
 
@@ -145,6 +378,121 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let menuInteractive = false;
   let menuInteractionTimer = null;
+
+
+  /*
+    Non-mobile page-frame state.
+
+    Only one page owns the shared temporary SVG morph surface at a time.
+    When the user selects a different page, the current frame reverses
+    into its source button first, then the newly requested page opens.
+  */
+  let activePageName = null;
+
+  /*
+    The most recently selected page button.
+
+    This is intentionally separate from activePageName:
+      selectedPageName = user intent, changes immediately on click
+      activePageName   = currently committed/animating real page
+
+    Keeping these separate prevents rapid clicks during the desktop
+    secondary-panel animation from leaving button/popout state stale.
+  */
+  let selectedPageName = null;
+
+  let pageFrameIsAnimating = false;
+  let pageFrameTargetOpen = false;
+  let pageFrameProgress = 0;
+
+  /*
+    If another page is clicked while one is open/opening, it is queued
+    here and opened as soon as the current frame finishes reversing.
+  */
+  let queuedPageName = null;
+
+  let incomingPageAnimationFrame = null;
+  let incomingOverlapStarted = false;
+  let incomingOverlapPageName = null;
+
+
+  /* =======================================================
+     Reusable morph target system
+     ======================================================= */
+
+  /*
+    The hamburger dropdown is now treated as the FIRST target of a
+    reusable morph system rather than as a one-off animation.
+
+    Future targets can register:
+      - which button/element is the source
+      - which real element is the destination
+      - how the final destination rectangle is measured
+      - later: a different final polygon/shape builder
+
+    For this refactor the existing hamburger behavior is intentionally
+    unchanged.
+  */
+
+  const morphTargets =
+    new Map();
+
+
+  const morphEngine = {
+    activeTargetName:
+      null,
+
+    register(
+      name,
+      descriptor
+    ) {
+      morphTargets.set(
+        name,
+        descriptor
+      );
+    },
+
+    getTarget(
+      name
+    ) {
+      return (
+        morphTargets.get(name) ||
+        null
+      );
+    },
+
+    setActive(
+      name
+    ) {
+      this.activeTargetName =
+        name;
+    },
+
+    clearActive() {
+      this.activeTargetName =
+        null;
+    },
+
+    getGeometry(
+      name
+    ) {
+      const target =
+        this.getTarget(name);
+
+
+      if (!target) {
+        return null;
+      }
+
+
+      this.setActive(name);
+
+
+      return getMorphGeometry(
+        target
+      );
+    }
+  };
 
 
   /* =======================================================
@@ -309,6 +657,129 @@ document.addEventListener("DOMContentLoaded", () => {
           ? parseFloat(match[4])
           : 1
     };
+  };
+
+  const parseRgbTriplet = (
+    value,
+    fallback = {
+      r: 255,
+      g: 114,
+      b: 2
+    }
+  ) => {
+    const numbers =
+      String(value)
+        .match(
+          /[0-9.]+/g
+        );
+
+
+    if (
+      !numbers ||
+      numbers.length < 3
+    ) {
+      return {
+        ...fallback
+      };
+    }
+
+
+    return {
+      r:
+        parseFloat(
+          numbers[0]
+        ),
+
+      g:
+        parseFloat(
+          numbers[1]
+        ),
+
+      b:
+        parseFloat(
+          numbers[2]
+        )
+    };
+  };
+
+
+  const rgbaFromRgb = (
+    rgb,
+    alpha
+  ) => {
+    return (
+      `rgba(` +
+      `${rgb.r}, ` +
+      `${rgb.g}, ` +
+      `${rgb.b}, ` +
+      `${alpha}` +
+      `)`
+    );
+  };
+
+
+  const lightenRgb = (
+    rgb,
+    amount
+  ) => {
+    const mix =
+      clamp(
+        amount,
+        0,
+        1
+      );
+
+
+    return {
+      r:
+        Math.round(
+          lerp(
+            rgb.r,
+            255,
+            mix
+          )
+        ),
+
+      g:
+        Math.round(
+          lerp(
+            rgb.g,
+            255,
+            mix
+          )
+        ),
+
+      b:
+        Math.round(
+          lerp(
+            rgb.b,
+            255,
+            mix
+          )
+        )
+    };
+  };
+
+
+  const getFrameAccentRgb = (
+    frame
+  ) => {
+    if (!frame) {
+      return {
+        r: 255,
+        g: 114,
+        b: 2
+      };
+    }
+
+
+    return parseRgbTriplet(
+      getComputedStyle(
+        frame
+      ).getPropertyValue(
+        "--page-accent-rgb"
+      )
+    );
   };
 
 
@@ -606,6 +1077,27 @@ document.addEventListener("DOMContentLoaded", () => {
         ),
 
       /*
+        Detached launch-parallelogram sizing.
+      */
+      parallelogramWidthRatio:
+        readNumber(
+          "--menu-morph-parallelogram-width-ratio",
+          0.70
+        ),
+
+      parallelogramDepthRatio:
+        readNumber(
+          "--menu-morph-parallelogram-depth-ratio",
+          0.50
+        ),
+
+      viewportSafeInset:
+        readNumber(
+          "--menu-morph-viewport-safe-inset",
+          12
+        ),
+
+      /*
         Hamburger -> X timing.
       */
       iconSwitchAt:
@@ -674,6 +1166,219 @@ document.addEventListener("DOMContentLoaded", () => {
             "--button-border-width"
           )
         ) || 2
+    };
+  };
+
+
+  /*
+    Page targets use the same geometry engine, but read a separate CSS
+    settings family so their timing can be tuned independently.
+  */
+  const getPageSettings = (
+    baseSettings
+  ) => {
+    const styles =
+      getComputedStyle(
+        siteHeader
+      );
+
+
+    const readNumber = (
+      name,
+      fallback
+    ) => {
+      const parsed =
+        parseFloat(
+          styles.getPropertyValue(name)
+        );
+
+
+      return Number.isFinite(parsed)
+        ? parsed
+        : fallback;
+    };
+
+
+    const readPercent = (
+      name,
+      fallback
+    ) => {
+      const raw =
+        styles
+          .getPropertyValue(name)
+          .trim();
+
+
+      if (!raw) {
+        return fallback;
+      }
+
+
+      const parsed =
+        parseFloat(raw);
+
+
+      if (!Number.isFinite(parsed)) {
+        return fallback;
+      }
+
+
+      return raw.endsWith("%")
+        ? parsed / 100
+        : parsed;
+    };
+
+
+    const readText = (
+      name,
+      fallback
+    ) => {
+      const value =
+        styles
+          .getPropertyValue(name)
+          .trim();
+
+
+      return value || fallback;
+    };
+
+
+    return {
+      ...baseSettings,
+
+      openDuration:
+        parseCssTime(
+          styles.getPropertyValue(
+            "--page-morph-duration"
+          ),
+          baseSettings.openDuration
+        ),
+
+      closeDuration:
+        parseCssTime(
+          styles.getPropertyValue(
+            "--page-morph-close-duration"
+          ),
+          baseSettings.closeDuration
+        ),
+
+      extensionMultiplier:
+        readNumber(
+          "--page-morph-extension-multiplier",
+          baseSettings.extensionMultiplier
+        ),
+
+      neckEnd:
+        clamp(
+          readPercent(
+            "--page-morph-neck-end",
+            baseSettings.neckEnd
+          ),
+          0,
+          1
+        ),
+
+      parallelogramStart:
+        clamp(
+          readPercent(
+            "--page-morph-parallelogram-start",
+            baseSettings.parallelogramStart
+          ),
+          0,
+          1
+        ),
+
+      parallelogramEnd:
+        clamp(
+          readPercent(
+            "--page-morph-parallelogram-end",
+            baseSettings.parallelogramEnd
+          ),
+          0,
+          1
+        ),
+
+      reshapeStart:
+        clamp(
+          readPercent(
+            "--page-morph-reshape-start",
+            baseSettings.reshapeStart
+          ),
+          0,
+          1
+        ),
+
+      neckEase:
+        readText(
+          "--page-morph-neck-ease",
+          baseSettings.neckEase
+        ),
+
+      parallelogramEase:
+        readText(
+          "--page-morph-parallelogram-ease",
+          baseSettings.parallelogramEase
+        ),
+
+      reshapeEase:
+        readText(
+          "--page-morph-reshape-ease",
+          baseSettings.reshapeEase
+        ),
+
+      realMenuRevealAt:
+        clamp(
+          readPercent(
+            "--page-morph-real-frame-reveal-at",
+            baseSettings.realMenuRevealAt
+          ),
+          0,
+          1
+        ),
+
+      fakeMenuFadeStart:
+        clamp(
+          readPercent(
+            "--page-morph-fake-frame-fade-start",
+            baseSettings.fakeMenuFadeStart
+          ),
+          0,
+          1
+        ),
+
+      realMenuFadeDuration:
+        parseCssTime(
+          styles.getPropertyValue(
+            "--page-morph-real-frame-fade-duration"
+          ),
+          baseSettings.realMenuFadeDuration
+        ),
+
+      fakeMenuFadeDuration:
+        parseCssTime(
+          styles.getPropertyValue(
+            "--page-morph-fake-frame-fade-duration"
+          ),
+          baseSettings.fakeMenuFadeDuration
+        ),
+
+      parallelogramWidthRatio:
+        readNumber(
+          "--page-morph-parallelogram-width-ratio",
+          0.32
+        ),
+
+      parallelogramDepthRatio:
+        readNumber(
+          "--page-morph-parallelogram-depth-ratio",
+          0.22
+        ),
+
+      viewportSafeInset:
+        readNumber(
+          "--page-morph-viewport-safe-inset",
+          12
+        )
     };
   };
 
@@ -986,13 +1691,14 @@ document.addEventListener("DOMContentLoaded", () => {
      Exact hamburger lower edge
      ======================================================= */
 
-  const getHamburgerBottomEdge = (
+  const getSourceBottomEdge = (
+    sourceElement,
     buttonRect,
     slope
   ) => {
     const pseudoStyles =
       getComputedStyle(
-        menuToggle,
+        sourceElement,
         "::before"
       );
 
@@ -1054,13 +1760,13 @@ document.addEventListener("DOMContentLoaded", () => {
     element's actual layout box before that transform, which is exactly
     where the final .is-open menu lives.
   */
-  const getFinalMenuRect = () => {
+  const getFinalElementRect = (element) => {
     const offsetParent =
-      mobileMenu.offsetParent;
+      element.offsetParent;
 
 
     if (!offsetParent) {
-      return mobileMenu.getBoundingClientRect();
+      return element.getBoundingClientRect();
     }
 
 
@@ -1069,7 +1775,7 @@ document.addEventListener("DOMContentLoaded", () => {
       getBoundingClientRect() is post-transform screen coordinates.
 
       Below 485px the complete header is uniformly scaled, so convert
-      the menu's layout offsets and size by the offset parent's rendered
+      the target's layout offsets and size by the offset parent's rendered
       scale before using them as viewport SVG coordinates.
     */
     const parentRect =
@@ -1100,23 +1806,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const left =
       parentRect.left +
-      mobileMenu.offsetLeft *
+      element.offsetLeft *
       scaleX;
 
 
     const top =
       parentRect.top +
-      mobileMenu.offsetTop *
+      element.offsetTop *
       scaleY;
 
 
     const width =
-      mobileMenu.offsetWidth *
+      element.offsetWidth *
       scaleX;
 
 
     const height =
-      mobileMenu.offsetHeight *
+      element.offsetHeight *
       scaleY;
 
 
@@ -1136,20 +1842,101 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const getMorphGeometry = () => {
-    const settings =
+  const getMorphGeometry = (
+    target
+  ) => {
+    const baseSettings =
       getSettings();
 
 
-    const buttonRect =
-      menuToggle.getBoundingClientRect();
+    let settings =
+      target.settingsFamily ===
+      "page"
+        ? getPageSettings(
+            baseSettings
+          )
+        : baseSettings;
+
+
+    const sourceElement =
+      typeof target.getSourceElement ===
+      "function"
+        ? target.getSourceElement()
+        : target.sourceElement;
+
+
+    const targetElement =
+      typeof target.getTargetElement ===
+      "function"
+        ? target.getTargetElement()
+        : target.targetElement;
+
 
     /*
-      Target the menu's untransformed OPEN layout box, not its
+      Page morphs inherit the accent of the button that launched them.
+      This keeps the geometry engine generic while allowing About/Contact,
+      Brobots, Etherian and Halodoom to each carry their own color.
+    */
+    if (
+      target.settingsFamily ===
+        "page" &&
+      sourceElement
+    ) {
+      const sourceStyles =
+        getComputedStyle(
+          sourceElement
+        );
+
+
+      const sourceAccent =
+        parseRgbTriplet(
+          sourceStyles.getPropertyValue(
+            "--nav-accent-rgb"
+          )
+        );
+
+
+      settings = {
+        ...settings,
+
+        startFill: {
+          ...sourceAccent,
+          a: 0.25
+        },
+
+        startStroke: {
+          ...sourceAccent,
+          a: 0.48
+        }
+      };
+    }
+
+
+    if (
+      !sourceElement ||
+      !targetElement
+    ) {
+      return null;
+    }
+
+
+    const buttonRect =
+      sourceElement.getBoundingClientRect();
+
+
+    /*
+      Target the destination's untransformed OPEN layout box, not its
       closed-state translated/scaled visual rectangle.
     */
     const menuRect =
-      getFinalMenuRect();
+      typeof target.getFinalRect ===
+      "function"
+        ? target.getFinalRect(
+            targetElement
+          )
+        : getFinalElementRect(
+            targetElement
+          );
 
 
     if (
@@ -1163,7 +1950,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const topEdge =
-      getHamburgerBottomEdge(
+      getSourceBottomEdge(
+        sourceElement,
         buttonRect,
         settings.slope
       );
@@ -1214,6 +2002,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     return {
+      target,
+      sourceElement,
+      targetElement,
+
       settings,
       buttonRect,
       menuRect,
@@ -1241,6 +2033,209 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =======================================================
      Shape builders
      ======================================================= */
+
+  /*
+    Calculate the detached Stage-2 launch parallelogram.
+
+    The launch shape is intentionally NOT the near-final target size.
+    It is a smaller "seed" shape that remains centred on the end of the
+    extrusion. Stage 3 handles the large spatial growth and travel.
+
+    A viewport-safe clamp prevents this intermediate shape from poking
+    outside the screen before it starts moving toward the final target.
+  */
+  const getLaunchParallelogram = (
+    geometry
+  ) => {
+    const {
+      settings,
+      menuRect,
+      topEdge,
+      fullStemBottomY,
+      stemXAtY
+    } = geometry;
+
+
+    const stemBottomLeft =
+      stemXAtY(
+        topEdge.left,
+        fullStemBottomY
+      );
+
+
+    const stemBottomRight =
+      stemXAtY(
+        topEdge.right,
+        fullStemBottomY
+      );
+
+
+    const stemEndCenterX =
+      (
+        stemBottomLeft +
+        stemBottomRight
+      ) / 2;
+
+
+    const stemWidth =
+      stemBottomRight -
+      stemBottomLeft;
+
+
+    const safeInset =
+      Math.max(
+        0,
+        settings.viewportSafeInset
+      );
+
+
+    const safeRight =
+      Math.max(
+        safeInset,
+        window.innerWidth -
+        safeInset
+      );
+
+
+    const safeBottom =
+      Math.max(
+        fullStemBottomY + 1,
+        window.innerHeight -
+        safeInset
+      );
+
+
+    /*
+      First clamp depth because the diagonal bottom edge shifts left as
+      depth grows. Width safety is calculated after that shift is known.
+    */
+    const desiredDepth =
+      Math.max(
+        1,
+        (
+          menuRect.bottom -
+          fullStemBottomY
+        ) *
+        settings.parallelogramDepthRatio
+      );
+
+
+    const maxDepthByViewport =
+      Math.max(
+        1,
+        safeBottom -
+        fullStemBottomY
+      );
+
+
+    const depth =
+      Math.min(
+        desiredDepth,
+        maxDepthByViewport
+      );
+
+
+    const shearOffset =
+      depth *
+      settings.slope;
+
+
+    const desiredWidth =
+      Math.max(
+        stemWidth,
+        menuRect.width *
+        settings.parallelogramWidthRatio
+      );
+
+
+    /*
+      Rightmost point is the top-right corner.
+      Leftmost point is the bottom-left corner because the parallelogram
+      shears left as it extends downward.
+    */
+    const maxWidthFromRight =
+      Math.max(
+        stemWidth,
+        2 *
+        (
+          safeRight -
+          stemEndCenterX
+        )
+      );
+
+
+    const maxWidthFromLeft =
+      Math.max(
+        stemWidth,
+        2 *
+        (
+          stemEndCenterX -
+          safeInset -
+          shearOffset
+        )
+      );
+
+
+    const width =
+      Math.max(
+        stemWidth,
+        Math.min(
+          desiredWidth,
+          maxWidthFromRight,
+          maxWidthFromLeft
+        )
+      );
+
+
+    const topY =
+      fullStemBottomY;
+
+
+    const bottomY =
+      topY +
+      depth;
+
+
+    const topLeft =
+      stemEndCenterX -
+      width / 2;
+
+
+    const topRight =
+      stemEndCenterX +
+      width / 2;
+
+
+    const bottomLeft =
+      topLeft -
+      shearOffset;
+
+
+    const bottomRight =
+      topRight -
+      shearOffset;
+
+
+    return {
+      stemBottomLeft,
+      stemBottomRight,
+      stemEndCenterX,
+      stemWidth,
+
+      width,
+      depth,
+
+      topY,
+      bottomY,
+
+      topLeft,
+      topRight,
+      bottomLeft,
+      bottomRight
+    };
+  };
+
+
 
   /*
     STAGE 1
@@ -1327,41 +2322,26 @@ document.addEventListener("DOMContentLoaded", () => {
     } = geometry;
 
 
-    const stemBottomLeft =
-      stemXAtY(
-        topEdge.left,
-        fullStemBottomY
+    const launch =
+      getLaunchParallelogram(
+        geometry
       );
 
 
-    const stemBottomRight =
-      stemXAtY(
-        topEdge.right,
-        fullStemBottomY
-      );
+    const {
+      stemBottomLeft,
+      stemBottomRight,
+      stemWidth,
 
+      width:
+        targetWidth,
 
-    /*
-      Exact centre of the END of the extrusion.
-    */
-    const stemEndCenterX =
-      (
-        stemBottomLeft +
-        stemBottomRight
-      ) / 2;
+      depth:
+        targetDepth,
 
-
-    const stemWidth =
-      stemBottomRight -
-      stemBottomLeft;
-
-
-    /*
-      Grow the temporary parallelogram around that exact point.
-    */
-    const targetWidth =
-      menuRect.width *
-      0.86;
+      topY:
+        bodyTopY
+    } = launch;
 
 
     const bodyWidth =
@@ -1372,21 +2352,9 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    const targetDepth =
-      Math.max(
-        1,
-        (menuRect.bottom - fullStemBottomY) *
-        0.64
-      );
-
-
     const bodyDepth =
       targetDepth *
       progress;
-
-
-    const bodyTopY =
-      fullStemBottomY;
 
 
     const bodyBottomY =
@@ -1395,12 +2363,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const bodyTopLeft =
-      stemEndCenterX -
+      launch.stemEndCenterX -
       bodyWidth / 2;
 
 
     const bodyTopRight =
-      stemEndCenterX +
+      launch.stemEndCenterX +
       bodyWidth / 2;
 
 
@@ -1554,75 +2522,34 @@ document.addEventListener("DOMContentLoaded", () => {
     } = geometry;
 
 
-    const stemBottomLeft =
-      stemXAtY(
-        topEdge.left,
-        fullStemBottomY
-      );
-
-
-    const stemBottomRight =
-      stemXAtY(
-        topEdge.right,
-        fullStemBottomY
-      );
-
-
-    const stemEndCenterX =
-      (
-        stemBottomLeft +
-        stemBottomRight
-      ) / 2;
-
-
-    /*
-      This exactly matches the END of Stage 2.
-    */
-    const startWidth =
-      menuRect.width *
-      0.86;
-
-
-    const startDepth =
-      Math.max(
-        1,
-        (menuRect.bottom - fullStemBottomY) *
-        0.64
+    const launch =
+      getLaunchParallelogram(
+        geometry
       );
 
 
     const startTopY =
-      fullStemBottomY;
+      launch.topY;
 
 
     const startBottomY =
-      startTopY +
-      startDepth;
+      launch.bottomY;
 
 
     const startTopLeft =
-      stemEndCenterX -
-      startWidth / 2;
+      launch.topLeft;
 
 
     const startTopRight =
-      stemEndCenterX +
-      startWidth / 2;
-
-
-    const startShear =
-      startDepth *
-      settings.slope;
+      launch.topRight;
 
 
     const startBottomLeft =
-      startTopLeft -
-      startShear;
+      launch.bottomLeft;
 
 
     const startBottomRight =
-      startTopRight -
-      startShear;
+      launch.bottomRight;
 
 
     /*
@@ -1919,13 +2846,811 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
+  /*
+    Target #1: existing hamburger dropdown.
+
+    This descriptor is deliberately boring right now: it points the
+    reusable engine at the same hamburger and menu elements we already
+    use. That gives us a stable baseline before adding page-frame targets.
+  */
+  morphEngine.register(
+    "mobile-menu",
+    {
+      getSourceElement: () =>
+        menuToggle,
+
+      getTargetElement: () =>
+        mobileMenu,
+
+      getFinalRect:
+        getFinalElementRect,
+
+      /*
+        Future page-frame targets can provide a different shape builder.
+        The current menu continues to use the existing six-point menu
+        geometry, so there is no visual change in this refactor.
+      */
+      shapeType:
+        "menu"
+    }
+  );
+
+
+  /*
+    Keep the REAL page-frame SVG in lockstep with the geometry used by
+    the temporary morph's final frame.
+  */
+  const updatePrototypePageFrameGeometry = (
+    frameElement
+  ) => {
+    if (!frameElement) {
+      return;
+    }
+
+
+    const shell =
+      frameElement.querySelector(
+        ".prototype-page-frame-shell"
+      );
+
+    const ring =
+      frameElement.querySelector(
+        ".page-frame-ring"
+      );
+
+    const outerEdge =
+      frameElement.querySelector(
+        ".page-frame-edge--outer"
+      );
+
+    const chromeEdge =
+      frameElement.querySelector(
+        ".page-frame-edge--chrome"
+      );
+
+    const innerEdge =
+      frameElement.querySelector(
+        ".page-frame-edge--inner"
+      );
+
+    const orangeRail =
+      frameElement.querySelector(
+        ".page-frame-orange-rail"
+      );
+
+    const orangeHighlight =
+      frameElement.querySelector(
+        ".page-frame-orange-highlight"
+      );
+
+    const bottomNotch =
+      frameElement.querySelector(
+        ".page-frame-bottom-notch"
+      );
+
+
+    if (
+      !shell ||
+      !ring ||
+      !outerEdge ||
+      !chromeEdge ||
+      !innerEdge ||
+      !orangeRail ||
+      !orangeHighlight ||
+      !bottomNotch
+    ) {
+      return;
+    }
+
+
+    const rect =
+      shell.getBoundingClientRect();
+
+
+    if (
+      rect.width <= 0 ||
+      rect.height <= 0
+    ) {
+      return;
+    }
+
+
+    const settings =
+      getSettings();
+
+
+    /*
+      Explicitly paint the page accents from the page's master RGB variable.
+      This avoids browser/SVG custom-property edge cases and guarantees the
+      real frame matches the morph color.
+    */
+    const accentRgb =
+      getFrameAccentRgb(
+        frameElement
+      );
+
+
+    const accentStrong =
+      rgbaFromRgb(
+        accentRgb,
+        0.92
+      );
+
+
+    const accentSoft =
+      rgbaFromRgb(
+        accentRgb,
+        0.34
+      );
+
+
+    const accentHighlight =
+      rgbaFromRgb(
+        accentRgb,
+        1
+      );
+
+
+    orangeRail.style.stroke =
+      accentStrong;
+
+    orangeRail.style.filter =
+      `drop-shadow(0 0 2px ${accentSoft})`;
+
+
+    orangeHighlight.style.stroke =
+      accentHighlight;
+
+    orangeHighlight.style.filter =
+      `drop-shadow(0 0 3px ${accentSoft})`;
+
+
+    bottomNotch.style.stroke =
+      accentStrong;
+
+    bottomNotch.style.filter =
+      `drop-shadow(0 0 2px ${accentSoft})`;
+
+
+    frameElement
+      .querySelectorAll(
+        ".page-frame-detail-dot, " +
+        ".page-frame-bottom-dots circle"
+      )
+      .forEach((dot) => {
+        dot.style.fill =
+          accentStrong;
+      });
+
+
+    shell.setAttribute(
+      "viewBox",
+      `0 0 ${rect.width} ${rect.height}`
+    );
+
+
+    /*
+      Same six-point topology as the morph target:
+        top-left diagonal
+        top horizontal
+        right vertical
+        bottom-right diagonal
+        bottom horizontal
+        left vertical
+
+      All decorative layers are derived from this one geometry family.
+    */
+    const makeShape = (
+      inset,
+      topHeight,
+      bottomHeight
+    ) => {
+      const topWidth =
+        topHeight *
+        settings.slope;
+
+      const bottomWidth =
+        bottomHeight *
+        settings.slope;
+
+
+      const left =
+        inset;
+
+      const top =
+        inset;
+
+      const right =
+        rect.width -
+        inset;
+
+      const bottom =
+        rect.height -
+        inset;
+
+
+      return {
+        inset,
+        topHeight,
+        bottomHeight,
+        topWidth,
+        bottomWidth,
+
+        left,
+        top,
+        right,
+        bottom,
+
+        topStartX:
+          left +
+          topWidth,
+
+        rightWallBottomY:
+          bottom -
+          bottomHeight,
+
+        bottomStartX:
+          right -
+          bottomWidth,
+
+        leftWallTopY:
+          top +
+          topHeight,
+
+        d: `
+          M ${left + topWidth} ${top}
+          H ${right}
+
+          V ${bottom - bottomHeight}
+
+          L ${right - bottomWidth} ${bottom}
+
+          H ${left}
+
+          V ${top + topHeight}
+
+          Z
+        `
+      };
+    };
+
+
+    /*
+      Outer silhouette stays consistent with the morph's final shape.
+    */
+    const outerTopHeight =
+      Math.min(
+        46,
+        rect.height * 0.12
+      );
+
+    const outerBottomHeight =
+      Math.min(
+        48,
+        rect.height * 0.12
+      );
+
+
+    const outerShape =
+      makeShape(
+        1,
+        outerTopHeight,
+        outerBottomHeight
+      );
+
+
+    /*
+      The transparent content window needs a more substantial inset than
+      the old thin-outline prototype.
+    */
+    const frameThickness =
+      clamp(
+        Math.min(
+          rect.width * 0.038,
+          rect.height * 0.070
+        ),
+        30,
+        56
+      );
+
+
+    const contentShape =
+      makeShape(
+        frameThickness,
+        Math.min(
+          64,
+          outerTopHeight + 18
+        ),
+        Math.min(
+          66,
+          outerBottomHeight + 18
+        )
+      );
+
+
+    /*
+      Compound even-odd path = real border ring with transparent middle.
+    */
+    ring.setAttribute(
+      "d",
+      `${outerShape.d} ${contentShape.d}`
+    );
+
+
+    outerEdge.setAttribute(
+      "d",
+      outerShape.d
+    );
+
+
+    const chromeShape =
+      makeShape(
+        6,
+        Math.min(
+          50,
+          outerTopHeight + 4
+        ),
+        Math.min(
+          52,
+          outerBottomHeight + 4
+        )
+      );
+
+
+    chromeEdge.setAttribute(
+      "d",
+      chromeShape.d
+    );
+
+
+    const innerChromeShape =
+      makeShape(
+        Math.max(
+          10,
+          frameThickness - 8
+        ),
+        Math.min(
+          60,
+          contentShape.topHeight - 4
+        ),
+        Math.min(
+          62,
+          contentShape.bottomHeight - 4
+        )
+      );
+
+
+    innerEdge.setAttribute(
+      "d",
+      innerChromeShape.d
+    );
+
+
+    orangeRail.setAttribute(
+      "d",
+      contentShape.d
+    );
+
+
+    /*
+      Small brighter orange section along the top-left horizontal rail.
+    */
+    const highlightStart =
+      contentShape.topStartX +
+      Math.min(
+        18,
+        rect.width * 0.015
+      );
+
+
+    const highlightEnd =
+      Math.min(
+        contentShape.right - 70,
+        highlightStart +
+        Math.max(
+          90,
+          rect.width * 0.14
+        )
+      );
+
+
+    orangeHighlight.setAttribute(
+      "d",
+      `
+        M ${highlightStart} ${contentShape.top}
+        H ${highlightEnd}
+      `
+    );
+
+
+    /*
+      Bottom-center decorative notch. This is an INSET detail only; it
+      does not alter the outer morph silhouette.
+    */
+    const centerX =
+      rect.width / 2;
+
+
+    const notchY =
+      contentShape.bottom;
+
+
+    const notchHalf =
+      clamp(
+        rect.width * 0.075,
+        58,
+        110
+      );
+
+
+    const notchDepth =
+      clamp(
+        rect.height * 0.018,
+        8,
+        16
+      );
+
+
+    bottomNotch.setAttribute(
+      "d",
+      `
+        M ${centerX - notchHalf} ${notchY}
+        H ${centerX - 18}
+        L ${centerX} ${notchY + notchDepth}
+        L ${centerX + 18} ${notchY}
+        H ${centerX + notchHalf}
+      `
+    );
+
+
+    /*
+      Corner triangle clusters.
+    */
+    const setTriangleCluster = (
+      selector,
+      originX,
+      originY,
+      scale = 1
+    ) => {
+      const group =
+        frameElement.querySelector(
+          selector
+        );
+
+
+      if (!group) {
+        return;
+      }
+
+
+      const triangles =
+        group.querySelectorAll(
+          ".page-frame-triangle"
+        );
+
+
+      const s =
+        11 * scale;
+
+
+      const trianglePoints = (
+        x,
+        y
+      ) => {
+        return (
+          `${x},${y + s} ` +
+          `${x + s * 0.55},${y} ` +
+          `${x + s * 1.1},${y + s}`
+        );
+      };
+
+
+      if (triangles[0]) {
+        triangles[0].setAttribute(
+          "points",
+          trianglePoints(
+            originX + s * 0.55,
+            originY
+          )
+        );
+      }
+
+
+      if (triangles[1]) {
+        triangles[1].setAttribute(
+          "points",
+          trianglePoints(
+            originX,
+            originY + s * 0.88
+          )
+        );
+      }
+
+
+      if (triangles[2]) {
+        triangles[2].setAttribute(
+          "points",
+          trianglePoints(
+            originX + s * 1.1,
+            originY + s * 0.88
+          )
+        );
+      }
+    };
+
+
+    setTriangleCluster(
+      ".page-frame-triangle-cluster--top",
+      Math.max(26, contentShape.left * 0.55),
+      Math.max(16, contentShape.top * 0.42),
+      0.95
+    );
+
+
+    setTriangleCluster(
+      ".page-frame-triangle-cluster--bottom",
+      rect.width - Math.max(72, contentShape.left * 1.1),
+      rect.height - Math.max(64, contentShape.top * 1.1),
+      0.95
+    );
+
+
+    /*
+      Side rails and dots.
+    */
+    const updateSideDetails = (
+      selector,
+      x,
+      mirror = false
+    ) => {
+      const group =
+        frameElement.querySelector(
+          selector
+        );
+
+
+      if (!group) {
+        return;
+      }
+
+
+      const lines =
+        group.querySelectorAll(
+          ".page-frame-detail-line"
+        );
+
+
+      const dots =
+        group.querySelectorAll(
+          ".page-frame-detail-dot"
+        );
+
+
+      const upperY =
+        clamp(
+          rect.height * 0.25,
+          90,
+          220
+        );
+
+
+      const lowerY =
+        clamp(
+          rect.height * 0.68,
+          260,
+          rect.height - 100
+        );
+
+
+      if (lines[0]) {
+        lines[0].setAttribute(
+          "x1",
+          x
+        );
+
+        lines[0].setAttribute(
+          "x2",
+          x
+        );
+
+        lines[0].setAttribute(
+          "y1",
+          upperY
+        );
+
+        lines[0].setAttribute(
+          "y2",
+          lowerY
+        );
+      }
+
+
+      if (lines[1]) {
+        const shortX =
+          mirror
+            ? x - 5
+            : x + 5;
+
+
+        lines[1].setAttribute(
+          "x1",
+          shortX
+        );
+
+        lines[1].setAttribute(
+          "x2",
+          shortX
+        );
+
+        lines[1].setAttribute(
+          "y1",
+          upperY + 18
+        );
+
+        lines[1].setAttribute(
+          "y2",
+          upperY + 64
+        );
+      }
+
+
+      dots.forEach((
+        dot,
+        index
+      ) => {
+        dot.setAttribute(
+          "cx",
+          mirror
+            ? x - 4
+            : x + 4
+        );
+
+        dot.setAttribute(
+          "cy",
+          lowerY +
+          14 +
+          index * 9
+        );
+      });
+    };
+
+
+    updateSideDetails(
+      ".page-frame-side-details--left",
+      18,
+      false
+    );
+
+
+    updateSideDetails(
+      ".page-frame-side-details--right",
+      rect.width - 18,
+      true
+    );
+
+
+    /*
+      Bottom-center dots.
+    */
+    const bottomDots =
+      frameElement.querySelectorAll(
+        ".page-frame-bottom-dots circle"
+      );
+
+
+    bottomDots.forEach((
+      dot,
+      index
+    ) => {
+      dot.setAttribute(
+        "cx",
+        centerX -
+        25 +
+        index * 10
+      );
+
+      dot.setAttribute(
+        "cy",
+        rect.height -
+        Math.max(
+          12,
+          frameThickness * 0.28
+        )
+      );
+    });
+
+
+    /*
+      Expose the true transparent-window bounds to future HTML content.
+    */
+    frameElement.style.setProperty(
+      "--page-content-left",
+      `${contentShape.left}px`
+    );
+
+    frameElement.style.setProperty(
+      "--page-content-top",
+      `${contentShape.top}px`
+    );
+
+    frameElement.style.setProperty(
+      "--page-content-right",
+      `${rect.width - contentShape.right}px`
+    );
+
+    frameElement.style.setProperty(
+      "--page-content-bottom",
+      `${rect.height - contentShape.bottom}px`
+    );
+  };
+
+
+  const updateAllPrototypePageFrameGeometry = () => {
+    pageFrames.forEach((frame) => {
+      updatePrototypePageFrameGeometry(
+        frame
+      );
+    });
+  };
+
+
+
+  /*
+    Targets #2-#6: one page-frame target per nav button.
+
+    They all use the same final frame shape and page timing family for
+    now. Unique page visuals/content can be layered in later.
+  */
+  pageNames.forEach((name) => {
+    const button =
+      pageNavButtons.get(name);
+
+    const frame =
+      pageFrames.get(name);
+
+
+    if (
+      !button ||
+      !frame
+    ) {
+      return;
+    }
+
+
+    morphEngine.register(
+      `${name}-page`,
+      {
+        getSourceElement: () =>
+          button,
+
+        getTargetElement: () =>
+          frame,
+
+        getFinalRect:
+          getFinalElementRect,
+
+        buildFormPath:
+          buildFormPath,
+
+        settingsFamily:
+          "page",
+
+        shapeType:
+          "page"
+      }
+    );
+  });
+
+
+
   /* =======================================================
      Render animation
      ======================================================= */
 
   const renderMorph = (
     geometry,
-    progress
+    progress,
+    outputPath = menuMorphPath
   ) => {
     let path;
 
@@ -2071,15 +3796,23 @@ document.addEventListener("DOMContentLoaded", () => {
         )(raw);
 
 
+      const formBuilder =
+        geometry.target &&
+        typeof geometry.target.buildFormPath ===
+        "function"
+          ? geometry.target.buildFormPath
+          : buildFormPath;
+
+
       path =
-        buildFormPath(
+        formBuilder(
           geometry,
           localProgress
         );
     }
 
 
-    menuMorphPath.setAttribute(
+    outputPath.setAttribute(
       "d",
       path
     );
@@ -2105,15 +3838,15 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    menuMorphPath.style.fill =
+    outputPath.style.fill =
       colorToCss(fill);
 
 
-    menuMorphPath.style.stroke =
+    outputPath.style.stroke =
       colorToCss(stroke);
 
 
-    menuMorphPath.style.strokeWidth =
+    outputPath.style.strokeWidth =
       geometry.settings.strokeWidth;
   };
 
@@ -2267,7 +4000,18 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
+    incomingPageMorphPath.setAttribute(
+      "d",
+      ""
+    );
+
+
     menuMorphPath.removeAttribute(
+      "style"
+    );
+
+
+    incomingPageMorphPath.removeAttribute(
       "style"
     );
 
@@ -2282,6 +4026,92 @@ document.addEventListener("DOMContentLoaded", () => {
           "miter"
       }
     );
+
+
+    Object.assign(
+      incomingPageMorphPath.style,
+      {
+        vectorEffect:
+          "non-scaling-stroke",
+
+        strokeLinejoin:
+          "miter",
+
+        visibility:
+          "hidden",
+
+        opacity:
+          "1"
+      }
+    );
+  };
+
+
+  const clearOutgoingMorphPath = () => {
+    menuMorphPath.setAttribute(
+      "d",
+      ""
+    );
+
+    menuMorphPath.removeAttribute(
+      "style"
+    );
+
+    Object.assign(
+      menuMorphPath.style,
+      {
+        vectorEffect:
+          "non-scaling-stroke",
+
+        strokeLinejoin:
+          "miter"
+      }
+    );
+  };
+
+
+  const clearIncomingMorphPath = () => {
+    incomingPageMorphPath.setAttribute(
+      "d",
+      ""
+    );
+
+    incomingPageMorphPath.removeAttribute(
+      "style"
+    );
+
+    Object.assign(
+      incomingPageMorphPath.style,
+      {
+        vectorEffect:
+          "non-scaling-stroke",
+
+        strokeLinejoin:
+          "miter",
+
+        visibility:
+          "hidden",
+
+        opacity:
+          "1"
+      }
+    );
+  };
+
+
+  const hideMorphIfIdle = () => {
+    if (incomingOverlapStarted) {
+      /*
+        Keep the shared SVG surface alive for the incoming animation.
+        Only remove the outgoing path.
+      */
+      clearOutgoingMorphPath();
+
+      return;
+    }
+
+
+    hideMorph();
   };
 
 
@@ -2428,7 +4258,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const geometry =
-      getMorphGeometry();
+      morphEngine.getGeometry(
+        "mobile-menu"
+      );
 
 
     if (!geometry) {
@@ -2703,7 +4535,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const geometry =
-      getMorphGeometry();
+      morphEngine.getGeometry(
+        "mobile-menu"
+      );
 
 
     if (!geometry) {
@@ -2803,6 +4637,8 @@ document.addEventListener("DOMContentLoaded", () => {
         isAnimating = false;
         animationTargetOpen = false;
 
+        morphEngine.clearActive();
+
 
         if (focusToggle) {
           menuToggle.focus();
@@ -2873,7 +4709,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const geometry =
-      getMorphGeometry();
+      morphEngine.getGeometry(
+        "mobile-menu"
+      );
 
 
     if (!geometry) {
@@ -3055,6 +4893,8 @@ document.addEventListener("DOMContentLoaded", () => {
       isAnimating = false;
       animationTargetOpen = false;
 
+      morphEngine.clearActive();
+
 
       mobileMenu.classList.remove(
         "is-open"
@@ -3102,7 +4942,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const geometry =
-      getMorphGeometry();
+      morphEngine.getGeometry(
+        "mobile-menu"
+      );
 
 
     if (!geometry) {
@@ -3192,6 +5034,2884 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =======================================================
+     Desktop / compact page-frame animation
+     ======================================================= */
+
+  /*
+    One page-morph interaction system now covers BOTH:
+      841–1400px  compact icon-button mode
+      1401px+     full text-button desktop mode
+
+    The destination layout itself is breakpoint-specific CSS.
+  */
+  const iconButtonMode =
+    window.matchMedia(
+      "(min-width: 841px)"
+    );
+
+
+  const fullTextDesktopMode =
+    window.matchMedia(
+      "(min-width: 1401px)"
+    );
+
+
+  const secondaryPanelTimers =
+    new Map();
+
+
+  const secondaryPanelAnimations =
+    new Map();
+
+
+  let pageLayoutTransitionRunId = 0;
+  let pageLayoutTransitionActive = false;
+  let lastStablePageRect = null;
+
+  /*
+    This tracks the mode represented by lastStablePageRect.
+    It intentionally updates only AFTER a breakpoint handoff completes.
+  */
+  let lastStablePageWasDesktop =
+    fullTextDesktopMode.matches;
+
+
+  const getPageFrame = (
+    name
+  ) => {
+    return (
+      pageFrames.get(name) ||
+      null
+    );
+  };
+
+
+  const getPageTargetName = (
+    name
+  ) => {
+    return `${name}-page`;
+  };
+
+
+  const clearSecondaryPanelTimer = (
+    frame
+  ) => {
+    const timer =
+      secondaryPanelTimers.get(
+        frame
+      );
+
+
+    if (timer !== undefined) {
+      clearTimeout(
+        timer
+      );
+
+      secondaryPanelTimers.delete(
+        frame
+      );
+    }
+  };
+
+
+  const cancelSecondaryPanelAnimation = (
+    frame
+  ) => {
+    const animation =
+      secondaryPanelAnimations.get(
+        frame
+      );
+
+
+    if (animation) {
+      animation.cancel();
+
+      secondaryPanelAnimations.delete(
+        frame
+      );
+    }
+  };
+
+
+  const getSecondaryPanelElements = (
+    frame
+  ) => {
+    if (!frame) {
+      return null;
+    }
+
+
+    const panel =
+      frame.querySelector(
+        ".desktop-secondary-panel"
+      );
+
+    const glass =
+      frame.querySelector(
+        ".desktop-secondary-panel-glass"
+      );
+
+
+    if (
+      !panel ||
+      !glass
+    ) {
+      return null;
+    }
+
+
+    return {
+      panel,
+      glass
+    };
+  };
+
+
+  const getSecondaryMorphKeyframes = (
+    frame
+  ) => {
+    const styles =
+      getComputedStyle(
+        frame
+      );
+
+
+    const elements =
+      getSecondaryPanelElements(
+        frame
+      );
+
+
+    const panelRect =
+      elements
+        ? elements.panel.getBoundingClientRect()
+        : {
+            width: 0,
+            height: 0
+          };
+
+
+    /*
+      Use the same master diagonal slope as the rest of the site.
+      The corner's horizontal run is derived from its vertical rise,
+      so resizing can change the SIZE of the cut without changing
+      its ANGLE.
+    */
+    const siteSettings =
+      getSettings();
+
+
+    const cornerHeightRaw =
+      styles
+        .getPropertyValue(
+          "--secondary-panel-corner-height"
+        )
+        .trim();
+
+
+    let cornerHeight =
+      parseFloat(
+        cornerHeightRaw
+      );
+
+
+    /*
+      CSS percentages from getComputedStyle may remain percentage text,
+      so resolve them against the panel height when necessary.
+    */
+    if (
+      Number.isFinite(cornerHeight) &&
+      cornerHeightRaw.endsWith("%")
+    ) {
+      cornerHeight =
+        panelRect.height *
+        (cornerHeight / 100);
+    }
+
+
+    if (!Number.isFinite(cornerHeight)) {
+      cornerHeight =
+        Math.min(
+          68,
+          Math.max(
+            42,
+            panelRect.height * 0.085
+          )
+        );
+    }
+
+
+    cornerHeight =
+      Math.min(
+        Math.max(
+          1,
+          cornerHeight
+        ),
+        Math.max(
+          1,
+          panelRect.height * 0.25
+        )
+      );
+
+
+    const cornerWidth =
+      cornerHeight *
+      siteSettings.slope;
+
+
+    const finalClipPath =
+      "polygon(" +
+      "0 0, " +
+      `calc(100% - ${cornerWidth}px) 0, ` +
+      `100% ${cornerHeight}px, ` +
+      `100% calc(100% - ${cornerHeight}px), ` +
+      `calc(100% - ${cornerWidth}px) 100%, ` +
+      "0 100%" +
+      ")";
+
+
+    const finalFill =
+      styles
+        .getPropertyValue(
+          "--secondary-panel-fill"
+        )
+        .trim() ||
+      "rgba(105, 118, 138, 0.24)";
+
+
+    const finalBorder =
+      styles
+        .getPropertyValue(
+          "--secondary-panel-border"
+        )
+        .trim() ||
+      "rgba(194, 205, 218, 0.28)";
+
+
+    const finalInnerBorder =
+      styles
+        .getPropertyValue(
+          "--secondary-panel-inner-border"
+        )
+        .trim() ||
+      "rgba(255, 255, 255, 0.08)";
+
+
+    const stageRaw =
+      styles
+        .getPropertyValue(
+          "--secondary-panel-triangle-stage"
+        )
+        .trim();
+
+
+    let stage =
+      parseFloat(
+        stageRaw
+      );
+
+
+    if (
+      Number.isFinite(stage) &&
+      stageRaw.endsWith("%")
+    ) {
+      stage /= 100;
+    }
+
+
+    stage =
+      clamp(
+        Number.isFinite(stage)
+          ? stage
+          : 0.38,
+        0.15,
+        0.75
+      );
+
+
+    const pageAccent =
+      getFrameAccentRgb(
+        frame
+      );
+
+
+    const pageAccentLight =
+      lightenRgb(
+        pageAccent,
+        0.22
+      );
+
+
+    const pageAccentLightMid =
+      lightenRgb(
+        pageAccent,
+        0.18
+      );
+
+
+    const morphFill =
+      rgbaFromRgb(
+        pageAccent,
+        0.68
+      );
+
+
+    const morphFillMid =
+      rgbaFromRgb(
+        pageAccent,
+        0.58
+      );
+
+
+    const morphBorder =
+      rgbaFromRgb(
+        pageAccentLight,
+        0.88
+      );
+
+
+    const morphBorderMid =
+      rgbaFromRgb(
+        pageAccentLightMid,
+        0.82
+      );
+
+
+    const morphInner =
+      rgbaFromRgb(
+        pageAccent,
+        0.16
+      );
+
+
+    const morphInnerMid =
+      rgbaFromRgb(
+        pageAccent,
+        0.14
+      );
+
+
+    const makeShadow = (
+      border,
+      inner
+    ) => {
+      return (
+        `inset 0 0 0 1px ${border}, ` +
+        `inset 0 0 0 3px ${inner}, ` +
+        `inset 18px 0 40px rgba(255,255,255,0.025), ` +
+        `0 8px 24px rgba(0,0,0,0.16)`
+      );
+    };
+
+
+    return [
+      {
+        offset: 0,
+
+        clipPath:
+          "polygon(" +
+          "0 47%, " +
+          "0 47%, " +
+          "7% 50%, " +
+          "7% 50%, " +
+          "0 53%, " +
+          "0 53%" +
+          ")",
+
+        backgroundColor:
+          morphFill,
+
+        boxShadow:
+          makeShadow(
+            morphBorder,
+            morphInner
+          ),
+
+        opacity: 0
+      },
+
+      /*
+        Large triangle stage. Six points are preserved so interpolation
+        into the final six-point panel is stable.
+      */
+      {
+        offset:
+          stage,
+
+        clipPath:
+          "polygon(" +
+          "0 5%, " +
+          "0 5%, " +
+          "56% 50%, " +
+          "56% 50%, " +
+          "0 95%, " +
+          "0 95%" +
+          ")",
+
+        backgroundColor:
+          morphFillMid,
+
+        boxShadow:
+          makeShadow(
+            morphBorderMid,
+            morphInnerMid
+          ),
+
+        opacity: 1
+      },
+
+      /*
+        Final glass panel. This matches the red-outline-inspired target:
+        straight left edge with clipped top-right / bottom-right corners.
+      */
+      {
+        offset: 1,
+
+        clipPath:
+          finalClipPath,
+
+        backgroundColor:
+          finalFill,
+
+        boxShadow:
+          makeShadow(
+            finalBorder,
+            finalInnerBorder
+          ),
+
+        opacity: 1
+      }
+    ];
+  };
+
+
+  const runSecondaryPanelMorph = (
+    frame,
+    opening
+  ) => {
+    if (
+      !frame ||
+      (
+        !fullTextDesktopMode.matches &&
+        !frame.classList.contains(
+          "is-layout-transitioning"
+        )
+      )
+    ) {
+      return;
+    }
+
+
+    const elements =
+      getSecondaryPanelElements(
+        frame
+      );
+
+
+    if (!elements) {
+      return;
+    }
+
+
+    clearSecondaryPanelTimer(
+      frame
+    );
+
+
+    /*
+      Capture the CURRENT visible state before cancelling any in-flight
+      animation. This is important when the viewport crosses the desktop
+      breakpoint while the sidebar is only partially grown.
+    */
+    const existingAnimation =
+      secondaryPanelAnimations.get(
+        frame
+      );
+
+
+    let existingProgress = null;
+
+
+    if (existingAnimation) {
+      const timing =
+        existingAnimation.effect
+          ? existingAnimation.effect.getComputedTiming()
+          : null;
+
+
+      if (
+        timing &&
+        Number.isFinite(
+          timing.progress
+        )
+      ) {
+        existingProgress =
+          timing.progress;
+      }
+    }
+
+
+    const currentStyles =
+      getComputedStyle(
+        elements.glass
+      );
+
+
+    const currentFrame = {
+      clipPath:
+        currentStyles.clipPath,
+
+      backgroundColor:
+        currentStyles.backgroundColor,
+
+      boxShadow:
+        currentStyles.boxShadow,
+
+      opacity:
+        parseFloat(
+          currentStyles.opacity
+        )
+    };
+
+
+    cancelSecondaryPanelAnimation(
+      frame
+    );
+
+
+    const styles =
+      getComputedStyle(
+        frame
+      );
+
+
+    const duration =
+      parseCssTime(
+        styles.getPropertyValue(
+          opening
+            ? "--secondary-panel-duration"
+            : "--secondary-panel-close-duration"
+        ),
+        opening
+          ? 720
+          : 460
+      );
+
+
+    const easing =
+      styles
+        .getPropertyValue(
+          opening
+            ? "--secondary-panel-ease"
+            : "--secondary-panel-close-ease"
+        )
+        .trim() ||
+      (
+        opening
+          ? "cubic-bezier(0.18, 0.78, 0.22, 1)"
+          : "cubic-bezier(0.55, 0, 0.72, 0.28)"
+      );
+
+
+    const keyframes =
+      getSecondaryMorphKeyframes(
+        frame
+      );
+
+
+    let animationFrames;
+
+
+    if (opening) {
+      /*
+        Normal open retains the full triangle choreography.
+      */
+      animationFrames =
+        keyframes;
+    }
+
+    else {
+      const seedFrame = {
+        ...keyframes[0],
+        offset: 1
+      };
+
+
+      const triangleFrame = {
+        ...keyframes[1],
+        offset: 0.58
+      };
+
+
+      /*
+        If the opening animation was already beyond its large-triangle
+        stage (or fully open), route the return through that large triangle.
+
+        If it was interrupted very early, going back through the large
+        triangle would briefly make the shape GROW while closing, so in
+        that case retract directly from the current shape into the seed.
+      */
+      const triangleStageRaw =
+        styles
+          .getPropertyValue(
+            "--secondary-panel-triangle-stage"
+          )
+          .trim();
+
+
+      let triangleStage =
+        parseFloat(
+          triangleStageRaw
+        );
+
+
+      if (
+        Number.isFinite(triangleStage) &&
+        triangleStageRaw.endsWith("%")
+      ) {
+        triangleStage /= 100;
+      }
+
+
+      triangleStage =
+        Number.isFinite(triangleStage)
+          ? triangleStage
+          : 0.38;
+
+
+      if (
+        existingProgress !== null &&
+        existingProgress <
+          triangleStage
+      ) {
+        animationFrames = [
+          {
+            ...currentFrame,
+            offset: 0
+          },
+
+          seedFrame
+        ];
+      }
+
+      else {
+        animationFrames = [
+          {
+            ...currentFrame,
+            offset: 0
+          },
+
+          triangleFrame,
+
+          seedFrame
+        ];
+      }
+    }
+
+
+    const animation =
+      elements.glass.animate(
+        animationFrames,
+        {
+          duration:
+            Math.max(
+              1,
+              duration
+            ),
+
+          easing,
+
+          fill:
+            "forwards"
+        }
+      );
+
+
+    secondaryPanelAnimations.set(
+      frame,
+      animation
+    );
+
+
+    if (opening) {
+      frame.classList.add(
+        "is-secondary-open"
+      );
+    }
+
+    else {
+      frame.classList.remove(
+        "is-secondary-open"
+      );
+    }
+
+
+    animation.onfinish = () => {
+      if (
+        secondaryPanelAnimations.get(
+          frame
+        ) !== animation
+      ) {
+        return;
+      }
+
+
+      secondaryPanelAnimations.delete(
+        frame
+      );
+
+
+      if (
+        typeof animation.commitStyles ===
+        "function"
+      ) {
+        animation.commitStyles();
+      }
+
+
+      animation.cancel();
+
+
+      if (!opening) {
+        elements.glass.style.removeProperty(
+          "clip-path"
+        );
+
+        elements.glass.style.removeProperty(
+          "background-color"
+        );
+
+        elements.glass.style.removeProperty(
+          "box-shadow"
+        );
+
+        elements.glass.style.removeProperty(
+          "opacity"
+        );
+      }
+    };
+  };
+
+
+  const closeSecondaryPanel = (
+    frame
+  ) => {
+    if (!frame) {
+      return;
+    }
+
+
+    clearSecondaryPanelTimer(
+      frame
+    );
+
+
+    const isOpen =
+      frame.classList.contains(
+        "is-secondary-open"
+      );
+
+
+    const hasAnimation =
+      secondaryPanelAnimations.has(
+        frame
+      );
+
+
+    if (
+      isOpen ||
+      hasAnimation
+    ) {
+      runSecondaryPanelMorph(
+        frame,
+        false
+      );
+    }
+
+    else {
+      frame.classList.remove(
+        "is-secondary-open"
+      );
+    }
+  };
+
+
+  const closeAllSecondaryPanels = (
+    exceptFrame = null
+  ) => {
+    pageFrames.forEach((frame) => {
+      if (frame === exceptFrame) {
+        return;
+      }
+
+
+      closeSecondaryPanel(
+        frame
+      );
+    });
+  };
+
+
+  const scheduleSecondaryPanelOpen = (
+    frame
+  ) => {
+    if (
+      !frame ||
+      !fullTextDesktopMode.matches
+    ) {
+      return;
+    }
+
+
+    clearSecondaryPanelTimer(
+      frame
+    );
+
+
+    closeAllSecondaryPanels(
+      frame
+    );
+
+
+    const styles =
+      getComputedStyle(
+        frame
+      );
+
+
+    const delay =
+      parseCssTime(
+        styles.getPropertyValue(
+          "--secondary-panel-delay"
+        ),
+        160
+      );
+
+
+    const timer =
+      setTimeout(
+        () => {
+          secondaryPanelTimers.delete(
+            frame
+          );
+
+
+          const framePageName =
+            frame.dataset.page ||
+            null;
+
+
+          /*
+            Only the page the user MOST RECENTLY selected is allowed to
+            grow a secondary panel. This kills stale delayed callbacks from
+            a previous page if the user clicks again while its popout is
+            still forming.
+          */
+          if (
+            !frame.classList.contains(
+              "is-open"
+            ) ||
+            !framePageName ||
+            framePageName !==
+              selectedPageName
+          ) {
+            return;
+          }
+
+
+          runSecondaryPanelMorph(
+            frame,
+            true
+          );
+        },
+        Math.max(
+          0,
+          delay
+        )
+      );
+
+
+    secondaryPanelTimers.set(
+      frame,
+      timer
+    );
+  };
+
+
+  const hideAllPageFrames = (
+    exceptName = null
+  ) => {
+    pageFrames.forEach((
+      frame,
+      name
+    ) => {
+      if (name === exceptName) {
+        return;
+      }
+
+
+      closeSecondaryPanel(
+        frame
+      );
+
+
+      frame.classList.remove(
+        "is-open"
+      );
+
+      frame.style.transition =
+        "";
+
+      frame.style.opacity =
+        "";
+
+      frame.style.opacity =
+        "";
+    });
+  };
+
+
+  /*
+    Hard real-page invariant.
+
+    Any code path that is about to reveal a real page frame MUST call
+    this first. That guarantees rapid clicking, overlap cancellation,
+    reversals and delayed callbacks can never leave two real frames open.
+  */
+  const enforceSingleRealPage = (
+    keepName = null
+  ) => {
+    pageFrames.forEach((
+      frame,
+      name
+    ) => {
+      if (
+        keepName !== null &&
+        name === keepName
+      ) {
+        return;
+      }
+
+
+      closeSecondaryPanel(
+        frame
+      );
+
+
+      frame.classList.remove(
+        "is-open"
+      );
+
+      frame.style.opacity =
+        "";
+
+      /*
+        Do not preserve a stale transition from an interrupted reveal.
+      */
+      frame.style.transition =
+        "";
+    });
+  };
+
+
+
+  const checkRealPageInvariant = () => {
+    const openPages = [];
+
+
+    pageFrames.forEach((
+      frame,
+      name
+    ) => {
+      if (
+        frame.classList.contains(
+          "is-open"
+        )
+      ) {
+        openPages.push(
+          name
+        );
+      }
+    });
+
+
+    if (openPages.length > 1) {
+      console.warn(
+        "Page-frame invariant repaired:",
+        openPages
+      );
+
+
+      enforceSingleRealPage(
+        activePageName
+      );
+    }
+  };
+
+
+  const resetPageFrames = () => {
+    animationRunId += 1;
+
+
+    if (
+      animationFrame !== null &&
+      morphEngine.activeTargetName &&
+      morphEngine.activeTargetName.endsWith(
+        "-page"
+      )
+    ) {
+      cancelAnimationFrame(
+        animationFrame
+      );
+
+      animationFrame = null;
+    }
+
+
+    closeAllSecondaryPanels();
+
+
+    activePageName = null;
+    selectedPageName = null;
+
+    setActivePageButtonState(
+      null
+    );
+
+    queuedPageName = null;
+
+    pageFrameIsAnimating = false;
+    pageFrameTargetOpen = false;
+    pageFrameProgress = 0;
+
+
+    hideAllPageFrames();
+
+
+    cancelIncomingPageOverlap();
+
+
+    hideMorph();
+
+
+    if (
+      morphEngine.activeTargetName &&
+      morphEngine.activeTargetName.endsWith(
+        "-page"
+      )
+    ) {
+      morphEngine.clearActive();
+    }
+  };
+
+
+  const startPageOpen = (
+    name
+  ) => {
+    const frame =
+      getPageFrame(name);
+
+
+    if (
+      !frame ||
+      !iconButtonMode.matches
+    ) {
+      return;
+    }
+
+
+    hideAllPageFrames(name);
+
+    updatePrototypePageFrameGeometry(
+      frame
+    );
+
+
+    const geometry =
+      morphEngine.getGeometry(
+        getPageTargetName(name)
+      );
+
+
+    if (!geometry) {
+      return;
+    }
+
+
+    activePageName =
+      name;
+
+
+    if (
+      !selectedPageName ||
+      selectedPageName === name
+    ) {
+      selectedPageName =
+        name;
+
+      setActivePageButtonState(
+        name
+      );
+    }
+
+
+    queuedPageName =
+      null;
+
+    pageFrameIsAnimating =
+      true;
+
+    pageFrameTargetOpen =
+      true;
+
+
+    /*
+      If we're opening a brand-new page, begin from zero.
+      If this is a reversal of the same page's close, preserve progress.
+    */
+    const from =
+      pageFrameProgress;
+
+
+    const to = 1;
+
+
+    animationRunId += 1;
+
+    const runId =
+      animationRunId;
+
+
+    const duration =
+      Math.max(
+        1,
+        geometry.settings.openDuration *
+        Math.abs(to - from)
+      );
+
+
+    showMorph();
+
+    menuMorph.style.transition =
+      "none";
+
+    menuMorph.style.opacity =
+      "1";
+
+
+    animateMorph({
+      from,
+      to,
+      duration,
+      geometry,
+      runId,
+
+      onProgress: (
+        progress
+      ) => {
+        pageFrameProgress =
+          progress;
+
+
+        if (
+          progress >=
+          geometry.settings.realMenuRevealAt
+        ) {
+          frame.style.transition =
+            `opacity ${
+              geometry.settings.realMenuFadeDuration
+            }ms ease`;
+
+          enforceSingleRealPage(
+            name
+          );
+
+          frame.classList.add(
+            "is-open"
+          );
+        }
+
+
+        if (
+          progress >=
+          geometry.settings.fakeMenuFadeStart
+        ) {
+          menuMorph.style.transition =
+            `opacity ${
+              geometry.settings.fakeMenuFadeDuration
+            }ms ease`;
+
+          menuMorph.style.opacity =
+            "0";
+        }
+      },
+
+      onComplete: () => {
+        if (runId !== animationRunId) {
+          return;
+        }
+
+
+        pageFrameProgress = 1;
+
+        pageFrameIsAnimating =
+          false;
+
+        pageFrameTargetOpen =
+          true;
+
+
+        enforceSingleRealPage(
+          name
+        );
+
+        frame.classList.add(
+          "is-open"
+        );
+
+        frame.style.transition =
+          "";
+
+
+        scheduleSecondaryPanelOpen(
+          frame
+        );
+
+
+        requestAnimationFrame(() => {
+          rememberStablePageRect();
+        });
+
+
+        hideMorph();
+
+        morphEngine.clearActive();
+      }
+    });
+  };
+
+
+  const cancelIncomingPageOverlap = ({
+    preserveRealFrame = false
+  } = {}) => {
+    if (incomingPageAnimationFrame !== null) {
+      cancelAnimationFrame(
+        incomingPageAnimationFrame
+      );
+
+      incomingPageAnimationFrame =
+        null;
+    }
+
+
+    /*
+      IMPORTANT:
+      The incoming animation may already have revealed its REAL page
+      frame before being cancelled/replaced.
+
+      Previously we cleared only the temporary SVG path, which could
+      leave that real frame's .is-open class behind indefinitely.
+    */
+    if (
+      incomingOverlapPageName &&
+      !preserveRealFrame
+    ) {
+      const staleFrame =
+        getPageFrame(
+          incomingOverlapPageName
+        );
+
+
+      if (
+        staleFrame &&
+        incomingOverlapPageName !==
+          activePageName
+      ) {
+        staleFrame.classList.remove(
+          "is-open"
+        );
+
+        staleFrame.style.transition =
+          "";
+
+        staleFrame.style.opacity =
+          "";
+      }
+    }
+
+
+    incomingOverlapStarted =
+      false;
+
+    incomingOverlapPageName =
+      null;
+
+
+    clearIncomingMorphPath();
+
+
+    /*
+      Defensive sweep after any cancelled incoming animation.
+      If a committed page exists, it is the only real frame allowed to
+      remain visible; otherwise all real frames must be closed.
+    */
+    enforceSingleRealPage(
+      activePageName
+    );
+  };
+
+
+  /*
+    Start the incoming page using the SAME normal open geometry/timing
+    that already works, but on an independent temporary path.
+
+    This is the key difference from the earlier overlap attempt:
+    we do not alter the outgoing geometry at all, and we do not make the
+    two animations share a transfer shape. We simply start the known-good
+    incoming animation a little early.
+  */
+  const startIncomingPageOverlap = (
+    name,
+    overlapDuration
+  ) => {
+    const frame =
+      getPageFrame(name);
+
+
+    if (
+      !frame ||
+      !iconButtonMode.matches
+    ) {
+      return;
+    }
+
+
+    updatePrototypePageFrameGeometry(
+      frame
+    );
+
+
+    const target =
+      morphEngine.getTarget(
+        getPageTargetName(name)
+      );
+
+
+    if (!target) {
+      return;
+    }
+
+
+    const geometry =
+      getMorphGeometry(
+        target
+      );
+
+
+    if (!geometry) {
+      return;
+    }
+
+
+    cancelIncomingPageOverlap();
+
+
+    incomingOverlapStarted =
+      true;
+
+    incomingOverlapPageName =
+      name;
+
+
+    incomingPageMorphPath.style.visibility =
+      "visible";
+
+    incomingPageMorphPath.style.opacity =
+      "1";
+
+
+    /*
+      Start the incoming morph partway through its timeline so that the
+      amount already "pre-played" roughly corresponds to the requested
+      overlap duration.
+
+      This preserves the normal incoming animation's proportions rather
+      than inventing a separate shortened geometry path.
+    */
+    const overlapProgress =
+      clamp(
+        overlapDuration /
+        Math.max(
+          1,
+          geometry.settings.openDuration
+        ),
+        0,
+        0.45
+      );
+
+
+    const fromProgress =
+      overlapProgress;
+
+
+    const remainingDuration =
+      Math.max(
+        1,
+        geometry.settings.openDuration *
+        (1 - fromProgress)
+      );
+
+
+    const startTime =
+      performance.now();
+
+
+    /*
+      Render the initial overlapped frame immediately.
+    */
+    renderMorph(
+      geometry,
+      fromProgress,
+      incomingPageMorphPath
+    );
+
+
+    const step = (
+      now
+    ) => {
+      if (!incomingOverlapStarted) {
+        return;
+      }
+
+
+      const raw =
+        clamp(
+          (
+            now -
+            startTime
+          ) /
+          remainingDuration,
+          0,
+          1
+        );
+
+
+      const progress =
+        lerp(
+          fromProgress,
+          1,
+          raw
+        );
+
+
+      renderMorph(
+        geometry,
+        progress,
+        incomingPageMorphPath
+      );
+
+
+      if (
+        progress >=
+        geometry.settings.realMenuRevealAt
+      ) {
+        frame.style.transition =
+          `opacity ${
+            geometry.settings.realMenuFadeDuration
+          }ms ease`;
+
+        enforceSingleRealPage(
+          name
+        );
+
+        frame.classList.add(
+          "is-open"
+        );
+      }
+
+
+      if (
+        progress >=
+        geometry.settings.fakeMenuFadeStart
+      ) {
+        const fadeRange =
+          Math.max(
+            0.0001,
+            1 -
+            geometry.settings.fakeMenuFadeStart
+          );
+
+
+        const fadeProgress =
+          clamp(
+            (
+              progress -
+              geometry.settings.fakeMenuFadeStart
+            ) /
+            fadeRange,
+            0,
+            1
+          );
+
+
+        incomingPageMorphPath.style.opacity =
+          String(
+            1 -
+            fadeProgress
+          );
+      }
+
+
+      if (raw < 1) {
+        incomingPageAnimationFrame =
+          requestAnimationFrame(
+            step
+          );
+
+        return;
+      }
+
+
+      incomingPageAnimationFrame =
+        null;
+
+      incomingOverlapStarted =
+        false;
+
+      incomingOverlapPageName =
+        null;
+
+
+      /*
+        A completed incoming overlap becomes the sole visible real page.
+        This also cleans up any stale page that may have survived an
+        unusual rapid-click sequence.
+      */
+      hideAllPageFrames(
+        name
+      );
+
+
+      enforceSingleRealPage(
+        name
+      );
+
+      frame.classList.add(
+        "is-open"
+      );
+
+      frame.style.transition =
+        "";
+
+
+      /*
+        Commit the incoming page BEFORE scheduling its popout. This removes
+        a small race where the delayed secondary-panel callback could see
+        stale page ownership during rapid interactions.
+      */
+      activePageName =
+        name;
+
+
+      /*
+        If the user clicked again while this incoming page was animating,
+        don't steal selection back from that newer request.
+      */
+      if (
+        !selectedPageName ||
+        selectedPageName === name
+      ) {
+        selectedPageName =
+          name;
+
+        setActivePageButtonState(
+          name
+        );
+      }
+
+
+      scheduleSecondaryPanelOpen(
+        frame
+      );
+
+
+      requestAnimationFrame(() => {
+        rememberStablePageRect();
+      });
+
+
+      clearIncomingMorphPath();
+
+
+      /*
+        If the outgoing return already finished, the shared SVG is now idle
+        and can finally be hidden. Otherwise leave it alive until that return
+        completes.
+      */
+      if (
+        !pageFrameIsAnimating ||
+        pageFrameTargetOpen
+      ) {
+        hideMorph();
+      }
+
+      enforceSingleRealPage(
+        activePageName
+      );
+
+      pageFrameProgress =
+        1;
+
+      pageFrameIsAnimating =
+        false;
+
+      pageFrameTargetOpen =
+        true;
+    };
+
+
+    incomingPageAnimationFrame =
+      requestAnimationFrame(
+        step
+      );
+  };
+
+
+  /*
+    Quick return path used ONLY when switching to a different page.
+
+    This deliberately avoids running the complete normal page animation
+    backward through:
+      page -> parallelogram -> neck -> button
+
+    Instead:
+      page
+        -> its own detached launch parallelogram
+        -> collapses directly into its own button's bottom edge
+
+    Once that finishes, the requested incoming page uses the existing
+    normal open animation unchanged.
+  */
+
+  const getPageFinalSixPoints = (
+    geometry
+  ) => {
+    const {
+      menuRect,
+      topCornerHeight,
+      bottomCornerHeight,
+      topCornerWidth,
+      bottomCornerWidth
+    } = geometry;
+
+
+    return [
+      {
+        x:
+          menuRect.left +
+          topCornerWidth,
+
+        y:
+          menuRect.top
+      },
+
+      {
+        x:
+          menuRect.right,
+
+        y:
+          menuRect.top
+      },
+
+      {
+        x:
+          menuRect.right,
+
+        y:
+          menuRect.bottom -
+          bottomCornerHeight
+      },
+
+      {
+        x:
+          menuRect.right -
+          bottomCornerWidth,
+
+        y:
+          menuRect.bottom
+      },
+
+      {
+        x:
+          menuRect.left,
+
+        y:
+          menuRect.bottom
+      },
+
+      {
+        x:
+          menuRect.left,
+
+        y:
+          menuRect.top +
+          topCornerHeight
+      }
+    ];
+  };
+
+
+  const getPageLaunchSixPoints = (
+    geometry
+  ) => {
+    const launch =
+      getLaunchParallelogram(
+        geometry
+      );
+
+
+    return [
+      {
+        x:
+          launch.topLeft,
+
+        y:
+          launch.topY
+      },
+
+      {
+        x:
+          launch.topRight,
+
+        y:
+          launch.topY
+      },
+
+      /*
+        Duplicate future vertical-wall vertices so topology stays
+        identical to the final six-point page shell.
+      */
+      {
+        x:
+          launch.topRight,
+
+        y:
+          launch.topY
+      },
+
+      {
+        x:
+          launch.bottomRight,
+
+        y:
+          launch.bottomY
+      },
+
+      {
+        x:
+          launch.bottomLeft,
+
+        y:
+          launch.bottomY
+      },
+
+      {
+        x:
+          launch.bottomLeft,
+
+        y:
+          launch.bottomY
+      }
+    ];
+  };
+
+
+  const getButtonReattachSixPoints = (
+    geometry,
+    depthRatio = 0.48
+  ) => {
+    const {
+      topEdge,
+      fullStemDepth,
+      stemXAtY
+    } = geometry;
+
+    const bottomY =
+      topEdge.y +
+      (fullStemDepth * depthRatio);
+
+    const bottomLeft =
+      stemXAtY(
+        topEdge.left,
+        bottomY
+      );
+
+    const bottomRight =
+      stemXAtY(
+        topEdge.right,
+        bottomY
+      );
+
+    return [
+      { x: topEdge.left,  y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: bottomRight,   y: bottomY },
+      { x: bottomLeft,    y: bottomY },
+      { x: bottomLeft,    y: bottomY }
+    ];
+  };
+
+
+  const getButtonAbsorbSixPoints = (
+    geometry
+  ) => {
+    const {
+      topEdge
+    } = geometry;
+
+    return [
+      { x: topEdge.left,  y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.left,  y: topEdge.y },
+      { x: topEdge.left,  y: topEdge.y }
+    ];
+  };
+
+
+  const mixPagePoints = (
+    fromPoints,
+    toPoints,
+    amount
+  ) => {
+    return fromPoints.map(
+      (
+        point,
+        index
+      ) => {
+        return {
+          x:
+            lerp(
+              point.x,
+              toPoints[index].x,
+              amount
+            ),
+
+          y:
+            lerp(
+              point.y,
+              toPoints[index].y,
+              amount
+            )
+        };
+      }
+    );
+  };
+
+
+  const pagePointsToPath = (
+    points
+  ) => {
+    const [
+      p0,
+      p1,
+      p2,
+      p3,
+      p4,
+      p5
+    ] = points;
+
+
+    return `
+      M ${p0.x} ${p0.y}
+      H ${p1.x}
+
+      L ${p2.x} ${p2.y}
+
+      L ${p3.x} ${p3.y}
+
+      H ${p4.x}
+
+      L ${p5.x} ${p5.y}
+
+      Z
+    `;
+  };
+
+
+  const renderQuickReturnShape = (
+    geometry,
+    fromPoints,
+    toPoints,
+    amount,
+    colorAmount
+  ) => {
+    const points =
+      mixPagePoints(
+        fromPoints,
+        toPoints,
+        amount
+      );
+
+
+    menuMorphPath.setAttribute(
+      "d",
+      pagePointsToPath(
+        points
+      )
+    );
+
+
+    /*
+      As the page is absorbed into its button, drift the temporary shell
+      back toward the button hover material. This helps the final handoff
+      feel connected to the source control.
+    */
+    const fill =
+      mixColor(
+        geometry.settings.endFill,
+        geometry.settings.startFill,
+        colorAmount
+      );
+
+
+    const stroke =
+      mixColor(
+        geometry.settings.endStroke,
+        geometry.settings.startStroke,
+        colorAmount
+      );
+
+
+    menuMorphPath.style.fill =
+      colorToCss(fill);
+
+
+    menuMorphPath.style.stroke =
+      colorToCss(stroke);
+
+
+    menuMorphPath.style.strokeWidth =
+      geometry.settings.strokeWidth;
+  };
+
+
+  const startQuickPageReturn = (
+    name,
+    nextPageName
+  ) => {
+    const frame =
+      getPageFrame(name);
+
+
+    closeSecondaryPanel(
+      frame
+    );
+
+
+    if (
+      !frame ||
+      !iconButtonMode.matches
+    ) {
+      return;
+    }
+
+
+    queuedPageName =
+      nextPageName;
+
+
+    /*
+      Clicking the already-open page button is a toggle-off action.
+      Clear its pressed/current state immediately when the close begins,
+      rather than leaving it visually selected until the reverse morph ends.
+    */
+    if (
+      !nextPageName ||
+      nextPageName === name
+    ) {
+      setActivePageButtonState(
+        null
+      );
+    }
+
+
+    updatePrototypePageFrameGeometry(
+      frame
+    );
+
+
+    const geometry =
+      morphEngine.getGeometry(
+        getPageTargetName(name)
+      );
+
+
+    if (!geometry) {
+      return;
+    }
+
+
+    pageFrameIsAnimating =
+      true;
+
+    pageFrameTargetOpen =
+      false;
+
+
+    animationRunId += 1;
+
+    const runId =
+      animationRunId;
+
+
+    /*
+      Reuse the page-switch collapse timing variable that is already in
+      the newer CSS. If it is missing, fall back to a quick 380ms return.
+
+      Because this JS is rebuilt from the last known-good sequential
+      version, no overlap logic is involved at all.
+    */
+    const styles =
+      getComputedStyle(
+        siteHeader
+      );
+
+
+    const switchDurationRaw =
+      parseCssTime(
+        styles.getPropertyValue(
+          "--page-switch-collapse-duration"
+        ),
+        380
+      );
+
+
+    const duration =
+      Math.max(
+        1,
+        switchDurationRaw
+      );
+
+
+    const overlapDuration =
+      Math.min(
+        duration,
+        Math.max(
+          0,
+          parseCssTime(
+            styles.getPropertyValue(
+              "--page-switch-overlap"
+            ),
+            0
+          )
+        )
+      );
+
+
+    const returnFadeMultiplierRaw =
+      parseFloat(
+        styles.getPropertyValue(
+          "--page-switch-return-frame-fade-multiplier"
+        )
+      );
+
+    const returnFadeMultiplier =
+      Number.isFinite(returnFadeMultiplierRaw)
+        ? Math.max(0.01, returnFadeMultiplierRaw)
+        : 0.22;
+
+
+    /*
+      Three-part return:
+        page -> detached parallelogram
+        parallelogram -> attached short extrusion
+        attached extrusion -> absorbed into button
+    */
+    const readReturnPercent = (
+      name,
+      fallback
+    ) => {
+      const raw =
+        styles
+          .getPropertyValue(name)
+          .trim();
+
+      if (!raw) {
+        return fallback;
+      }
+
+      const parsed =
+        parseFloat(raw);
+
+      if (!Number.isFinite(parsed)) {
+        return fallback;
+      }
+
+      return raw.endsWith("%")
+        ? parsed / 100
+        : parsed;
+    };
+
+
+    /*
+      Keep the same total return speed and simply allocate more of that
+      time to the page -> parallelogram transformation.
+    */
+    const parallelogramAt =
+      clamp(
+        readReturnPercent(
+          "--page-switch-return-parallelogram-at",
+          0.72
+        ),
+        0.10,
+        0.90
+      );
+
+    const reattachAt =
+      clamp(
+        readReturnPercent(
+          "--page-switch-return-reattach-at",
+          0.90
+        ),
+        parallelogramAt + 0.02,
+        0.98
+      );
+
+
+    /*
+      Complete the dark -> page-accent color transition during the FIRST
+      return phase, rather than waiting until the shape is already attached
+      to the button.
+    */
+    const returnColorCompleteAt =
+      clamp(
+        readReturnPercent(
+          "--page-switch-return-color-complete-at",
+          0.55
+        ),
+        0.05,
+        1
+      );
+
+
+    /*
+      While switching pages, both buttons are pressed during the detached
+      return. The outgoing button releases at the exact moment the detached
+      parallelogram finishes reattaching to its home button.
+    */
+    let outgoingButtonReleased =
+      false;
+
+
+    const releaseOutgoingButton = () => {
+      if (
+        outgoingButtonReleased ||
+        !selectedPageName
+      ) {
+        return;
+      }
+
+
+      outgoingButtonReleased =
+        true;
+
+
+      /*
+        Keep the latest user selection active, but release ONLY this
+        outgoing button with its custom softer fade.
+      */
+      setActivePageButtonState(
+        selectedPageName,
+        name
+      );
+
+
+      releasePageButtonState(
+        name
+      );
+    };
+
+
+    const pagePoints =
+      getPageFinalSixPoints(
+        geometry
+      );
+
+    const launchPoints =
+      getPageLaunchSixPoints(
+        geometry
+      );
+
+    const reattachPoints =
+      getButtonReattachSixPoints(
+        geometry,
+        0.48
+      );
+
+    const absorbPoints =
+      getButtonAbsorbSixPoints(
+        geometry
+      );
+
+
+    cancelIncomingPageOverlap();
+
+
+    showMorph();
+
+
+    menuMorph.style.transition =
+      "none";
+
+    menuMorph.style.opacity =
+      "1";
+
+
+    /*
+      Start with the fake shell exactly over the real page, then fade the
+      real page out underneath it.
+    */
+    renderQuickReturnShape(
+      geometry,
+      pagePoints,
+      pagePoints,
+      0,
+      0
+    );
+
+
+    frame.style.transition =
+      `opacity ${
+        Math.max(
+          1,
+          geometry.settings.realMenuFadeDuration *
+          returnFadeMultiplier
+        )
+      }ms ease`;
+
+    frame.classList.remove(
+      "is-open"
+    );
+
+
+    const startTime =
+      performance.now();
+
+
+    const frameStep = (
+      now
+    ) => {
+      if (runId !== animationRunId) {
+        return;
+      }
+
+
+      const raw =
+        clamp(
+          (
+            now -
+            startTime
+          ) /
+          duration,
+          0,
+          1
+        );
+
+
+      /*
+        reattachAt is the first frame where the detached parallelogram is
+        gone and the remaining shape is physically part of the button.
+        Release the outgoing pressed state right there.
+      */
+      if (
+        raw >= reattachAt
+      ) {
+        releaseOutgoingButton();
+      }
+
+
+      if (raw <= parallelogramAt) {
+        const localRaw =
+          raw / parallelogramAt;
+
+        const local =
+          easingFromName(
+            geometry.settings.reshapeEase
+          )(
+            clamp(localRaw, 0, 1)
+          );
+
+        /*
+          Geometry and color have separate pacing here:
+            geometry -> normal page-to-parallelogram easing
+            color    -> reaches the page accent earlier
+
+          This keeps the outgoing page dark at the start, but by the time
+          it resolves into the detached parallelogram it has clearly become
+          its own page color.
+        */
+        /*
+          Color timing uses the OVERALL quick-return progress (`raw`), not
+          the local 0..1 progress of this first geometry stage.
+
+          The old version divided localRaw by the setting and then applied
+          easeOutCubic, which front-loaded the change so heavily that even
+          large values looked almost instantaneous.
+
+          Example with the current defaults:
+            returnColorCompleteAt = 55%
+            parallelogramAt       = 69%
+
+          -> dark at 0%
+          -> gradually gains page color
+          -> reaches full accent at 55%
+          -> remains full accent through the parallelogram at 69%
+        */
+        const colorRaw =
+          clamp(
+            raw /
+            returnColorCompleteAt,
+            0,
+            1
+          );
+
+
+        const colorAmount =
+          easeInOutCubic(
+            colorRaw
+          );
+
+
+        renderQuickReturnShape(
+          geometry,
+          pagePoints,
+          launchPoints,
+          local,
+          colorAmount
+        );
+      }
+
+      else if (raw <= reattachAt) {
+        /*
+          Move and shrink the detached parallelogram until it becomes a
+          short extrusion physically connected to the home button.
+        */
+        const localRaw =
+          (
+            raw -
+            parallelogramAt
+          ) /
+          (
+            reattachAt -
+            parallelogramAt
+          );
+
+        const local =
+          easeInOutCubic(
+            clamp(localRaw, 0, 1)
+          );
+
+        renderQuickReturnShape(
+          geometry,
+          launchPoints,
+          reattachPoints,
+          local,
+          1
+        );
+      }
+
+      else {
+        /*
+          Only after reattachment do we collapse the remaining extrusion
+          upward into the button.
+        */
+        const localRaw =
+          (
+            raw -
+            reattachAt
+          ) /
+          (
+            1 -
+            reattachAt
+          );
+
+        const local =
+          easeInCubic(
+            clamp(localRaw, 0, 1)
+          );
+
+        renderQuickReturnShape(
+          geometry,
+          reattachPoints,
+          absorbPoints,
+          local,
+          1
+        );
+      }
+
+
+      /*
+        Start the incoming page during the final overlapDuration of this
+        otherwise-unchanged outgoing return.
+      */
+      if (
+        !incomingOverlapStarted &&
+        nextPageName &&
+        overlapDuration > 0 &&
+        (
+          (now - startTime) >=
+          (duration - overlapDuration)
+        )
+      ) {
+        startIncomingPageOverlap(
+          nextPageName,
+          overlapDuration
+        );
+      }
+
+
+      pageFrameProgress =
+        1 -
+        raw;
+
+
+      if (raw < 1) {
+        animationFrame =
+          requestAnimationFrame(
+            frameStep
+          );
+
+        return;
+      }
+
+
+      animationFrame = null;
+
+
+      releaseOutgoingButton();
+
+
+      if (runId !== animationRunId) {
+        return;
+      }
+
+
+      closeSecondaryPanel(
+        frame
+      );
+
+
+      frame.classList.remove(
+        "is-open"
+      );
+
+      frame.style.transition =
+        "";
+
+      frame.style.opacity =
+        "";
+
+
+      hideMorphIfIdle();
+
+      morphEngine.clearActive();
+
+
+      pageFrameProgress = 0;
+
+      pageFrameIsAnimating =
+        false;
+
+      pageFrameTargetOpen =
+        false;
+
+
+      /*
+        A newer click may have changed selectedPageName while this return
+        was running. Honor the latest selection instead of blindly opening
+        the page captured when the return first started.
+      */
+      const next =
+        selectedPageName ||
+        queuedPageName;
+
+
+      queuedPageName =
+        null;
+
+
+      if (
+        next &&
+        next !== name
+      ) {
+        /*
+          If overlap was disabled (0ms), preserve the exact old sequential
+          behavior. If overlap has already started, simply let that
+          independent incoming animation continue.
+        */
+        if (!incomingOverlapStarted) {
+          activePageName =
+            next;
+
+          setActivePageButtonState(
+            next
+          );
+
+          pageFrameProgress = 0;
+
+          startPageOpen(
+            next
+          );
+        }
+      }
+
+      else {
+        activePageName =
+          null;
+        selectedPageName =
+          null;
+
+        setActivePageButtonState(
+          null
+        );
+      }
+    };
+
+
+    animationFrame =
+      requestAnimationFrame(
+        frameStep
+      );
+  };
+
+
+  const startPageClose = (
+    name,
+    nextPageName = null
+  ) => {
+    const frame =
+      getPageFrame(name);
+
+
+    closeSecondaryPanel(
+      frame
+    );
+
+
+    if (
+      !frame ||
+      !iconButtonMode.matches
+    ) {
+      return;
+    }
+
+
+    queuedPageName =
+      nextPageName;
+
+
+    updatePrototypePageFrameGeometry(
+      frame
+    );
+
+
+    const geometry =
+      morphEngine.getGeometry(
+        getPageTargetName(name)
+      );
+
+
+    if (!geometry) {
+      return;
+    }
+
+
+    pageFrameIsAnimating =
+      true;
+
+    pageFrameTargetOpen =
+      false;
+
+
+    const from =
+      pageFrameProgress;
+
+
+    const to = 0;
+
+
+    animationRunId += 1;
+
+    const runId =
+      animationRunId;
+
+
+    const duration =
+      Math.max(
+        1,
+        geometry.settings.closeDuration *
+        Math.abs(from - to)
+      );
+
+
+    /*
+      Bring the fake frame back at the exact current geometry so the real
+      frame can crossfade into the reverse morph cleanly.
+    */
+    showMorph();
+
+    renderMorph(
+      geometry,
+      from
+    );
+
+
+    menuMorph.style.transition =
+      "none";
+
+    menuMorph.style.opacity =
+      "1";
+
+
+    frame.style.transition =
+      `opacity ${
+        geometry.settings.realMenuFadeDuration
+      }ms ease`;
+
+    frame.classList.remove(
+      "is-open"
+    );
+
+
+    animateMorph({
+      from,
+      to,
+      duration,
+      geometry,
+      runId,
+
+      onProgress: (
+        progress
+      ) => {
+        pageFrameProgress =
+          progress;
+      },
+
+      onComplete: () => {
+        if (runId !== animationRunId) {
+          return;
+        }
+
+
+        pageFrameProgress = 0;
+
+        pageFrameIsAnimating =
+          false;
+
+        pageFrameTargetOpen =
+          false;
+
+
+        frame.classList.remove(
+          "is-open"
+        );
+
+        frame.style.transition =
+          "";
+
+
+        hideMorph();
+
+        morphEngine.clearActive();
+
+
+        const next =
+          queuedPageName;
+
+
+        queuedPageName =
+          null;
+
+
+        if (
+          next &&
+          next !== name
+        ) {
+          activePageName =
+            next;
+
+          setActivePageButtonState(
+            next
+          );
+
+          pageFrameProgress = 0;
+
+          startPageOpen(
+            next
+          );
+        }
+
+        else {
+          activePageName =
+            null;
+
+          setActivePageButtonState(
+            null
+          );
+        }
+      }
+    });
+  };
+
+
+  const requestPage = (
+    name
+  ) => {
+    /*
+      Repair any stale real-frame state before processing a new click.
+      The animation SVGs are independent; this only normalizes REAL pages.
+    */
+    enforceSingleRealPage(
+      activePageName
+    );
+
+
+    if (
+      !iconButtonMode.matches ||
+      !pageFrames.has(name)
+    ) {
+      return;
+    }
+
+
+    /*
+      No active page yet: open immediately.
+    */
+    if (!activePageName) {
+      selectedPageName =
+        name;
+
+      setActivePageButtonState(
+        name
+      );
+
+
+      pageFrameProgress = 0;
+
+      startPageOpen(
+        name
+      );
+
+      return;
+    }
+
+
+    /*
+      Clicking the SAME page toggles/reverses it.
+    */
+    if (name === activePageName) {
+      if (pageFrameIsAnimating) {
+        if (pageFrameTargetOpen) {
+          selectedPageName =
+            null;
+
+          setActivePageButtonState(
+            null
+          );
+
+
+          startPageClose(
+            activePageName
+          );
+        }
+
+        else {
+          selectedPageName =
+            activePageName;
+
+          setActivePageButtonState(
+            activePageName
+          );
+
+
+          startPageOpen(
+            activePageName
+          );
+        }
+
+        return;
+      }
+
+
+      if (pageFrameProgress >= 1) {
+        selectedPageName =
+          null;
+
+        setActivePageButtonState(
+          null
+        );
+
+
+        startPageClose(
+          activePageName
+        );
+      }
+
+      else {
+        selectedPageName =
+          activePageName;
+
+        setActivePageButtonState(
+          activePageName
+        );
+
+
+        startPageOpen(
+          activePageName
+        );
+      }
+
+
+      return;
+    }
+
+
+    /*
+      Different page:
+
+      The button state represents the USER'S CURRENT SELECTION, not which
+      page has finished animating. So select the newly-clicked button
+      immediately while activePageName continues to represent the outgoing
+      page until its return animation hands off to the incoming page.
+    */
+    selectedPageName =
+      name;
+
+
+    setActivePageButtonState(
+      selectedPageName,
+      activePageName
+    );
+
+
+    /*
+      current page
+        -> its own detached parallelogram
+        -> directly absorbed into its own home button
+      then:
+        requested page opens normally
+    */
+    startQuickPageReturn(
+      activePageName,
+      name
+    );
+  };
+
+
+  /* =======================================================
      Initial state
      ======================================================= */
 
@@ -3203,6 +7923,39 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =======================================================
      Interactions
      ======================================================= */
+
+  pageNames.forEach((name) => {
+    const button =
+      pageNavButtons.get(name);
+
+
+    if (!button) {
+      return;
+    }
+
+
+    button.addEventListener(
+      "click",
+      (event) => {
+        /*
+          Intercept the five nav buttons in both non-mobile modes.\n          Hamburger/mobile behavior remains separate.
+        */
+        if (!iconButtonMode.matches) {
+          return;
+        }
+
+
+        event.preventDefault();
+
+
+        requestPage(
+          name
+        );
+      }
+    );
+  });
+
+
 
   menuToggle.addEventListener(
     "click",
@@ -3355,12 +8108,880 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  const copyRect = (
+    rect
+  ) => {
+    if (!rect) {
+      return null;
+    }
+
+
+    return {
+      left:
+        rect.left,
+
+      top:
+        rect.top,
+
+      width:
+        rect.width,
+
+      height:
+        rect.height,
+
+      right:
+        rect.right,
+
+      bottom:
+        rect.bottom
+    };
+  };
+
+
+  const rememberStablePageRect = () => {
+    if (
+      pageLayoutTransitionActive ||
+      fullTextDesktopMode.matches !==
+        lastStablePageWasDesktop ||
+      !activePageName ||
+      pageFrameIsAnimating ||
+      pageFrameProgress < 1
+    ) {
+      return;
+    }
+
+
+    const frame =
+      getPageFrame(
+        activePageName
+      );
+
+
+    if (
+      !frame ||
+      !frame.classList.contains(
+        "is-open"
+      )
+    ) {
+      return;
+    }
+
+
+    lastStablePageRect =
+      copyRect(
+        frame.getBoundingClientRect()
+      );
+  };
+
+
+  const waitForSecondaryPanelClose = async (
+    frame,
+    runId
+  ) => {
+    closeSecondaryPanel(
+      frame
+    );
+
+
+    const animation =
+      secondaryPanelAnimations.get(
+        frame
+      );
+
+
+    if (!animation) {
+      return;
+    }
+
+
+    try {
+      await animation.finished;
+    }
+
+    catch {
+      /*
+        Cancellation is expected if the user crosses the breakpoint again
+        before the transition finishes.
+      */
+    }
+
+
+    if (runId !== pageLayoutTransitionRunId) {
+      return;
+    }
+  };
+
+
+  const measureNaturalPageRect = (
+    frame
+  ) => {
+    if (!frame) {
+      return null;
+    }
+
+
+    /*
+      Temporarily release only the rectangle properties that our responsive
+      transition owns, measure where CSS wants the frame RIGHT NOW, then
+      restore the in-progress animated rectangle.
+
+      These changes happen synchronously before the browser paints, so the
+      user never sees the measurement state.
+    */
+    const saved = {
+      left:
+        frame.style.left,
+
+      top:
+        frame.style.top,
+
+      right:
+        frame.style.right,
+
+      bottom:
+        frame.style.bottom,
+
+      width:
+        frame.style.width,
+
+      height:
+        frame.style.height,
+
+      transform:
+        frame.style.transform,
+
+      transformOrigin:
+        frame.style.transformOrigin
+    };
+
+
+    frame.style.removeProperty(
+      "left"
+    );
+
+    frame.style.removeProperty(
+      "top"
+    );
+
+    frame.style.removeProperty(
+      "right"
+    );
+
+    frame.style.removeProperty(
+      "bottom"
+    );
+
+    frame.style.removeProperty(
+      "width"
+    );
+
+    frame.style.removeProperty(
+      "height"
+    );
+
+    frame.style.removeProperty(
+      "transform"
+    );
+
+    frame.style.removeProperty(
+      "transform-origin"
+    );
+
+
+    const rect =
+      copyRect(
+        frame.getBoundingClientRect()
+      );
+
+
+    const restore = (
+      property,
+      value
+    ) => {
+      if (value) {
+        frame.style.setProperty(
+          property,
+          value
+        );
+      }
+
+      else {
+        frame.style.removeProperty(
+          property
+        );
+      }
+    };
+
+
+    restore(
+      "left",
+      saved.left
+    );
+
+    restore(
+      "top",
+      saved.top
+    );
+
+    restore(
+      "right",
+      saved.right
+    );
+
+    restore(
+      "bottom",
+      saved.bottom
+    );
+
+    restore(
+      "width",
+      saved.width
+    );
+
+    restore(
+      "height",
+      saved.height
+    );
+
+    restore(
+      "transform",
+      saved.transform
+    );
+
+    restore(
+      "transform-origin",
+      saved.transformOrigin
+    );
+
+
+    return rect;
+  };
+
+
+  const animateFrameBetweenRects = async (
+    frame,
+    fromRect,
+    initialToRect,
+    runId
+  ) => {
+    if (
+      !frame ||
+      !fromRect ||
+      !initialToRect
+    ) {
+      return;
+    }
+
+
+    const styles =
+      getComputedStyle(
+        frame
+      );
+
+
+    const duration =
+      parseCssTime(
+        styles.getPropertyValue(
+          "--page-layout-transition-duration"
+        ),
+        480
+      );
+
+
+    const easingName =
+      styles
+        .getPropertyValue(
+          "--page-layout-transition-ease"
+        )
+        .trim() ||
+      "ease-in-out";
+
+
+    const ease =
+      (
+        easingName === "linear" ||
+        easingName === "ease-in" ||
+        easingName === "ease-out" ||
+        easingName === "ease-in-out"
+      )
+        ? easingFromName(
+            easingName
+          )
+        : easeInOutCubic;
+
+
+    frame.style.transform =
+      "none";
+
+    frame.style.transformOrigin =
+      "top left";
+
+    frame.style.right =
+      "auto";
+
+    frame.style.bottom =
+      "auto";
+
+
+    const startTime =
+      performance.now();
+
+
+    let latestTarget =
+      initialToRect;
+
+
+    await new Promise((resolve) => {
+      const step = (
+        now
+      ) => {
+        if (
+          runId !==
+          pageLayoutTransitionRunId
+        ) {
+          resolve();
+
+          return;
+        }
+
+
+        /*
+          The important bit: while the user is still dragging the browser
+          edge, the responsive CSS destination keeps moving. Re-measure it
+          every RAF instead of animating toward the breakpoint-era snapshot.
+        */
+        const naturalTarget =
+          measureNaturalPageRect(
+            frame
+          );
+
+
+        if (
+          naturalTarget &&
+          naturalTarget.width > 0 &&
+          naturalTarget.height > 0
+        ) {
+          latestTarget =
+            naturalTarget;
+        }
+
+
+        const raw =
+          clamp(
+            (
+              now -
+              startTime
+            ) /
+            Math.max(
+              1,
+              duration
+            ),
+            0,
+            1
+          );
+
+
+        const t =
+          ease(
+            raw
+          );
+
+
+        const left =
+          lerp(
+            fromRect.left,
+            latestTarget.left,
+            t
+          );
+
+
+        const top =
+          lerp(
+            fromRect.top,
+            latestTarget.top,
+            t
+          );
+
+
+        const width =
+          lerp(
+            fromRect.width,
+            latestTarget.width,
+            t
+          );
+
+
+        const height =
+          lerp(
+            fromRect.height,
+            latestTarget.height,
+            t
+          );
+
+
+        frame.style.left =
+          `${left}px`;
+
+        frame.style.top =
+          `${top}px`;
+
+        frame.style.width =
+          `${width}px`;
+
+        frame.style.height =
+          `${height}px`;
+
+
+        updatePrototypePageFrameGeometry(
+          frame
+        );
+
+
+        if (raw < 1) {
+          requestAnimationFrame(
+            step
+          );
+
+          return;
+        }
+
+
+        resolve();
+      };
+
+
+      requestAnimationFrame(
+        step
+      );
+    });
+
+
+    if (
+      runId !==
+      pageLayoutTransitionRunId
+    ) {
+      return;
+    }
+
+
+    /*
+      Do one final live measurement at the exact handoff point. If the
+      viewport moved during the last animation frame, use that newest
+      rectangle rather than releasing to a slightly different CSS size.
+    */
+    const finalTarget =
+      measureNaturalPageRect(
+        frame
+      ) ||
+      latestTarget;
+
+
+    if (finalTarget) {
+      frame.style.left =
+        `${finalTarget.left}px`;
+
+      frame.style.top =
+        `${finalTarget.top}px`;
+
+      frame.style.width =
+        `${finalTarget.width}px`;
+
+      frame.style.height =
+        `${finalTarget.height}px`;
+
+
+      updatePrototypePageFrameGeometry(
+        frame
+      );
+
+
+      /*
+        Force the exact current endpoint into layout before releasing our
+        temporary dimensions. There should now be zero geometric difference
+        between the inline rectangle and the responsive CSS rectangle.
+      */
+      frame.getBoundingClientRect();
+    }
+
+
+    frame.style.removeProperty(
+      "left"
+    );
+
+    frame.style.removeProperty(
+      "top"
+    );
+
+    frame.style.removeProperty(
+      "right"
+    );
+
+    frame.style.removeProperty(
+      "bottom"
+    );
+
+    frame.style.removeProperty(
+      "width"
+    );
+
+    frame.style.removeProperty(
+      "height"
+    );
+
+    frame.style.removeProperty(
+      "transform"
+    );
+
+    frame.style.removeProperty(
+      "transform-origin"
+    );
+
+
+    updatePrototypePageFrameGeometry(
+      frame
+    );
+  };
+
+
+  const transitionPageLayoutMode = async (
+    enteringDesktop
+  ) => {
+    if (
+      !activePageName ||
+      pageFrameIsAnimating ||
+      pageFrameProgress < 1
+    ) {
+      closeAllSecondaryPanels();
+
+      lastStablePageWasDesktop =
+        enteringDesktop;
+
+
+      requestAnimationFrame(() => {
+        updateAllPrototypePageFrameGeometry();
+
+        rememberStablePageRect();
+
+
+        if (
+          enteringDesktop &&
+          activePageName &&
+          pageFrameProgress >= 1
+        ) {
+          scheduleSecondaryPanelOpen(
+            getPageFrame(
+              activePageName
+            )
+          );
+        }
+      });
+
+      return;
+    }
+
+
+    const frame =
+      getPageFrame(
+        activePageName
+      );
+
+
+    if (!frame) {
+      return;
+    }
+
+
+    pageLayoutTransitionRunId += 1;
+
+    const runId =
+      pageLayoutTransitionRunId;
+
+
+    /*
+      If another handoff was already running, start from its CURRENT
+      on-screen rectangle instead of snapping back to its old endpoint.
+    */
+    const fromRect =
+      pageLayoutTransitionActive
+        ? copyRect(
+            frame.getBoundingClientRect()
+          )
+        : (
+            lastStablePageRect ||
+            copyRect(
+              frame.getBoundingClientRect()
+            )
+          );
+
+
+    pageLayoutTransitionActive =
+      true;
+
+
+    frame.classList.add(
+      "is-layout-transitioning"
+    );
+
+
+    /*
+      The media query has already switched to the NEW responsive layout.
+      Measure that destination rectangle now.
+
+      We then immediately restore the OLD rectangle with real dimensions,
+      not a non-uniform scale transform. That preserves the frame angles.
+    */
+    updatePrototypePageFrameGeometry(
+      frame
+    );
+
+
+    const toRect =
+      measureNaturalPageRect(
+        frame
+      );
+
+
+    if (!toRect) {
+      pageLayoutTransitionActive =
+        false;
+
+      frame.classList.remove(
+        "is-layout-transitioning"
+      );
+
+      return;
+    }
+
+
+    frame.style.right =
+      "auto";
+
+    frame.style.bottom =
+      "auto";
+
+    frame.style.left =
+      `${fromRect.left}px`;
+
+    frame.style.top =
+      `${fromRect.top}px`;
+
+    frame.style.width =
+      `${fromRect.width}px`;
+
+    frame.style.height =
+      `${fromRect.height}px`;
+
+    frame.style.transform =
+      "none";
+
+
+    /*
+      Regenerate SVG geometry immediately at the held old rectangle so the
+      frame never appears in the target shape before animation begins.
+    */
+    updatePrototypePageFrameGeometry(
+      frame
+    );
+
+
+    frame.getBoundingClientRect();
+
+
+    if (!enteringDesktop) {
+      /*
+        DESKTOP -> TABLET
+        1. Hold the entire composition at desktop size.
+        2. Suck the glass sidebar back into its orange seed triangle.
+        3. Resize the main frame smoothly into the tablet composition.
+      */
+      await waitForSecondaryPanelClose(
+        frame,
+        runId
+      );
+
+
+      if (runId !== pageLayoutTransitionRunId) {
+        return;
+      }
+
+
+      await animateFrameBetweenRects(
+        frame,
+        fromRect,
+        toRect,
+        runId
+      );
+    }
+
+    else {
+      /*
+        TABLET -> DESKTOP
+        1. Resize the main frame into the desktop composition.
+        2. Once settled, grow the secondary panel from its seed triangle.
+      */
+      closeSecondaryPanel(
+        frame
+      );
+
+
+      await animateFrameBetweenRects(
+        frame,
+        fromRect,
+        toRect,
+        runId
+      );
+
+
+      if (runId !== pageLayoutTransitionRunId) {
+        return;
+      }
+    }
+
+
+    if (runId !== pageLayoutTransitionRunId) {
+      return;
+    }
+
+
+    frame.style.removeProperty(
+      "left"
+    );
+
+    frame.style.removeProperty(
+      "top"
+    );
+
+    frame.style.removeProperty(
+      "right"
+    );
+
+    frame.style.removeProperty(
+      "bottom"
+    );
+
+    frame.style.removeProperty(
+      "width"
+    );
+
+    frame.style.removeProperty(
+      "height"
+    );
+
+    frame.style.removeProperty(
+      "transform"
+    );
+
+    frame.style.removeProperty(
+      "transform-origin"
+    );
+
+
+    frame.classList.remove(
+      "is-layout-transitioning"
+    );
+
+
+    pageLayoutTransitionActive =
+      false;
+
+    lastStablePageWasDesktop =
+      enteringDesktop;
+
+
+    updatePrototypePageFrameGeometry(
+      frame
+    );
+
+
+    lastStablePageRect =
+      copyRect(
+        frame.getBoundingClientRect()
+      );
+
+
+    if (enteringDesktop) {
+      scheduleSecondaryPanelOpen(
+        frame
+      );
+    }
+  };
+
+
+  const handleFullTextDesktopModeChange = (
+    event
+  ) => {
+    transitionPageLayoutMode(
+      event.matches
+    );
+  };
+
+
+  if (
+    typeof fullTextDesktopMode.addEventListener ===
+    "function"
+  ) {
+    fullTextDesktopMode.addEventListener(
+      "change",
+      handleFullTextDesktopModeChange
+    );
+  }
+
+  else if (
+    typeof fullTextDesktopMode.addListener ===
+    "function"
+  ) {
+    fullTextDesktopMode.addListener(
+      handleFullTextDesktopModeChange
+    );
+  }
+
+
+  const handleIconModeChange = (
+    event
+  ) => {
+    if (!event.matches) {
+      resetPageFrames();
+    }
+
+    else {
+      requestAnimationFrame(() => {
+        updateAllPrototypePageFrameGeometry();
+      });
+    }
+  };
+
+
+  if (
+    typeof iconButtonMode.addEventListener ===
+    "function"
+  ) {
+    iconButtonMode.addEventListener(
+      "change",
+      handleIconModeChange
+    );
+  }
+
+  else if (
+    typeof iconButtonMode.addListener ===
+    "function"
+  ) {
+    iconButtonMode.addListener(
+      handleIconModeChange
+    );
+  }
+
+
   /* =======================================================
      Geometry / resize updates
      ======================================================= */
 
   requestAnimationFrame(() => {
     updateMenuShearGeometry();
+    updateAllPrototypePageFrameGeometry();
+
+    requestAnimationFrame(() => {
+      rememberStablePageRect();
+    });
   });
 
 
@@ -3375,6 +8996,12 @@ document.addEventListener("DOMContentLoaded", () => {
     resizeFrame =
       requestAnimationFrame(() => {
         updateMenuShearGeometry();
+
+        updateAllPrototypePageFrameGeometry();
+
+        checkRealPageInvariant();
+
+        rememberStablePageRect();
 
 
         menuMorph.setAttribute(

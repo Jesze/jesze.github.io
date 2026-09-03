@@ -9,6 +9,23 @@
 
 <body>
 
+  <!-- Global blurred looping background video -->
+  <div class="site-background" aria-hidden="true">
+    <video
+      class="site-background-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+    >
+      <source
+        src="assets/simulacrum-loop.mp4"
+        type="video/mp4"
+      >
+    </video>
+  </div>
+
 <header class="site-header">
 
   <div class="banner-frame" aria-hidden="true">
@@ -369,6 +386,399 @@
 </header>
 
 <main class="page-demo">
+
+  <!--
+    Temporary page-frame targets for the five middle/icon-mode buttons.
+
+    They intentionally all share the same visual shell for now. The
+    current task is to establish page-to-page transition behavior before
+    introducing unique content/designs.
+  -->
+  <section
+    class="prototype-page-frame"
+    id="about-page-frame"
+    data-page="about"
+    aria-hidden="true"
+  >
+    <svg
+      class="prototype-page-frame-shell"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+      <path
+        class="page-frame-ring"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+      />
+
+      <path class="page-frame-edge page-frame-edge--outer" />
+      <path class="page-frame-edge page-frame-edge--chrome" />
+      <path class="page-frame-edge page-frame-edge--inner" />
+
+      <path class="page-frame-orange-rail" />
+      <path class="page-frame-orange-highlight" />
+
+      <!-- Decorative rails / micro-HUD details -->
+      <g class="page-frame-side-details page-frame-side-details--left">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+      <g class="page-frame-side-details page-frame-side-details--right">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+
+      <!-- Bottom-center notch / indicator treatment -->
+      <path class="page-frame-bottom-notch" />
+
+      <g class="page-frame-bottom-dots">
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+      </g>
+    </svg>
+
+    <!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+    <div class="prototype-page-frame-content" aria-label="About page content"></div>
+
+    <!-- Desktop-only secondary glass panel -->
+    <div class="desktop-secondary-panel" aria-hidden="true">
+      <div class="desktop-secondary-panel-glass"></div>
+      <div class="desktop-secondary-panel-content"></div>
+    </div>
+  </section>
+
+  <section
+    class="prototype-page-frame"
+    id="brobots-page-frame"
+    data-page="brobots"
+    aria-hidden="true"
+  >
+    <svg
+      class="prototype-page-frame-shell"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+      <path
+        class="page-frame-ring"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+      />
+
+      <path class="page-frame-edge page-frame-edge--outer" />
+      <path class="page-frame-edge page-frame-edge--chrome" />
+      <path class="page-frame-edge page-frame-edge--inner" />
+
+      <path class="page-frame-orange-rail" />
+      <path class="page-frame-orange-highlight" />
+
+      <!-- Decorative rails / micro-HUD details -->
+      <g class="page-frame-side-details page-frame-side-details--left">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+      <g class="page-frame-side-details page-frame-side-details--right">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+
+      <!-- Bottom-center notch / indicator treatment -->
+      <path class="page-frame-bottom-notch" />
+
+      <g class="page-frame-bottom-dots">
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+      </g>
+    </svg>
+
+    <!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+    <div class="prototype-page-frame-content" aria-label="Brobots page content"></div>
+
+    <!-- Desktop-only secondary glass panel -->
+    <div class="desktop-secondary-panel" aria-hidden="true">
+      <div class="desktop-secondary-panel-glass"></div>
+      <div class="desktop-secondary-panel-content"></div>
+    </div>
+  </section>
+
+  <section
+    class="prototype-page-frame"
+    id="etherian-page-frame"
+    data-page="etherian"
+    aria-hidden="true"
+  >
+    <svg
+      class="prototype-page-frame-shell"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+      <path
+        class="page-frame-ring"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+      />
+
+      <path class="page-frame-edge page-frame-edge--outer" />
+      <path class="page-frame-edge page-frame-edge--chrome" />
+      <path class="page-frame-edge page-frame-edge--inner" />
+
+      <path class="page-frame-orange-rail" />
+      <path class="page-frame-orange-highlight" />
+
+      <!-- Decorative rails / micro-HUD details -->
+      <g class="page-frame-side-details page-frame-side-details--left">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+      <g class="page-frame-side-details page-frame-side-details--right">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+
+      <!-- Bottom-center notch / indicator treatment -->
+      <path class="page-frame-bottom-notch" />
+
+      <g class="page-frame-bottom-dots">
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+      </g>
+    </svg>
+
+    <!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+    <div class="prototype-page-frame-content" aria-label="Etherian page content"></div>
+
+    <!-- Desktop-only secondary glass panel -->
+    <div class="desktop-secondary-panel" aria-hidden="true">
+      <div class="desktop-secondary-panel-glass"></div>
+      <div class="desktop-secondary-panel-content"></div>
+    </div>
+  </section>
+
+  <section
+    class="prototype-page-frame"
+    id="halodoom-page-frame"
+    data-page="halodoom"
+    aria-hidden="true"
+  >
+    <svg
+      class="prototype-page-frame-shell"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+      <path
+        class="page-frame-ring"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+      />
+
+      <path class="page-frame-edge page-frame-edge--outer" />
+      <path class="page-frame-edge page-frame-edge--chrome" />
+      <path class="page-frame-edge page-frame-edge--inner" />
+
+      <path class="page-frame-orange-rail" />
+      <path class="page-frame-orange-highlight" />
+
+      <!-- Decorative rails / micro-HUD details -->
+      <g class="page-frame-side-details page-frame-side-details--left">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+      <g class="page-frame-side-details page-frame-side-details--right">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+
+      <!-- Bottom-center notch / indicator treatment -->
+      <path class="page-frame-bottom-notch" />
+
+      <g class="page-frame-bottom-dots">
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+      </g>
+    </svg>
+
+    <!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+    <div class="prototype-page-frame-content" aria-label="Halodoom page content"></div>
+
+    <!-- Desktop-only secondary glass panel -->
+    <div class="desktop-secondary-panel" aria-hidden="true">
+      <div class="desktop-secondary-panel-glass"></div>
+      <div class="desktop-secondary-panel-content"></div>
+    </div>
+  </section>
+
+  <section
+    class="prototype-page-frame"
+    id="contact-page-frame"
+    data-page="contact"
+    aria-hidden="true"
+  >
+    <svg
+      class="prototype-page-frame-shell"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+      <path
+        class="page-frame-ring"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+      />
+
+      <path class="page-frame-edge page-frame-edge--outer" />
+      <path class="page-frame-edge page-frame-edge--chrome" />
+      <path class="page-frame-edge page-frame-edge--inner" />
+
+      <path class="page-frame-orange-rail" />
+      <path class="page-frame-orange-highlight" />
+
+      <!-- Decorative rails / micro-HUD details -->
+      <g class="page-frame-side-details page-frame-side-details--left">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+      <g class="page-frame-side-details page-frame-side-details--right">
+        <line class="page-frame-detail-line page-frame-detail-line--long" />
+        <line class="page-frame-detail-line page-frame-detail-line--short" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+        <circle class="page-frame-detail-dot" r="1.4" />
+      </g>
+
+
+      <!-- Bottom-center notch / indicator treatment -->
+      <path class="page-frame-bottom-notch" />
+
+      <g class="page-frame-bottom-dots">
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+        <circle r="1.5" />
+      </g>
+    </svg>
+
+    <!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+    <div class="prototype-page-frame-content" aria-label="Contact page content"></div>
+
+    <!-- Desktop-only secondary glass panel -->
+    <div class="desktop-secondary-panel" aria-hidden="true">
+      <div class="desktop-secondary-panel-glass"></div>
+      <div class="desktop-secondary-panel-content"></div>
+    </div>
+  </section>
+
 </main>
 
 <script src="header-menu.js"></script>

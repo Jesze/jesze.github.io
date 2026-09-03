@@ -1,3 +1,42 @@
+:root {
+  /*
+    =========================================================
+    Master per-page accent palette
+    =========================================================
+
+    These live at :root because both major UI systems need them:
+      - the fixed header/nav buttons
+      - the page frames + desktop sidebar, which live in <main>
+
+    Edit these five RGB triplets to retheme the pages.
+  */
+  --accent-about-rgb: 255, 114, 2;
+  --accent-contact-rgb: 255, 114, 2;
+
+  --accent-brobots-rgb: 222, 170, 42;
+  --accent-etherian-rgb: 54, 232, 232;
+  --accent-halodoom-rgb: 69, 173, 245;
+
+  /*
+    Current-page button darkness.
+
+    50% = an even accent/black mix.
+    Higher = brighter/more accent.
+    Lower = darker/more black.
+  */
+  --active-page-accent-share: 50%;
+
+  /*
+    Outgoing-button release time.
+
+    Incoming/pressed activation keeps the normal button transition speed.
+    This longer duration is used ONLY when an outgoing page returns to its
+    button and that button fades back to its normal state.
+  */
+  --active-page-release-duration: 580ms;
+}
+
+
 /* ---------------------------------------------------------
    Simulacrum Interactive — responsive header shell
 
@@ -29,6 +68,67 @@ body {
   background: #474847;
   color: #f0f0f0;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   Global background video
+   ========================================================= */
+
+.site-background {
+  position: fixed;
+  inset: 0;
+
+  z-index: -2;
+
+  overflow: hidden;
+
+  pointer-events: none;
+
+  background: #474847;
+}
+
+
+.site-background-video {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  opacity: 0.62;
+
+  pointer-events: none;
+}
+
+
+/*
+  Neutral dark veil keeps the motion atmospheric and prevents the
+  background from competing with the header/page-frame UI.
+*/
+.site-background::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    rgba(18, 20, 22, 0.28);
+
+  pointer-events: none;
+}
+
+
+/*
+  Decorative motion is disabled for users who prefer reduced motion.
+  The normal body background remains as the fallback.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .site-background-video {
+    display: none;
+  }
 }
 
 
@@ -108,8 +208,35 @@ body {
 
   --button-border-color: rgba(240, 240, 240, 0.2);
 
-  --button-hover-color: rgba(255, 114, 2, 0.25);
-  --button-hover-border-color: rgba(255, 210, 165, 0.4);
+  /* =======================================================
+     Per-page accent palette
+     =======================================================
+
+     These five values are the MASTER page colors.
+     Everything page-specific derives from them:
+       - nav-button hover/focus
+       - page morph animation
+       - page-frame rails/highlights/dots
+       - desktop secondary-panel triangle/accent
+
+     Tweak these later without touching the individual effects.
+  */
+  /*
+    Default remains Simulacrum orange.
+  */
+  --nav-accent-rgb:
+    var(--accent-about-rgb);
+
+  /*
+    These remain as orange fallbacks for non-page controls.
+    Page nav buttons calculate their hover directly from their own
+    --nav-accent-rgb below.
+  */
+  --button-hover-color:
+    rgba(255, 114, 2, 0.25);
+
+  --button-hover-border-color:
+    rgba(255, 210, 165, 0.4);
 
   /*
     Mobile menu visual controls.
@@ -143,7 +270,7 @@ body {
   --mobile-menu-shell-inner-border-color: rgba(120, 126, 132, 0.3);
 
   --mobile-menu-accent-color: rgba(255, 114, 2, 0.95);
-  --mobile-menu-accent-soft: rgba(255, 114, 2, 0.42);
+  --mobile-menu-accent-soft: var(--secondary-panel-accent);
 
   --mobile-menu-link-color: rgba(38, 40, 42, 0.9);
   --mobile-menu-link-border-color: rgba(236, 238, 240, 0.2);
@@ -220,6 +347,118 @@ body {
   */
   --menu-morph-real-menu-fade-duration: 850ms;
   --menu-morph-fake-menu-fade-duration: 850ms;
+
+  /*
+    Launch parallelogram size.
+
+    These control how large the detached "seed" parallelogram becomes
+    BEFORE it begins travelling / reshaping into the final target.
+
+    Keeping this smaller prevents the intermediate shape from becoming
+    wider than the viewport near the header.
+  */
+  --menu-morph-parallelogram-width-ratio: 0.70;
+  --menu-morph-parallelogram-depth-ratio: 0.50;
+
+  /*
+    Safety margin used to keep the launch parallelogram inside the
+    viewport. This only constrains the detached Stage-2 launch shape;
+    the final real menu/frame can still use its normal layout.
+  */
+  --menu-morph-viewport-safe-inset: 12px;
+
+  /*
+    Page-frame morph controls.
+
+    Page morphs use their own timing family so their much larger motion
+    can be tuned independently from the hamburger dropdown.
+  */
+  --page-morph-duration: 1150ms;
+  --page-morph-close-duration: 950ms;
+
+  --page-morph-extension-multiplier: 1.5;
+
+  --page-morph-neck-end: 13%;
+  --page-morph-parallelogram-start: 13%;
+  --page-morph-parallelogram-end: 27%;
+  --page-morph-reshape-start: 27%;
+
+  --page-morph-neck-ease: ease-out;
+  --page-morph-parallelogram-ease: ease-in-out;
+  --page-morph-reshape-ease: ease-out;
+
+  /*
+    Page-frame crossfade.
+  */
+  --page-morph-real-frame-reveal-at: 55%;
+  --page-morph-fake-frame-fade-start: 45%;
+
+  --page-morph-real-frame-fade-duration: 850ms;
+  --page-morph-fake-frame-fade-duration: 850ms;
+
+  /*
+    Page launch shape is intentionally much smaller than the final page
+    frame. Stage 3 now does most of the growing while the shape is also
+    travelling into position.
+  */
+  --page-morph-parallelogram-width-ratio: 0.32;
+  --page-morph-parallelogram-depth-ratio: 0.22;
+
+  --page-morph-viewport-safe-inset: 12px;
+
+  /*
+    Page-to-page switching.
+
+    When a DIFFERENT page is selected, we no longer return all the way
+    through the neck/button animation. Instead:
+
+      page A -> detached transfer parallelogram
+             -> page B
+
+    These timings are independent from ordinary page open/close.
+
+    --page-switch-overlap controls how long the incoming expansion starts
+    BEFORE the outgoing collapse has finished.
+
+      0ms   = strictly sequential
+      100ms = slight overlap
+      250ms = much more simultaneous
+  */
+  --page-switch-collapse-duration: 450ms;
+  --page-switch-expand-duration: 600ms;
+  --page-switch-overlap: 110ms;
+
+  /*
+    Outgoing real-page fade speed during quick returns.
+    Multiplies --page-morph-real-frame-fade-duration.
+  */
+  --page-switch-return-frame-fade-multiplier: 0.1;
+
+  /*
+    Quick-return phase allocation.
+
+    These values do NOT change the total return duration; they only decide
+    how that time is distributed between the three visual stages.
+
+    Increasing the first value gives the page -> parallelogram shape
+    transformation more screen time while keeping the overall return quick.
+  */
+  --page-switch-return-parallelogram-at: 69%;
+  --page-switch-return-reattach-at: 70%;
+
+  /*
+    Outgoing-page color return.
+
+    This is measured across the ENTIRE quick-return animation.
+
+      20% = reaches its page accent very quickly
+      55% = gradual transition through roughly the first half
+      69% = reaches full accent exactly as the parallelogram is formed
+
+    Because --page-switch-return-parallelogram-at is currently 69%,
+    values up to 69% keep the color transition inside that first stage.
+  */
+  --page-switch-return-color-complete-at: 80%;
 
   /*
     MERGE TRANSITION
@@ -555,7 +794,7 @@ body {
     solid
     var(--button-border-color);
 
-  background:
+  background-image:
     linear-gradient(
       180deg,
       rgb(
@@ -575,21 +814,152 @@ body {
       )
     );
 
+  background-color:
+    transparent;
+
   transition:
-    background 120ms ease,
-    border-color 120ms ease;
+    background-color 170ms ease,
+    border-color 170ms ease,
+    box-shadow 170ms ease;
+}
+
+
+
+/* Page-specific nav-button accent assignment. */
+.nav-button[href="#about"] {
+  --nav-accent-rgb:
+    var(--accent-about-rgb);
+}
+
+
+.nav-button[href="#brobots"] {
+  --nav-accent-rgb:
+    var(--accent-brobots-rgb);
+}
+
+
+.nav-button[href="#etherian"] {
+  --nav-accent-rgb:
+    var(--accent-etherian-rgb);
+}
+
+
+.nav-button[href="#halodoom"] {
+  --nav-accent-rgb:
+    var(--accent-halodoom-rgb);
+}
+
+
+.nav-button[href="#contact"] {
+  --nav-accent-rgb:
+    var(--accent-contact-rgb);
+}
+
+
+/*
+  Pressed/current-page state.
+
+  The visible color mixes the page accent with black. The amount of
+  accent retained is controlled globally by --active-page-accent-share.
+*/
+.nav-button.is-page-active::before,
+.nav-button[aria-current="page"]::before {
+  background-color:
+    color-mix(
+      in srgb,
+      rgb(var(--nav-accent-rgb))
+        var(--active-page-accent-share),
+      black
+    );
+
+  border-color:
+    color-mix(
+      in srgb,
+      rgb(var(--nav-accent-rgb))
+        var(--active-page-accent-share),
+      black
+    );
+
+  box-shadow:
+    inset 0 0 0 1px
+      rgba(255, 255, 255, 0.12),
+
+    0 0 7px
+      rgba(
+        var(--nav-accent-rgb),
+        0.20
+      );
+}
+
+
+/*
+  Keep the pressed state dominant when the active button is hovered.
+*/
+/*
+  Outgoing-page release state.
+
+  JS adds .is-page-releasing for only the button whose page is returning.
+  The incoming selection continues to use the normal 170ms transition.
+*/
+.nav-button.is-page-releasing::before {
+  transition-duration:
+    var(--active-page-release-duration);
+}
+
+
+.mobile-menu-link.is-page-releasing
+.mobile-menu-link-shell-path {
+  transition-duration:
+    var(--active-page-release-duration);
+}
+
+
+.nav-button.is-page-active:hover::before,
+.nav-button.is-page-active:focus-visible::before,
+.nav-button[aria-current="page"]:hover::before,
+.nav-button[aria-current="page"]:focus-visible::before {
+  background-color:
+    color-mix(
+      in srgb,
+      rgb(var(--nav-accent-rgb))
+        var(--active-page-accent-share),
+      black
+    );
+
+  border-color:
+    color-mix(
+      in srgb,
+      rgb(var(--nav-accent-rgb))
+        var(--active-page-accent-share),
+      black
+    );
 }
 
 
 .nav-button:hover::before,
 .nav-button:focus-visible::before {
-  border-color: var(--button-hover-border-color);
+  border-color:
+    rgba(
+      var(--nav-accent-rgb),
+      0.48
+    );
 
-  background: var(--button-hover-color);
+  background-color:
+    rgba(
+      var(--nav-accent-rgb),
+      0.25
+    );
 }
 
+
 .nav-button:focus-visible {
-  outline: 2px solid rgba(255, 114, 2, 0.9);
+  outline:
+    2px solid
+    rgba(
+      var(--nav-accent-rgb),
+      0.9
+    );
+
   outline-offset: 2px;
 }
 
@@ -903,6 +1273,1190 @@ body {
 }
 
 
+
+/* =========================================================
+   Inline SVG page-frame morph targets
+   ========================================================= */
+
+/*
+  These are the REAL page frames that the temporary morph SVG hands off
+  into. The outer silhouette remains generated from the same geometry as
+  the animation target, while the richer border is layered inside it.
+*/
+.prototype-page-frame {
+  position: fixed;
+  z-index: 20;
+
+  top:
+    calc(
+      clamp(82px, calc(64px + 3.9vw), 120px)
+      + (clamp(6px, 0.7vw, 10px) * 2)
+      + 20px
+    );
+
+  right: clamp(18px, 2vw, 30px);
+  bottom: clamp(18px, 2vw, 30px);
+  left: clamp(18px, 2vw, 30px);
+
+  /*
+    The frame itself fades in. The center is genuinely transparent;
+    future HTML content lives in .prototype-page-frame-content.
+  */
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    opacity var(--prototype-page-frame-fade-duration, 850ms) ease;
+
+  /*
+    Base frame theme. These can later be overridden per [data-page].
+  */
+  --page-frame-shell: rgba(17, 19, 22, 0.92);
+  --page-frame-shell-mid: rgba(35, 39, 44, 0.68);
+
+  --page-frame-chrome-bright: rgba(238, 241, 244, 0.72);
+  --page-frame-chrome-mid: rgba(135, 142, 150, 0.44);
+  --page-frame-chrome-dark: rgba(62, 67, 73, 0.72);
+
+  --page-accent-rgb:
+    var(--accent-about-rgb);
+
+  --page-frame-orange:
+    rgba(
+      var(--page-accent-rgb),
+      0.92
+    );
+
+  --page-frame-orange-soft:
+    rgba(
+      var(--page-accent-rgb),
+      0.34
+    );
+
+  --page-frame-accent-highlight:
+    rgba(
+      var(--page-accent-rgb),
+      1
+    );
+
+  --page-frame-detail: rgba(150, 157, 165, 0.38);
+  --page-frame-glass-line: rgba(255, 255, 255, 0.09);
+}
+
+
+.prototype-page-frame-shell {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: visible;
+
+  pointer-events: none;
+}
+
+
+/* -------------------------
+   Main structural ring
+   ------------------------- */
+
+.page-frame-ring {
+  fill: var(--page-frame-shell);
+
+  /*
+    Small shadow + inner orange warmth gives the otherwise vector-clean
+    frame some of the rendered/glass character of the concept image.
+  */
+  filter:
+    drop-shadow(0 5px 9px rgba(0, 0, 0, 0.42))
+    drop-shadow(
+      0 0 3px
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      )
+    );
+}
+
+
+.page-frame-edge,
+.page-frame-orange-rail,
+.page-frame-orange-highlight,
+.page-frame-bottom-notch,
+.page-frame-detail-line {
+  fill: none;
+
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: miter;
+}
+
+
+.page-frame-edge--outer {
+  stroke: var(--page-frame-detail);
+  stroke-width: 2.4;
+}
+
+
+.page-frame-edge--chrome {
+  stroke: var(--page-frame-chrome-mid);
+  stroke-width: 1.3;
+}
+
+
+.page-frame-edge--inner {
+  stroke: var(--page-frame-glass-line);
+  stroke-width: 1.2;
+}
+
+
+.page-frame-orange-rail {
+  stroke: var(--page-frame-orange);
+  stroke-width: 1.65;
+
+  filter:
+    drop-shadow(0 0 2px var(--page-frame-orange-soft));
+}
+
+
+.page-frame-orange-highlight {
+  stroke:
+    var(--page-frame-accent-highlight);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+
+  filter:
+    drop-shadow(0 0 3px var(--page-frame-orange-soft));
+}
+
+
+/* -------------------------
+   Micro details
+   ------------------------- */
+
+.page-frame-detail-line {
+  stroke: var(--page-frame-detail);
+  stroke-width: 1.15;
+  stroke-linecap: round;
+}
+
+
+.page-frame-detail-dot,
+.page-frame-bottom-dots circle {
+  fill: var(--page-frame-orange);
+}
+
+
+
+
+.page-frame-bottom-notch {
+  stroke: var(--page-frame-orange);
+  stroke-width: 1.35;
+
+  filter:
+    drop-shadow(0 0 2px var(--page-frame-orange-soft));
+}
+
+
+.page-frame-bottom-dots {
+  opacity: 0.88;
+}
+
+
+/* -------------------------
+   Future real page content
+   ------------------------- */
+
+.prototype-page-frame-content {
+  position: absolute;
+
+  /*
+    JS writes the exact transparent-window offsets as CSS variables so
+    HTML content automatically tracks the generated inner cutout.
+  */
+  top: var(--page-content-top, 48px);
+  right: var(--page-content-right, 48px);
+  bottom: var(--page-content-bottom, 48px);
+  left: var(--page-content-left, 48px);
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+
+  pointer-events: auto;
+}
+
+
+/* -------------------------
+   Open state
+   ------------------------- */
+
+.prototype-page-frame.is-open {
+  opacity: 1;
+}
+
+
+/*
+  Page-specific theme assignment.
+  All detailed frame/morph colors derive from these master accent values.
+*/
+.prototype-page-frame[data-page="about"] {
+  --page-accent-rgb:
+    var(--accent-about-rgb);
+
+  --page-frame-orange:
+    rgba(
+      var(--accent-about-rgb),
+      0.92
+    );
+
+  --page-frame-orange-soft:
+    rgba(
+      var(--accent-about-rgb),
+      0.34
+    );
+
+  --page-frame-accent-highlight:
+    rgba(
+      var(--accent-about-rgb),
+      1
+    );
+
+  --secondary-panel-accent:
+    rgba(
+      var(--accent-about-rgb),
+      0.42
+    );
+
+  --secondary-panel-morph-fill:
+    rgba(
+      var(--accent-about-rgb),
+      0.68
+    );
+
+  --secondary-panel-morph-fill-mid:
+    rgba(
+      var(--accent-about-rgb),
+      0.58
+    );
+
+  --secondary-panel-morph-border:
+    rgba(
+      var(--accent-about-rgb),
+      0.88
+    );
+
+  --secondary-panel-morph-border-mid:
+    rgba(
+      var(--accent-about-rgb),
+      0.82
+    );
+
+  --secondary-panel-morph-inner:
+    rgba(
+      var(--accent-about-rgb),
+      0.16
+    );
+
+  --secondary-panel-morph-inner-mid:
+    rgba(
+      var(--accent-about-rgb),
+      0.14
+    );
+}
+
+
+.prototype-page-frame[data-page="brobots"] {
+  --page-accent-rgb:
+    var(--accent-brobots-rgb);
+
+  --page-frame-orange:
+    rgba(
+      var(--accent-brobots-rgb),
+      0.92
+    );
+
+  --page-frame-orange-soft:
+    rgba(
+      var(--accent-brobots-rgb),
+      0.34
+    );
+
+  --page-frame-accent-highlight:
+    rgba(
+      var(--accent-brobots-rgb),
+      1
+    );
+
+  --secondary-panel-accent:
+    rgba(
+      var(--accent-brobots-rgb),
+      0.42
+    );
+
+  --secondary-panel-morph-fill:
+    rgba(
+      var(--accent-brobots-rgb),
+      0.68
+    );
+
+  --secondary-panel-morph-fill-mid:
+    rgba(
+      var(--accent-brobots-rgb),
+      0.58
+    );
+
+  --secondary-panel-morph-border:
+    rgba(
+      var(--accent-brobots-rgb),
+      0.88
+    );
+
+  --secondary-panel-morph-border-mid:
+    rgba(
+      var(--accent-brobots-rgb),
+      0.82
+    );
+
+  --secondary-panel-morph-inner:
+    rgba(
+      var(--accent-brobots-rgb),
+      0.16
+    );
+
+  --secondary-panel-morph-inner-mid:
+    rgba(
+      var(--accent-brobots-rgb),
+      0.14
+    );
+}
+
+
+.prototype-page-frame[data-page="etherian"] {
+  --page-accent-rgb:
+    var(--accent-etherian-rgb);
+
+  --page-frame-orange:
+    rgba(
+      var(--accent-etherian-rgb),
+      0.92
+    );
+
+  --page-frame-orange-soft:
+    rgba(
+      var(--accent-etherian-rgb),
+      0.34
+    );
+
+  --page-frame-accent-highlight:
+    rgba(
+      var(--accent-etherian-rgb),
+      1
+    );
+
+  --secondary-panel-accent:
+    rgba(
+      var(--accent-etherian-rgb),
+      0.42
+    );
+
+  --secondary-panel-morph-fill:
+    rgba(
+      var(--accent-etherian-rgb),
+      0.68
+    );
+
+  --secondary-panel-morph-fill-mid:
+    rgba(
+      var(--accent-etherian-rgb),
+      0.58
+    );
+
+  --secondary-panel-morph-border:
+    rgba(
+      var(--accent-etherian-rgb),
+      0.88
+    );
+
+  --secondary-panel-morph-border-mid:
+    rgba(
+      var(--accent-etherian-rgb),
+      0.82
+    );
+
+  --secondary-panel-morph-inner:
+    rgba(
+      var(--accent-etherian-rgb),
+      0.16
+    );
+
+  --secondary-panel-morph-inner-mid:
+    rgba(
+      var(--accent-etherian-rgb),
+      0.14
+    );
+}
+
+
+.prototype-page-frame[data-page="halodoom"] {
+  --page-accent-rgb:
+    var(--accent-halodoom-rgb);
+
+  --page-frame-orange:
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.92
+    );
+
+  --page-frame-orange-soft:
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.34
+    );
+
+  --page-frame-accent-highlight:
+    rgba(
+      var(--accent-halodoom-rgb),
+      1
+    );
+
+  --secondary-panel-accent:
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.42
+    );
+
+  --secondary-panel-morph-fill:
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.68
+    );
+
+  --secondary-panel-morph-fill-mid:
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.58
+    );
+
+  --secondary-panel-morph-border:
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.88
+    );
+
+  --secondary-panel-morph-border-mid:
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.82
+    );
+
+  --secondary-panel-morph-inner:
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.16
+    );
+
+  --secondary-panel-morph-inner-mid:
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.14
+    );
+}
+
+
+.prototype-page-frame[data-page="contact"] {
+  --page-accent-rgb:
+    var(--accent-contact-rgb);
+
+  --page-frame-orange:
+    rgba(
+      var(--accent-contact-rgb),
+      0.92
+    );
+
+  --page-frame-orange-soft:
+    rgba(
+      var(--accent-contact-rgb),
+      0.34
+    );
+
+  --page-frame-accent-highlight:
+    rgba(
+      var(--accent-contact-rgb),
+      1
+    );
+
+  --secondary-panel-accent:
+    rgba(
+      var(--accent-contact-rgb),
+      0.42
+    );
+
+  --secondary-panel-morph-fill:
+    rgba(
+      var(--accent-contact-rgb),
+      0.68
+    );
+
+  --secondary-panel-morph-fill-mid:
+    rgba(
+      var(--accent-contact-rgb),
+      0.58
+    );
+
+  --secondary-panel-morph-border:
+    rgba(
+      var(--accent-contact-rgb),
+      0.88
+    );
+
+  --secondary-panel-morph-border-mid:
+    rgba(
+      var(--accent-contact-rgb),
+      0.82
+    );
+
+  --secondary-panel-morph-inner:
+    rgba(
+      var(--accent-contact-rgb),
+      0.16
+    );
+
+  --secondary-panel-morph-inner-mid:
+    rgba(
+      var(--accent-contact-rgb),
+      0.14
+    );
+}
+
+
+/*
+  Page frames only participate in the middle/icon-button mode for now.
+*/
+@media (max-width: 840px) {
+  .prototype-page-frame {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   Full-text desktop page layout
+   ========================================================= */
+
+/*
+  Above 1400px the full text nav buttons use the SAME page morph system,
+  but the final page frame occupies only the LEFT half of the viewport.
+
+  The reference composition is almost square, so aspect ratio wins over
+  filling arbitrary available space. The frame grows as large as possible
+  while staying:
+    - inside the left half
+    - below the header
+    - vertically centered in the available area
+*/
+@media (min-width: 1401px) {
+  .prototype-page-frame {
+    --desktop-page-aspect: 1.006;
+
+    --desktop-page-area-top:
+      calc(
+        clamp(82px, calc(64px + 3.9vw), 120px)
+        + (clamp(6px, 0.7vw, 10px) * 2)
+        + 18px
+      );
+
+    --desktop-page-available-width:
+      calc(
+        50vw -
+        (var(--desktop-page-gap) * 2)
+      );
+
+    --desktop-page-available-height:
+      calc(
+        100vh -
+        var(--desktop-page-area-top) -
+        var(--desktop-page-gap)
+      );
+
+    /*
+      Width is constrained by BOTH:
+        left-half width
+        available height × target aspect ratio
+    */
+    --desktop-page-width:
+      min(
+        var(--desktop-page-available-width),
+        calc(
+          var(--desktop-page-available-height)
+          * var(--desktop-page-aspect)
+        )
+      );
+
+    --desktop-page-height:
+      calc(
+        var(--desktop-page-width)
+        / var(--desktop-page-aspect)
+      );
+
+    width:
+      var(--desktop-page-width);
+
+    height:
+      var(--desktop-page-height);
+
+    /*
+      Center horizontally inside the left 50vw.
+    */
+    left:
+      calc(
+        25vw -
+        (var(--desktop-page-width) / 2)
+      );
+
+    right: auto;
+    bottom: auto;
+
+    /*
+      Center vertically inside the area beneath the header.
+    */
+    top:
+      calc(
+        var(--desktop-page-area-top)
+        +
+        (
+          var(--desktop-page-available-height)
+          -
+          var(--desktop-page-height)
+        ) / 2
+      );
+  }
+}
+
+
+
+/* =========================================================
+   Desktop secondary glass panel
+   ========================================================= */
+
+/*
+  This panel exists on every page frame, but only appears in full-text
+  desktop mode. It sits BEHIND the main frame and slides out from the
+  main frame's right edge after the main page has finished forming.
+*/
+.prototype-page-frame {
+  /*
+    Desktop <-> tablet composition transition.
+    These control only the FRAME resize between the two layouts.
+    The sidebar uses its own close/open timings.
+  */
+  --page-layout-transition-duration: 480ms;
+
+  --page-layout-transition-ease:
+    cubic-bezier(0.20, 0.72, 0.22, 1);
+
+  /*
+    Keep this available outside the desktop media query as well. It lets
+    the popout retain its desktop geometry for a few hundred milliseconds
+    while it gets sucked back in after crossing the breakpoint.
+  */
+  --desktop-page-gap:
+    clamp(16px, 1.15vw, 26px);
+
+  --secondary-panel-delay: 160ms;
+
+  /*
+    Triangle -> panel morph timing.
+  */
+  --secondary-panel-duration: 720ms;
+  --secondary-panel-close-duration: 460ms;
+
+  /*
+    Fraction of the open animation spent growing from the tiny seed
+    triangle into the large triangle before the final panel reshape.
+  */
+  --secondary-panel-triangle-stage: 38%;
+
+  --secondary-panel-ease:
+    cubic-bezier(0.18, 0.78, 0.22, 1);
+
+  --secondary-panel-close-ease:
+    cubic-bezier(0.55, 0, 0.72, 0.28);
+
+  /*
+    Small overlap under the main frame strengthens the illusion that
+    this panel physically slides out from behind it.
+  */
+  --secondary-panel-overlap: 22px;
+
+  /*
+    Final desktop popout placement.
+    The lower inset is intentionally larger so the panel clears the
+    main frame's bottom-right angled section.
+  */
+  --secondary-panel-top-inset: 4.5%;
+  --secondary-panel-bottom-inset: 11%;
+
+  /*
+    Vertical size of the final right-side diagonal cuts. JS converts
+    this into the matching horizontal offset using the SAME master
+    frame/button/menu slope, so the angle never stretches.
+  */
+  --secondary-panel-corner-height:
+    clamp(42px, 8.5%, 68px);
+
+  --secondary-panel-fill:
+    rgba(105, 118, 138, 0.24);
+
+  --secondary-panel-border:
+    rgba(194, 205, 218, 0.28);
+
+  --secondary-panel-inner-border:
+    rgba(255, 255, 255, 0.08);
+
+  --secondary-panel-highlight:
+    rgba(255, 255, 255, 0.06);
+
+  --secondary-panel-accent:
+    rgba(
+      var(--page-accent-rgb),
+      0.42
+    );
+
+  /*
+    Triangle -> glass morph colors. JavaScript reads these so the same
+    secondary-panel animation automatically inherits each page's accent.
+  */
+  --secondary-panel-morph-fill:
+    rgba(
+      var(--page-accent-rgb),
+      0.68
+    );
+
+  --secondary-panel-morph-fill-mid:
+    rgba(
+      var(--page-accent-rgb),
+      0.58
+    );
+
+  --secondary-panel-morph-border:
+    rgba(
+      var(--page-accent-rgb),
+      0.88
+    );
+
+  --secondary-panel-morph-border-mid:
+    rgba(
+      var(--page-accent-rgb),
+      0.82
+    );
+
+  --secondary-panel-morph-inner:
+    rgba(
+      var(--page-accent-rgb),
+      0.16
+    );
+
+  --secondary-panel-morph-inner-mid:
+    rgba(
+      var(--page-accent-rgb),
+      0.14
+    );
+
+  /*
+    Establish a predictable local layer stack:
+      secondary panel
+      main SVG frame
+      page content
+  */
+  isolation: isolate;
+}
+
+
+.prototype-page-frame-shell {
+  z-index: 2;
+}
+
+
+.prototype-page-frame-content {
+  z-index: 3;
+}
+
+
+.desktop-secondary-panel {
+  display: none;
+}
+
+
+/*
+  Only the full-text PC mode gets the secondary panel for now.
+*/
+@media (min-width: 1401px) {
+  .desktop-secondary-panel {
+    position: absolute;
+
+    display: block;
+
+    /*
+      Final panel begins exactly at the main frame's right edge, with a
+      small amount tucked underneath it so the triangle feels attached.
+    */
+    left:
+      calc(
+        100% -
+        var(--secondary-panel-overlap)
+      );
+
+    top:
+      var(--secondary-panel-top-inset);
+
+    width:
+      calc(
+        50vw -
+        var(--desktop-page-gap)
+        +
+        var(--secondary-panel-overlap)
+      );
+
+    bottom:
+      var(--secondary-panel-bottom-inset);
+
+    height: auto;
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    /*
+      The container itself does not slide anymore. The glass surface
+      morphs inside this final layout box.
+    */
+    opacity: 1;
+  }
+
+
+  .desktop-secondary-panel-glass {
+    position: absolute;
+    inset: 0;
+
+    /*
+      Default resting state is the tiny triangle, anchored to the
+      center-right edge of the main page frame.
+      JS animates this through a large triangle into the final panel.
+    */
+    clip-path:
+      polygon(
+        0 47%,
+        0 47%,
+        7% 50%,
+        7% 50%,
+        0 53%,
+        0 53%
+      );
+
+    background-color:
+      var(--secondary-panel-morph-fill);
+
+    backdrop-filter:
+      blur(18px)
+      saturate(112%);
+
+    -webkit-backdrop-filter:
+      blur(18px)
+      saturate(112%);
+
+    box-shadow:
+      inset 0 0 0 1px
+        var(--secondary-panel-morph-border),
+
+      inset 0 0 0 3px
+        var(--secondary-panel-morph-inner),
+
+      inset 18px 0 40px
+        rgba(255, 255, 255, 0.025),
+
+      0 8px 24px
+        rgba(0, 0, 0, 0.16);
+
+    opacity: 0;
+
+    will-change:
+      clip-path,
+      background-color,
+      box-shadow,
+      opacity;
+  }
+
+
+  /*
+    Soft glass reflection. Kept separate so the base fill can interpolate
+    cleanly from orange into the final grey glass.
+  */
+  .desktop-secondary-panel-glass::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+      linear-gradient(
+        115deg,
+        var(--secondary-panel-highlight),
+        transparent 23%,
+        transparent 70%
+      );
+
+    pointer-events: none;
+  }
+
+
+  /*
+    A faint connection rail stays on the main-frame side of the panel.
+    It is revealed naturally by the clip-path morph.
+  */
+  .desktop-secondary-panel-glass::before {
+    content: "";
+
+    position: absolute;
+
+    top: 4%;
+    bottom: 4%;
+    left: 0;
+
+    width: 1px;
+
+    background:
+      var(--secondary-panel-accent);
+
+    box-shadow:
+      0 0 5px
+      var(--secondary-panel-morph-inner);
+  }
+
+
+  .desktop-secondary-panel-content {
+    position: absolute;
+
+    top: 5%;
+    right: 8%;
+    bottom: 5%;
+    left:
+      calc(
+        var(--secondary-panel-overlap) +
+        4%
+      );
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+
+    pointer-events: auto;
+
+    /*
+      Content is hidden until the morph is essentially complete.
+    */
+    opacity: 0;
+
+    transition:
+      opacity 180ms ease;
+  }
+
+
+  .prototype-page-frame.is-secondary-open
+  .desktop-secondary-panel-content {
+    opacity: 1;
+
+    transition-delay:
+      calc(
+        var(--secondary-panel-duration) * 0.78
+      );
+  }
+}
+
+
+
+/*
+  During the desktop -> tablet handoff the media query has already changed,
+  but we temporarily keep the desktop popout alive long enough to reverse
+  its triangle morph before the main frame resizes.
+
+  The main frame itself is visually held in its old desktop rectangle by
+  a FLIP transform in JavaScript.
+*/
+
+.prototype-page-frame.is-layout-transitioning
+.desktop-secondary-panel-glass {
+  position: absolute;
+  inset: 0;
+
+  clip-path:
+    polygon(
+      0 47%,
+      0 47%,
+      7% 50%,
+      7% 50%,
+      0 53%,
+      0 53%
+    );
+
+  background-color:
+    var(--secondary-panel-morph-fill);
+
+  backdrop-filter:
+    blur(18px)
+    saturate(112%);
+
+  -webkit-backdrop-filter:
+    blur(18px)
+    saturate(112%);
+
+  box-shadow:
+    inset 0 0 0 1px
+      var(--secondary-panel-morph-border),
+
+    inset 0 0 0 3px
+      var(--secondary-panel-morph-inner),
+
+    inset 18px 0 40px
+      rgba(255, 255, 255, 0.025),
+
+    0 8px 24px
+      rgba(0, 0, 0, 0.16);
+
+  opacity: 0;
+
+  will-change:
+    clip-path,
+    background-color,
+    box-shadow,
+    opacity;
+}
+
+
+.prototype-page-frame.is-layout-transitioning
+.desktop-secondary-panel-glass::before {
+  content: "";
+
+  position: absolute;
+
+  top: 4%;
+  bottom: 4%;
+  left: 0;
+
+  width: 1px;
+
+  background:
+    var(--secondary-panel-accent);
+
+  box-shadow:
+    0 0 5px
+    var(--secondary-panel-morph-inner);
+}
+
+
+.prototype-page-frame.is-layout-transitioning
+.desktop-secondary-panel-glass::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      115deg,
+      var(--secondary-panel-highlight),
+      transparent 23%,
+      transparent 70%
+    );
+
+  pointer-events: none;
+}
+
+
+.prototype-page-frame.is-layout-transitioning
+.desktop-secondary-panel-content {
+  position: absolute;
+
+  top: 5%;
+  right: 8%;
+  bottom: 5%;
+
+  left:
+    calc(
+      var(--secondary-panel-overlap)
+      +
+      4%
+    );
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+
+  pointer-events: none;
+
+  opacity: 0;
+}
+
+
+.prototype-page-frame.is-layout-transitioning
+.desktop-secondary-panel {
+  position: absolute;
+
+  display: block;
+
+  left:
+    calc(
+      100% -
+      var(--secondary-panel-overlap)
+    );
+
+  top:
+    var(--secondary-panel-top-inset);
+
+  width:
+    calc(
+      50vw -
+      var(--desktop-page-gap)
+      +
+      var(--secondary-panel-overlap)
+    );
+
+  bottom:
+    var(--secondary-panel-bottom-inset);
+
+  height: auto;
+
+  z-index: 1;
+
+  pointer-events: none;
+}
+
+
+.prototype-page-frame.is-layout-transitioning {
+  /*
+    JavaScript owns the frame rectangle during the breakpoint handoff.
+    Width/height are regenerated continuously so the shared diagonal
+    geometry remains correct even while the browser window is still moving.
+  */
+  will-change: left, top, width, height;
+}
+
+
+/*
+  Reduced-motion keeps the final visual composition but removes the slide.
+*/
+@media (min-width: 1401px) and (prefers-reduced-motion: reduce) {
+  .desktop-secondary-panel,
+  .prototype-page-frame.is-secondary-open
+  .desktop-secondary-panel {
+    transition: none;
+  }
+}
+
+
 /* =========================================================
    Very narrow safety behavior
    ========================================================= */
@@ -1061,6 +2615,37 @@ body {
   isolation: isolate;
 
   /*
+    Each mobile menu button carries its own page accent.
+    Defaults to About/Contact orange unless overridden below.
+  */
+  --mobile-menu-item-accent-rgb:
+    var(--accent-about-rgb);
+
+  --mobile-menu-accent-color:
+    rgba(
+      var(--mobile-menu-item-accent-rgb),
+      0.95
+    );
+
+  --mobile-menu-accent-soft:
+    rgba(
+      var(--mobile-menu-item-accent-rgb),
+      0.24
+    );
+
+  --mobile-menu-item-hover-fill:
+    rgba(
+      var(--mobile-menu-item-accent-rgb),
+      0.25
+    );
+
+  --mobile-menu-item-hover-border:
+    rgba(
+      var(--mobile-menu-item-accent-rgb),
+      0.48
+    );
+
+  /*
     All five items divide the available inner height evenly.
     min-height: 0 is important: it allows them to shrink enough to
     remain inside the frame even at smaller menu-height scales.
@@ -1111,9 +2696,9 @@ body {
   stroke-linejoin: miter;
 
   transition:
-    fill 110ms linear,
-    stroke 110ms linear,
-    filter 110ms linear;
+    fill 170ms ease,
+    stroke 170ms ease,
+    filter 170ms ease;
 }
 
 
@@ -1208,13 +2793,105 @@ body {
 
 
 /* -------------------------
+   Per-page mobile accents
+   ------------------------- */
+
+.mobile-menu-link[href="#about"] {
+  --mobile-menu-item-accent-rgb:
+    var(--accent-about-rgb);
+}
+
+
+.mobile-menu-link[href="#brobots"] {
+  --mobile-menu-item-accent-rgb:
+    var(--accent-brobots-rgb);
+}
+
+
+.mobile-menu-link[href="#etherian"] {
+  --mobile-menu-item-accent-rgb:
+    var(--accent-etherian-rgb);
+}
+
+
+.mobile-menu-link[href="#halodoom"] {
+  --mobile-menu-item-accent-rgb:
+    var(--accent-halodoom-rgb);
+}
+
+
+.mobile-menu-link[href="#contact"] {
+  --mobile-menu-item-accent-rgb:
+    var(--accent-contact-rgb);
+}
+
+
+/* -------------------------
    Active / hover states
    ------------------------- */
 
 .mobile-menu-link:hover .mobile-menu-link-shell-path,
 .mobile-menu-link:focus-visible .mobile-menu-link-shell-path {
-  fill: var(--button-hover-color);
-  stroke: var(--button-hover-border-color);
+  fill:
+    var(--mobile-menu-item-hover-fill);
+
+  stroke:
+    var(--mobile-menu-item-hover-border);
+}
+
+
+/*
+  Mobile pressed/current-page state uses the same accent-to-black
+  treatment as the desktop buttons.
+*/
+.mobile-menu-link.is-page-active .mobile-menu-link-shell-path,
+.mobile-menu-link[aria-current="page"] .mobile-menu-link-shell-path {
+  fill:
+    color-mix(
+      in srgb,
+      rgb(var(--mobile-menu-item-accent-rgb))
+        var(--active-page-accent-share),
+      black
+    );
+
+  stroke:
+    color-mix(
+      in srgb,
+      rgb(var(--mobile-menu-item-accent-rgb))
+        var(--active-page-accent-share),
+      black
+    );
+
+  filter:
+    drop-shadow(
+      0 0 5px
+      rgba(
+        var(--mobile-menu-item-accent-rgb),
+        0.18
+      )
+    );
+}
+
+
+.mobile-menu-link.is-page-active:hover .mobile-menu-link-shell-path,
+.mobile-menu-link.is-page-active:focus-visible .mobile-menu-link-shell-path,
+.mobile-menu-link[aria-current="page"]:hover .mobile-menu-link-shell-path,
+.mobile-menu-link[aria-current="page"]:focus-visible .mobile-menu-link-shell-path {
+  fill:
+    color-mix(
+      in srgb,
+      rgb(var(--mobile-menu-item-accent-rgb))
+        var(--active-page-accent-share),
+      black
+    );
+
+  stroke:
+    color-mix(
+      in srgb,
+      rgb(var(--mobile-menu-item-accent-rgb))
+        var(--active-page-accent-share),
+      black
+    );
 }
 
 .mobile-menu-link:hover,
