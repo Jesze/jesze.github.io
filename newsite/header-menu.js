@@ -9,6 +9,199 @@
 */
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  /* =======================================================
+     Decorative background video autoplay
+     ======================================================= */
+
+  const backgroundVideo =
+    document.querySelector(
+      ".site-background-video"
+    );
+
+
+  if (backgroundVideo) {
+    /*
+      iOS is stricter about the DOM property state than the HTML
+      attributes alone in some autoplay situations.
+    */
+    backgroundVideo.muted = true;
+    backgroundVideo.defaultMuted = true;
+    backgroundVideo.playsInline = true;
+
+
+    if (
+      "disablePictureInPicture" in
+      backgroundVideo
+    ) {
+      backgroundVideo.disablePictureInPicture =
+        true;
+    }
+
+
+    if (
+      "disableRemotePlayback" in
+      backgroundVideo
+    ) {
+      backgroundVideo.disableRemotePlayback =
+        true;
+    }
+
+
+    let backgroundVideoPlaying =
+      false;
+
+
+    const markBackgroundVideoPlaying = () => {
+      backgroundVideoPlaying =
+        true;
+
+      backgroundVideo.classList.remove(
+        "is-autoplay-blocked"
+      );
+    };
+
+
+    const markBackgroundVideoBlocked = () => {
+      if (
+        !backgroundVideoPlaying &&
+        backgroundVideo.paused
+      ) {
+        backgroundVideo.classList.add(
+          "is-autoplay-blocked"
+        );
+      }
+    };
+
+
+    const tryBackgroundVideoPlayback = () => {
+      /*
+        Keep these set immediately before play(). Safari can re-evaluate
+        autoplay eligibility after page restore / visibility changes.
+      */
+      backgroundVideo.muted = true;
+      backgroundVideo.defaultMuted = true;
+      backgroundVideo.playsInline = true;
+
+
+      const playAttempt =
+        backgroundVideo.play();
+
+
+      if (
+        playAttempt &&
+        typeof playAttempt.then ===
+          "function"
+      ) {
+        playAttempt
+          .then(() => {
+            markBackgroundVideoPlaying();
+          })
+          .catch(() => {
+            markBackgroundVideoBlocked();
+          });
+      }
+
+      else if (!backgroundVideo.paused) {
+        markBackgroundVideoPlaying();
+      }
+    };
+
+
+    backgroundVideo.addEventListener(
+      "playing",
+      markBackgroundVideoPlaying
+    );
+
+
+    backgroundVideo.addEventListener(
+      "pause",
+      markBackgroundVideoBlocked
+    );
+
+
+    /*
+      First attempt immediately. If iOS blocks it, the page continues
+      normally with the static background beneath the video.
+    */
+    tryBackgroundVideoPlayback();
+
+
+    /*
+      A normal user gesture unlocks media playback on iOS. Listen at the
+      document level so the user does not need to interact with the
+      decorative background itself.
+    */
+    const unlockBackgroundVideo = () => {
+      if (
+        backgroundVideoPlaying ||
+        !backgroundVideo.paused
+      ) {
+        return;
+      }
+
+
+      tryBackgroundVideoPlayback();
+    };
+
+
+    document.addEventListener(
+      "pointerdown",
+      unlockBackgroundVideo,
+      {
+        passive: true
+      }
+    );
+
+
+    document.addEventListener(
+      "touchstart",
+      unlockBackgroundVideo,
+      {
+        passive: true
+      }
+    );
+
+
+    document.addEventListener(
+      "click",
+      unlockBackgroundVideo,
+      {
+        passive: true
+      }
+    );
+
+
+    /*
+      Safari may suspend media when the tab/app backgrounds. Retry when
+      the page becomes visible again or is restored from the back/forward
+      cache.
+    */
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (
+          document.visibilityState ===
+            "visible" &&
+          backgroundVideo.paused
+        ) {
+          tryBackgroundVideoPlayback();
+        }
+      }
+    );
+
+
+    window.addEventListener(
+      "pageshow",
+      () => {
+        if (backgroundVideo.paused) {
+          tryBackgroundVideoPlayback();
+        }
+      }
+    );
+  }
+
+
   const setActivePageButtonState = (
     name = null,
     preserveName = null

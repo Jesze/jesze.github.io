@@ -105,6 +105,43 @@ body {
 
 
 /*
+  iOS Safari can occasionally refuse decorative autoplay (for example in
+  Low Power Mode) and draw its own large play affordance over the video.
+
+  This video is intentionally non-interactive, so suppress WebKit's native
+  playback UI rather than allowing an unclickable control to appear.
+*/
+.site-background-video::-webkit-media-controls {
+  display: none !important;
+}
+
+
+.site-background-video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+
+.site-background-video::-webkit-media-controls-play-button {
+  display: none !important;
+}
+
+
+.site-background-video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+
+/*
+  Used by JS only as a harmless state hook when autoplay is temporarily
+  blocked. The normal site background remains visible underneath.
+*/
+.site-background-video.is-autoplay-blocked {
+  pointer-events: none;
+}
+
+
+/*
   Neutral dark veil keeps the motion atmospheric and prevents the
   background from competing with the header/page-frame UI.
 */
