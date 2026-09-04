@@ -718,10 +718,317 @@
     </svg>
 
     <!--
-      Real HTML page content will eventually live here.
-      It is intentionally empty for now.
+      Etherian page module.
+
+      The outer .prototype-page-frame-content remains owned by the global
+      frame/morph system. Everything inside .game-page is page-specific and
+      can later be swapped independently of the frame itself.
     -->
-    <div class="prototype-page-frame-content" aria-label="Etherian page content"></div>
+    <div
+      class="prototype-page-frame-content"
+      aria-label="Etherian page content"
+    >
+      <div class="game-page game-page--etherian">
+
+        <!--
+          Step 1 prototype:
+          structural media-browser shell only.
+
+          No real media or carousel behavior yet; these temporary regions
+          let us verify sizing in tablet and desktop frame layouts first.
+        -->
+        <section
+          class="media-browser"
+          data-media-browser
+          aria-label="Etherian media gallery"
+        >
+
+          <div
+            class="media-viewer"
+            data-media-viewer
+            aria-live="polite"
+          >
+            <div class="media-viewer-stage" data-media-viewer-stage></div>
+          </div>
+
+          <div class="media-strip">
+            <button
+              class="media-arrow media-arrow--previous"
+              type="button"
+              data-media-prev
+              aria-label="Previous media"
+            >
+              ‹
+            </button>
+
+            <div
+              class="media-thumbnails"
+              data-media-thumbnails
+              aria-label="Etherian media thumbnails"
+            >
+              <button
+                class="media-thumbnail is-selected"
+                type="button"
+                data-media-item
+                data-media-type="youtube"
+                data-media-title="Announcement Trailer"
+                aria-label="Show Announcement Trailer"
+                data-youtube-id="f1XcuUs06lQ"
+                data-media-thumb="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-play" aria-hidden="true">▶</span>
+                    <span class="media-thumbnail-type">VIDEO</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="youtube"
+                data-media-title="Release Trailer"
+                aria-label="Show Release Trailer"
+                data-youtube-id="mz-zPOR3cC4"
+                data-media-thumb="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-play" aria-hidden="true">▶</span>
+                    <span class="media-thumbnail-type">VIDEO</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="image"
+                data-media-title="Etherian Screenshot 1"
+                aria-label="Show Etherian Screenshot 1"
+                data-media-src="assets/etherian/etherian-screenshot-0.jpg"
+                data-media-thumb="assets/etherian/etherian-screenshot-0.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="assets/etherian/etherian-screenshot-0.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-type">IMAGE</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="image"
+                data-media-title="Etherian Screenshot 2"
+                aria-label="Show Etherian Screenshot 2"
+                data-media-src="assets/etherian/etherian-screenshot-1.jpg"
+                data-media-thumb="assets/etherian/etherian-screenshot-1.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="assets/etherian/etherian-screenshot-1.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-type">IMAGE</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="image"
+                data-media-title="Etherian Screenshot 3"
+                aria-label="Show Etherian Screenshot 3"
+                data-media-src="assets/etherian/etherian-screenshot-2.jpg"
+                data-media-thumb="assets/etherian/etherian-screenshot-2.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="assets/etherian/etherian-screenshot-2.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-type">IMAGE</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="image"
+                data-media-title="Etherian Screenshot 4"
+                aria-label="Show Etherian Screenshot 4"
+                data-media-src="assets/etherian/etherian-screenshot-3.jpg"
+                data-media-thumb="assets/etherian/etherian-screenshot-3.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="assets/etherian/etherian-screenshot-3.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-type">IMAGE</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="image"
+                data-media-title="Etherian Screenshot 5"
+                aria-label="Show Etherian Screenshot 5"
+                data-media-src="assets/etherian/etherian-screenshot-4.jpg"
+                data-media-thumb="assets/etherian/etherian-screenshot-4.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="assets/etherian/etherian-screenshot-4.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-type">IMAGE</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="image"
+                data-media-title="Etherian Screenshot 6"
+                aria-label="Show Etherian Screenshot 6"
+                data-media-src="assets/etherian/etherian-screenshot-5.jpg"
+                data-media-thumb="assets/etherian/etherian-screenshot-5.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="assets/etherian/etherian-screenshot-5.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-type">IMAGE</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="image"
+                data-media-title="Etherian Screenshot 7"
+                aria-label="Show Etherian Screenshot 7"
+                data-media-src="assets/etherian/etherian-screenshot-6.jpg"
+                data-media-thumb="assets/etherian/etherian-screenshot-6.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="assets/etherian/etherian-screenshot-6.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-type">IMAGE</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="image"
+                data-media-title="Etherian Screenshot 8"
+                aria-label="Show Etherian Screenshot 8"
+                data-media-src="assets/etherian/etherian-screenshot-7.jpg"
+                data-media-thumb="assets/etherian/etherian-screenshot-7.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="assets/etherian/etherian-screenshot-7.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-type">IMAGE</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="image"
+                data-media-title="Etherian Screenshot 9"
+                aria-label="Show Etherian Screenshot 9"
+                data-media-src="assets/etherian/etherian-screenshot-8.jpg"
+                data-media-thumb="assets/etherian/etherian-screenshot-8.jpg"
+              >
+                  <img
+                    class="media-thumbnail-image"
+                    src="assets/etherian/etherian-screenshot-8.jpg"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <span class="media-thumbnail-overlay">
+                    <span class="media-thumbnail-type">IMAGE</span>
+                  </span>
+              </button>
+              <button
+                class="media-thumbnail"
+                type="button"
+                data-media-item
+                data-media-type="video"
+                data-media-title="Local Video Test"
+                aria-label="Show Local Video Test"
+                data-media-src="assets/simulacrum-loop.mp4"
+              >
+                  <span class="media-thumbnail-local-video">
+                    <span class="media-thumbnail-play" aria-hidden="true">▶</span>
+                    <span class="media-thumbnail-type">LOCAL VIDEO</span>
+                  </span>
+              </button>
+            </div>
+
+            <button
+              class="media-arrow media-arrow--next"
+              type="button"
+              data-media-next
+              aria-label="Next media"
+            >
+              ›
+            </button>
+          </div>
+
+        </section>
+
+      </div>
+    </div>
 
     <!-- Desktop-only secondary glass panel -->
     <div class="desktop-secondary-panel" aria-hidden="true">

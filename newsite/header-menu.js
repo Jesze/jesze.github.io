@@ -9071,6 +9071,467 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+
+  /* =======================================================
+     Reusable media-browser controller
+     ======================================================= */
+
+  const mediaBrowsers =
+    Array.from(
+      document.querySelectorAll(
+        "[data-media-browser]"
+      )
+    );
+
+
+  const createMediaElement = (
+    item
+  ) => {
+    const type =
+      item.dataset.mediaType;
+
+
+    if (type === "youtube") {
+      const youtubeId =
+        item.dataset.youtubeId;
+
+      const title =
+        item.dataset.mediaTitle ||
+        "YouTube video";
+
+
+      /*
+        YouTube now requires an HTTP Referer for embedded playback.
+        A page opened directly as file:// has no valid HTTP Referer, which
+        produces YouTube error 153.
+
+        During local file testing, show a clean preview/link instead of a
+        broken iframe. The real embed is used automatically on localhost
+        or the deployed website.
+      */
+      if (window.location.protocol === "file:") {
+        const fallback =
+          document.createElement(
+            "div"
+          );
+
+
+        fallback.className =
+          "media-youtube-local-fallback";
+
+
+        const image =
+          document.createElement(
+            "img"
+          );
+
+
+        image.className =
+          "media-youtube-local-fallback-image";
+
+        image.src =
+          item.dataset.mediaThumb ||
+          `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+
+        image.alt = "";
+
+
+        const link =
+          document.createElement(
+            "a"
+          );
+
+
+        link.className =
+          "media-youtube-local-fallback-link";
+
+        link.href =
+          `https://www.youtube.com/watch?v=${youtubeId}`;
+
+        link.target =
+          "_blank";
+
+        link.rel =
+          "noopener noreferrer";
+
+        link.textContent =
+          `▶ ${title}`;
+
+
+        fallback.append(
+          image,
+          link
+        );
+
+
+        return fallback;
+      }
+
+
+      const iframe =
+        document.createElement(
+          "iframe"
+        );
+
+
+      iframe.className =
+        "media-viewer-youtube";
+
+      iframe.src =
+        `https://www.youtube.com/embed/${youtubeId}?rel=0`;
+
+      iframe.title =
+        title;
+
+      iframe.loading =
+        "lazy";
+
+      iframe.referrerPolicy =
+        "strict-origin-when-cross-origin";
+
+      iframe.allow =
+        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+
+      iframe.allowFullscreen =
+        true;
+
+
+      return iframe;
+    }
+
+
+    if (type === "image") {
+      const image =
+        document.createElement(
+          "img"
+        );
+
+
+      image.className =
+        "media-viewer-image";
+
+      image.src =
+        item.dataset.mediaSrc;
+
+      image.alt =
+        item.dataset.mediaTitle ||
+        "Game screenshot";
+
+      image.decoding =
+        "async";
+
+
+      return image;
+    }
+
+
+    if (type === "video") {
+      const video =
+        document.createElement(
+          "video"
+        );
+
+
+      video.className =
+        "media-viewer-video";
+
+      video.src =
+        item.dataset.mediaSrc;
+
+      video.controls =
+        true;
+
+      video.playsInline =
+        true;
+
+      video.preload =
+        "metadata";
+
+
+      return video;
+    }
+
+
+    return null;
+  };
+
+
+  const initializeMediaBrowser = (
+    browser
+  ) => {
+    const stage =
+      browser.querySelector(
+        "[data-media-viewer-stage]"
+      );
+
+    const thumbnails =
+      browser.querySelector(
+        "[data-media-thumbnails]"
+      );
+
+    const items =
+      Array.from(
+        browser.querySelectorAll(
+          "[data-media-item]"
+        )
+      );
+
+    const previousButton =
+      browser.querySelector(
+        "[data-media-prev]"
+      );
+
+    const nextButton =
+      browser.querySelector(
+        "[data-media-next]"
+      );
+
+
+    if (
+      !stage ||
+      !thumbnails ||
+      items.length === 0
+    ) {
+      return;
+    }
+
+
+    let activeIndex =
+      Math.max(
+        0,
+        items.findIndex(
+          (item) =>
+            item.classList.contains(
+              "is-selected"
+            )
+        )
+      );
+
+
+    const updateArrowState = () => {
+      if (previousButton) {
+        previousButton.disabled =
+          activeIndex <= 0;
+      }
+
+
+      if (nextButton) {
+        nextButton.disabled =
+          activeIndex >=
+          items.length - 1;
+      }
+    };
+
+
+    const centerThumbnail = (
+      item,
+      behavior = "smooth"
+    ) => {
+      const targetLeft =
+        item.offsetLeft
+        -
+        (
+          thumbnails.clientWidth
+          -
+          item.offsetWidth
+        ) / 2;
+
+
+      thumbnails.scrollTo({
+        left:
+          Math.max(
+            0,
+            targetLeft
+          ),
+
+        behavior
+      });
+    };
+
+
+    const renderItem = (
+      index,
+      {
+        focusThumbnail = false,
+        scrollBehavior = "smooth"
+      } = {}
+    ) => {
+      const clampedIndex =
+        Math.max(
+          0,
+          Math.min(
+            items.length - 1,
+            index
+          )
+        );
+
+
+      activeIndex =
+        clampedIndex;
+
+
+      items.forEach(
+        (item, itemIndex) => {
+          const selected =
+            itemIndex ===
+            activeIndex;
+
+
+          item.classList.toggle(
+            "is-selected",
+            selected
+          );
+
+
+          item.setAttribute(
+            "aria-pressed",
+            selected
+              ? "true"
+              : "false"
+          );
+        }
+      );
+
+
+      const activeItem =
+        items[activeIndex];
+
+      const mediaElement =
+        createMediaElement(
+          activeItem
+        );
+
+
+      stage.classList.remove(
+        "is-ready"
+      );
+
+
+      /*
+        Replacing the child also stops any previous YouTube/local-video
+        playback automatically, so media never keeps playing off-screen.
+      */
+      stage.replaceChildren();
+
+
+      if (mediaElement) {
+        stage.appendChild(
+          mediaElement
+        );
+      }
+
+
+      requestAnimationFrame(() => {
+        stage.classList.add(
+          "is-ready"
+        );
+      });
+
+
+      centerThumbnail(
+        activeItem,
+        scrollBehavior
+      );
+
+
+      if (focusThumbnail) {
+        activeItem.focus({
+          preventScroll: true
+        });
+      }
+
+
+      updateArrowState();
+    };
+
+
+    items.forEach(
+      (item, index) => {
+        item.addEventListener(
+          "click",
+          () => {
+            renderItem(
+              index
+            );
+          }
+        );
+      }
+    );
+
+
+    previousButton?.addEventListener(
+      "click",
+      () => {
+        renderItem(
+          activeIndex - 1,
+          {
+            focusThumbnail: true
+          }
+        );
+      }
+    );
+
+
+    nextButton?.addEventListener(
+      "click",
+      () => {
+        renderItem(
+          activeIndex + 1,
+          {
+            focusThumbnail: true
+          }
+        );
+      }
+    );
+
+
+    browser.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+
+          renderItem(
+            activeIndex - 1,
+            {
+              focusThumbnail: true
+            }
+          );
+        }
+
+
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+
+          renderItem(
+            activeIndex + 1,
+            {
+              focusThumbnail: true
+            }
+          );
+        }
+      }
+    );
+
+
+    /*
+      Initial media is rendered without a scroll animation so opening the
+      page frame does not cause the thumbnail rail to visibly slide.
+    */
+    renderItem(
+      activeIndex,
+      {
+        scrollBehavior: "auto"
+      }
+    );
+  };
+
+
+  mediaBrowsers.forEach(
+    initializeMediaBrowser
+  );
+
+
   /* =======================================================
      Geometry / resize updates
      ======================================================= */

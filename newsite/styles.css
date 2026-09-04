@@ -34,6 +34,15 @@
     button and that button fades back to its normal state.
   */
   --active-page-release-duration: 580ms;
+
+  /*
+    Master UI diagonal angle.
+
+    This used to live only on .site-header, which meant page-content modules
+    elsewhere in the DOM could not inherit it. Keep it global so header,
+    page-frame details, and media modules can all derive the exact same slope.
+  */
+  --button-shear-angle: -40deg;
 }
 
 
@@ -276,7 +285,10 @@ body {
 
     More negative = stronger slant.
   */
-  --button-shear-angle: -40deg;
+  /*
+    --button-shear-angle is defined globally at :root so page modules can
+    share this exact same diagonal.
+  */
 
   /*
     Minimum usable horizontal face width AFTER the diagonal cut.
@@ -1623,6 +1635,718 @@ body {
   overflow: hidden;
 
   pointer-events: auto;
+
+  /*
+    Each page interior responds to the ACTUAL usable frame opening rather
+    than to the browser viewport. This keeps page modules independent from
+    the frame's tablet/desktop layout rules.
+  */
+  container-type: size;
+  container-name: page-content;
+}
+
+
+/* =========================================================
+   Modular page-content foundation
+   ========================================================= */
+
+/*
+  A .game-page is the self-contained interior of one morphing page frame.
+  The global frame controls placement/morphing; the module controls only
+  its own internal layout.
+*/
+.game-page {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   Media browser — Step 2 continuous responsive prototype
+   ========================================================= */
+
+/*
+  One continuous composition scale now drives the viewer, thumbnail rail,
+  arrows, spacing, and corner cuts.
+
+  This avoids the previous breakpoint "pop" and prevents odd wide/short
+  containers from making one part of the layout outgrow another.
+*/
+.media-browser {
+  /*
+    Padding responds to whichever dimension is more restrictive.
+    There are no hard mode changes here.
+  */
+  --media-browser-outer-padding:
+    clamp(
+      18px,
+      min(4.2cqw, 4.2cqh),
+      42px
+    );
+
+  --media-browser-row-gap:
+    clamp(
+      12px,
+      min(3cqw, 3cqh),
+      28px
+    );
+
+  /*
+    The whole media composition is sized from BOTH available width and
+    available height.
+
+    Vertical budget:
+      viewer = 56.25% of composition width
+      thumbnails = ~15% of composition width
+      + one row gap
+
+    1.38 is a small safety margin below the theoretical maximum, leaving
+    breathing room even in unusually wide/short frame openings.
+  */
+  --media-composition-width:
+    min(
+      720px,
+      calc(
+        100cqw
+        -
+        (var(--media-browser-outer-padding) * 2)
+      ),
+      calc(
+        (
+          100cqh
+          -
+          (var(--media-browser-outer-padding) * 2)
+          -
+          var(--media-browser-row-gap)
+        )
+        * 1.38
+      )
+    );
+
+  --media-thumb-width:
+    calc(
+      var(--media-composition-width) * 0.20
+    );
+
+  --media-arrow-width:
+    calc(
+      var(--media-composition-width) * 0.055
+    );
+
+  --media-strip-gap:
+    clamp(
+      8px,
+      calc(var(--media-composition-width) * 0.025),
+      20px
+    );
+
+  --media-thumb-gap:
+    clamp(
+      8px,
+      calc(var(--media-composition-width) * 0.024),
+      18px
+    );
+
+  /*
+    IMPORTANT:
+    --button-shear-angle now lives at :root, so this module can actually
+    inherit it. The positive angle is used only for the trigonometric corner
+    calculation; the visual slope remains exactly the same as the header.
+  */
+  --media-corner-angle:
+    calc(var(--button-shear-angle) * -1);
+
+  /*
+    Corner rise changes smoothly with the composition size.
+    Corner run is derived from the angle using the same relation as the
+    frame/morph JS: horizontal run = vertical rise × tan(angle).
+    The slope itself NEVER changes.
+  */
+  --media-viewer-corner-rise:
+    clamp(
+      14px,
+      calc(var(--media-composition-width) * 0.038),
+      28px
+    );
+
+  --media-thumb-corner-rise:
+    clamp(
+      7px,
+      calc(var(--media-composition-width) * 0.018),
+      13px
+    );
+
+  --media-viewer-corner-run:
+    calc(
+      var(--media-viewer-corner-rise)
+      *
+      tan(var(--media-corner-angle))
+    );
+
+  --media-thumb-corner-run:
+    calc(
+      var(--media-thumb-corner-rise)
+      *
+      tan(var(--media-corner-angle))
+    );
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    var(--media-browser-row-gap);
+
+  padding:
+    var(--media-browser-outer-padding);
+
+  overflow: hidden;
+}
+
+
+.media-viewer {
+  flex: 0 0 auto;
+
+  width:
+    var(--media-composition-width);
+
+  max-width: 100%;
+
+  aspect-ratio: 16 / 9;
+
+  min-width: 0;
+  min-height: 0;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(
+      var(--page-accent-rgb),
+      0.58
+    );
+
+  background:
+    rgba(18, 21, 24, 0.28);
+
+  clip-path:
+    polygon(
+      var(--media-viewer-corner-run) 0,
+      100% 0,
+      100% calc(100% - var(--media-viewer-corner-rise)),
+      calc(100% - var(--media-viewer-corner-run)) 100%,
+      0 100%,
+      0 var(--media-viewer-corner-rise)
+    );
+}
+
+
+.media-prototype-label {
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      0.86
+    );
+
+  font-size:
+    clamp(
+      10px,
+      calc(var(--media-composition-width) * 0.025),
+      18px
+    );
+
+  letter-spacing:
+    0.12em;
+
+  opacity: 0.76;
+}
+
+
+.media-strip {
+  flex: 0 0 auto;
+
+  width:
+    var(--media-composition-width);
+
+  max-width: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    var(--media-arrow-width)
+    minmax(0, 1fr)
+    var(--media-arrow-width);
+
+  align-items: center;
+
+  gap:
+    var(--media-strip-gap);
+}
+
+
+.media-thumbnails {
+  min-width: 0;
+  min-height: 0;
+
+  display: grid;
+  grid-auto-flow: column;
+
+  /*
+    Keep three media tiles visible at once. Additional items remain in the
+    same reusable rail and are revealed by the generic controller/arrows.
+  */
+  grid-auto-columns:
+    calc(
+      (
+        100%
+        -
+        (var(--media-thumb-gap) * 2)
+      )
+      / 3
+    );
+
+  align-items: center;
+
+  gap:
+    var(--media-thumb-gap);
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+
+  overscroll-behavior-inline: contain;
+}
+
+.media-thumbnails::-webkit-scrollbar {
+  display: none;
+}
+
+
+.media-thumbnail {
+  flex: 0 0 auto;
+
+  width: 100%;
+
+  aspect-ratio: 4 / 3;
+
+  min-width: 0;
+  min-height: 0;
+
+  padding:
+    clamp(
+      4px,
+      calc(var(--media-composition-width) * 0.012),
+      10px
+    );
+
+  border:
+    1px solid
+    rgba(
+      var(--page-accent-rgb),
+      0.48
+    );
+
+  background:
+    rgba(20, 23, 27, 0.34);
+
+  color:
+    rgba(240, 240, 240, 0.74);
+
+  clip-path:
+    polygon(
+      var(--media-thumb-corner-run) 0,
+      calc(100% - var(--media-thumb-corner-run)) 0,
+      100% var(--media-thumb-corner-rise),
+      100% calc(100% - var(--media-thumb-corner-rise)),
+      calc(100% - var(--media-thumb-corner-run)) 100%,
+      var(--media-thumb-corner-run) 100%,
+      0 calc(100% - var(--media-thumb-corner-rise)),
+      0 var(--media-thumb-corner-rise)
+    );
+}
+
+
+.media-thumbnail.is-selected {
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.92
+    );
+
+  background:
+    rgba(
+      var(--page-accent-rgb),
+      0.12
+    );
+}
+
+
+.media-thumbnail-type {
+  font-size:
+    clamp(
+      8px,
+      calc(var(--media-composition-width) * 0.017),
+      13px
+    );
+
+  letter-spacing:
+    0.08em;
+}
+
+
+.media-arrow {
+  width:
+    var(--media-arrow-width);
+
+  height:
+    calc(var(--media-thumb-width) * 0.75);
+
+  padding: 0;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  background: transparent;
+
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      0.86
+    );
+
+  font-size:
+    clamp(
+      22px,
+      calc(var(--media-composition-width) * 0.055),
+      42px
+    );
+
+  line-height: 1;
+
+  opacity: 0.78;
+}
+
+
+
+
+/* ---------------------------------------------------------
+   Real media content
+   --------------------------------------------------------- */
+
+.media-viewer-stage {
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  opacity: 0;
+
+  transition:
+    opacity 180ms ease;
+}
+
+.media-viewer-stage.is-ready {
+  opacity: 1;
+}
+
+.media-viewer {
+  position: relative;
+}
+
+.media-viewer-image,
+.media-viewer-video,
+.media-viewer-youtube {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  border: 0;
+
+  background:
+    rgba(8, 10, 12, 0.72);
+}
+
+.media-viewer-image {
+  object-fit: contain;
+}
+
+.media-viewer-video {
+  object-fit: contain;
+}
+
+.media-viewer-youtube {
+  aspect-ratio: 16 / 9;
+}
+
+
+.media-youtube-local-fallback {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  background:
+    rgba(8, 10, 12, 0.82);
+}
+
+
+.media-youtube-local-fallback-image {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  opacity: 0.62;
+}
+
+
+.media-youtube-local-fallback::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    rgba(6, 8, 10, 0.34);
+
+  pointer-events: none;
+}
+
+
+.media-youtube-local-fallback-link {
+  position: relative;
+  z-index: 1;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding:
+    12px
+    18px;
+
+  border:
+    1px solid
+    rgba(
+      var(--page-accent-rgb),
+      0.72
+    );
+
+  background:
+    rgba(12, 15, 18, 0.84);
+
+  color: #ffffff;
+
+  text-decoration: none;
+
+  pointer-events: auto;
+}
+
+
+.media-youtube-local-fallback-link:hover,
+.media-youtube-local-fallback-link:focus-visible {
+  background:
+    rgba(
+      var(--page-accent-rgb),
+      0.22
+    );
+}
+
+
+.media-thumbnail {
+  position: relative;
+
+  overflow: hidden;
+
+  cursor: pointer;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.media-thumbnail:hover,
+.media-thumbnail:focus-visible {
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.78
+    );
+
+  transform:
+    translateY(-2px);
+}
+
+.media-thumbnail:focus-visible {
+  outline: none;
+}
+
+.media-thumbnail-image {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  pointer-events: none;
+}
+
+.media-thumbnail-overlay,
+.media-thumbnail-local-video {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    clamp(
+      4px,
+      calc(var(--media-composition-width) * 0.008),
+      8px
+    );
+
+  padding:
+    clamp(
+      5px,
+      calc(var(--media-composition-width) * 0.012),
+      10px
+    );
+
+  pointer-events: none;
+}
+
+.media-thumbnail-overlay {
+  align-items: flex-end;
+  justify-content: flex-start;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent 46%,
+      rgba(7, 9, 11, 0.76)
+    );
+}
+
+.media-thumbnail-local-video {
+  flex-direction: column;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(24, 28, 32, 0.86),
+      rgba(9, 11, 13, 0.94)
+    );
+}
+
+.media-thumbnail-play {
+  display: grid;
+  place-items: center;
+
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      0.96
+    );
+
+  font-size:
+    clamp(
+      13px,
+      calc(var(--media-composition-width) * 0.024),
+      21px
+    );
+
+  filter:
+    drop-shadow(
+      0 0 4px
+      rgba(
+        var(--page-accent-rgb),
+        0.34
+      )
+    );
+}
+
+.media-thumbnail.is-selected {
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(
+      var(--page-accent-rgb),
+      0.42
+    );
+}
+
+.media-arrow {
+  cursor: pointer;
+
+  transition:
+    opacity 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.media-arrow:hover,
+.media-arrow:focus-visible {
+  opacity: 1;
+
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      1
+    );
+
+  transform:
+    scale(1.08);
+}
+
+.media-arrow:focus-visible {
+  outline: none;
+}
+
+.media-arrow:disabled {
+  opacity: 0.28;
+
+  cursor: default;
+
+  transform: none;
 }
 
 
@@ -1632,6 +2356,44 @@ body {
 
 .prototype-page-frame.is-open {
   opacity: 1;
+
+  /*
+    Once the real page is open, restore pointer interaction for its HTML
+    content. The closed frame itself can remain non-interactive.
+  */
+  pointer-events: auto;
+}
+
+
+.prototype-page-frame:not(.is-open)
+.prototype-page-frame-content {
+  pointer-events: none;
+}
+
+
+.prototype-page-frame.is-open
+.prototype-page-frame-content,
+.prototype-page-frame.is-open
+.game-page,
+.prototype-page-frame.is-open
+.media-browser,
+.prototype-page-frame.is-open
+.media-viewer,
+.prototype-page-frame.is-open
+.media-strip,
+.prototype-page-frame.is-open
+.media-thumbnails,
+.prototype-page-frame.is-open
+.media-thumbnail,
+.prototype-page-frame.is-open
+.media-arrow,
+.prototype-page-frame.is-open
+.media-viewer-stage,
+.prototype-page-frame.is-open
+.media-viewer-youtube,
+.prototype-page-frame.is-open
+.media-viewer-video {
+  pointer-events: auto;
 }
 
 
