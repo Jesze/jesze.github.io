@@ -9555,3 +9555,16 @@ body.is-media-lightbox-open {
    The outgoing desktop info is now a frozen JS snapshot, so the real
    tablet layout is free to reflow invisibly underneath it.
    ========================================================= */
+
+
+/* =========================================================
+   PERFORMANCE TEST — disable Etherian backdrop blur only
+   Temporary diagnostic pass.
+   ========================================================= */
+
+#etherian-page-frame .desktop-secondary-panel-glass,
+#etherian-page-frame .etherian-popout-glass-layer,
+#etherian-page-frame .game-info-surface {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
