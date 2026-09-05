@@ -1,3 +1,26 @@
+
+/*
+  The lightbox button morph changes height, so its horizontal shear run
+  must change at the same time to preserve the site's master angle.
+
+  Registering this custom property as a <length> lets Web Animations
+  interpolate it continuously rather than treating it as a discrete value.
+*/
+@property --media-lightbox-morph-shear {
+  syntax: "<length>";
+
+  /*
+    IMPORTANT:
+    The animated value lives on .media-lightbox-button-morph, while the
+    visible skewed face is its ::before pseudo-element. This MUST inherit
+    so the face uses the same continuously animated shear value.
+  */
+  inherits: true;
+
+  initial-value: 32px;
+}
+
+
 :root {
   /*
     =========================================================
@@ -34,6 +57,23 @@
     button and that button fades back to its normal state.
   */
   --active-page-release-duration: 580ms;
+
+  /*
+    Screenshot lightbox animation timing.
+  */
+  --media-lightbox-duration: 520ms;
+  --media-lightbox-button-duration: 460ms;
+  --media-lightbox-close-state-duration: 190ms;
+
+  /*
+    Desktop/tablet -> mobile handoff.
+    These affect only the breakpoint-collapse animation.
+  */
+  --mobile-ui-collapse-duration: 620ms;
+  --mobile-lightbox-collapse-duration: 560ms;
+  --mobile-page-real-fade-duration: 220ms;
+  --media-lightbox-ease:
+    cubic-bezier(0.18, 0.78, 0.22, 1);
 
   /*
     Master UI diagonal angle.
@@ -958,7 +998,7 @@ body {
 
 .nav-button[href="#etherian"] {
   --nav-accent-rgb:
-    var(--accent-etherian-rgb);
+    var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb));
 }
 
 
@@ -1679,6 +1719,13 @@ body {
 */
 .media-browser {
   /*
+    Generic per-page media accent. Brobots / Etherian / Halodoom all inherit
+    their own page-frame theme automatically.
+  */
+  --media-accent-rgb:
+    var(--page-accent-rgb);
+
+  /*
     Padding responds to whichever dimension is more restrictive.
     There are no hard mode changes here.
   */
@@ -1932,10 +1979,24 @@ body {
   overflow-x: auto;
   overflow-y: hidden;
 
-  scroll-behavior: smooth;
+  /*
+    JS now controls when rail movement is smooth vs immediate.
+    Keeping CSS at auto prevents viewport resizes/fullscreen changes from
+    animating toward stale pixel scroll positions.
+  */
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+
   scrollbar-width: none;
 
   overscroll-behavior-inline: contain;
+
+  /*
+    The thumbnail rail is positioned by our logical media index.
+    Disable browser scroll anchoring so a desktop/tablet layout handoff
+    cannot temporarily "help" by preserving an obsolete pixel position.
+  */
+  overflow-anchor: none;
 }
 
 .media-thumbnails::-webkit-scrollbar {
@@ -2094,6 +2155,8 @@ body {
 
 .media-viewer-image {
   object-fit: contain;
+
+  cursor: zoom-in;
 }
 
 .media-viewer-video {
@@ -2350,6 +2413,741 @@ body {
 }
 
 
+/* ---------------------------------------------------------
+   Fullscreen screenshot preview
+   --------------------------------------------------------- */
+
+.media-lightbox {
+  /*
+    Keep the existing automatic image sizing/centering behavior.
+
+    Instead of calculating image geometry in JS, reserve control gutters
+    around the lightbox. The image still uses normal max-width/max-height
+    containment inside this padded box.
+  */
+  --media-lightbox-side-gutter:
+    clamp(76px, 7vw, 116px);
+
+  /*
+    Slightly larger than before because the X is now locked to the banner
+    button's Y position instead of drifting upward during its morph.
+  */
+  --media-lightbox-top-gutter:
+    clamp(112px, 11vh, 152px);
+
+  --media-lightbox-bottom-gutter:
+    clamp(30px, 4vh, 48px);
+
+  position: fixed;
+  inset: 0;
+
+  z-index: 5000;
+
+  display: grid;
+  place-items: center;
+
+  padding:
+    var(--media-lightbox-top-gutter)
+    var(--media-lightbox-side-gutter)
+    var(--media-lightbox-bottom-gutter);
+
+  background:
+    rgba(5, 7, 9, 0);
+
+  backdrop-filter:
+    blur(0);
+
+  -webkit-backdrop-filter:
+    blur(0);
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    background-color
+      var(--media-lightbox-duration)
+      var(--media-lightbox-ease),
+
+    backdrop-filter
+      var(--media-lightbox-duration)
+      var(--media-lightbox-ease),
+
+    -webkit-backdrop-filter
+      var(--media-lightbox-duration)
+      var(--media-lightbox-ease),
+
+    opacity
+      var(--media-lightbox-duration)
+      var(--media-lightbox-ease),
+
+    visibility
+      0s linear
+      var(--media-lightbox-duration);
+}
+
+
+.media-lightbox.is-open {
+  background:
+    rgba(5, 7, 9, 0.94);
+
+  backdrop-filter:
+    blur(10px);
+
+  -webkit-backdrop-filter:
+    blur(10px);
+
+  opacity: 1;
+  visibility: visible;
+
+  pointer-events: auto;
+
+  transition-delay: 0s;
+}
+
+
+.media-lightbox-image {
+  display: block;
+
+  /*
+    Automatic intrinsic-ratio sizing remains intact.
+    The lightbox's padding defines the safe rectangle, so the screenshot
+    cannot overlap the X button or side arrows.
+  */
+  /*
+    Use explicit viewport-derived limits instead of percentage max sizes.
+
+    This keeps the screenshot fully inside the safe rectangle even when the
+    browser becomes very wide but short, where percentage sizing inside the
+    grid could allow the intrinsic image height to poke below the viewport.
+  */
+  max-width:
+    calc(
+      100vw -
+      (var(--media-lightbox-side-gutter) * 2)
+    );
+
+  max-height:
+    calc(
+      100vh -
+      var(--media-lightbox-top-gutter) -
+      var(--media-lightbox-bottom-gutter)
+    );
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+
+  opacity: 0;
+
+  box-shadow:
+    0 18px 60px
+    rgba(0, 0, 0, 0.58);
+}
+
+
+.media-lightbox.is-settled
+.media-lightbox-image {
+  opacity: 1;
+}
+
+
+/*
+  The real close button is hidden while the temporary morph proxy travels
+  from/to the selected header button. It appears only after the morph lands.
+*/
+.media-lightbox-close {
+  position: absolute;
+
+  top:
+    var(
+      --media-lightbox-close-top,
+      clamp(14px, 2vw, 26px)
+    );
+
+  right:
+    clamp(14px, 2vw, 26px);
+
+  /*
+    JS copies the selected banner button's live dimensions here.
+    This keeps tablet-icon and desktop-text button sizes consistent.
+  */
+  width:
+    var(
+      --media-lightbox-close-width,
+      54px
+    );
+
+  height:
+    var(
+      --media-lightbox-close-height,
+      46px
+    );
+
+  display: grid;
+  place-items: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  color: #ffffff;
+
+  font: inherit;
+  font-size:
+    clamp(24px, 3vw, 32px);
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  isolation: isolate;
+
+  /*
+    JS copies the originating page accent here as an RGB triplet.
+  */
+  --media-lightbox-close-accent-rgb:
+    var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb));
+
+  /*
+    Height-only reduction for the fullscreen X.
+    Width remains matched to the source banner button.
+  */
+  --media-lightbox-close-height-scale:
+    0.7;
+
+  opacity: 0;
+
+  /*
+    No opacity transition here: the temporary button morph already arrives
+    visibly at this exact position/appearance. The real X simply takes over
+    on the next frame instead of visibly fading in a second time.
+  */
+  transition: none;
+}
+
+
+/*
+  Same construction as .nav-button::before.
+
+  Rather than approximating the selected button's appearance, JS copies
+  the COMPUTED pseudo-element styles from that exact button:
+    - gradient
+    - active-page tint
+    - border
+    - glow/shadow
+    - shear size
+*/
+.media-lightbox-close::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+
+  left:
+    calc(
+      var(
+        --media-lightbox-close-shear,
+        32px
+      )
+      / 2
+    );
+
+  right:
+    calc(
+      var(
+        --media-lightbox-close-shear,
+        32px
+      )
+      / 2
+    );
+
+  z-index: -1;
+
+  transform:
+    skewX(var(--button-shear-angle));
+
+  transform-origin:
+    center;
+
+  border-style:
+    solid;
+
+  border-width:
+    var(
+      --media-lightbox-close-border-width,
+      var(--button-border-width)
+    );
+
+  border-color:
+    var(
+      --media-lightbox-close-border-color,
+      var(--button-border-color)
+    );
+
+  background-image:
+    var(
+      --media-lightbox-close-background-image,
+      none
+    );
+
+  background-color:
+    var(
+      --media-lightbox-close-background-color,
+      transparent
+    );
+
+  box-shadow:
+    var(
+      --media-lightbox-close-box-shadow,
+      none
+    );
+
+  transition:
+    background-color
+      var(--media-lightbox-close-state-duration)
+      ease,
+    border-color
+      var(--media-lightbox-close-state-duration)
+      ease,
+    box-shadow
+      var(--media-lightbox-close-state-duration)
+      ease;
+}
+
+
+.media-lightbox.is-settled
+.media-lightbox-close {
+  opacity: 1;
+}
+
+
+/*
+  X BUTTON STATE MODEL
+
+  1) Formation begins in the SELECTED/PRESSED styling copied from the
+     originating banner button.
+  2) Once settled, it fades to the normal UNPRESSED banner-button styling.
+  3) Hover/focus uses the originating banner button's normal HOVER styling.
+  4) When closing starts by ANY method, .is-closing overrides hover and
+     fades the X back into the SELECTED/PRESSED styling before it moves.
+*/
+.media-lightbox.is-settled
+.media-lightbox-close::before {
+  border-color:
+    var(
+      --media-lightbox-close-unpressed-border-color,
+      var(--button-border-color)
+    );
+
+  background-color:
+    var(
+      --media-lightbox-close-unpressed-background-color,
+      transparent
+    );
+
+  box-shadow:
+    var(
+      --media-lightbox-close-unpressed-box-shadow,
+      none
+    );
+}
+
+
+.media-lightbox-close > span {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* Match the HOME banner button's ordinary hover state. */
+.media-lightbox.is-settled:not(.is-closing)
+.media-lightbox-close:hover::before,
+.media-lightbox.is-settled:not(.is-closing)
+.media-lightbox-close:focus-visible::before {
+  border-color:
+    var(
+      --media-lightbox-close-hover-border-color,
+      rgba(
+        var(--media-lightbox-close-accent-rgb),
+        0.48
+      )
+    );
+
+  background-color:
+    var(
+      --media-lightbox-close-hover-background-color,
+      rgba(
+        var(--media-lightbox-close-accent-rgb),
+        0.25
+      )
+    );
+
+  box-shadow:
+    var(
+      --media-lightbox-close-hover-box-shadow,
+      none
+    );
+}
+
+
+/*
+  Pressed/selected state. This deliberately wins over :hover so clicking
+  the X, Escape, or backdrop close all produce the exact same press-in.
+*/
+.media-lightbox.is-settled.is-closing
+.media-lightbox-close::before {
+  border-color:
+    var(
+      --media-lightbox-close-selected-border-color,
+      var(--media-lightbox-close-border-color)
+    );
+
+  background-color:
+    var(
+      --media-lightbox-close-selected-background-color,
+      var(--media-lightbox-close-background-color)
+    );
+
+  box-shadow:
+    var(
+      --media-lightbox-close-selected-box-shadow,
+      var(--media-lightbox-close-box-shadow)
+    );
+}
+
+
+.media-lightbox-close:focus-visible {
+  outline:
+    2px solid
+    rgba(
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
+      0.74
+    );
+
+  outline-offset: 3px;
+}
+
+
+
+/* ---------------------------------------------------------
+   Fullscreen screenshot navigation
+   --------------------------------------------------------- */
+
+.media-lightbox-arrow {
+  position: absolute;
+  top: 50%;
+
+  width:
+    clamp(42px, 4vw, 54px);
+
+  height:
+    clamp(62px, 7vw, 86px);
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  color:
+    rgba(
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
+      0.92
+    );
+
+  font: inherit;
+  font-size:
+    clamp(34px, 4vw, 52px);
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transform:
+    translateY(-50%);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    color 160ms ease;
+}
+
+
+.media-lightbox.is-settled
+.media-lightbox-arrow {
+  opacity: 0.82;
+
+  pointer-events: auto;
+}
+
+
+.media-lightbox-arrow--previous {
+  left:
+    calc(
+      var(--media-lightbox-side-gutter) / 2
+      - 22px
+    );
+}
+
+
+.media-lightbox-arrow--next {
+  right:
+    calc(
+      var(--media-lightbox-side-gutter) / 2
+      - 22px
+    );
+}
+
+
+.media-lightbox-arrow:hover,
+.media-lightbox-arrow:focus-visible {
+  color:
+    rgba(
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
+      1
+    );
+
+  opacity: 1;
+
+  transform:
+    translateY(-50%)
+    scale(1.08);
+}
+
+
+.media-lightbox-arrow:focus-visible {
+  outline: none;
+}
+
+
+.media-lightbox-arrow:disabled {
+  color:
+    rgba(
+      170,
+      176,
+      182,
+      0.48
+    );
+
+  /*
+    Stay fully hidden during the opening morph, exactly like an enabled
+    arrow. The settled rule below is the only place that reveals it.
+  */
+  opacity: 0;
+
+  cursor: default;
+
+  pointer-events: none;
+
+  transform:
+    translateY(-50%);
+}
+
+
+/*
+  Once the lightbox has finished opening, disabled arrows fade from zero
+  to their greyed-out resting opacity at the same time as enabled arrows.
+*/
+.media-lightbox.is-settled
+.media-lightbox-arrow:disabled {
+  opacity: 0.46;
+}
+
+
+
+/* ---------------------------------------------------------
+   Temporary opening/closing image proxy
+   --------------------------------------------------------- */
+
+.media-lightbox-image-morph {
+  position: fixed;
+
+  z-index: 5002;
+
+  margin: 0;
+
+  display: block;
+
+  object-fit: contain;
+
+  pointer-events: none;
+
+  will-change:
+    left,
+    top,
+    width,
+    height,
+    clip-path,
+    box-shadow;
+
+  box-shadow:
+    0 0 0
+    rgba(0, 0, 0, 0);
+}
+
+
+/* ---------------------------------------------------------
+   Header-button -> lightbox-close morph proxy
+   --------------------------------------------------------- */
+
+.media-lightbox-button-morph {
+  position: fixed;
+
+  z-index: 5003;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  color: #f0f0f0;
+
+  pointer-events: none;
+
+  will-change:
+    left,
+    top,
+    width,
+    height;
+}
+
+
+.media-lightbox-button-morph::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  left:
+    calc(
+      var(--media-lightbox-morph-shear, 32px)
+      / 2
+    );
+
+  right:
+    calc(
+      var(--media-lightbox-morph-shear, 32px)
+      / 2
+    );
+
+  border-style:
+    solid;
+
+  border-width:
+    var(
+      --media-lightbox-morph-border-width,
+      var(--button-border-width)
+    );
+
+  border-color:
+    var(
+      --media-lightbox-morph-border-color,
+      var(--button-border-color)
+    );
+
+  background-image:
+    var(
+      --media-lightbox-morph-background-image,
+      none
+    );
+
+  background-color:
+    var(
+      --media-lightbox-morph-background-color,
+      transparent
+    );
+
+  box-shadow:
+    var(
+      --media-lightbox-morph-box-shadow,
+      none
+    );
+
+  transform:
+    skewX(var(--button-shear-angle));
+
+  transform-origin:
+    center;
+
+  /*
+    Used on the RETURN journey so the proxy can fade from the X's resting
+    appearance back into the selected banner-button appearance while it
+    travels home.
+  */
+  transition:
+    background-color 190ms ease,
+    border-color 190ms ease,
+    box-shadow 190ms ease;
+}
+
+
+.media-lightbox-button-morph-label,
+.media-lightbox-button-morph-x {
+  position: absolute;
+
+  z-index: 1;
+
+  display: grid;
+  place-items: center;
+
+  inset: 0;
+
+  line-height: 1;
+}
+
+
+.media-lightbox-button-morph-label {
+  font-size:
+    clamp(10px, 0.68vw, 14px);
+
+  opacity: 1;
+}
+
+
+.media-lightbox-button-morph-x {
+  font-size:
+    clamp(24px, 3vw, 32px);
+
+  opacity: 0;
+}
+
+
+.nav-button.is-lightbox-morph-source {
+  visibility: hidden;
+}
+
+
+body.is-media-lightbox-open {
+  overflow: hidden;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .media-lightbox {
+    transition-duration: 1ms;
+  }
+
+  .media-lightbox-image-morph,
+  .media-lightbox-button-morph {
+    display: none;
+  }
+}
+
+
 /* -------------------------
    Open state
    ------------------------- */
@@ -2535,65 +3333,65 @@ body {
 
 .prototype-page-frame[data-page="etherian"] {
   --page-accent-rgb:
-    var(--accent-etherian-rgb);
+    var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb));
 
   --page-frame-orange:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       0.92
     );
 
   --page-frame-orange-soft:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       0.34
     );
 
   --page-frame-accent-highlight:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       1
     );
 
   --secondary-panel-accent:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       0.42
     );
 
   --secondary-panel-morph-fill:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       0.68
     );
 
   --secondary-panel-morph-fill-mid:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       0.58
     );
 
   --secondary-panel-morph-border:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       0.88
     );
 
   --secondary-panel-morph-border-mid:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       0.82
     );
 
   --secondary-panel-morph-inner:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       0.16
     );
 
   --secondary-panel-morph-inner-mid:
     rgba(
-      var(--accent-etherian-rgb),
+      var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb)),
       0.14
     );
 }
@@ -3084,9 +3882,6 @@ body {
       saturate(112%);
 
     box-shadow:
-      inset 0 0 0 1px
-        var(--secondary-panel-morph-border),
-
       inset 0 0 0 3px
         var(--secondary-panel-morph-inner),
 
@@ -3230,9 +4025,6 @@ body {
     saturate(112%);
 
   box-shadow:
-    inset 0 0 0 1px
-      var(--secondary-panel-morph-border),
-
     inset 0 0 0 3px
       var(--secondary-panel-morph-inner),
 
@@ -3735,7 +4527,7 @@ body {
 
 .mobile-menu-link[href="#etherian"] {
   --mobile-menu-item-accent-rgb:
-    var(--accent-etherian-rgb);
+    var(--media-lightbox-close-accent-rgb, var(--accent-etherian-rgb));
 }
 
 
@@ -4247,3 +5039,4519 @@ body {
   }
 }
 
+
+
+/* =========================================================
+   Etherian desktop information panel — Step 1 structure
+   ========================================================= */
+
+/*
+  This first pass deliberately leaves the existing secondary-panel morph
+  geometry untouched. The layered treatment lives INSIDE the current final
+  popout silhouette, so the triangle -> popout animation still has one clear
+  destination shape.
+*/
+@media (min-width: 1401px) {
+  #etherian-page-frame .desktop-secondary-panel-content {
+    top: 3.5%;
+    right: 4.5%;
+    bottom: 3.5%;
+
+    left:
+      calc(
+        var(--secondary-panel-overlap) +
+        3%
+      );
+
+    overflow: visible;
+  }
+
+
+  #etherian-page-frame .game-info {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    color: rgba(244, 248, 250, 0.96);
+
+    isolation: isolate;
+  }
+
+
+  /*
+    The screenshot behaves like imagery suspended IN the glass, not a second
+    media card. It is strongest at the upper-right and dissolves into the
+    information field.
+  */
+  #etherian-page-frame .game-info-background {
+    position: absolute;
+    inset: 2% 0 4% 14%;
+
+    z-index: 0;
+
+    overflow: hidden;
+
+    opacity: 0.33;
+
+    clip-path:
+      polygon(
+        7% 0,
+        100% 0,
+        100% 90%,
+        93% 100%,
+        0 100%,
+        0 8%
+      );
+
+    pointer-events: none;
+  }
+
+
+  #etherian-page-frame .game-info-background-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: 58% 44%;
+
+    filter:
+      saturate(0.88)
+      contrast(0.94)
+      brightness(0.72);
+
+    -webkit-mask-image:
+      linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.16) 18%,
+        rgba(0, 0, 0, 0.70) 54%,
+        rgba(0, 0, 0, 0.92) 100%
+      );
+
+    mask-image:
+      linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.16) 18%,
+        rgba(0, 0, 0, 0.70) 54%,
+        rgba(0, 0, 0, 0.92) 100%
+      );
+  }
+
+
+  /*
+    Two restrained inner panes create the layered dossier feeling while
+    staying almost entirely inside the existing popout silhouette.
+  */
+  #etherian-page-frame .game-info-layer {
+    position: absolute;
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.17
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.025
+      );
+
+    clip-path:
+      polygon(
+        5% 0,
+        100% 0,
+        100% 91%,
+        94% 100%,
+        0 100%,
+        0 7%
+      );
+  }
+
+
+  #etherian-page-frame .game-info-layer--rear {
+    inset: 0.5% 1.5% 1.5% 5.5%;
+
+    transform:
+      translate(1.6%, -1.4%);
+
+    opacity: 0.58;
+  }
+
+
+  #etherian-page-frame .game-info-layer--mid {
+    inset: 2.5% 3.5% 3% 2%;
+
+    transform:
+      translate(-0.8%, 0.7%);
+
+    opacity: 0.78;
+  }
+
+
+  #etherian-page-frame .game-info-surface {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto
+      auto;
+
+    align-content: center;
+
+    gap:
+      clamp(10px, 1.15vh, 18px);
+
+    padding:
+      clamp(22px, 2.15vw, 38px)
+      clamp(22px, 2.25vw, 42px)
+      clamp(20px, 2vw, 34px)
+      clamp(24px, 2.4vw, 46px);
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.26
+      );
+
+    background:
+      linear-gradient(
+        105deg,
+        rgba(20, 29, 34, 0.72) 0%,
+        rgba(22, 34, 40, 0.60) 48%,
+        rgba(19, 31, 37, 0.40) 100%
+      );
+
+    backdrop-filter:
+      blur(10px)
+      saturate(112%);
+
+    -webkit-backdrop-filter:
+      blur(10px)
+      saturate(112%);
+
+    clip-path:
+      polygon(
+        5% 0,
+        100% 0,
+        100% 90%,
+        94% 100%,
+        0 100%,
+        0 7%
+      );
+
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+      inset 18px 0 42px rgba(255, 255, 255, 0.018);
+  }
+
+
+  #etherian-page-frame .game-info-header {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap:
+      clamp(5px, 0.65vh, 10px);
+
+    min-width: 0;
+  }
+
+
+  #etherian-page-frame .game-info-logo {
+    display: block;
+
+    width:
+      min(
+        68%,
+        440px
+      );
+
+    max-height:
+      clamp(70px, 12vh, 132px);
+
+    object-fit: contain;
+    object-position: left center;
+  }
+
+
+  #etherian-page-frame .game-info-kicker {
+    margin: 0;
+
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.93
+      );
+
+    font-size:
+      clamp(9px, 0.72vw, 13px);
+
+    font-weight: 700;
+
+    letter-spacing:
+      0.34em;
+  }
+
+
+  #etherian-page-frame .game-info-blurb {
+    max-width: 94%;
+
+    margin: 0;
+
+    color:
+      rgba(246, 249, 251, 0.92);
+
+    font-size:
+      clamp(12px, 0.86vw, 16px);
+
+    line-height: 1.48;
+  }
+
+
+  #etherian-page-frame .game-info-features {
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    align-content: center;
+
+    gap:
+      clamp(8px, 0.75vw, 14px);
+  }
+
+
+  #etherian-page-frame .game-info-feature {
+    min-width: 0;
+
+    display: grid;
+
+    grid-template-columns:
+      clamp(34px, 2.7vw, 48px)
+      minmax(0, 1fr);
+
+    align-items: center;
+
+    gap:
+      clamp(8px, 0.7vw, 13px);
+
+    padding:
+      clamp(7px, 0.65vw, 11px);
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      );
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.075
+        ),
+        rgba(16, 22, 26, 0.18)
+      );
+
+    clip-path:
+      polygon(
+        8px 0,
+        100% 0,
+        100% calc(100% - 8px),
+        calc(100% - 8px) 100%,
+        0 100%,
+        0 8px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-icon {
+    display: grid;
+    place-items: center;
+
+    aspect-ratio: 1;
+
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.96
+      );
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.45
+      );
+
+    font-size:
+      clamp(18px, 1.5vw, 26px);
+
+    line-height: 1;
+
+    clip-path:
+      polygon(
+        25% 0,
+        75% 0,
+        100% 25%,
+        100% 75%,
+        75% 100%,
+        25% 100%,
+        0 75%,
+        0 25%
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy strong {
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.96
+      );
+
+    font-size:
+      clamp(8px, 0.61vw, 11px);
+
+    letter-spacing:
+      0.13em;
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy small {
+    overflow: hidden;
+
+    color: rgba(232, 239, 243, 0.70);
+
+    font-size:
+      clamp(8px, 0.58vw, 10px);
+
+    line-height: 1.25;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+  }
+
+
+  #etherian-page-frame .game-info-facts {
+    display: grid;
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    border-top:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    border-bottom:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact {
+    position: relative;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding:
+      clamp(9px, 0.75vw, 13px)
+      clamp(8px, 0.8vw, 14px);
+  }
+
+
+  #etherian-page-frame
+  .game-info-fact +
+  .game-info-fact::before {
+    content: "";
+
+    position: absolute;
+
+    top: 22%;
+    bottom: 22%;
+    left: 0;
+
+    width: 1px;
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact span {
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.78
+      );
+
+    font-size:
+      clamp(8px, 0.58vw, 10px);
+
+    letter-spacing:
+      0.18em;
+  }
+
+
+  #etherian-page-frame .game-info-fact strong {
+    overflow: hidden;
+
+    color: rgba(244, 248, 250, 0.92);
+
+    font-size:
+      clamp(10px, 0.72vw, 13px);
+
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+  }
+
+
+  #etherian-page-frame .game-info-actions {
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1.35fr)
+      minmax(0, 0.9fr);
+
+    gap:
+      clamp(10px, 0.85vw, 16px);
+  }
+
+
+  #etherian-page-frame .game-info-action {
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding:
+      clamp(10px, 0.8vw, 14px)
+      clamp(14px, 1vw, 18px);
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.48
+      );
+
+    background:
+      rgba(15, 21, 25, 0.42);
+
+    color: rgba(248, 251, 252, 0.96);
+
+    font: inherit;
+
+    font-size:
+      clamp(9px, 0.68vw, 12px);
+
+    font-weight: 700;
+
+    letter-spacing:
+      0.11em;
+
+    cursor: default;
+
+    clip-path:
+      polygon(
+        10px 0,
+        100% 0,
+        100% calc(100% - 10px),
+        calc(100% - 10px) 100%,
+        0 100%,
+        0 10px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-action--primary {
+    background:
+      linear-gradient(
+        110deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.30
+        ),
+        rgba(
+          var(--page-accent-rgb),
+          0.10
+        )
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      );
+  }
+
+
+  /*
+    This is intentionally just the desktop content composition. Tablet
+    stacking will be a separate pass once we like this hierarchy.
+  */
+}
+
+
+/* =========================================================
+   Etherian desktop information panel — Step 1B refinement
+   Hierarchy/content pass; existing frame/morph geometry untouched.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+  /*
+    Give the identity/blurb area a little more room while reducing the
+    visual weight of the feature section below it.
+  */
+  #etherian-page-frame .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 0.78fr)
+      auto
+      auto;
+
+    gap:
+      clamp(12px, 1.35vh, 20px);
+
+    padding-top:
+      clamp(26px, 2.55vw, 44px);
+  }
+
+
+  #etherian-page-frame .game-info-header {
+    gap:
+      clamp(7px, 0.8vh, 12px);
+  }
+
+
+  #etherian-page-frame .game-info-logo {
+    width:
+      min(
+        70%,
+        460px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-blurb {
+    max-width: 91%;
+
+    line-height: 1.54;
+  }
+
+
+  /*
+    Let the screenshot read more clearly as imagery trapped inside the glass.
+    It is still deliberately strongest on the right and fades underneath text.
+  */
+  #etherian-page-frame .game-info-background {
+    inset: 0.5% -0.5% 1.5% 9%;
+
+    opacity: 0.47;
+  }
+
+
+  #etherian-page-frame .game-info-background-image {
+    object-position: 60% 42%;
+
+    filter:
+      saturate(0.94)
+      contrast(0.96)
+      brightness(0.78);
+
+    -webkit-mask-image:
+      linear-gradient(
+        102deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.06) 13%,
+        rgba(0, 0, 0, 0.36) 35%,
+        rgba(0, 0, 0, 0.82) 66%,
+        rgba(0, 0, 0, 0.96) 100%
+      );
+
+    mask-image:
+      linear-gradient(
+        102deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.06) 13%,
+        rgba(0, 0, 0, 0.36) 35%,
+        rgba(0, 0, 0, 0.82) 66%,
+        rgba(0, 0, 0, 0.96) 100%
+      );
+  }
+
+
+  /*
+    Features now behave more like an editorial strip than four separate
+    dashboard cards. The icons remain distinct; the surrounding boxes recede.
+  */
+  #etherian-page-frame .game-info-features {
+    gap:
+      clamp(6px, 0.55vw, 10px)
+      clamp(14px, 1.05vw, 20px);
+
+    padding:
+      clamp(5px, 0.4vw, 8px)
+      0;
+
+    border-top:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    border-bottom:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.14
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(30px, 2.35vw, 42px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(8px, 0.65vw, 12px);
+
+    padding:
+      clamp(7px, 0.5vw, 9px)
+      clamp(5px, 0.4vw, 8px);
+
+    border: 0;
+
+    background: transparent;
+
+    clip-path: none;
+  }
+
+
+  #etherian-page-frame .game-info-feature-icon {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.34
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.045
+      );
+
+    font-size:
+      clamp(16px, 1.25vw, 22px);
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(8px, 0.59vw, 10.5px);
+
+    letter-spacing:
+      0.14em;
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(7.5px, 0.54vw, 9.5px);
+
+    color:
+      rgba(232, 239, 243, 0.64);
+  }
+
+
+  /*
+    Quick facts stay compact and factual rather than repeating the genre
+    description immediately beneath the logo.
+  */
+  #etherian-page-frame .game-info-facts {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.035
+        ),
+        rgba(12, 18, 22, 0.08)
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact {
+    padding-top:
+      clamp(8px, 0.65vw, 11px);
+
+    padding-bottom:
+      clamp(8px, 0.65vw, 11px);
+  }
+
+
+  /*
+    One strong store action, one quieter media action.
+  */
+  #etherian-page-frame .game-info-action--primary {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.62
+      );
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.34
+        ),
+        rgba(
+          var(--page-accent-rgb),
+          0.12
+        )
+      );
+  }
+
+
+  #etherian-page-frame .game-info-action--secondary {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    color:
+      rgba(238, 244, 247, 0.84);
+  }
+}
+
+
+/* =========================================================
+   Etherian desktop information panel — Step 1C visual polish
+   Existing popout/morph geometry remains untouched.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /* ---------------------------------------------------------
+     Screenshot-bearing glass layer
+     --------------------------------------------------------- */
+
+  #etherian-page-frame .game-info-background {
+    /*
+      Pull the photographic layer farther right and slightly upward so it
+      reads as a deliberate inset pane instead of a generic full-panel wash.
+    */
+    inset:
+      -1.2%
+      -0.8%
+      8%
+      31%;
+
+    opacity: 0.54;
+
+    overflow: hidden;
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.028
+      );
+
+    clip-path:
+      polygon(
+        7% 0,
+        100% 0,
+        100% 86%,
+        93% 100%,
+        0 100%,
+        0 10%
+      );
+
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.018);
+  }
+
+
+  #etherian-page-frame .game-info-background::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(17, 27, 32, 0.92) 0%,
+        rgba(17, 27, 32, 0.60) 27%,
+        rgba(17, 27, 32, 0.22) 58%,
+        rgba(17, 27, 32, 0.08) 100%
+      );
+  }
+
+
+  #etherian-page-frame .game-info-background-image {
+    width: 112%;
+    height: 112%;
+
+    transform:
+      translate(
+        -4%,
+        -5%
+      );
+
+    object-fit: cover;
+
+    /*
+      Favor the ringed sky / floating-island area so the image contributes
+      atmosphere without competing directly with the text.
+    */
+    object-position: 69% 30%;
+
+    filter:
+      saturate(0.90)
+      contrast(0.92)
+      brightness(0.74);
+
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+
+  /* ---------------------------------------------------------
+     Layered glass / asymmetry
+     --------------------------------------------------------- */
+
+  #etherian-page-frame .game-info-layer--rear {
+    inset:
+      -1.3%
+      0.4%
+      0.8%
+      6.8%;
+
+    transform:
+      translate(
+        2.2%,
+        -1.2%
+      );
+
+    opacity: 0.64;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.15
+      );
+  }
+
+
+  #etherian-page-frame .game-info-layer--mid {
+    inset:
+      1.4%
+      2.3%
+      2%
+      1.2%;
+
+    transform:
+      translate(
+        -0.5%,
+        0.9%
+      );
+
+    opacity: 0.82;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      );
+  }
+
+
+  /*
+    Small cyan rail on the far-right edge: enough asymmetry to make the
+    panel feel constructed without turning it into a HUD.
+  */
+  #etherian-page-frame .game-info::after {
+    content: "";
+
+    position: absolute;
+
+    z-index: 3;
+
+    top: 18%;
+    right: 0.35%;
+
+    width: 2px;
+    height: 28%;
+
+    background:
+      linear-gradient(
+        to bottom,
+        transparent,
+        rgba(
+          var(--page-accent-rgb),
+          0.62
+        ) 18%,
+        rgba(
+          var(--page-accent-rgb),
+          0.28
+        ) 76%,
+        transparent
+      );
+
+    box-shadow:
+      0 0 14px
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    pointer-events: none;
+  }
+
+
+  /* ---------------------------------------------------------
+     Front surface polish
+     --------------------------------------------------------- */
+
+  #etherian-page-frame .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 0.70fr)
+      auto
+      auto;
+
+    gap:
+      clamp(11px, 1.22vh, 18px);
+
+    padding:
+      clamp(26px, 2.35vw, 42px)
+      clamp(24px, 2.2vw, 40px)
+      clamp(22px, 1.9vw, 34px)
+      clamp(28px, 2.55vw, 48px);
+
+    background:
+      linear-gradient(
+        102deg,
+        rgba(18, 27, 32, 0.80) 0%,
+        rgba(20, 31, 36, 0.67) 43%,
+        rgba(18, 30, 35, 0.47) 72%,
+        rgba(18, 30, 35, 0.34) 100%
+      );
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.30
+      );
+
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.032),
+      inset 28px 0 56px rgba(255,255,255,0.012),
+      inset -1px 0 0
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      );
+  }
+
+
+  #etherian-page-frame .game-info-logo {
+    width:
+      min(
+        67%,
+        450px
+      );
+
+    margin-left:
+      -0.6%;
+  }
+
+
+  #etherian-page-frame .game-info-kicker {
+    letter-spacing:
+      0.31em;
+
+    opacity: 0.94;
+  }
+
+
+  #etherian-page-frame .game-info-blurb {
+    max-width: 89%;
+
+    font-size:
+      clamp(12px, 0.84vw, 15px);
+
+    line-height: 1.52;
+  }
+
+
+  /* ---------------------------------------------------------
+     Feature strip polish
+     --------------------------------------------------------- */
+
+  #etherian-page-frame .game-info-features {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    column-gap:
+      clamp(18px, 1.3vw, 24px);
+
+    row-gap:
+      clamp(7px, 0.6vw, 11px);
+
+    padding:
+      clamp(7px, 0.55vw, 10px)
+      0;
+
+    border-top-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      );
+
+    border-bottom-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.13
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature {
+    position: relative;
+
+    padding:
+      clamp(6px, 0.48vw, 9px)
+      clamp(4px, 0.3vw, 6px);
+  }
+
+
+  #etherian-page-frame .game-info-feature::after {
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+    bottom: 0;
+
+    width:
+      clamp(18px, 1.8vw, 30px);
+
+    height: 1px;
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.13
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-icon {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.08
+        ),
+        rgba(12, 18, 22, 0.05)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.035
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy strong {
+    line-height: 1.15;
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy small {
+    line-height: 1.22;
+  }
+
+
+  /* ---------------------------------------------------------
+     Metadata row polish
+     --------------------------------------------------------- */
+
+  #etherian-page-frame .game-info-facts {
+    border-top-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+
+    border-bottom-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.028
+        ),
+        rgba(12, 18, 22, 0.055)
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact span {
+    font-size:
+      clamp(7.5px, 0.54vw, 9.5px);
+
+    letter-spacing:
+      0.19em;
+  }
+
+
+  #etherian-page-frame .game-info-fact strong {
+    font-size:
+      clamp(9.5px, 0.68vw, 12.5px);
+  }
+
+
+  /* ---------------------------------------------------------
+     CTA polish
+     --------------------------------------------------------- */
+
+  #etherian-page-frame .game-info-actions {
+    grid-template-columns:
+      minmax(0, 1.42fr)
+      minmax(0, 0.88fr);
+
+    gap:
+      clamp(11px, 0.9vw, 17px);
+  }
+
+
+  #etherian-page-frame .game-info-action {
+    padding-top:
+      clamp(10px, 0.72vw, 13px);
+
+    padding-bottom:
+      clamp(10px, 0.72vw, 13px);
+  }
+
+
+  #etherian-page-frame .game-info-action--primary {
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.12
+      ),
+      0 0 18px
+      rgba(
+        var(--page-accent-rgb),
+        0.055
+      );
+  }
+}
+
+
+/* =========================================================
+   TEMPORARY STUDY VARIANT
+   Original popout glass frame + Etherian info only.
+   Screenshot and decorative inner glass layers disabled.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+  #etherian-page-frame .game-info-background,
+  #etherian-page-frame .game-info-layer--rear,
+  #etherian-page-frame .game-info-layer--mid,
+  #etherian-page-frame .game-info::after {
+    display: none !important;
+  }
+
+
+  /*
+    Strip the extra front-surface pane treatment too, so what remains
+    visually is the original secondary-panel glass/frame underneath,
+    with only the Etherian content laid over it.
+  */
+  #etherian-page-frame .game-info-surface {
+    border: 0;
+
+    background: transparent;
+
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    clip-path: none;
+
+    box-shadow: none;
+  }
+}
+
+
+/* =========================================================
+   Etherian popout — numbered layered-glass study
+   Based on the user's 1 / 2 / 3 / 4 sketch.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    Shared angle token.
+
+    IMPORTANT:
+    Every sloped edge below derives its horizontal run from the site's
+    existing --button-shear-angle instead of inventing a second angle.
+  */
+  #etherian-page-frame .desktop-secondary-panel {
+    --etherian-glass-angle:
+      calc(
+        var(--button-shear-angle) * -1
+      );
+
+    /*
+      Outer clipping shape for the whole decorative stack.
+      This mirrors the final popout's right-hand diagonal logic so none of
+      the added panes can visibly escape the original glass frame.
+    */
+    --etherian-stack-cut-rise:
+      clamp(42px, 4.1vw, 68px);
+
+    --etherian-stack-cut-run:
+      calc(
+        var(--etherian-stack-cut-rise)
+        *
+        tan(
+          var(--etherian-glass-angle)
+        )
+      );
+  }
+
+
+  #etherian-page-frame .etherian-popout-layer-stack {
+    position: absolute;
+    inset: 0;
+
+    z-index: 1;
+
+    overflow: hidden;
+
+    /*
+      Clip the entire system to the ORIGINAL popout silhouette.
+    */
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--etherian-stack-cut-run)
+        ) 0,
+        100%
+        var(--etherian-stack-cut-rise),
+        100%
+        calc(
+          100% -
+          var(--etherian-stack-cut-rise)
+        ),
+        calc(
+          100% -
+          var(--etherian-stack-cut-run)
+        ) 100%,
+        0 100%
+      );
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transition:
+      opacity 220ms ease;
+
+    /*
+      The original morphing glass remains the physical popout.
+      These panes become visible only near the end, along with the content.
+    */
+  }
+
+
+  #etherian-page-frame.is-secondary-open
+  .etherian-popout-layer-stack {
+    opacity: 1;
+
+    transition-delay:
+      calc(
+        var(--secondary-panel-duration) * 0.74
+      );
+  }
+
+
+  #etherian-page-frame .etherian-popout-glass-layer {
+    position: absolute;
+
+    /*
+      Each layer gets its own diagonal rise, but EVERY run derives from
+      the shared master angle.
+    */
+    --layer-cut-rise:
+      clamp(44px, 4.8vw, 78px);
+
+    --layer-cut-run:
+      calc(
+        var(--layer-cut-rise)
+        *
+        tan(
+          var(--etherian-glass-angle)
+        )
+      );
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(255,255,255,0.022),
+        rgba(
+          var(--page-accent-rgb),
+          0.034
+        ) 45%,
+        rgba(20,28,34,0.020)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255,255,255,0.018);
+
+    backdrop-filter:
+      blur(2px)
+      saturate(108%);
+
+    -webkit-backdrop-filter:
+      blur(2px)
+      saturate(108%);
+  }
+
+
+  /*
+    1 — backmost / broadest pane.
+    Nearly fills the original popout but sits slightly inward.
+  */
+  #etherian-page-frame .etherian-popout-glass-layer--1 {
+    z-index: 1;
+
+    inset:
+      2.5%
+      1.7%
+      5.5%
+      0;
+
+    --layer-cut-rise:
+      clamp(54px, 5.4vw, 86px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100%
+        calc(
+          100% -
+          var(--layer-cut-rise)
+        ),
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 100%,
+        0 100%
+      );
+
+    opacity: 0.42;
+
+    border-color:
+      rgba(
+        220, 230, 242,
+        0.18
+      );
+  }
+
+
+  /*
+    2 — second pane.
+    Starts lower and lands farther inward on the right, matching the
+    second red outline in the sketch.
+  */
+  #etherian-page-frame .etherian-popout-glass-layer--2 {
+    z-index: 2;
+
+    inset:
+      7.5%
+      6.2%
+      8.5%
+      0;
+
+    --layer-cut-rise:
+      clamp(62px, 6.1vw, 96px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100%
+        calc(
+          100% -
+          var(--layer-cut-rise) * 0.42
+        ),
+        calc(
+          100% -
+          var(--layer-cut-run) * 0.42
+        ) 100%,
+        0 100%
+      );
+
+    opacity: 0.50;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      );
+
+    background:
+      linear-gradient(
+        118deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.022
+        ),
+        rgba(255,255,255,0.018)
+      );
+  }
+
+
+  /*
+    3 — principal inner pane.
+    This is the pane the content visually sits over. It uses the same
+    sloped corner relation but is narrower and more pronounced.
+  */
+  #etherian-page-frame .etherian-popout-glass-layer--3 {
+    z-index: 3;
+
+    inset:
+      11.5%
+      12.2%
+      13.5%
+      0;
+
+    --layer-cut-rise:
+      clamp(70px, 7vw, 110px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100% 100%,
+        0 100%
+      );
+
+    opacity: 0.58;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(255,255,255,0.016),
+        rgba(
+          var(--page-accent-rgb),
+          0.045
+        )
+      );
+  }
+
+
+  /*
+    4 — foreground lower pane.
+    Begins around the feature/facts area and cuts down into the right edge,
+    matching the lower red outline from the sketch.
+  */
+  #etherian-page-frame .etherian-popout-glass-layer--4 {
+    z-index: 4;
+
+    left: 0;
+    right: 13.6%;
+    top: 49%;
+    bottom: 0;
+
+    --layer-cut-rise:
+      clamp(46px, 4.8vw, 76px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100% 100%,
+        0 100%
+      );
+
+    opacity: 0.66;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+
+    background:
+      linear-gradient(
+        108deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.040
+        ),
+        rgba(255,255,255,0.018)
+      );
+  }
+
+
+  /*
+    The original morphing glass is z-index 0 by default in the panel;
+    decorative panes sit above it, while content remains on top.
+  */
+  #etherian-page-frame .desktop-secondary-panel-glass {
+    z-index: 0;
+  }
+
+
+  #etherian-page-frame .desktop-secondary-panel-content {
+    z-index: 2;
+  }
+
+
+  /*
+    Keep the content visually above all four pane fills even though the
+    layer stack itself occupies z-index 1.
+  */
+  #etherian-page-frame .game-info {
+    z-index: 2;
+  }
+}
+
+
+/* =========================================================
+   Etherian layered glass — stronger opacity pass
+   Geometry/order unchanged; only material presence is increased.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  #etherian-page-frame .etherian-popout-glass-layer {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(255,255,255,0.055),
+        rgba(
+          var(--page-accent-rgb),
+          0.085
+        ) 44%,
+        rgba(26,36,42,0.055)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255,255,255,0.032);
+
+    backdrop-filter:
+      blur(4px)
+      saturate(112%);
+
+    -webkit-backdrop-filter:
+      blur(4px)
+      saturate(112%);
+  }
+
+
+  #etherian-page-frame .etherian-popout-glass-layer--1 {
+    opacity: 0.62;
+
+    border-color:
+      rgba(
+        220, 230, 242,
+        0.26
+      );
+
+    background:
+      linear-gradient(
+        116deg,
+        rgba(255,255,255,0.060),
+        rgba(177,202,216,0.065) 52%,
+        rgba(28,36,42,0.040)
+      );
+  }
+
+
+  #etherian-page-frame .etherian-popout-glass-layer--2 {
+    opacity: 0.70;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    background:
+      linear-gradient(
+        118deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.070
+        ),
+        rgba(255,255,255,0.050)
+      );
+  }
+
+
+  #etherian-page-frame .etherian-popout-glass-layer--3 {
+    opacity: 0.76;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.32
+      );
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(255,255,255,0.045),
+        rgba(
+          var(--page-accent-rgb),
+          0.095
+        )
+      );
+  }
+
+
+  #etherian-page-frame .etherian-popout-glass-layer--4 {
+    opacity: 0.82;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.35
+      );
+
+    background:
+      linear-gradient(
+        108deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.105
+        ),
+        rgba(255,255,255,0.048)
+      );
+  }
+}
+
+
+/* =========================================================
+   Etherian layered glass — restored clean baseline
+   No experimental full-perimeter border system.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+  #etherian-page-frame .etherian-popout-glass-layer--1 {
+    opacity: 0.50;
+  }
+
+  #etherian-page-frame .etherian-popout-glass-layer--2 {
+    opacity: 0.58;
+  }
+
+  #etherian-page-frame .etherian-popout-glass-layer--3 {
+    opacity: 0.64;
+  }
+
+  #etherian-page-frame .etherian-popout-glass-layer--4 {
+    right: 20%;
+    opacity: 0.70;
+  }
+}
+
+
+/* =========================================================
+   Etherian decorative glass panes — borderless
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    Main popout glass:
+    remove only the 1px outer inset line that was incomplete on diagonals.
+    Preserve the 3px inner highlight and all glass/shadow behavior.
+  */
+  
+
+
+  /*
+    Inner layered panes:
+    remove their explicit CSS border entirely so straight edges do not
+    appear outlined while diagonal clip edges remain unoutlined.
+  */
+  #etherian-page-frame .etherian-popout-glass-layer {
+    border-color: transparent !important;
+    border-width: 0 !important;
+  }
+
+
+  /*
+    Keep a very faint internal glass rim so the panes still read as layered
+    sheets rather than disappearing into one another. This is an inset glow,
+    not a hard perimeter line.
+  */
+  #etherian-page-frame .etherian-popout-glass-layer {
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255, 255, 255, 0.018);
+  }
+}
+
+
+/* =========================================================
+   Generic desktop popouts — rimless glass
+   Shared by About, Brobots, Etherian, Halodoom, and Contact.
+   Etherian-specific styling belongs only to its content/decorative panes.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+  .prototype-page-frame
+  .desktop-secondary-panel-glass,
+  .prototype-page-frame.is-layout-transitioning
+  .desktop-secondary-panel-glass {
+    box-shadow:
+      inset 18px 0 40px
+        rgba(255, 255, 255, 0.025),
+
+      0 8px 24px
+        rgba(0, 0, 0, 0.16) !important;
+  }
+}
+
+
+
+/* =========================================================
+   Etherian glass geometry + feature crowding polish
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    Layer 3 is the pane that begins just above the Etherian logo.
+    Its original polygon had a vertical right edge running all the way
+    to the bottom, producing a square lower-right corner above the CTAs.
+
+    Give that lower edge the same shared-angle treatment as the other panes.
+  */
+  #etherian-page-frame .etherian-popout-glass-layer--3 {
+    clip-path:
+      polygon(
+        0 0,
+
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+
+        100%
+        var(--layer-cut-rise),
+
+        100%
+        calc(
+          100% -
+          var(--layer-cut-rise) * 0.42
+        ),
+
+        calc(
+          100% -
+          var(--layer-cut-run) * 0.42
+        ) 100%,
+
+        0 100%
+      );
+  }
+
+
+  /*
+    Feature cards remain laid out normally so their geometry can still be
+    measured while hidden. JS only fades them away when they actually start
+    colliding with one another or escaping their allotted grid area.
+  */
+  #etherian-page-frame .game-info-features {
+    transition:
+      opacity 120ms ease;
+  }
+
+
+  #etherian-page-frame
+  .game-info-features.is-crowded {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+
+/* =========================================================
+   Etherian responsive desktop composition
+   Three states:
+   - standard: existing composition, but top identity is anchored
+   - compact: moderate width/height pressure
+   - tight: strong desktop pressure before tablet handoff
+
+   State classes are applied from the actual secondary-panel content size,
+   not the browser width, so the layout reacts to the space it really owns.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /* -------------------------------------------------------
+     STANDARD DESKTOP
+     Stop vertically re-centering the whole dossier as its children wrap.
+     This is the main reason the Etherian logo appeared to "wander".
+     ------------------------------------------------------- */
+
+  #etherian-page-frame .game-info-surface {
+    align-content: stretch;
+
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto
+      auto;
+  }
+
+
+  #etherian-page-frame .game-info-header {
+    align-self: start;
+  }
+
+
+  /*
+    Use a bounded physical-feeling logo size rather than a percentage of
+    the changing panel width. It can still scale, but much less dramatically.
+  */
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        250px,
+        30vw,
+        430px
+      );
+
+    max-width: 62%;
+
+    max-height:
+      clamp(
+        76px,
+        11vh,
+        126px
+      );
+
+    margin-left: 0;
+  }
+
+
+  /*
+    Character-based line length makes the blurb's wrapping feel intentional.
+    It no longer expands/contracts as aggressively with the panel.
+  */
+  #etherian-page-frame .game-info-blurb {
+    width: min(100%, 76ch);
+    max-width: 76ch;
+  }
+
+
+  /* -------------------------------------------------------
+     COMPACT DESKTOP
+     ------------------------------------------------------- */
+
+  #etherian-page-frame.is-info-compact
+  .game-info-surface {
+    gap:
+      clamp(8px, 0.9vh, 13px);
+
+    padding:
+      clamp(20px, 1.75vw, 30px)
+      clamp(20px, 1.7vw, 30px)
+      clamp(18px, 1.55vw, 27px)
+      clamp(22px, 1.9vw, 34px);
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-header {
+    gap:
+      clamp(4px, 0.5vh, 7px);
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-logo {
+    width:
+      clamp(
+        220px,
+        25vw,
+        350px
+      );
+
+    max-width: 58%;
+
+    max-height:
+      clamp(
+        66px,
+        9.5vh,
+        104px
+      );
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-kicker {
+    font-size:
+      clamp(8px, 0.62vw, 11px);
+
+    letter-spacing: 0.27em;
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-blurb {
+    width: min(100%, 70ch);
+    max-width: 70ch;
+
+    font-size:
+      clamp(11px, 0.76vw, 13.5px);
+
+    line-height: 1.43;
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-features {
+    column-gap:
+      clamp(12px, 0.9vw, 18px);
+
+    row-gap:
+      clamp(5px, 0.42vw, 8px);
+
+    padding:
+      clamp(4px, 0.36vw, 7px)
+      0;
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-feature {
+    grid-template-columns:
+      clamp(27px, 2.15vw, 36px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(6px, 0.5vw, 9px);
+
+    padding:
+      clamp(4px, 0.34vw, 6px)
+      clamp(3px, 0.26vw, 5px);
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-feature-icon {
+    font-size:
+      clamp(14px, 1.12vw, 20px);
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-feature-copy strong {
+    font-size:
+      clamp(7.5px, 0.53vw, 9.5px);
+
+    letter-spacing: 0.12em;
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-feature-copy small {
+    font-size:
+      clamp(7px, 0.49vw, 8.8px);
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-fact {
+    gap: 2px;
+
+    padding:
+      clamp(6px, 0.48vw, 8px)
+      clamp(6px, 0.58vw, 10px);
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-actions {
+    gap:
+      clamp(8px, 0.62vw, 11px);
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-action {
+    padding:
+      clamp(8px, 0.6vw, 10px)
+      clamp(11px, 0.8vw, 14px);
+  }
+
+
+  /* -------------------------------------------------------
+     TIGHT DESKTOP
+     Preserve identity/blurb + facts/CTAs first. Features remain available
+     while they fit, but the JS crowding guard can retire them gracefully.
+     ------------------------------------------------------- */
+
+  #etherian-page-frame.is-info-tight
+  .game-info-surface {
+    gap:
+      clamp(6px, 0.68vh, 9px);
+
+    padding:
+      clamp(16px, 1.35vw, 22px)
+      clamp(17px, 1.4vw, 24px)
+      clamp(15px, 1.25vw, 21px)
+      clamp(18px, 1.55vw, 27px);
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-logo {
+    width:
+      clamp(
+        190px,
+        21vw,
+        290px
+      );
+
+    max-width: 54%;
+
+    max-height:
+      clamp(
+        58px,
+        8vh,
+        86px
+      );
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-kicker {
+    font-size:
+      clamp(7.5px, 0.56vw, 9.5px);
+
+    letter-spacing: 0.23em;
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-blurb {
+    width: min(100%, 64ch);
+    max-width: 64ch;
+
+    font-size:
+      clamp(10.5px, 0.7vw, 12.5px);
+
+    line-height: 1.38;
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-features {
+    column-gap:
+      clamp(9px, 0.65vw, 13px);
+
+    row-gap: 4px;
+
+    padding: 3px 0;
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-feature {
+    grid-template-columns:
+      clamp(24px, 1.85vw, 31px)
+      minmax(0, 1fr);
+
+    gap: 5px;
+
+    padding: 3px 2px;
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-feature-icon {
+    font-size:
+      clamp(12px, 0.92vw, 17px);
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-feature-copy strong {
+    font-size:
+      clamp(7px, 0.48vw, 8.5px);
+
+    letter-spacing: 0.10em;
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-feature-copy small {
+    font-size:
+      clamp(6.7px, 0.45vw, 8px);
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-fact {
+    padding:
+      5px
+      clamp(5px, 0.46vw, 8px);
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-fact span {
+    font-size:
+      clamp(7px, 0.48vw, 8.5px);
+
+    letter-spacing: 0.15em;
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-fact strong {
+    font-size:
+      clamp(9px, 0.6vw, 11px);
+  }
+
+
+  #etherian-page-frame.is-info-tight
+  .game-info-action {
+    padding:
+      7px
+      clamp(9px, 0.68vw, 12px);
+
+    font-size:
+      clamp(8px, 0.58vw, 10px);
+
+    letter-spacing: 0.09em;
+  }
+
+
+  /*
+    Let the feature cards tolerate a little pressure before disappearing.
+    The JS class is only set after a 14px encroachment threshold is exceeded.
+  */
+  #etherian-page-frame
+  .game-info-features.is-crowded {
+    transition:
+      opacity 130ms ease;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+
+/* =========================================================
+   Etherian responsive desktop — smoothed state transitions
+   Philosophy:
+   - fluid sizing remains continuous
+   - compact/tight states only make larger structural decisions
+   - state changes animate instead of popping
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    Animate the properties that were visibly snapping when a state class
+    changed. Keep the timing short enough to follow active window resizing.
+  */
+  #etherian-page-frame .game-info-surface,
+  #etherian-page-frame .game-info-header,
+  #etherian-page-frame .game-info-logo,
+  #etherian-page-frame .game-info-kicker,
+  #etherian-page-frame .game-info-blurb,
+  #etherian-page-frame .game-info-features,
+  #etherian-page-frame .game-info-feature,
+  #etherian-page-frame .game-info-feature-icon,
+  #etherian-page-frame .game-info-feature-copy strong,
+  #etherian-page-frame .game-info-feature-copy small,
+  #etherian-page-frame .game-info-fact,
+  #etherian-page-frame .game-info-fact span,
+  #etherian-page-frame .game-info-fact strong,
+  #etherian-page-frame .game-info-actions,
+  #etherian-page-frame .game-info-action {
+    transition:
+      width 210ms ease,
+      max-width 210ms ease,
+      max-height 210ms ease,
+      padding 210ms ease,
+      gap 210ms ease,
+      font-size 210ms ease,
+      line-height 210ms ease,
+      letter-spacing 210ms ease,
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+
+
+  /*
+    Restore more continuous "living" behavior between states.
+    These values interpolate with the actual panel size instead of waiting
+    for a class flip.
+  */
+  #etherian-page-frame .game-info-surface {
+    padding:
+      clamp(16px, 1.65cqw, 34px)
+      clamp(17px, 1.55cqw, 32px)
+      clamp(15px, 1.45cqw, 29px)
+      clamp(18px, 1.75cqw, 36px);
+
+    gap:
+      clamp(7px, 0.78cqh, 14px);
+  }
+
+
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        220px,
+        27cqw,
+        390px
+      );
+
+    max-width: 60%;
+
+    max-height:
+      clamp(
+        66px,
+        10cqh,
+        112px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-kicker {
+    font-size:
+      clamp(8px, 0.60cqw, 11px);
+
+    letter-spacing:
+      clamp(0.22em, 0.26em, 0.28em);
+  }
+
+
+  #etherian-page-frame .game-info-blurb {
+    width:
+      min(
+        100%,
+        clamp(
+          58ch,
+          67cqw,
+          76ch
+        )
+      );
+
+    max-width: 76ch;
+
+    font-size:
+      clamp(10.8px, 0.70cqw, 13.5px);
+
+    line-height:
+      clamp(1.38, 1.42, 1.46);
+  }
+
+
+  #etherian-page-frame .game-info-features {
+    column-gap:
+      clamp(10px, 0.85cqw, 18px);
+
+    row-gap:
+      clamp(4px, 0.38cqw, 8px);
+
+    padding:
+      clamp(3px, 0.32cqw, 7px)
+      0;
+  }
+
+
+  #etherian-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(25px, 2cqw, 36px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(5px, 0.46cqw, 9px);
+
+    padding:
+      clamp(3px, 0.3cqw, 6px)
+      clamp(2px, 0.24cqw, 5px);
+  }
+
+
+  #etherian-page-frame .game-info-feature-icon {
+    font-size:
+      clamp(13px, 1.02cqw, 20px);
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(7.3px, 0.50cqw, 9.5px);
+
+    letter-spacing:
+      clamp(0.10em, 0.115em, 0.12em);
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(6.9px, 0.46cqw, 8.8px);
+  }
+
+
+  #etherian-page-frame .game-info-fact {
+    padding:
+      clamp(5px, 0.44cqw, 8px)
+      clamp(5px, 0.54cqw, 10px);
+  }
+
+
+  #etherian-page-frame .game-info-action {
+    padding:
+      clamp(7px, 0.56cqw, 10px)
+      clamp(9px, 0.74cqw, 14px);
+
+    font-size:
+      clamp(8px, 0.55cqw, 10px);
+  }
+
+
+  /*
+    Compact now only nudges hierarchy and density. It no longer abruptly
+    restyles every element.
+  */
+  #etherian-page-frame.is-info-compact
+  .game-info-logo {
+    max-width: 57%;
+  }
+
+
+  #etherian-page-frame.is-info-compact
+  .game-info-blurb {
+    max-width: 70ch;
+  }
+
+
+  /*
+    Tight mode makes one decisive structural change:
+    retire the feature block rather than shrinking it into illegibility.
+  */
+  #etherian-page-frame.is-info-tight
+  .game-info-features {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform:
+      translateY(-4px);
+  }
+
+
+  /*
+    When tight mode hides features, allow the remaining rows to reclaim
+    the vertical breathing room naturally.
+  */
+  #etherian-page-frame.is-info-tight
+  .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 0.18fr)
+      auto
+      auto;
+  }
+
+
+  /*
+    The crowding guard remains a fallback, but behaves visually like the
+    tight-state transition rather than an abrupt disappearance.
+  */
+  #etherian-page-frame
+  .game-info-features.is-crowded {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform:
+      translateY(-4px);
+  }
+}
+
+
+/* =========================================================
+   Etherian responsive desktop — proportion-preserving pass
+   Preserve the original hero composition for much longer.
+   Compress whitespace first, optional content second, type last.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /* -------------------------------------------------------
+     Identity / copy
+     ------------------------------------------------------- */
+
+  /*
+    Keep the logo visually substantial. It can ease down a little, but no
+    longer miniaturizes as the panel approaches tablet territory.
+  */
+  #etherian-page-frame .game-info-logo,
+  #etherian-page-frame.is-info-compact .game-info-logo,
+  #etherian-page-frame.is-info-tight .game-info-logo {
+    width:
+      clamp(
+        270px,
+        29cqw,
+        410px
+      );
+
+    max-width: 61%;
+
+    max-height:
+      clamp(
+        78px,
+        10.5cqh,
+        116px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-kicker,
+  #etherian-page-frame.is-info-compact .game-info-kicker,
+  #etherian-page-frame.is-info-tight .game-info-kicker {
+    font-size:
+      clamp(
+        9px,
+        0.60cqw,
+        11px
+      );
+
+    letter-spacing: 0.27em;
+  }
+
+
+  /*
+    Preserve readable body copy. Let the line length adjust before the
+    typography itself becomes noticeably smaller.
+  */
+  #etherian-page-frame .game-info-blurb,
+  #etherian-page-frame.is-info-compact .game-info-blurb,
+  #etherian-page-frame.is-info-tight .game-info-blurb {
+    width:
+      min(
+        100%,
+        clamp(
+          62ch,
+          68cqw,
+          76ch
+        )
+      );
+
+    max-width: 76ch;
+
+    font-size:
+      clamp(
+        11.8px,
+        0.72cqw,
+        13.8px
+      );
+
+    line-height: 1.44;
+  }
+
+
+  /* -------------------------------------------------------
+     Features
+     ------------------------------------------------------- */
+
+  /*
+    Keep features at a readable scale. Tight mode fades the whole group
+    rather than shrinking individual cards into a miniature version.
+  */
+  #etherian-page-frame .game-info-feature,
+  #etherian-page-frame.is-info-compact .game-info-feature,
+  #etherian-page-frame.is-info-tight .game-info-feature {
+    grid-template-columns:
+      clamp(30px, 2.05cqw, 38px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(6px, 0.46cqw, 9px);
+
+    padding:
+      clamp(4px, 0.32cqw, 7px)
+      clamp(3px, 0.25cqw, 6px);
+  }
+
+
+  #etherian-page-frame .game-info-feature-icon,
+  #etherian-page-frame.is-info-compact .game-info-feature-icon,
+  #etherian-page-frame.is-info-tight .game-info-feature-icon {
+    font-size:
+      clamp(
+        15px,
+        1.02cqw,
+        20px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy strong,
+  #etherian-page-frame.is-info-compact .game-info-feature-copy strong,
+  #etherian-page-frame.is-info-tight .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        8px,
+        0.51cqw,
+        9.5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy small,
+  #etherian-page-frame.is-info-compact .game-info-feature-copy small,
+  #etherian-page-frame.is-info-tight .game-info-feature-copy small {
+    font-size:
+      clamp(
+        7.5px,
+        0.47cqw,
+        8.8px
+      );
+  }
+
+
+  /*
+    Don't change the grid row structure in tight mode. That was a visible
+    pop. The feature group now fades in place, keeping the lower metadata /
+    CTA region anchored while resizing.
+  */
+  #etherian-page-frame.is-info-tight .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto
+      auto;
+  }
+
+
+  #etherian-page-frame.is-info-tight .game-info-features,
+  #etherian-page-frame .game-info-features.is-crowded {
+    opacity: 0;
+
+    /*
+      Visibility stays visible during resizing so there is no discrete
+      visibility switch mid-fade. Pointer events are enough here because
+      these are informational cards, not controls.
+    */
+    visibility: visible;
+
+    pointer-events: none;
+
+    transform:
+      translateY(-3px);
+  }
+
+
+  /* -------------------------------------------------------
+     Facts + CTAs: treat these as stable anchors
+     ------------------------------------------------------- */
+
+  #etherian-page-frame .game-info-fact,
+  #etherian-page-frame.is-info-compact .game-info-fact,
+  #etherian-page-frame.is-info-tight .game-info-fact {
+    padding:
+      clamp(7px, 0.46cqw, 10px)
+      clamp(7px, 0.55cqw, 11px);
+  }
+
+
+  #etherian-page-frame .game-info-fact span,
+  #etherian-page-frame.is-info-compact .game-info-fact span,
+  #etherian-page-frame.is-info-tight .game-info-fact span {
+    font-size:
+      clamp(
+        8px,
+        0.49cqw,
+        9.5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact strong,
+  #etherian-page-frame.is-info-compact .game-info-fact strong,
+  #etherian-page-frame.is-info-tight .game-info-fact strong {
+    font-size:
+      clamp(
+        10px,
+        0.62cqw,
+        12px
+      );
+  }
+
+
+  /*
+    Buttons keep a stable physical height and readable type. Their width can
+    continue to follow the available panel width, but they no longer flatten
+    and miniaturize near the desktop/tablet handoff.
+  */
+  #etherian-page-frame .game-info-actions,
+  #etherian-page-frame.is-info-compact .game-info-actions,
+  #etherian-page-frame.is-info-tight .game-info-actions {
+    grid-template-columns:
+      minmax(0, 1.25fr)
+      minmax(0, 0.95fr);
+
+    gap:
+      clamp(
+        9px,
+        0.65cqw,
+        13px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-action,
+  #etherian-page-frame.is-info-compact .game-info-action,
+  #etherian-page-frame.is-info-tight .game-info-action {
+    min-height:
+      clamp(
+        40px,
+        4.7cqh,
+        48px
+      );
+
+    padding:
+      0
+      clamp(
+        12px,
+        0.78cqw,
+        16px
+      );
+
+    gap:
+      clamp(
+        8px,
+        0.55cqw,
+        12px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.57cqw,
+        11px
+      );
+
+    letter-spacing: 0.10em;
+  }
+
+
+  /*
+    Avoid transitioning typography/layout values during every state flip.
+    Those transitions lagged behind the live resize and created a second,
+    visible "catch-up" motion. Keep only genuinely visual transitions.
+  */
+  #etherian-page-frame .game-info-surface,
+  #etherian-page-frame .game-info-header,
+  #etherian-page-frame .game-info-logo,
+  #etherian-page-frame .game-info-kicker,
+  #etherian-page-frame .game-info-blurb,
+  #etherian-page-frame .game-info-feature,
+  #etherian-page-frame .game-info-feature-icon,
+  #etherian-page-frame .game-info-feature-copy strong,
+  #etherian-page-frame .game-info-feature-copy small,
+  #etherian-page-frame .game-info-fact,
+  #etherian-page-frame .game-info-fact span,
+  #etherian-page-frame .game-info-fact strong,
+  #etherian-page-frame .game-info-actions,
+  #etherian-page-frame .game-info-action {
+    transition: none;
+  }
+
+
+  #etherian-page-frame .game-info-features {
+    transition:
+      opacity 190ms ease,
+      transform 190ms ease;
+  }
+}
+
+
+/* =========================================================
+   Etherian responsive desktop — spacing + feature-collapse fix
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    The default panel had too much vertical distribution because the middle
+    row was allowed to absorb a large amount of spare height. Keep the whole
+    information stack more compact and top-weighted instead.
+  */
+  #etherian-page-frame .game-info-surface {
+    align-content: start;
+
+    grid-template-rows:
+      auto
+      auto
+      auto
+      auto
+      auto;
+
+    row-gap:
+      clamp(
+        8px,
+        0.72cqh,
+        14px
+      );
+  }
+
+
+  /*
+    The feature region should only occupy the space its content actually
+    needs. This prevents the large airy gap seen in the wide layout.
+  */
+  #etherian-page-frame .game-info-features {
+    align-content: start;
+
+    min-height: 0;
+
+    max-height: 180px;
+
+    margin-block:
+      clamp(
+        2px,
+        0.22cqh,
+        5px
+      );
+
+    overflow: hidden;
+
+    transition:
+      opacity 190ms ease,
+      transform 190ms ease,
+      max-height 220ms ease,
+      margin 220ms ease;
+  }
+
+
+  /*
+    Hidden features now collapse their own vertical footprint instead of
+    leaving an empty middle band between the blurb and facts/buttons.
+  */
+  #etherian-page-frame
+  .game-info-features.is-crowded,
+  #etherian-page-frame
+  .game-info-features.is-structure-hidden {
+    opacity: 0;
+
+    max-height: 0;
+
+    margin-block: 0;
+
+    transform:
+      translateY(-3px);
+
+    pointer-events: none;
+  }
+
+
+  /*
+    Tight mode no longer automatically hides the feature block. Its job is
+    only to tighten spacing. Actual collision detection decides whether the
+    features really need to disappear.
+  */
+  #etherian-page-frame.is-info-tight
+  .game-info-features {
+    opacity: 1;
+
+    max-height: 180px;
+
+    margin-block:
+      clamp(
+        1px,
+        0.15cqh,
+        4px
+      );
+
+    transform: none;
+
+    pointer-events: auto;
+  }
+
+
+  /*
+    Slightly tighten the separation between the top identity group and the
+    rest of the dossier without making the layout feel cramped.
+  */
+  #etherian-page-frame .game-info-header {
+    margin-bottom:
+      clamp(
+        1px,
+        0.18cqh,
+        4px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-blurb {
+    margin-bottom:
+      clamp(
+        2px,
+        0.25cqh,
+        5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-facts {
+    margin-top:
+      clamp(
+        2px,
+        0.22cqh,
+        5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-actions {
+    margin-top:
+      clamp(
+        1px,
+        0.16cqh,
+        4px
+      );
+  }
+}
+
+
+/* =========================================================
+   Etherian info — proportional three-zone vertical layout
+   Top: identity + blurb
+   Middle: features
+   Bottom: facts + actions
+
+   The surface is centered as a composition at generous sizes.
+   Spacing compresses continuously. The middle track can smoothly
+   collapse to 0 when there genuinely isn't enough room.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  #etherian-page-frame .game-info-surface {
+    --feature-zone-height: 118px;
+
+    display: grid;
+
+    grid-template-rows:
+      auto
+      var(--feature-zone-height)
+      auto;
+
+    align-content: center;
+
+    row-gap:
+      clamp(
+        11px,
+        1.25cqh,
+        20px
+      );
+
+    padding:
+      clamp(22px, 3.2cqh, 40px)
+      clamp(20px, 1.65cqw, 34px)
+      clamp(20px, 2.9cqh, 36px)
+      clamp(22px, 1.8cqw, 38px);
+
+    transition:
+      grid-template-rows 230ms
+      cubic-bezier(0.2, 0.78, 0.24, 1),
+      row-gap 180ms ease,
+      padding 180ms ease;
+  }
+
+
+  /* Remove the old discrete responsive-state behavior from the composition. */
+  #etherian-page-frame.is-info-compact .game-info-surface,
+  #etherian-page-frame.is-info-tight .game-info-surface {
+    grid-template-rows:
+      auto
+      var(--feature-zone-height)
+      auto;
+
+    align-content: center;
+  }
+
+
+  #etherian-page-frame .game-info-top-zone,
+  #etherian-page-frame .game-info-bottom-zone {
+    min-width: 0;
+
+    display: grid;
+
+    align-content: start;
+  }
+
+
+  #etherian-page-frame .game-info-top-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.68cqh,
+        11px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-bottom-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.62cqh,
+        11px
+      );
+  }
+
+
+  /*
+    Remove spacing rules that previously belonged to separate grid rows.
+    Zone gaps now own the vertical rhythm.
+  */
+  #etherian-page-frame .game-info-header,
+  #etherian-page-frame .game-info-blurb,
+  #etherian-page-frame .game-info-facts,
+  #etherian-page-frame .game-info-actions {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+
+  /*
+    Preserve the good desktop proportions instead of scaling everything down.
+  */
+  #etherian-page-frame .game-info-logo,
+  #etherian-page-frame.is-info-compact .game-info-logo,
+  #etherian-page-frame.is-info-tight .game-info-logo {
+    width:
+      clamp(
+        280px,
+        28cqw,
+        405px
+      );
+
+    max-width: 60%;
+
+    max-height:
+      clamp(
+        80px,
+        10.5cqh,
+        116px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-blurb,
+  #etherian-page-frame.is-info-compact .game-info-blurb,
+  #etherian-page-frame.is-info-tight .game-info-blurb {
+    width:
+      min(
+        100%,
+        74ch
+      );
+
+    max-width: 74ch;
+
+    font-size:
+      clamp(
+        11.8px,
+        0.72cqw,
+        13.8px
+      );
+
+    line-height: 1.44;
+  }
+
+
+  /*
+    The feature grid fills a dedicated animated track. It never sits under
+    the facts/actions, so clipping-by-overlap cannot happen.
+  */
+  #etherian-page-frame .game-info-features,
+  #etherian-page-frame.is-info-tight .game-info-features,
+  #etherian-page-frame
+  .game-info-features.is-crowded {
+    min-height: 0;
+    height: 100%;
+    max-height: none;
+
+    margin: 0;
+
+    align-content: center;
+
+    overflow: hidden;
+
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+
+    transition:
+      opacity 170ms ease;
+  }
+
+
+  #etherian-page-frame
+  .game-info-surface.is-features-collapsed
+  .game-info-features {
+    opacity: 0;
+
+    pointer-events: none;
+  }
+
+
+  /*
+    Facts and buttons remain stable anchors. Their proportions no longer
+    change when compact/tight bookkeeping classes toggle.
+  */
+  #etherian-page-frame .game-info-fact,
+  #etherian-page-frame.is-info-compact .game-info-fact,
+  #etherian-page-frame.is-info-tight .game-info-fact {
+    padding:
+      clamp(7px, 0.48cqw, 10px)
+      clamp(7px, 0.56cqw, 11px);
+  }
+
+
+  #etherian-page-frame .game-info-action,
+  #etherian-page-frame.is-info-compact .game-info-action,
+  #etherian-page-frame.is-info-tight .game-info-action {
+    min-height:
+      clamp(
+        40px,
+        4.7cqh,
+        48px
+      );
+
+    padding:
+      0
+      clamp(
+        12px,
+        0.78cqw,
+        16px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.57cqw,
+        11px
+      );
+  }
+}
+
+
+/* =========================================================
+   Etherian three-zone grid — roomy desktop scaling polish
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    Let the composition grow more confidently when it has the room.
+    The mins stay close to the current good compact values; the maxes are
+    roughly 20–25% larger than the previous pass.
+  */
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        285px,
+        30cqw,
+        500px
+      );
+
+    max-width: 63%;
+
+    max-height:
+      clamp(
+        82px,
+        11.5cqh,
+        142px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-kicker {
+    font-size:
+      clamp(
+        9px,
+        0.66cqw,
+        13px
+      );
+
+    letter-spacing:
+      clamp(
+        0.25em,
+        0.28em,
+        0.30em
+      );
+  }
+
+
+  #etherian-page-frame .game-info-blurb {
+    width:
+      min(
+        100%,
+        76ch
+      );
+
+    max-width: 76ch;
+
+    font-size:
+      clamp(
+        12px,
+        0.78cqw,
+        16.5px
+      );
+
+    line-height: 1.46;
+  }
+
+
+  #etherian-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(
+        32px,
+        2.2cqw,
+        46px
+      )
+      minmax(0, 1fr);
+
+    gap:
+      clamp(
+        7px,
+        0.52cqw,
+        11px
+      );
+
+    padding:
+      clamp(
+        5px,
+        0.36cqw,
+        8px
+      )
+      clamp(
+        4px,
+        0.3cqw,
+        7px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-icon {
+    font-size:
+      clamp(
+        16px,
+        1.1cqw,
+        23px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        8px,
+        0.56cqw,
+        10.5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(
+        7.5px,
+        0.50cqw,
+        9.5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact span {
+    font-size:
+      clamp(
+        8px,
+        0.54cqw,
+        10px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact strong {
+    font-size:
+      clamp(
+        10px,
+        0.68cqw,
+        13px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-action {
+    min-height:
+      clamp(
+        41px,
+        5cqh,
+        54px
+      );
+
+    padding:
+      0
+      clamp(
+        13px,
+        0.86cqw,
+        19px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.62cqw,
+        12px
+      );
+  }
+
+
+  /*
+    At genuinely roomy sizes, increase the composition's breathing room too,
+    but keep it centered rather than pushing the rows apart individually.
+  */
+  #etherian-page-frame .game-info-surface {
+    row-gap:
+      clamp(
+        12px,
+        1.45cqh,
+        24px
+      );
+
+    padding:
+      clamp(
+        24px,
+        3.5cqh,
+        46px
+      )
+      clamp(
+        22px,
+        1.85cqw,
+        38px
+      )
+      clamp(
+        22px,
+        3.2cqh,
+        42px
+      )
+      clamp(
+        24px,
+        2cqw,
+        42px
+      );
+  }
+
+
+  /*
+    The feature track transition remains the only structural animation.
+    Slightly lengthen it so the collapse/reopen reads as one deliberate move.
+  */
+  #etherian-page-frame .game-info-surface {
+    transition:
+      grid-template-rows 260ms
+      cubic-bezier(0.2, 0.78, 0.24, 1),
+      row-gap 180ms ease,
+      padding 180ms ease;
+  }
+}
+
+
+/* =========================================================
+   Etherian three-zone grid — large-desktop scale-up
+   Preserve the same proportions, but actually use the extra room.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    The previous cqw coefficients were too conservative, so most elements
+    sat on their minimum clamp values even on a roomy desktop. Raise the
+    fluid terms so the composition genuinely grows with the popout.
+  */
+
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        285px,
+        36cqw,
+        540px
+      );
+
+    max-width: 66%;
+
+    max-height:
+      clamp(
+        82px,
+        13cqh,
+        150px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-kicker {
+    font-size:
+      clamp(
+        9px,
+        0.78cqw,
+        13.5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-blurb {
+    max-width: 78ch;
+
+    font-size:
+      clamp(
+        12px,
+        0.98cqw,
+        17px
+      );
+
+    line-height: 1.46;
+  }
+
+
+  #etherian-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(
+        32px,
+        2.65cqw,
+        50px
+      )
+      minmax(0, 1fr);
+
+    gap:
+      clamp(
+        7px,
+        0.66cqw,
+        12px
+      );
+
+    padding:
+      clamp(
+        5px,
+        0.46cqw,
+        9px
+      )
+      clamp(
+        4px,
+        0.38cqw,
+        8px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-icon {
+    font-size:
+      clamp(
+        16px,
+        1.35cqw,
+        25px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        8px,
+        0.68cqw,
+        11px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(
+        7.5px,
+        0.60cqw,
+        10px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact span {
+    font-size:
+      clamp(
+        8px,
+        0.63cqw,
+        10.5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact strong {
+    font-size:
+      clamp(
+        10px,
+        0.78cqw,
+        13.5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-action {
+    min-height:
+      clamp(
+        41px,
+        5.8cqh,
+        58px
+      );
+
+    padding:
+      0
+      clamp(
+        13px,
+        1.02cqw,
+        21px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.75cqw,
+        12.5px
+      );
+  }
+
+
+  /*
+    Let the complete 3-zone composition breathe more as the panel grows,
+    but keep the spacing proportional rather than simply pushing rows apart.
+  */
+  #etherian-page-frame .game-info-surface {
+    row-gap:
+      clamp(
+        12px,
+        1.7cqh,
+        28px
+      );
+
+    padding:
+      clamp(
+        24px,
+        4.1cqh,
+        52px
+      )
+      clamp(
+        22px,
+        2.15cqw,
+        44px
+      )
+      clamp(
+        22px,
+        3.7cqh,
+        48px
+      )
+      clamp(
+        24px,
+        2.35cqw,
+        48px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-top-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.9cqh,
+        13px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-bottom-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.78cqh,
+        13px
+      );
+  }
+}
+
+
+/*
+  Give especially wide desktop layouts another small lift.
+  This is intentionally modest: the fluid cqw/cqh rules above do most of
+  the work, while this prevents very large monitors from feeling underfilled.
+*/
+@media (min-width: 1900px) {
+
+  #etherian-page-frame .game-info-logo {
+    max-width: 68%;
+  }
+
+
+  #etherian-page-frame .game-info-blurb {
+    max-width: 80ch;
+  }
+
+
+  #etherian-page-frame .game-info-surface {
+    padding-left:
+      clamp(
+        28px,
+        2.55cqw,
+        54px
+      );
+
+    padding-right:
+      clamp(
+        26px,
+        2.35cqw,
+        50px
+      );
+  }
+}
+
+
+/* =========================================================
+   Etherian blurb — stable line-measure box
+   Scale the box and type together so wrapping stays effectively fixed.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    The previous blurb used a width that eventually hit 100%, so nearby
+    desktop sizes could push a word onto the next line.
+
+    Using a fixed character measure means the text box grows/shrinks with
+    the font itself. The visual size changes, but the line length in
+    characters remains essentially constant.
+  */
+  #etherian-page-frame .game-info-blurb {
+    width: 64ch;
+    max-width: none;
+
+    font-size:
+      clamp(
+        12px,
+        0.98cqw,
+        17px
+      );
+
+    line-height: 1.46;
+  }
+
+
+  /*
+    Only when the available desktop popout becomes genuinely narrower than
+    that preferred measure do we allow the box to compress. This should now
+    happen very close to the tablet handoff rather than throughout desktop.
+  */
+  #etherian-page-frame .game-info-top-zone {
+    min-width: 0;
+  }
+
+
+  #etherian-page-frame .game-info-blurb {
+    max-inline-size:
+      min(
+        64ch,
+        calc(100cqw - 48px)
+      );
+  }
+}
+
+
+/* =========================================================
+   Etherian three-zone grid — width-pressure compensation
+   Keep the blurb's 64ch measure, but let its physical size and the
+   surrounding vertical whitespace compress a little earlier as the
+   popout narrows. This gives the feature zone room before it has to cull.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    Keep the same character measure, but make the font respond a little
+    more strongly to narrowing width. Since `ch` scales with the font,
+    the box itself gets physically smaller without changing line breaks.
+  */
+  #etherian-page-frame .game-info-blurb {
+    width: 64ch;
+
+    max-inline-size:
+      min(
+        64ch,
+        calc(100cqw - 40px)
+      );
+
+    font-size:
+      clamp(
+        11.4px,
+        0.84cqw,
+        17px
+      );
+
+    line-height: 1.45;
+  }
+
+
+  /*
+    Width pressure now also compresses vertical rhythm. Previously only
+    height affected these values, so a narrower window could make the blurb
+    taller without freeing any vertical space elsewhere.
+  */
+  #etherian-page-frame .game-info-surface {
+    row-gap:
+      clamp(
+        9px,
+        min(
+          1.65cqh,
+          1.05cqw
+        ),
+        26px
+      );
+
+    padding-top:
+      clamp(
+        20px,
+        min(
+          3.8cqh,
+          2.4cqw
+        ),
+        48px
+      );
+
+    padding-bottom:
+      clamp(
+        18px,
+        min(
+          3.4cqh,
+          2.15cqw
+        ),
+        44px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-top-zone {
+    row-gap:
+      clamp(
+        6px,
+        min(
+          0.85cqh,
+          0.62cqw
+        ),
+        12px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-bottom-zone {
+    row-gap:
+      clamp(
+        6px,
+        min(
+          0.74cqh,
+          0.56cqw
+        ),
+        12px
+      );
+  }
+}
+
+
+/* =========================================================
+   Etherian logo priority pass
+   Preserve logo scale; let supporting copy/metadata compress first.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    Keep the logo visually stable across desktop compression.
+    It now has a much tighter min/max range, so the identity does not
+    shrink as aggressively as the supporting information.
+  */
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        320px,
+        31cqw,
+        420px
+      );
+
+    max-width: 64%;
+
+    max-height:
+      clamp(
+        92px,
+        11.5cqh,
+        122px
+      );
+  }
+
+
+  /*
+    Let supporting copy yield a little more under pressure instead.
+  */
+  #etherian-page-frame .game-info-blurb {
+    font-size:
+      clamp(
+        10.8px,
+        0.82cqw,
+        16.5px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-kicker {
+    font-size:
+      clamp(
+        8.5px,
+        0.60cqw,
+        12.5px
+      );
+  }
+
+
+  /*
+    Metadata is lower priority than the logo, so it can compress a little
+    further before the identity does.
+  */
+  #etherian-page-frame .game-info-fact span {
+    font-size:
+      clamp(
+        7.5px,
+        0.50cqw,
+        10px
+      );
+  }
+
+
+  #etherian-page-frame .game-info-fact strong {
+    font-size:
+      clamp(
+        9.5px,
+        0.64cqw,
+        13px
+      );
+  }
+}
+
+
+/* =========================================================
+   Etherian logo priority — large-frame prominence
+   Keep the protected desktop minimum, but allow a stronger lift
+   once the popout itself becomes genuinely roomy.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        320px,
+        31cqw,
+        420px
+      );
+  }
+}
+
+
+/*
+  Large-frame lift:
+  once the popout is comfortably large, let the logo become a more
+  prominent hero element again without weakening its protected minimum.
+*/
+@container (min-width: 980px) {
+
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        390px,
+        38cqw,
+        520px
+      );
+
+    max-width: 68%;
+
+    max-height:
+      clamp(
+        108px,
+        13cqh,
+        148px
+      );
+  }
+}
+
+
+/*
+  Extra-wide desktop refinement.
+*/
+@container (min-width: 1180px) {
+
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        430px,
+        40cqw,
+        560px
+      );
+
+    max-width: 70%;
+  }
+}
+
+
+/* =========================================================
+   Etherian logo priority — working large-desktop lift
+   ========================================================= */
+
+/*
+  The previous lift used @container, but the secondary popout is a sibling
+  of the page-content container rather than a descendant of it, so those
+  queries never matched. Use the actual desktop viewport thresholds here.
+
+  Normal desktop still keeps the protected 320–420px logo range.
+  Large desktop restores the stronger hero-logo growth we had earlier.
+*/
+
+@media (min-width: 1900px) {
+
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        410px,
+        23vw,
+        520px
+      );
+
+    max-width: 68%;
+
+    max-height:
+      clamp(
+        112px,
+        12.5vh,
+        148px
+      );
+  }
+}
+
+
+@media (min-width: 2200px) {
+
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        470px,
+        24vw,
+        560px
+      );
+
+    max-width: 70%;
+
+    max-height: 156px;
+  }
+}
+
+
+/* =========================================================
+   Etherian logo priority — smooth large-desktop growth
+   Replace the stepped 1900px / 2200px jumps with one continuous curve.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  /*
+    Protected at smaller desktop sizes, then grows continuously as the
+    viewport gets roomier. The cap is about 15% larger than the previous
+    420px desktop maximum:
+      420px × 1.15 ≈ 483px
+
+    Because this is one continuous clamp() rather than breakpoint jumps,
+    there is no threshold pop.
+  */
+  #etherian-page-frame .game-info-logo {
+    width:
+      clamp(
+        320px,
+        calc(27.2vw - 118px),
+        483px
+      );
+
+    max-width: 68%;
+
+    max-height:
+      clamp(
+        92px,
+        calc(7.8vw - 18px),
+        140px
+      );
+
+    transition:
+      width 140ms ease-out,
+      max-height 140ms ease-out;
+  }
+}
+
+
+/* =========================================================
+   Etherian logo priority — feature-collapse emphasis
+   When the middle feature zone retires, use some of the reclaimed
+   vertical space to give the logo a modest additional lift.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  #etherian-page-frame
+  .game-info-surface.is-features-collapsed
+  .game-info-logo {
+    width:
+      clamp(
+        340px,
+        calc(29.5vw - 122px),
+        520px
+      );
+
+    max-width: 70%;
+
+    max-height:
+      clamp(
+        100px,
+        calc(8.6vw - 18px),
+        150px
+      );
+  }
+}
+
+
+/* =========================================================
+   Etherian backmost glass pane — screenshot atmosphere
+   Screenshot 5 fills the pane by height, preserving its aspect ratio.
+   Its top-right corner is anchored to the pane's top-right corner.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  #etherian-page-frame
+  .etherian-popout-glass-layer--1 {
+    overflow: hidden;
+  }
+
+
+  #etherian-page-frame
+  .etherian-popout-layer-image {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    height: 100%;
+    width: auto;
+
+    max-width: none;
+
+    display: block;
+
+    object-fit: contain;
+    object-position: top right;
+
+    pointer-events: none;
+
+    /*
+      Keep it atmospheric rather than reading as a literal screenshot card.
+      The pane's own glass treatment remains above/around it.
+    */
+    opacity: 0.40;
+
+    filter:
+      saturate(0.92)
+      contrast(0.96)
+      brightness(0.88);
+  }
+
+
+  /*
+    Preserve the pane's glass veil over the screenshot by adding a subtle
+    tint layer above the image but below any content.
+  */
+  #etherian-page-frame
+  .etherian-popout-glass-layer--1::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 1;
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(18, 30, 34, 0.22),
+        rgba(
+          var(--page-accent-rgb),
+          0.055
+        ) 48%,
+        rgba(10, 18, 22, 0.10)
+      );
+
+    pointer-events: none;
+  }
+
+
+  #etherian-page-frame
+  .etherian-popout-layer-image {
+    z-index: 0;
+  }
+}
+
+
+/* =========================================================
+   Etherian screenshot — top-right gradient reveal
+   Keep only the upper-right portion of the image visible and
+   feather it smoothly into the surrounding glass.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  #etherian-page-frame
+  .etherian-popout-layer-image {
+    /*
+      Radial mask anchored to the same top-right point as the image itself.
+      Opaque near the corner, then smoothly fades away toward the left/bottom.
+    */
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      );
+
+    mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      );
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+  }
+}
+
+
+/* =========================================================
+   Etherian screenshot — final opacity polish
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  #etherian-page-frame
+  .etherian-popout-layer-image {
+    opacity: 0.30;
+  }
+}
+
+
+/* =========================================================
+   Etherian decorative stack — tablet handoff fade
+   Ensure the screenshot + extra glass panes leave with the popout.
+   ========================================================= */
+
+/*
+  During the desktop -> tablet FLIP/retract handoff, the generic popout
+  content is forced to opacity: 0, but Etherian's decorative glass stack is
+  a separate sibling and was not participating in that fade.
+
+  Fade the whole stack immediately when the layout transition begins.
+  Because the screenshot lives inside layer 1, it now fades in perfect sync
+  with the other Etherian decorative panes.
+*/
+.prototype-page-frame.is-layout-transitioning
+.etherian-popout-layer-stack {
+  opacity: 0 !important;
+
+  transition:
+    opacity 180ms ease !important;
+
+  transition-delay: 0ms !important;
+}
+
+
+/*
+  Also remove the delayed desktop reveal while the breakpoint handoff is
+  active, so an old is-secondary-open state cannot fight the fade.
+*/
+#etherian-page-frame.is-layout-transitioning.is-secondary-open
+.etherian-popout-layer-stack {
+  opacity: 0 !important;
+  transition-delay: 0ms !important;
+}
+
+
+/* =========================================================
+   Etherian info — slower established desktop reveal
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  #etherian-page-frame
+  .desktop-secondary-panel-content {
+    transition:
+      opacity 650ms ease !important;
+  }
+
+
+  #etherian-page-frame.is-secondary-open
+  .desktop-secondary-panel-content {
+    transition:
+      opacity 650ms ease !important;
+
+    /*
+      Keep the same established reveal phase; only lengthen the fade itself.
+    */
+    transition-delay:
+      calc(
+        var(--secondary-panel-duration) * 0.78
+      ) !important;
+  }
+}
+
+
+/* =========================================================
+   Etherian screenshot — breakpoint handoff hard-hide
+   ========================================================= */
+
+/*
+  The screenshot's positioning/mask rules live inside the desktop
+  (min-width: 1401px) block. The instant we cross into tablet, those rules
+  stop applying before the retract has finished.
+
+  During the handoff, explicitly hide the screenshot itself so it cannot
+  survive as an unstyled/intrinsic <img> while the decorative stack is
+  retracting.
+*/
+#etherian-page-frame.is-layout-transitioning
+.etherian-popout-layer-image {
+  opacity: 0 !important;
+
+  transition:
+    opacity 220ms ease !important;
+
+  transition-delay: 0ms !important;
+
+  pointer-events: none !important;
+}
+
+
+/*
+  Keep the decorative stack itself in the desktop positioning context for
+  the brief handoff interval, even though the desktop media query has
+  already turned off.
+*/
+#etherian-page-frame.is-layout-transitioning
+.etherian-popout-layer-stack {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   Etherian screenshot — preserve desktop geometry during handoff
+   ========================================================= */
+
+/*
+  The clip exposed the actual issue: the screenshot is not merely failing
+  to fade. At <=1400px its normal desktop-only positioning rules disappear,
+  so the <img> briefly falls back into ordinary document flow and becomes
+  the large rectangular tile visible beside the gallery.
+
+  While the responsive handoff class is active, explicitly preserve the
+  screenshot's desktop geometry so the existing opacity fade can happen
+  without the image reflowing.
+*/
+#etherian-page-frame.is-layout-transitioning
+.etherian-popout-layer-image {
+  position: absolute !important;
+
+  top: 0 !important;
+  right: 0 !important;
+
+  height: 100% !important;
+  width: auto !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  display: block !important;
+
+  object-fit: contain !important;
+  object-position: top right !important;
+
+  z-index: 0 !important;
+
+  opacity: 0 !important;
+
+  filter:
+    saturate(0.92)
+    contrast(0.96)
+    brightness(0.88) !important;
+
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse 78% 72%
+      at 100% 0%,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.96) 30%,
+      rgba(0, 0, 0, 0.72) 48%,
+      rgba(0, 0, 0, 0.30) 66%,
+      rgba(0, 0, 0, 0) 84%
+    ) !important;
+
+  mask-image:
+    radial-gradient(
+      ellipse 78% 72%
+      at 100% 0%,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.96) 30%,
+      rgba(0, 0, 0, 0.72) 48%,
+      rgba(0, 0, 0, 0.30) 66%,
+      rgba(0, 0, 0, 0) 84%
+    ) !important;
+
+  -webkit-mask-repeat: no-repeat !important;
+  mask-repeat: no-repeat !important;
+
+  -webkit-mask-size: 100% 100% !important;
+  mask-size: 100% 100% !important;
+
+  transition:
+    opacity 220ms ease !important;
+
+  transition-delay: 0ms !important;
+
+  pointer-events: none !important;
+}
+
+
+/*
+  Once the handoff is complete and we are genuinely in tablet mode, this
+  decorative desktop-only screenshot should not participate in layout at
+  all. This is the safety net that prevents an intrinsic <img> rectangle
+  from ever appearing in the tablet composition.
+*/
+@media (max-width: 1400px) {
+  #etherian-page-frame:not(.is-layout-transitioning)
+  .etherian-popout-layer-image {
+    display: none !important;
+  }
+}
+
+
+/* =========================================================
+   Etherian legacy screenshot-0 layer — disable in ALL layouts
+   ========================================================= */
+
+/*
+  Root cause of the "stuck screenshot" during desktop -> tablet:
+
+  .game-info-background contains etherian-screenshot-0.jpg.
+
+  We had already disabled this old/parked background system, but ONLY inside
+  @media (min-width: 1401px). The instant the viewport crossed to tablet,
+  that desktop-only display:none rule stopped applying and screenshot-0
+  became visible again during the handoff.
+
+  This layer is no longer part of the current Etherian design at any size,
+  so disable it globally rather than only on desktop.
+*/
+#etherian-page-frame .game-info-background,
+#etherian-page-frame .game-info-layer--rear,
+#etherian-page-frame .game-info-layer--mid,
+#etherian-page-frame .game-info::after {
+  display: none !important;
+}
+
+
+/* =========================================================
+   Etherian responsive snapshot pass
+   No extra breakpoint layout overrides are needed here.
+   The outgoing desktop info is now a frozen JS snapshot, so the real
+   tablet layout is free to reflow invisibly underneath it.
+   ========================================================= */

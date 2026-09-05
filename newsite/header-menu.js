@@ -5069,11 +5069,37 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastStablePageRect = null;
 
   /*
+    Mobile breakpoint handoff state.
+    Kept deliberately separate from normal page/lightbox animation state.
+  */
+  let mobileUiCollapseRunId = 0;
+  let mobileUiCollapseActive = false;
+
+  /*
     This tracks the mode represented by lastStablePageRect.
     It intentionally updates only AFTER a breakpoint handoff completes.
   */
   let lastStablePageWasDesktop =
     fullTextDesktopMode.matches;
+
+
+  /*
+    Media rails register a lightweight layout-sync callback here.
+    The page-frame transition calls these on the SAME RAF that it changes
+    the frame rectangle, so the thumbnail strip cannot lag one layout frame
+    behind in either desktop -> tablet OR tablet -> desktop.
+  */
+  const mediaRailLayoutSyncCallbacks =
+    new Set();
+
+
+  const syncMediaRailsForLayout = () => {
+    mediaRailLayoutSyncCallbacks.forEach(
+      (sync) => {
+        sync();
+      }
+    );
+  };
 
 
   const getPageFrame = (
@@ -5279,24 +5305,6 @@ document.addEventListener("DOMContentLoaded", () => {
       "rgba(105, 118, 138, 0.24)";
 
 
-    const finalBorder =
-      styles
-        .getPropertyValue(
-          "--secondary-panel-border"
-        )
-        .trim() ||
-      "rgba(194, 205, 218, 0.28)";
-
-
-    const finalInnerBorder =
-      styles
-        .getPropertyValue(
-          "--secondary-panel-inner-border"
-        )
-        .trim() ||
-      "rgba(255, 255, 255, 0.08)";
-
-
     const stageRaw =
       styles
         .getPropertyValue(
@@ -5335,20 +5343,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    const pageAccentLight =
-      lightenRgb(
-        pageAccent,
-        0.22
-      );
-
-
-    const pageAccentLightMid =
-      lightenRgb(
-        pageAccent,
-        0.18
-      );
-
-
     const morphFill =
       rgbaFromRgb(
         pageAccent,
@@ -5363,41 +5357,8 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    const morphBorder =
-      rgbaFromRgb(
-        pageAccentLight,
-        0.88
-      );
-
-
-    const morphBorderMid =
-      rgbaFromRgb(
-        pageAccentLightMid,
-        0.82
-      );
-
-
-    const morphInner =
-      rgbaFromRgb(
-        pageAccent,
-        0.16
-      );
-
-
-    const morphInnerMid =
-      rgbaFromRgb(
-        pageAccent,
-        0.14
-      );
-
-
-    const makeShadow = (
-      border,
-      inner
-    ) => {
+    const makeShadow = () => {
       return (
-        `inset 0 0 0 1px ${border}, ` +
-        `inset 0 0 0 3px ${inner}, ` +
         `inset 18px 0 40px rgba(255,255,255,0.025), ` +
         `0 8px 24px rgba(0,0,0,0.16)`
       );
@@ -5422,10 +5383,7 @@ document.addEventListener("DOMContentLoaded", () => {
           morphFill,
 
         boxShadow:
-          makeShadow(
-            morphBorder,
-            morphInner
-          ),
+          makeShadow(),
 
         opacity: 0
       },
@@ -5452,10 +5410,7 @@ document.addEventListener("DOMContentLoaded", () => {
           morphFillMid,
 
         boxShadow:
-          makeShadow(
-            morphBorderMid,
-            morphInnerMid
-          ),
+          makeShadow(),
 
         opacity: 1
       },
@@ -5474,10 +5429,7 @@ document.addEventListener("DOMContentLoaded", () => {
           finalFill,
 
         boxShadow:
-          makeShadow(
-            finalBorder,
-            finalInnerBorder
-          ),
+          makeShadow(),
 
         opacity: 1
       }
@@ -8238,6 +8190,519 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
+  /*
+    Etherian responsive content snapshot
+    -------------------------------------
+    The desktop Etherian info styling itself lives inside min-width:1401px.
+    Therefore, once the breakpoint is crossed, the LIVE info surface has
+    already reflowed into its tablet styling before our transition callback
+    can fade it.
+
+    Cache a frozen, fully-computed copy while we are still genuinely on the
+    desktop side. Desktop -> tablet then fades that frozen copy, while the
+    live tablet version stays hidden until the frame has finished resizing.
+  */
+  let etherianDesktopInfoSnapshot =
+    null;
+
+  let etherianResponsiveOverlay =
+    null;
+
+  let etherianResponsiveOverlayAnimation =
+    null;
+
+  let etherianTabletInfoFadeAnimation =
+    null;
+
+
+  const copyComputedStyleTree = (
+    source,
+    clone
+  ) => {
+    if (
+      !(source instanceof Element) ||
+      !(clone instanceof Element)
+    ) {
+      return;
+    }
+
+
+    const styles =
+      getComputedStyle(
+        source
+      );
+
+
+    for (
+      let index = 0;
+      index < styles.length;
+      index += 1
+    ) {
+      const property =
+        styles[index];
+
+
+      clone.style.setProperty(
+        property,
+        styles.getPropertyValue(
+          property
+        ),
+        styles.getPropertyPriority(
+          property
+        )
+      );
+    }
+
+
+    const sourceChildren =
+      Array.from(
+        source.children
+      );
+
+
+    const cloneChildren =
+      Array.from(
+        clone.children
+      );
+
+
+    sourceChildren.forEach(
+      (
+        child,
+        index
+      ) => {
+        copyComputedStyleTree(
+          child,
+          cloneChildren[index]
+        );
+      }
+    );
+  };
+
+
+  const captureEtherianDesktopInfoSnapshot = () => {
+    if (
+      !fullTextDesktopMode.matches ||
+      pageLayoutTransitionActive ||
+      activePageName !== "etherian"
+    ) {
+      return;
+    }
+
+
+    const frame =
+      getPageFrame(
+        "etherian"
+      );
+
+
+    if (
+      !frame ||
+      !frame.classList.contains(
+        "is-open"
+      )
+    ) {
+      return;
+    }
+
+
+    const surface =
+      frame.querySelector(
+        ".game-info-surface"
+      );
+
+
+    if (!surface) {
+      return;
+    }
+
+
+    const rect =
+      copyRect(
+        surface.getBoundingClientRect()
+      );
+
+
+    if (
+      !rect ||
+      rect.width <= 0 ||
+      rect.height <= 0
+    ) {
+      return;
+    }
+
+
+    const clone =
+      surface.cloneNode(
+        true
+      );
+
+
+    copyComputedStyleTree(
+      surface,
+      clone
+    );
+
+
+    /*
+      Root geometry will be supplied from the cached viewport rect when the
+      overlay is actually shown.
+    */
+    clone.removeAttribute(
+      "id"
+    );
+
+
+    clone.querySelectorAll(
+      "[id]"
+    ).forEach(
+      (element) => {
+        element.removeAttribute(
+          "id"
+        );
+      }
+    );
+
+
+    etherianDesktopInfoSnapshot = {
+      clone,
+      rect,
+      viewportWidth:
+        window.innerWidth
+    };
+  };
+
+
+  const clearEtherianResponsiveFadeArtifacts = (
+    frame = null
+  ) => {
+    if (
+      etherianResponsiveOverlayAnimation
+    ) {
+      etherianResponsiveOverlayAnimation.cancel();
+
+      etherianResponsiveOverlayAnimation =
+        null;
+    }
+
+
+    if (
+      etherianResponsiveOverlay
+    ) {
+      etherianResponsiveOverlay.remove();
+
+      etherianResponsiveOverlay =
+        null;
+    }
+
+
+    if (
+      etherianTabletInfoFadeAnimation
+    ) {
+      etherianTabletInfoFadeAnimation.cancel();
+
+      etherianTabletInfoFadeAnimation =
+        null;
+    }
+
+
+    const targetFrame =
+      frame ||
+      getPageFrame(
+        "etherian"
+      );
+
+
+    const surface =
+      targetFrame?.querySelector(
+        ".game-info-surface"
+      );
+
+
+    if (surface) {
+      surface.style.removeProperty(
+        "opacity"
+      );
+    }
+  };
+
+
+  const showEtherianDesktopInfoSnapshot = (
+    frame,
+    duration = 650
+  ) => {
+    if (
+      !frame ||
+      frame.dataset.page !== "etherian" ||
+      !etherianDesktopInfoSnapshot
+    ) {
+      return Promise.resolve();
+    }
+
+
+    clearEtherianResponsiveFadeArtifacts(
+      frame
+    );
+
+
+    const surface =
+      frame.querySelector(
+        ".game-info-surface"
+      );
+
+
+    if (surface) {
+      /*
+        Hide the newly-reflowed live tablet content immediately. The frozen
+        desktop snapshot now supplies the outgoing visual.
+      */
+      surface.style.opacity =
+        "0";
+    }
+
+
+    const {
+      clone,
+      rect
+    } =
+      etherianDesktopInfoSnapshot;
+
+
+    const overlay =
+      clone.cloneNode(
+        true
+      );
+
+
+    Object.assign(
+      overlay.style,
+      {
+        position:
+          "fixed",
+
+        left:
+          `${rect.left}px`,
+
+        top:
+          `${rect.top}px`,
+
+        width:
+          `${rect.width}px`,
+
+        height:
+          `${rect.height}px`,
+
+        margin:
+          "0",
+
+        transform:
+          "none",
+
+        transformOrigin:
+          "top left",
+
+        opacity:
+          "1",
+
+        pointerEvents:
+          "none",
+
+        zIndex:
+          "999"
+      }
+    );
+
+
+    overlay.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+
+    document.body.appendChild(
+      overlay
+    );
+
+
+    etherianResponsiveOverlay =
+      overlay;
+
+
+    const animation =
+      overlay.animate(
+        [
+          {
+            opacity: 1
+          },
+          {
+            opacity: 0
+          }
+        ],
+        {
+          duration:
+            Math.max(
+              1,
+              duration
+            ),
+
+          easing:
+            "ease-in-out",
+
+          fill:
+            "forwards"
+        }
+      );
+
+
+    etherianResponsiveOverlayAnimation =
+      animation;
+
+
+    return animation.finished
+      .catch(
+        () => {}
+      )
+      .then(
+        () => {
+          if (
+            etherianResponsiveOverlayAnimation !==
+            animation
+          ) {
+            return;
+          }
+
+
+          etherianResponsiveOverlayAnimation =
+            null;
+
+
+          if (
+            etherianResponsiveOverlay ===
+            overlay
+          ) {
+            etherianResponsiveOverlay =
+              null;
+          }
+
+
+          overlay.remove();
+        }
+      );
+  };
+
+
+  const fadeEtherianTabletInfoIn = (
+    frame,
+    runId,
+    duration = 650
+  ) => {
+    if (
+      !frame ||
+      frame.dataset.page !== "etherian"
+    ) {
+      return;
+    }
+
+
+    const surface =
+      frame.querySelector(
+        ".game-info-surface"
+      );
+
+
+    if (!surface) {
+      return;
+    }
+
+
+    if (
+      etherianTabletInfoFadeAnimation
+    ) {
+      etherianTabletInfoFadeAnimation.cancel();
+
+      etherianTabletInfoFadeAnimation =
+        null;
+    }
+
+
+    surface.style.opacity =
+      "0";
+
+
+    surface.getBoundingClientRect();
+
+
+    const animation =
+      surface.animate(
+        [
+          {
+            opacity: 0
+          },
+          {
+            opacity: 1
+          }
+        ],
+        {
+          duration:
+            Math.max(
+              1,
+              duration
+            ),
+
+          easing:
+            "ease-in-out",
+
+          fill:
+            "forwards"
+        }
+      );
+
+
+    etherianTabletInfoFadeAnimation =
+      animation;
+
+
+    animation.finished
+      .catch(
+        () => {}
+      )
+      .then(
+        () => {
+          if (
+            etherianTabletInfoFadeAnimation !==
+            animation
+          ) {
+            return;
+          }
+
+
+          etherianTabletInfoFadeAnimation =
+            null;
+
+
+          /*
+            A rapid breakpoint reversal may have started a newer handoff.
+            Never let an old fade callback overwrite that newer state.
+          */
+          if (
+            runId !==
+            pageLayoutTransitionRunId
+          ) {
+            return;
+          }
+
+
+          surface.style.removeProperty(
+            "opacity"
+          );
+
+
+          animation.cancel();
+        }
+      );
+  };
+
+
   const rememberStablePageRect = () => {
     if (
       pageLayoutTransitionActive ||
@@ -8637,6 +9102,13 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
+        /*
+          Keep media rails locked to their logical first-visible item on
+          the same animation frame as the page-frame resize.
+        */
+        syncMediaRailsForLayout();
+
+
         if (raw < 1) {
           requestAnimationFrame(
             step
@@ -8694,6 +9166,8 @@ document.addEventListener("DOMContentLoaded", () => {
         frame
       );
 
+      syncMediaRailsForLayout();
+
 
       /*
         Force the exact current endpoint into layout before releasing our
@@ -8740,6 +9214,12 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePrototypePageFrameGeometry(
       frame
     );
+
+    syncMediaRailsForLayout();
+
+    requestAnimationFrame(() => {
+      syncMediaRailsForLayout();
+    });
   };
 
 
@@ -8795,6 +9275,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const runId =
       pageLayoutTransitionRunId;
+
+
+    /*
+      A breakpoint can reverse before the previous fade has completed.
+      Always start from a clean visual ownership state.
+    */
+    clearEtherianResponsiveFadeArtifacts(
+      frame
+    );
 
 
     /*
@@ -8883,6 +9372,8 @@ document.addEventListener("DOMContentLoaded", () => {
       frame
     );
 
+    syncMediaRailsForLayout();
+
 
     frame.getBoundingClientRect();
 
@@ -8890,17 +9381,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!enteringDesktop) {
       /*
         DESKTOP -> TABLET
-        1. Hold the entire composition at desktop size.
-        2. Suck the glass sidebar back into its orange seed triangle.
-        3. Resize the main frame smoothly into the tablet composition.
+        1. Hold the frame at the old desktop rectangle.
+        2. Fade the last PRE-BREAKPOINT Etherian desktop snapshot.
+        3. Retract the glass sidebar normally underneath it.
+        4. Keep the already-reflowed live tablet info hidden.
+        5. Resize into tablet only after the outgoing desktop visual is gone.
       */
-      await waitForSecondaryPanelClose(
-        frame,
-        runId
+      await Promise.all(
+        [
+          waitForSecondaryPanelClose(
+            frame,
+            runId
+          ),
+
+          showEtherianDesktopInfoSnapshot(
+            frame,
+            340
+          )
+        ]
       );
 
 
       if (runId !== pageLayoutTransitionRunId) {
+        clearEtherianResponsiveFadeArtifacts(
+          frame
+        );
+
         return;
       }
 
@@ -8992,6 +9498,12 @@ document.addEventListener("DOMContentLoaded", () => {
       frame
     );
 
+    syncMediaRailsForLayout();
+
+    requestAnimationFrame(() => {
+      syncMediaRailsForLayout();
+    });
+
 
     lastStablePageRect =
       copyRect(
@@ -9000,8 +9512,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (enteringDesktop) {
+      /*
+        Preserve the known-good tablet -> desktop reveal behavior.
+      */
+      clearEtherianResponsiveFadeArtifacts(
+        frame
+      );
+
+
       scheduleSecondaryPanelOpen(
         frame
+      );
+    }
+
+    else {
+      /*
+        The real tablet layout is now settled. Bring its content in only
+        after the frozen desktop snapshot has completely disappeared.
+      */
+      fadeEtherianTabletInfoIn(
+        frame,
+        runId,
+        360
       );
     }
   };
@@ -9036,18 +9568,1031 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  const readMobileCollapseDuration = (
+    variableName,
+    fallback
+  ) => {
+    return parseCssTime(
+      getComputedStyle(
+        document.documentElement
+      ).getPropertyValue(
+        variableName
+      ),
+      fallback
+    );
+  };
+
+
+  const getLiveHamburgerRect = () => {
+    return copyRect(
+      menuToggle.getBoundingClientRect()
+    );
+  };
+
+
+  /*
+    Generic rectangle animation whose DESTINATION is re-measured every RAF.
+
+    This is important because the hamburger continues changing width while
+    the viewport is being dragged through the mobile breakpoint. Capturing
+    its rectangle once produces the offset/misalignment seen in the clip.
+  */
+  const animateRectToLiveHamburger = (
+    element,
+    fromRect,
+    duration,
+    easingName,
+    {
+      fadeOut = false,
+      onFrame = null
+    } = {}
+  ) => {
+    const ease =
+      (
+        easingName === "linear" ||
+        easingName === "ease-in" ||
+        easingName === "ease-out" ||
+        easingName === "ease-in-out"
+      )
+        ? easingFromName(
+            easingName
+          )
+        : easeInOutCubic;
+
+
+    return new Promise((resolve) => {
+      const startTime =
+        performance.now();
+
+
+      const step = (now) => {
+        const raw =
+          clamp(
+            (
+              now -
+              startTime
+            ) /
+            Math.max(
+              1,
+              duration
+            ),
+            0,
+            1
+          );
+
+
+        const t =
+          ease(
+            raw
+          );
+
+
+        const targetRect =
+          getLiveHamburgerRect();
+
+
+        if (!targetRect) {
+          resolve();
+
+          return;
+        }
+
+
+        const currentRect = {
+          left:
+            lerp(
+              fromRect.left,
+              targetRect.left,
+              t
+            ),
+
+          top:
+            lerp(
+              fromRect.top,
+              targetRect.top,
+              t
+            ),
+
+          width:
+            lerp(
+              fromRect.width,
+              targetRect.width,
+              t
+            ),
+
+          height:
+            lerp(
+              fromRect.height,
+              targetRect.height,
+              t
+            )
+        };
+
+
+        Object.assign(
+          element.style,
+          {
+            left:
+              `${currentRect.left}px`,
+
+            top:
+              `${currentRect.top}px`,
+
+            width:
+              `${currentRect.width}px`,
+
+            height:
+              `${currentRect.height}px`
+          }
+        );
+
+
+        if (fadeOut) {
+          element.style.opacity =
+            String(
+              1 -
+              easeInCubic(raw)
+            );
+        }
+
+
+        if (
+          typeof onFrame ===
+          "function"
+        ) {
+          onFrame(
+            raw,
+            currentRect,
+            targetRect
+          );
+        }
+
+
+        if (raw < 1) {
+          requestAnimationFrame(
+            step
+          );
+
+          return;
+        }
+
+
+        resolve();
+      };
+
+
+      requestAnimationFrame(
+        step
+      );
+    });
+  };
+
+
+  /*
+    PAGE -> live hamburger
+
+    The real page becomes display:none at <=840px, so use the last stable
+    desktop/tablet rectangle as a temporary visual shell. Unlike the first
+    experiment, the hamburger/source geometry is rebuilt EVERY FRAME.
+  */
+  const collapseOpenPageIntoLiveHamburger = async (
+    collapseRunId
+  ) => {
+    if (
+      !activePageName ||
+      !lastStablePageRect
+    ) {
+      return false;
+    }
+
+
+    const frame =
+      getPageFrame(
+        activePageName
+      );
+
+
+    if (!frame) {
+      return false;
+    }
+
+
+    const cachedPageRect =
+      copyRect(
+        lastStablePageRect
+      );
+
+
+    if (
+      !cachedPageRect ||
+      cachedPageRect.width <= 0 ||
+      cachedPageRect.height <= 0
+    ) {
+      return false;
+    }
+
+
+    /*
+      Keep the REAL page visible just long enough to crossfade into the
+      temporary reverse-morph shell. Mobile CSS would otherwise make it
+      disappear instantly at the breakpoint.
+    */
+    const savedFrameInline = {
+      display:
+        frame.style.display,
+
+      left:
+        frame.style.left,
+
+      top:
+        frame.style.top,
+
+      right:
+        frame.style.right,
+
+      bottom:
+        frame.style.bottom,
+
+      width:
+        frame.style.width,
+
+      height:
+        frame.style.height,
+
+      opacity:
+        frame.style.opacity,
+
+      transition:
+        frame.style.transition,
+
+      pointerEvents:
+        frame.style.pointerEvents
+    };
+
+
+    Object.assign(
+      frame.style,
+      {
+        display:
+          "block",
+
+        left:
+          `${cachedPageRect.left}px`,
+
+        top:
+          `${cachedPageRect.top}px`,
+
+        right:
+          "auto",
+
+        bottom:
+          "auto",
+
+        width:
+          `${cachedPageRect.width}px`,
+
+        height:
+          `${cachedPageRect.height}px`,
+
+        opacity:
+          "1",
+
+        pointerEvents:
+          "none",
+
+        transition:
+          "none"
+      }
+    );
+
+
+    /*
+      Force the held desktop/tablet frame into layout before beginning
+      its short fade.
+    */
+    frame.getBoundingClientRect();
+
+
+    const realPageFadeDuration =
+      Math.max(
+        1,
+        readMobileCollapseDuration(
+          "--mobile-page-real-fade-duration",
+          220
+        )
+      );
+
+
+    frame.style.transition =
+      `opacity ${realPageFadeDuration}ms ease`;
+
+
+    requestAnimationFrame(() => {
+      frame.style.opacity =
+        "0";
+    });
+
+
+    const targetDescriptor = {
+      getSourceElement: () =>
+        menuToggle,
+
+      getTargetElement: () =>
+        frame,
+
+      getFinalRect: () =>
+        cachedPageRect,
+
+      buildFormPath:
+        buildFormPath,
+
+      settingsFamily:
+        "page",
+
+      shapeType:
+        "page"
+    };
+
+
+    const duration =
+      Math.max(
+        1,
+        readMobileCollapseDuration(
+          "--mobile-ui-collapse-duration",
+          620
+        )
+      );
+
+
+    showMorph();
+
+    menuMorph.style.transition =
+      "none";
+
+    menuMorph.style.opacity =
+      "1";
+
+
+    /*
+      Keep the hamburger visible throughout the page collapse.
+    */
+    await new Promise((resolve) => {
+      const startTime =
+        performance.now();
+
+
+      const step = (now) => {
+        if (
+          collapseRunId !==
+          mobileUiCollapseRunId
+        ) {
+          resolve();
+
+          return;
+        }
+
+
+        const raw =
+          clamp(
+            (
+              now -
+              startTime
+            ) /
+            duration,
+            0,
+            1
+          );
+
+
+        /*
+          Rebuild geometry from the hamburger's CURRENT rectangle every RAF.
+        */
+        const geometry =
+          getMorphGeometry(
+            targetDescriptor
+          );
+
+
+        if (!geometry) {
+          resolve();
+
+          return;
+        }
+
+
+        /*
+          This is a page retracting INTO the hamburger, not a hamburger
+          opening a page. getMorphGeometry() therefore sees the hamburger
+          as the source and would normally choose its orange accent.
+
+          Explicitly preserve the outgoing PAGE accent for the retracting
+          neck/shell so Etherian stays cyan, Brobots stays gold, etc.
+        */
+        const pageAccent =
+          getFrameAccentRgb(
+            frame
+          );
+
+
+        geometry.settings.startFill = {
+          ...pageAccent,
+          a: 0.25
+        };
+
+        geometry.settings.startStroke = {
+          ...pageAccent,
+          a: 0.48
+        };
+
+
+        renderMorph(
+          geometry,
+          1 - easeInOutCubic(raw)
+        );
+
+
+        menuMorph.setAttribute(
+          "viewBox",
+          `0 0 ${window.innerWidth} ${window.innerHeight}`
+        );
+
+
+        if (raw < 1) {
+          requestAnimationFrame(
+            step
+          );
+
+          return;
+        }
+
+
+        resolve();
+      };
+
+
+      requestAnimationFrame(
+        step
+      );
+    });
+
+
+    hideMorph();
+
+
+    /*
+      Give responsive CSS ownership back now that the crossfade/morph is
+      finished. resetPageFrames() runs immediately afterward and preserves
+      the existing clean mobile state.
+    */
+    const restoreInline = (
+      property,
+      value
+    ) => {
+      if (value) {
+        frame.style.setProperty(
+          property,
+          value
+        );
+      }
+
+      else {
+        frame.style.removeProperty(
+          property
+        );
+      }
+    };
+
+
+    restoreInline(
+      "display",
+      savedFrameInline.display
+    );
+
+    restoreInline(
+      "left",
+      savedFrameInline.left
+    );
+
+    restoreInline(
+      "top",
+      savedFrameInline.top
+    );
+
+    restoreInline(
+      "right",
+      savedFrameInline.right
+    );
+
+    restoreInline(
+      "bottom",
+      savedFrameInline.bottom
+    );
+
+    restoreInline(
+      "width",
+      savedFrameInline.width
+    );
+
+    restoreInline(
+      "height",
+      savedFrameInline.height
+    );
+
+    restoreInline(
+      "opacity",
+      savedFrameInline.opacity
+    );
+
+    restoreInline(
+      "transition",
+      savedFrameInline.transition
+    );
+
+    restoreInline(
+      "pointer-events",
+      savedFrameInline.pointerEvents
+    );
+
+
+    return (
+      collapseRunId ===
+      mobileUiCollapseRunId
+    );
+  };
+
+
+  /*
+    LIGHTBOX -> live hamburger
+
+    Uses completely standalone temporary elements. It does NOT call or
+    modify createLightboxButtonMorph(), so the normal X-button alignment,
+    styling and open/close behavior remain exactly as they were before
+    this mobile experiment.
+  */
+  const collapseOpenLightboxIntoLiveHamburger = async (
+    collapseRunId
+  ) => {
+    const lightbox =
+      document.querySelector(
+        "[data-media-lightbox].is-open"
+      );
+
+
+    if (
+      !lightbox ||
+      mediaLightboxState.isAnimating
+    ) {
+      return false;
+    }
+
+
+    const image =
+      lightbox.querySelector(
+        ".media-lightbox-image"
+      );
+
+    const closeButton =
+      lightbox.querySelector(
+        ".media-lightbox-close"
+      );
+
+
+    if (
+      !image ||
+      !closeButton
+    ) {
+      return false;
+    }
+
+
+    mediaLightboxState.isAnimating =
+      true;
+
+
+    const imageRect =
+      copyRect(
+        image.getBoundingClientRect()
+      );
+
+    const xRect =
+      copyRect(
+        closeButton.getBoundingClientRect()
+      );
+
+
+    if (
+      !imageRect ||
+      !xRect
+    ) {
+      mediaLightboxState.isAnimating =
+        false;
+
+      return false;
+    }
+
+
+    const duration =
+      Math.max(
+        1,
+        readMobileCollapseDuration(
+          "--mobile-lightbox-collapse-duration",
+          560
+        )
+      );
+
+
+    const easing =
+      getMediaLightboxTiming()
+        .easing;
+
+
+    /*
+      Temporary screenshot.
+    */
+    const imageProxy =
+      document.createElement(
+        "img"
+      );
+
+
+    imageProxy.className =
+      "media-lightbox-image-morph";
+
+    imageProxy.src =
+      image.src;
+
+    imageProxy.alt = "";
+
+
+    Object.assign(
+      imageProxy.style,
+      {
+        left:
+          `${imageRect.left}px`,
+
+        top:
+          `${imageRect.top}px`,
+
+        width:
+          `${imageRect.width}px`,
+
+        height:
+          `${imageRect.height}px`,
+
+        clipPath:
+          rectangularSixPointClip
+      }
+    );
+
+
+    /*
+      Temporary X surface: clone the real button instead of using the normal
+      lightbox morph helper. This avoids touching any of the source-button
+      bookkeeping used by ordinary lightbox operation.
+    */
+    const xProxy =
+      closeButton.cloneNode(
+        true
+      );
+
+
+    xProxy.removeAttribute(
+      "id"
+    );
+
+    xProxy.removeAttribute(
+      "data-media-lightbox-close"
+    );
+
+    xProxy.classList.add(
+      "media-lightbox-mobile-collapse-x"
+    );
+
+
+    Object.assign(
+      xProxy.style,
+      {
+        position:
+          "fixed",
+
+        zIndex:
+          "5004",
+
+        right:
+          "auto",
+
+        left:
+          `${xRect.left}px`,
+
+        top:
+          `${xRect.top}px`,
+
+        width:
+          `${xRect.width}px`,
+
+        height:
+          `${xRect.height}px`,
+
+        opacity:
+          "1",
+
+        pointerEvents:
+          "none"
+      }
+    );
+
+
+    document.body.append(
+      imageProxy,
+      xProxy
+    );
+
+
+    /*
+      Proxies own the visible transition from this point.
+    */
+    image.style.visibility =
+      "hidden";
+
+    closeButton.style.visibility =
+      "hidden";
+
+    lightbox.classList.remove(
+      "is-settled"
+    );
+
+    lightbox.classList.remove(
+      "is-open"
+    );
+
+    document.body.classList.remove(
+      "is-media-lightbox-open"
+    );
+
+
+    /*
+      Keep the hamburger visible. The X and screenshot collapse toward it
+      while the actual button remains continuously present underneath.
+    */
+    /*
+      Geometry can keep using the mobile-collapse duration, but screenshot
+      opacity should disappear with the black lightbox backdrop itself.
+    */
+    const backdropDuration =
+      getMediaLightboxTiming()
+        .duration;
+
+
+    const imageFade =
+      imageProxy.animate(
+        [
+          {
+            opacity: 1
+          },
+
+          {
+            opacity: 0
+          }
+        ],
+        {
+          duration:
+            Math.max(
+              1,
+              backdropDuration
+            ),
+
+          easing,
+
+          fill:
+            "forwards"
+        }
+      );
+
+
+    const imagePromise =
+      animateRectToLiveHamburger(
+        imageProxy,
+        imageRect,
+        duration,
+        easing,
+        {
+          fadeOut:
+            false
+        }
+      );
+
+
+    const xPromise =
+      animateRectToLiveHamburger(
+        xProxy,
+        xRect,
+        duration,
+        easing,
+        {
+          fadeOut:
+            true
+        }
+      );
+
+
+    await Promise.all([
+      imagePromise,
+      xPromise,
+      imageFade.finished.catch(
+        () => {}
+      )
+    ]);
+
+
+    imageProxy.remove();
+
+    xProxy.remove();
+
+
+    image.style.visibility =
+      "";
+
+    closeButton.style.visibility =
+      "";
+
+
+    /*
+      Mobile collapse is a terminal state for this lightbox session.
+      Remove any physical positioning left from the old tablet/desktop
+      session so reopening later cannot inherit stale coordinates.
+    */
+    clearLightboxClosePhysicalOverrides(
+      closeButton
+    );
+
+
+    const sourceImage =
+      mediaLightboxState.sourceImage;
+
+    const sourceButton =
+      mediaLightboxState.sourceButton;
+
+
+    if (
+      sourceImage &&
+      sourceImage.isConnected
+    ) {
+      sourceImage.style.visibility =
+        "";
+    }
+
+
+    sourceButton?.classList.remove(
+      "is-lightbox-morph-source"
+    );
+
+
+    image.removeAttribute(
+      "src"
+    );
+
+    image.alt =
+      "";
+
+
+    lightbox.classList.remove(
+      "is-closing"
+    );
+
+
+    mediaLightboxState.isAnimating =
+      false;
+
+    mediaLightboxState.sourceImage =
+      null;
+
+    mediaLightboxState.sourceButton =
+      null;
+
+    mediaLightboxState.imageItems =
+      [];
+
+    mediaLightboxState.imageIndex =
+      -1;
+
+    mediaLightboxState.mediaBrowser =
+      null;
+
+    mediaLightboxState.pageAccentRgb =
+      "";
+
+
+    return (
+      collapseRunId ===
+      mobileUiCollapseRunId
+    );
+  };
+
+
+  const collapseDesktopUiIntoMobile = async () => {
+    if (mobileUiCollapseActive) {
+      return;
+    }
+
+
+    mobileUiCollapseActive =
+      true;
+
+    mobileUiCollapseRunId += 1;
+
+    const collapseRunId =
+      mobileUiCollapseRunId;
+
+
+    const hasLightbox =
+      Boolean(
+        document.querySelector(
+          "[data-media-lightbox].is-open"
+        )
+      );
+
+
+    let collapsed =
+      false;
+
+
+    if (hasLightbox) {
+      collapsed =
+        await collapseOpenLightboxIntoLiveHamburger(
+          collapseRunId
+        );
+    }
+
+
+    if (
+      collapseRunId !==
+      mobileUiCollapseRunId
+    ) {
+      mobileUiCollapseActive =
+        false;
+
+      return;
+    }
+
+
+    if (
+      !hasLightbox ||
+      !collapsed
+    ) {
+      await collapseOpenPageIntoLiveHamburger(
+        collapseRunId
+      );
+    }
+
+
+    if (
+      collapseRunId !==
+      mobileUiCollapseRunId
+    ) {
+      mobileUiCollapseActive =
+        false;
+
+      return;
+    }
+
+
+    /*
+      Preserve the existing clean-slate mobile behavior after the visual
+      collapse completes.
+    */
+    resetPageFrames();
+
+    mobileUiCollapseActive =
+      false;
+  };
+
+
   const handleIconModeChange = (
     event
   ) => {
     if (!event.matches) {
-      resetPageFrames();
+      /*
+        Entering mobile: visually retract whatever is open before performing
+        the same clean-state reset mobile already used.
+      */
+      collapseDesktopUiIntoMobile();
+
+      return;
     }
 
-    else {
-      requestAnimationFrame(() => {
-        updateAllPrototypePageFrameGeometry();
-      });
-    }
+
+    /*
+      Returning to tablet/desktop invalidates any stale collapse callback.
+    */
+    mobileUiCollapseRunId += 1;
+
+    mobileUiCollapseActive =
+      false;
+
+
+    requestAnimationFrame(() => {
+      updateAllPrototypePageFrameGeometry();
+    });
   };
 
 
@@ -9221,6 +10766,19 @@ document.addEventListener("DOMContentLoaded", () => {
         "async";
 
 
+      image.addEventListener(
+        "click",
+        () => {
+          openMediaLightbox(
+            item.dataset.mediaSrc,
+            item.dataset.mediaTitle ||
+            "Game screenshot",
+            image
+          );
+        }
+      );
+
+
       return image;
     }
 
@@ -9254,6 +10812,2041 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return null;
   };
+
+
+
+  let mediaLightboxState = {
+    isAnimating: false,
+    sourceImage: null,
+    sourceButton: null,
+    lastFocusedElement: null,
+
+    imageItems: [],
+    imageIndex: -1,
+    mediaBrowser: null,
+    pageAccentRgb: ""
+  };
+
+
+  const getMediaLightboxTiming = () => {
+    const styles =
+      getComputedStyle(
+        document.documentElement
+      );
+
+
+    return {
+      duration:
+        parseCssTime(
+          styles.getPropertyValue(
+            "--media-lightbox-duration"
+          ),
+          520
+        ),
+
+      buttonDuration:
+        parseCssTime(
+          styles.getPropertyValue(
+            "--media-lightbox-button-duration"
+          ),
+          460
+        ),
+
+      easing:
+        styles.getPropertyValue(
+          "--media-lightbox-ease"
+        ).trim() ||
+        "ease",
+
+      closeStateDuration:
+        parseCssTime(
+          styles.getPropertyValue(
+            "--media-lightbox-close-state-duration"
+          ),
+          190
+        )
+    };
+  };
+
+
+  const getContainedRect = (
+    naturalWidth,
+    naturalHeight,
+    inset = 24
+  ) => {
+    const availableWidth =
+      Math.max(
+        1,
+        window.innerWidth -
+        (inset * 2)
+      );
+
+    const availableHeight =
+      Math.max(
+        1,
+        window.innerHeight -
+        (inset * 2)
+      );
+
+
+    const scale =
+      Math.min(
+        availableWidth /
+        naturalWidth,
+
+        availableHeight /
+        naturalHeight,
+
+        1
+      );
+
+
+    const width =
+      naturalWidth * scale;
+
+    const height =
+      naturalHeight * scale;
+
+
+    return {
+      left:
+        (window.innerWidth - width) / 2,
+
+      top:
+        (window.innerHeight - height) / 2,
+
+      width,
+      height
+    };
+  };
+
+
+  const animateRect = (
+    element,
+    fromRect,
+    toRect,
+    duration,
+    easing,
+    extraFrom = {},
+    extraTo = {}
+  ) => {
+    return element.animate(
+      [
+        {
+          left:
+            `${fromRect.left}px`,
+
+          top:
+            `${fromRect.top}px`,
+
+          width:
+            `${fromRect.width}px`,
+
+          height:
+            `${fromRect.height}px`,
+
+          ...extraFrom
+        },
+
+        {
+          left:
+            `${toRect.left}px`,
+
+          top:
+            `${toRect.top}px`,
+
+          width:
+            `${toRect.width}px`,
+
+          height:
+            `${toRect.height}px`,
+
+          ...extraTo
+        }
+      ],
+      {
+        duration,
+        easing,
+        fill: "forwards"
+      }
+    ).finished;
+  };
+
+
+  /*
+    The in-page media viewer uses a six-point polygon:
+      top-left cut
+      top edge
+      right edge
+      bottom-right cut
+      bottom edge
+      left edge
+
+    A normal rectangle can use the SAME six points by collapsing both cut
+    edges to zero length. Because the topology stays identical, clip-path
+    interpolation is continuous instead of popping between two shapes.
+  */
+  const rectangularSixPointClip =
+    "polygon(" +
+    "0% 0%, " +
+    "100% 0%, " +
+    "100% 100%, " +
+    "100% 100%, " +
+    "0% 100%, " +
+    "0% 0%" +
+    ")";
+
+
+  const getSourceMediaClipPath = (
+    sourceImage
+  ) => {
+    const viewer =
+      sourceImage?.closest(
+        ".media-viewer"
+      );
+
+
+    if (!viewer) {
+      return rectangularSixPointClip;
+    }
+
+
+    const clipPath =
+      getComputedStyle(
+        viewer
+      ).clipPath;
+
+
+    return (
+      clipPath &&
+      clipPath !== "none"
+    )
+      ? clipPath
+      : rectangularSixPointClip;
+  };
+
+
+  const getCurrentPageNavButton = () => {
+    const name =
+      selectedPageName ||
+      activePageName;
+
+
+    return (
+      (
+        name &&
+        pageNavButtons.get(
+          name
+        )
+      )
+      ||
+      document.querySelector(
+        ".main-nav .nav-button.is-page-active"
+      )
+    );
+  };
+
+
+  const getNavButtonDisplayText = (
+    button
+  ) => {
+    if (!button) {
+      return "";
+    }
+
+
+    const compact =
+      window.matchMedia(
+        "(max-width: 1400px)"
+      ).matches;
+
+
+    if (compact) {
+      return (
+        button.querySelector(
+          ".nav-icon"
+        )?.textContent?.trim()
+        ||
+        ""
+      );
+    }
+
+
+    return (
+      button.querySelector(
+        ".nav-label"
+      )?.textContent?.trim()
+      ||
+      ""
+    );
+  };
+
+
+  const getLightboxSourceButtonSnapshot = (
+    sourceButton
+  ) => {
+    if (!sourceButton) {
+      return null;
+    }
+
+
+    const rect =
+      sourceButton.getBoundingClientRect();
+
+
+    const pseudo =
+      getComputedStyle(
+        sourceButton,
+        "::before"
+      );
+
+
+    return {
+      rect,
+
+      shear:
+        Math.max(
+          20,
+          rect.height * 0.73
+        ),
+
+      borderWidth:
+        pseudo.borderTopWidth ||
+        "2px",
+
+      borderColor:
+        pseudo.borderTopColor ||
+        "rgba(240, 240, 240, 0.2)",
+
+      backgroundImage:
+        pseudo.backgroundImage ||
+        "none",
+
+      backgroundColor:
+        pseudo.backgroundColor ||
+        "transparent",
+
+      boxShadow:
+        pseudo.boxShadow ||
+        "none",
+
+      accentRgb:
+        mediaLightboxState.pageAccentRgb ||
+        getComputedStyle(
+          sourceButton
+        ).getPropertyValue(
+          "--nav-accent-rgb"
+        ).trim() ||
+        "54, 232, 232",
+
+      /*
+        The source button is currently active, so its computed pseudo
+        gives us the PRESSED/SELECTED state above.
+
+        The ordinary and hover states come from the same CSS variables /
+        rules used by the banner buttons themselves.
+      */
+      unpressedBorderColor:
+        getComputedStyle(
+          sourceButton
+        ).getPropertyValue(
+          "--button-border-color"
+        ).trim() ||
+        "rgba(240, 240, 240, 0.2)",
+
+      unpressedBackgroundColor:
+        "transparent",
+
+      unpressedBoxShadow:
+        "none",
+
+      hoverBorderColor:
+        `rgba(${
+          mediaLightboxState.pageAccentRgb ||
+          getComputedStyle(
+            sourceButton
+          ).getPropertyValue(
+            "--nav-accent-rgb"
+          ).trim() ||
+          "54, 232, 232"
+        }, 0.48)`,
+
+      hoverBackgroundColor:
+        `rgba(${
+          mediaLightboxState.pageAccentRgb ||
+          getComputedStyle(
+            sourceButton
+          ).getPropertyValue(
+            "--nav-accent-rgb"
+          ).trim() ||
+          "54, 232, 232"
+        }, 0.25)`,
+
+      hoverBoxShadow:
+        "none"
+    };
+  };
+
+
+  const applyLightboxSnapshotToProxy = (
+    proxy,
+    snapshot
+  ) => {
+    if (
+      !proxy ||
+      !snapshot
+    ) {
+      return;
+    }
+
+
+    proxy.style.setProperty(
+      "--media-lightbox-morph-shear",
+      `${snapshot.shear}px`
+    );
+
+    proxy.style.setProperty(
+      "--media-lightbox-morph-border-width",
+      snapshot.borderWidth
+    );
+
+    proxy.style.setProperty(
+      "--media-lightbox-morph-border-color",
+      snapshot.borderColor
+    );
+
+    proxy.style.setProperty(
+      "--media-lightbox-morph-background-image",
+      snapshot.backgroundImage
+    );
+
+    proxy.style.setProperty(
+      "--media-lightbox-morph-background-color",
+      snapshot.backgroundColor
+    );
+
+    proxy.style.setProperty(
+      "--media-lightbox-morph-box-shadow",
+      snapshot.boxShadow
+    );
+  };
+
+
+  const applyLightboxSnapshotToCloseButton = (
+    closeButton,
+    snapshot
+  ) => {
+    if (
+      !closeButton ||
+      !snapshot
+    ) {
+      return;
+    }
+
+
+    const closeHeightScale =
+      parseFloat(
+        getComputedStyle(
+          closeButton
+        ).getPropertyValue(
+          "--media-lightbox-close-height-scale"
+        )
+      ) || 0.7;
+
+
+    const scaledHeight =
+      snapshot.rect.height *
+      closeHeightScale;
+
+
+    /*
+      Width intentionally remains unchanged.
+    */
+    /*
+      Width always mirrors the source banner button exactly.
+      Only height is reduced.
+    */
+    closeButton.style.setProperty(
+      "--media-lightbox-close-width",
+      `${snapshot.rect.width}px`
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-height",
+      `${scaledHeight}px`
+    );
+
+
+    /*
+      Center-squish explicitly:
+      move the top edge down by HALF of the lost height.
+      The bottom edge therefore moves up by the same amount.
+    */
+    const centeredTop =
+      snapshot.rect.top +
+      (
+        snapshot.rect.height -
+        scaledHeight
+      ) / 2;
+
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-top",
+      `${centeredTop}px`
+    );
+
+
+    /*
+      Preserve the exact master shear angle.
+
+      The existing relation is:
+        shear run = button height * 0.73
+
+      Recompute from the NEW height instead of scaling the old geometry
+      non-uniformly.
+    */
+    closeButton.style.setProperty(
+      "--media-lightbox-close-shear",
+      `${scaledHeight * 0.73}px`
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-border-width",
+      snapshot.borderWidth
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-border-color",
+      snapshot.borderColor
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-background-image",
+      snapshot.backgroundImage
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-background-color",
+      snapshot.backgroundColor
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-box-shadow",
+      snapshot.boxShadow
+    );
+
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-accent-rgb",
+      snapshot.accentRgb
+    );
+
+
+    /*
+      Preserve the exact selected-page appearance separately so the X can
+      use it as its NEW hover state after its resting state is inverted.
+    */
+    closeButton.style.setProperty(
+      "--media-lightbox-close-selected-background-color",
+      snapshot.backgroundColor
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-selected-border-color",
+      snapshot.borderColor
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-selected-box-shadow",
+      snapshot.boxShadow
+    );
+
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-unpressed-border-color",
+      snapshot.unpressedBorderColor
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-unpressed-background-color",
+      snapshot.unpressedBackgroundColor
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-unpressed-box-shadow",
+      snapshot.unpressedBoxShadow
+    );
+
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-hover-border-color",
+      snapshot.hoverBorderColor
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-hover-background-color",
+      snapshot.hoverBackgroundColor
+    );
+
+    closeButton.style.setProperty(
+      "--media-lightbox-close-hover-box-shadow",
+      snapshot.hoverBoxShadow
+    );
+  };
+
+
+  const applyLightboxRestingStyleToProxy = (
+    proxy,
+    snapshot
+  ) => {
+    if (
+      !proxy ||
+      !snapshot
+    ) {
+      return;
+    }
+
+
+    proxy.style.setProperty(
+      "--media-lightbox-morph-border-color",
+      `rgba(${snapshot.accentRgb}, 0.48)`
+    );
+
+    proxy.style.setProperty(
+      "--media-lightbox-morph-background-color",
+      `rgba(${snapshot.accentRgb}, 0.25)`
+    );
+
+    /*
+      The resting X keeps the inherited selected-button shadow, matching
+      the real X's current idle appearance.
+    */
+    proxy.style.setProperty(
+      "--media-lightbox-morph-box-shadow",
+      snapshot.boxShadow
+    );
+  };
+
+
+  const getLightboxCloseTargetRect = (
+    sourceButton,
+    closeButton
+  ) => {
+    if (
+      !sourceButton ||
+      !closeButton
+    ) {
+      return null;
+    }
+
+
+    const sourceRect =
+      sourceButton.getBoundingClientRect();
+
+
+    const closeHeightScale =
+      parseFloat(
+        getComputedStyle(
+          closeButton
+        ).getPropertyValue(
+          "--media-lightbox-close-height-scale"
+        )
+      ) || 0.7;
+
+
+    const height =
+      sourceRect.height *
+      closeHeightScale;
+
+
+    /*
+      This is the invariant the sketch is asking for:
+      shrink the button equally upward and downward around the source
+      banner button's vertical center.
+    */
+    const top =
+      sourceRect.top +
+      (
+        sourceRect.height -
+        height
+      ) / 2;
+
+
+    const currentCloseRect =
+      closeButton.getBoundingClientRect();
+
+
+    return {
+      left:
+        currentCloseRect.left,
+
+      top,
+
+      width:
+        sourceRect.width,
+
+      height
+    };
+  };
+
+
+  const syncLightboxCloseButtonToSource = () => {
+    const lightbox =
+      document.querySelector(
+        "[data-media-lightbox].is-open"
+      );
+
+
+    if (!lightbox) {
+      return;
+    }
+
+
+    const closeButton =
+      lightbox.querySelector(
+        ".media-lightbox-close"
+      );
+
+
+    const sourceButton =
+      mediaLightboxState.sourceButton;
+
+
+    if (
+      !closeButton ||
+      !sourceButton
+    ) {
+      return;
+    }
+
+
+    applyLightboxSnapshotToCloseButton(
+      closeButton,
+      getLightboxSourceButtonSnapshot(
+        sourceButton
+      )
+    );
+
+
+    /*
+      Geometry is now owned entirely by the CSS custom properties written
+      in applyLightboxSnapshotToCloseButton().
+
+      Do NOT also write top/width/height as physical inline properties here.
+      Those survive responsive teardown and can override the freshly updated
+      variables the next time the lightbox opens.
+    */
+  };
+
+
+  const clearLightboxClosePhysicalOverrides = (
+    closeButton
+  ) => {
+    if (!closeButton) {
+      return;
+    }
+
+
+    /*
+      These should normally be empty now, but clear them defensively in case
+      an older responsive/mobile path left stale physical geometry behind.
+    */
+    closeButton.style.removeProperty(
+      "top"
+    );
+
+    closeButton.style.removeProperty(
+      "width"
+    );
+
+    closeButton.style.removeProperty(
+      "height"
+    );
+
+    closeButton.style.removeProperty(
+      "left"
+    );
+
+    closeButton.style.removeProperty(
+      "right"
+    );
+  };
+
+
+  const createLightboxButtonMorph = (
+    sourceButton
+  ) => {
+    if (!sourceButton) {
+      return null;
+    }
+
+
+    const proxy =
+      document.createElement(
+        "div"
+      );
+
+
+    proxy.className =
+      "media-lightbox-button-morph";
+
+
+    const label =
+      document.createElement(
+        "span"
+      );
+
+
+    label.className =
+      "media-lightbox-button-morph-label";
+
+    label.textContent =
+      getNavButtonDisplayText(
+        sourceButton
+      );
+
+
+    const x =
+      document.createElement(
+        "span"
+      );
+
+
+    x.className =
+      "media-lightbox-button-morph-x";
+
+    x.textContent =
+      "×";
+
+
+    proxy.append(
+      label,
+      x
+    );
+
+
+    const snapshot =
+      getLightboxSourceButtonSnapshot(
+        sourceButton
+      );
+
+
+    if (!snapshot) {
+      return null;
+    }
+
+
+    const sourceRect =
+      snapshot.rect;
+
+
+    applyLightboxSnapshotToProxy(
+      proxy,
+      snapshot
+    );
+
+
+    Object.assign(
+      proxy.style,
+      {
+        left:
+          `${sourceRect.left}px`,
+
+        top:
+          `${sourceRect.top}px`,
+
+        width:
+          `${sourceRect.width}px`,
+
+        height:
+          `${sourceRect.height}px`
+      }
+    );
+
+
+    document.body.appendChild(
+      proxy
+    );
+
+
+    return {
+      proxy,
+      label,
+      x
+    };
+  };
+
+
+  const getMediaLightbox = () => {
+    let lightbox =
+      document.querySelector(
+        "[data-media-lightbox]"
+      );
+
+
+    if (lightbox) {
+      return lightbox;
+    }
+
+
+    lightbox =
+      document.createElement(
+        "div"
+      );
+
+
+    lightbox.className =
+      "media-lightbox";
+
+    lightbox.dataset.mediaLightbox =
+      "";
+
+
+    const image =
+      document.createElement(
+        "img"
+      );
+
+
+    image.className =
+      "media-lightbox-image";
+
+    image.alt = "";
+
+
+    const closeButton =
+      document.createElement(
+        "button"
+      );
+
+
+    closeButton.className =
+      "media-lightbox-close";
+
+    closeButton.type =
+      "button";
+
+    closeButton.setAttribute(
+      "aria-label",
+      "Close fullscreen image"
+    );
+
+    closeButton.innerHTML =
+      "<span aria-hidden=\"true\">×</span>";
+
+
+    const previousButton =
+      document.createElement(
+        "button"
+      );
+
+
+    previousButton.className =
+      "media-lightbox-arrow media-lightbox-arrow--previous";
+
+    previousButton.type =
+      "button";
+
+    previousButton.setAttribute(
+      "aria-label",
+      "Previous screenshot"
+    );
+
+    previousButton.textContent =
+      "‹";
+
+
+    const nextButton =
+      document.createElement(
+        "button"
+      );
+
+
+    nextButton.className =
+      "media-lightbox-arrow media-lightbox-arrow--next";
+
+    nextButton.type =
+      "button";
+
+    nextButton.setAttribute(
+      "aria-label",
+      "Next screenshot"
+    );
+
+    nextButton.textContent =
+      "›";
+
+
+    lightbox.append(
+      image,
+      previousButton,
+      nextButton,
+      closeButton
+    );
+
+
+    const updateLightboxArrowState = () => {
+      previousButton.disabled =
+        mediaLightboxState.imageIndex <= 0;
+
+      nextButton.disabled =
+        mediaLightboxState.imageIndex < 0 ||
+        mediaLightboxState.imageIndex >=
+          mediaLightboxState.imageItems.length - 1;
+    };
+
+
+    const showLightboxImageAt = async (
+      nextIndex
+    ) => {
+      if (
+        mediaLightboxState.isAnimating ||
+        nextIndex < 0 ||
+        nextIndex >=
+          mediaLightboxState.imageItems.length
+      ) {
+        return;
+      }
+
+
+      const nextItem =
+        mediaLightboxState.imageItems[
+          nextIndex
+        ];
+
+
+      if (!nextItem) {
+        return;
+      }
+
+
+      mediaLightboxState.imageIndex =
+        nextIndex;
+
+
+      /*
+        Keep the normal gallery synchronized with the fullscreen view.
+        That preserves the existing close-to-current-preview behavior.
+      */
+      nextItem.click();
+
+
+      image.style.opacity =
+        "0";
+
+      image.src =
+        nextItem.dataset.mediaSrc;
+
+      image.alt =
+        nextItem.dataset.mediaTitle ||
+        "Game screenshot";
+
+
+      try {
+        await image.decode();
+      }
+
+      catch {
+        // Cached/local images may already be ready.
+      }
+
+
+      requestAnimationFrame(() => {
+        image.style.opacity =
+          "";
+      });
+
+
+      /*
+        renderItem() has replaced the in-page viewer image. Capture that
+        new element as the destination for the existing close animation.
+      */
+      requestAnimationFrame(() => {
+        const currentViewerImage =
+          mediaLightboxState.mediaBrowser
+            ?.querySelector(
+              "[data-media-viewer-stage] .media-viewer-image"
+            );
+
+
+        if (currentViewerImage) {
+          mediaLightboxState.sourceImage =
+            currentViewerImage;
+
+          currentViewerImage.style.visibility =
+            "hidden";
+        }
+      });
+
+
+      updateLightboxArrowState();
+    };
+
+
+    previousButton.addEventListener(
+      "click",
+      () => {
+        showLightboxImageAt(
+          mediaLightboxState.imageIndex - 1
+        );
+      }
+    );
+
+
+    nextButton.addEventListener(
+      "click",
+      () => {
+        showLightboxImageAt(
+          mediaLightboxState.imageIndex + 1
+        );
+      }
+    );
+
+
+    closeButton.addEventListener(
+      "click",
+      () => {
+        closeMediaLightbox();
+      }
+    );
+
+
+    lightbox.addEventListener(
+      "click",
+      (event) => {
+        if (event.target === lightbox) {
+          closeMediaLightbox();
+        }
+      }
+    );
+
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          event.key === "Escape" &&
+          lightbox.classList.contains(
+            "is-open"
+          )
+        ) {
+          closeMediaLightbox();
+
+          return;
+        }
+
+
+        if (
+          event.key === "ArrowLeft" &&
+          lightbox.classList.contains(
+            "is-settled"
+          )
+        ) {
+          event.preventDefault();
+
+          previousButton.click();
+
+          return;
+        }
+
+
+        if (
+          event.key === "ArrowRight" &&
+          lightbox.classList.contains(
+            "is-settled"
+          )
+        ) {
+          event.preventDefault();
+
+          nextButton.click();
+        }
+      }
+    );
+
+
+    document.body.appendChild(
+      lightbox
+    );
+
+
+    return lightbox;
+  };
+
+
+  const closeMediaLightbox = async () => {
+    const lightbox =
+      getMediaLightbox();
+
+
+    if (
+      mediaLightboxState.isAnimating ||
+      !lightbox.classList.contains(
+        "is-open"
+      )
+    ) {
+      return;
+    }
+
+
+    mediaLightboxState.isAnimating =
+      true;
+
+
+    const image =
+      lightbox.querySelector(
+        ".media-lightbox-image"
+      );
+
+    const closeButton =
+      lightbox.querySelector(
+        ".media-lightbox-close"
+      );
+
+    const {
+      duration,
+      buttonDuration,
+      easing,
+      closeStateDuration
+    } =
+      getMediaLightboxTiming();
+
+
+    const sourceImage =
+      mediaLightboxState.sourceImage;
+
+    const sourceButton =
+      mediaLightboxState.sourceButton;
+
+
+    /*
+      First make the real X behave like a proper pressed button.
+
+      IMPORTANT:
+      Keep it stationary and keep .is-settled present during this phase.
+      .is-closing overrides both unpressed and hover styling, so EVERY close
+      method follows the same visual sequence:
+
+        current state -> selected/pressed -> move home
+    */
+    lightbox.classList.add(
+      "is-closing"
+    );
+
+
+    await new Promise(
+      (resolve) =>
+        window.setTimeout(
+          resolve,
+          Math.max(
+            0,
+            closeStateDuration
+          )
+        )
+    );
+
+
+    /*
+      Only after the press-in fade finishes do the arrows/background begin
+      leaving and the moving proxies take ownership.
+    */
+    lightbox.classList.remove(
+      "is-settled"
+    );
+
+
+    const imageProxy =
+      document.createElement(
+        "img"
+      );
+
+
+    imageProxy.className =
+      "media-lightbox-image-morph";
+
+    imageProxy.src =
+      image.src;
+
+    imageProxy.alt = "";
+
+
+    const fromRect =
+      image.getBoundingClientRect();
+
+
+    const sourceClipPath =
+      getSourceMediaClipPath(
+        sourceImage
+      );
+
+
+    const toRect =
+      (
+        sourceImage &&
+        sourceImage.isConnected
+      )
+        ? sourceImage.getBoundingClientRect()
+        : fromRect;
+
+
+    Object.assign(
+      imageProxy.style,
+      {
+        left:
+          `${fromRect.left}px`,
+
+        top:
+          `${fromRect.top}px`,
+
+        width:
+          `${fromRect.width}px`,
+
+        height:
+          `${fromRect.height}px`,
+
+        /*
+          Closing starts from the rectangular fullscreen shape, so seed
+          that state before the reverse animation begins as well.
+        */
+        clipPath:
+          rectangularSixPointClip
+      }
+    );
+
+
+    document.body.appendChild(
+      imageProxy
+    );
+
+
+    const buttonMorph =
+      createLightboxButtonMorph(
+        sourceButton
+      );
+
+
+    if (buttonMorph && closeButton) {
+      const navRectRaw =
+        sourceButton.getBoundingClientRect();
+
+
+      const closeRect =
+        getLightboxCloseTargetRect(
+          sourceButton,
+          closeButton
+        );
+
+
+      if (!closeRect) {
+        return;
+      }
+
+
+      /*
+        Keep the entire return on one horizontal row. This also protects
+        against tiny fractional top-coordinate differences during responsive
+        header layout.
+      */
+      const navRect = {
+        left:
+          navRectRaw.left,
+
+        /*
+          Reverse the same center-preserving height change:
+          the shortened X expands upward AND downward into the full-height
+          banner button while keeping the same vertical centerline.
+        */
+        top:
+          navRectRaw.top,
+
+        width:
+          navRectRaw.width,
+
+        height:
+          navRectRaw.height
+      };
+
+
+      Object.assign(
+        buttonMorph.proxy.style,
+        {
+          left:
+            `${closeRect.left}px`,
+
+          top:
+            `${closeRect.top}px`,
+
+          width:
+            `${closeRect.width}px`,
+
+          height:
+            `${closeRect.height}px`
+        }
+      );
+
+
+      const sourceSnapshot =
+        getLightboxSourceButtonSnapshot(
+          sourceButton
+        );
+
+
+      /*
+        The stationary real X has already faded into the selected state.
+        Seed the moving proxy with that exact same selected state so the
+        handoff is visually continuous.
+      */
+      if (sourceSnapshot) {
+        applyLightboxSnapshotToProxy(
+          buttonMorph.proxy,
+          sourceSnapshot
+        );
+      }
+
+
+      buttonMorph.label.style.opacity =
+        "0";
+
+      buttonMorph.x.style.opacity =
+        "1";
+
+
+      const returnSourceShear =
+        closeRect.height * 0.73;
+
+
+      const returnTargetShear =
+        sourceSnapshot
+          ? sourceSnapshot.shear
+          : navRect.height * 0.73;
+
+
+      animateRect(
+        buttonMorph.proxy,
+        closeRect,
+        navRect,
+        buttonDuration,
+        easing,
+        {
+          "--media-lightbox-morph-shear":
+            `${returnSourceShear}px`
+        },
+        {
+          "--media-lightbox-morph-shear":
+            `${returnTargetShear}px`
+        }
+      );
+
+
+      buttonMorph.label.animate(
+        [
+          { opacity: 0 },
+          { opacity: 1 }
+        ],
+        {
+          duration:
+            buttonDuration * 0.55,
+
+          delay:
+            buttonDuration * 0.35,
+
+          easing,
+          fill: "forwards"
+        }
+      );
+
+
+      buttonMorph.x.animate(
+        [
+          { opacity: 1 },
+          { opacity: 0 }
+        ],
+        {
+          duration:
+            buttonDuration * 0.45,
+
+          easing,
+          fill: "forwards"
+        }
+      );
+    }
+
+
+    const imagePromise =
+      animateRect(
+        imageProxy,
+        fromRect,
+        toRect,
+        duration,
+        easing,
+        {
+          clipPath:
+            rectangularSixPointClip,
+
+          boxShadow:
+            "0 18px 60px rgba(0,0,0,0.58)"
+        },
+        {
+          /*
+            Restore the in-page viewer's angled cuts gradually as the
+            screenshot returns to the frame.
+          */
+          clipPath:
+            sourceClipPath,
+
+          boxShadow:
+            "0 0 0 rgba(0,0,0,0)"
+        }
+      );
+
+
+    /*
+      Begin the black-background fade at the same moment the screenshot
+      starts returning to its framed position.
+    */
+    lightbox.classList.remove(
+      "is-open"
+    );
+
+
+    document.body.classList.remove(
+      "is-media-lightbox-open"
+    );
+
+
+    await imagePromise.catch(
+      () => {}
+    );
+
+
+    imageProxy.remove();
+
+    buttonMorph?.proxy.remove();
+
+
+    if (
+      sourceImage &&
+      sourceImage.isConnected
+    ) {
+      sourceImage.style.visibility =
+        "";
+    }
+
+
+    sourceButton?.classList.remove(
+      "is-lightbox-morph-source"
+    );
+
+
+    image.removeAttribute(
+      "src"
+    );
+
+    image.alt = "";
+
+
+    lightbox.classList.remove(
+      "is-closing"
+    );
+
+
+    mediaLightboxState.isAnimating =
+      false;
+
+    mediaLightboxState.sourceImage =
+      null;
+
+    mediaLightboxState.sourceButton =
+      null;
+
+    mediaLightboxState.imageItems =
+      [];
+
+    mediaLightboxState.imageIndex =
+      -1;
+
+    mediaLightboxState.mediaBrowser =
+      null;
+
+    mediaLightboxState.pageAccentRgb =
+      "";
+
+
+    mediaLightboxState.lastFocusedElement
+      ?.focus?.({
+        preventScroll: true
+      });
+  };
+
+
+  const openMediaLightbox = async (
+    src,
+    alt = "",
+    sourceImage = null
+  ) => {
+    const lightbox =
+      getMediaLightbox();
+
+
+    if (
+      mediaLightboxState.isAnimating ||
+      lightbox.classList.contains(
+        "is-open"
+      )
+    ) {
+      return;
+    }
+
+
+    const image =
+      lightbox.querySelector(
+        ".media-lightbox-image"
+      );
+
+    const closeButton =
+      lightbox.querySelector(
+        ".media-lightbox-close"
+      );
+
+
+    if (!image) {
+      return;
+    }
+
+
+    mediaLightboxState.isAnimating =
+      true;
+
+
+    lightbox.classList.remove(
+      "is-closing"
+    );
+
+
+    mediaLightboxState.sourceImage =
+      sourceImage;
+
+    mediaLightboxState.sourceButton =
+      getCurrentPageNavButton();
+
+    mediaLightboxState.lastFocusedElement =
+      document.activeElement;
+
+
+    /*
+      Cache the owning page accent directly from the media browser/frame.
+      This keeps the shared lightbox page-aware for Etherian, Brobots and
+      Halodoom instead of depending solely on whichever nav button happens
+      to be current.
+    */
+    const owningPageFrame =
+      sourceImage?.closest(
+        ".prototype-page-frame"
+      ) ||
+      null;
+
+
+    mediaLightboxState.pageAccentRgb =
+      owningPageFrame
+        ? getComputedStyle(
+            owningPageFrame
+          ).getPropertyValue(
+            "--page-accent-rgb"
+          ).trim()
+        : "";
+
+
+    const mediaBrowser =
+      sourceImage?.closest(
+        "[data-media-browser]"
+      ) ||
+      null;
+
+
+    mediaLightboxState.mediaBrowser =
+      mediaBrowser;
+
+
+    mediaLightboxState.imageItems =
+      mediaBrowser
+        ? Array.from(
+            mediaBrowser.querySelectorAll(
+              '[data-media-item][data-media-type="image"]'
+            )
+          )
+        : [];
+
+
+    mediaLightboxState.imageIndex =
+      mediaLightboxState.imageItems.findIndex(
+        (item) =>
+          item.dataset.mediaSrc ===
+          src
+      );
+
+
+    image.src =
+      src;
+
+    image.alt =
+      alt;
+
+
+    /*
+      Make sure natural image dimensions are available before calculating
+      the final contain rectangle.
+    */
+    try {
+      await image.decode();
+    }
+
+    catch {
+      // decode() can reject for already-cached images; layout still works.
+    }
+
+
+    const {
+      duration,
+      buttonDuration,
+      easing
+    } =
+      getMediaLightboxTiming();
+
+
+    const sourceClipPath =
+      getSourceMediaClipPath(
+        sourceImage
+      );
+
+
+    const startRect =
+      sourceImage
+        ? sourceImage.getBoundingClientRect()
+        : getContainedRect(
+            image.naturalWidth,
+            image.naturalHeight,
+            24
+          );
+
+
+    /*
+      IMPORTANT:
+      The fullscreen image is sized by CSS inside the lightbox's padded
+      safe-area. Do not duplicate that layout math in JS.
+
+      Instead, reveal the lightbox invisibly, let the browser perform its
+      real layout, then measure the exact rectangle the image will occupy.
+      The morph proxy therefore lands pixel-for-pixel on the final image.
+    */
+    document.body.classList.add(
+      "is-media-lightbox-open"
+    );
+
+    lightbox.classList.add(
+      "is-open"
+    );
+
+
+    await new Promise(
+      (resolve) =>
+        requestAnimationFrame(() => {
+          requestAnimationFrame(
+            resolve
+          );
+        })
+    );
+
+
+    const measuredEndRect =
+      image.getBoundingClientRect();
+
+
+    const endRect =
+      (
+        measuredEndRect.width > 0 &&
+        measuredEndRect.height > 0
+      )
+        ? measuredEndRect
+        : getContainedRect(
+            image.naturalWidth,
+            image.naturalHeight,
+            24
+          );
+
+
+    const imageProxy =
+      document.createElement(
+        "img"
+      );
+
+
+    imageProxy.className =
+      "media-lightbox-image-morph";
+
+    imageProxy.src =
+      src;
+
+    imageProxy.alt = "";
+
+
+    Object.assign(
+      imageProxy.style,
+      {
+        left:
+          `${startRect.left}px`,
+
+        top:
+          `${startRect.top}px`,
+
+        width:
+          `${startRect.width}px`,
+
+        height:
+          `${startRect.height}px`,
+
+        /*
+          Seed the exact angled source shape BEFORE the proxy is appended.
+          Without this, the browser can paint one rectangular frame before
+          the animation's first clip-path keyframe takes effect.
+        */
+        clipPath:
+          sourceClipPath
+      }
+    );
+
+
+    document.body.appendChild(
+      imageProxy
+    );
+
+
+    if (sourceImage) {
+      sourceImage.style.visibility =
+        "hidden";
+    }
+
+
+    const sourceButton =
+      mediaLightboxState.sourceButton;
+
+
+    const sourceButtonSnapshot =
+      getLightboxSourceButtonSnapshot(
+        sourceButton
+      );
+
+
+    /*
+      A mobile collapse may have happened since the last lightbox session.
+      Start from a clean physical box so the fresh CSS-variable geometry
+      completely determines the new X placement.
+    */
+    clearLightboxClosePhysicalOverrides(
+      closeButton
+    );
+
+
+    applyLightboxSnapshotToCloseButton(
+      closeButton,
+      sourceButtonSnapshot
+    );
+
+
+    const buttonMorph =
+      createLightboxButtonMorph(
+        sourceButton
+      );
+
+
+    if (
+      buttonMorph &&
+      sourceButtonSnapshot
+    ) {
+      buttonMorph.proxy.style.setProperty(
+        "--media-lightbox-morph-shear",
+        `${sourceButtonSnapshot.shear}px`
+      );
+    }
+
+
+    sourceButton?.classList.add(
+      "is-lightbox-morph-source"
+    );
+
+
+    /*
+      The lightbox is already open above so its CSS-sized image could be
+      measured. Wait one more frame here so the close button also has its
+      final target rectangle before the button morph begins.
+    */
+    await new Promise(
+      (resolve) =>
+        requestAnimationFrame(
+          resolve
+        )
+    );
+
+
+    if (buttonMorph && closeButton) {
+      const navRect =
+        sourceButton.getBoundingClientRect();
+
+      const closeRect =
+        getLightboxCloseTargetRect(
+          sourceButton,
+          closeButton
+        );
+
+
+      if (!closeRect) {
+        return;
+      }
+
+
+      /*
+        The proxy rectangle was already arriving at the correct size, but
+        its internal skewed face was still using the source button's
+        full-height shear. Animate the shear run with the height so the
+        visible endpoint exactly matches the real X.
+      */
+      const sourceShear =
+        sourceButtonSnapshot
+          ? sourceButtonSnapshot.shear
+          : navRect.height * 0.73;
+
+
+      const targetShear =
+        closeRect.height * 0.73;
+
+
+      animateRect(
+        buttonMorph.proxy,
+        navRect,
+        closeRect,
+        buttonDuration,
+        easing,
+        {
+          "--media-lightbox-morph-shear":
+            `${sourceShear}px`
+        },
+        {
+          "--media-lightbox-morph-shear":
+            `${targetShear}px`
+        }
+      );
+
+
+      buttonMorph.label.animate(
+        [
+          { opacity: 1 },
+          { opacity: 0 }
+        ],
+        {
+          duration:
+            buttonDuration * 0.48,
+
+          easing,
+          fill: "forwards"
+        }
+      );
+
+
+      buttonMorph.x.animate(
+        [
+          { opacity: 0 },
+          { opacity: 1 }
+        ],
+        {
+          duration:
+            buttonDuration * 0.55,
+
+          delay:
+            buttonDuration * 0.30,
+
+          easing,
+          fill: "forwards"
+        }
+      );
+    }
+
+
+    await animateRect(
+      imageProxy,
+      startRect,
+      endRect,
+      duration,
+      easing,
+      {
+        /*
+          Start with the exact cut-corner silhouette of the in-page
+          media viewer.
+        */
+        clipPath:
+          sourceClipPath,
+
+        boxShadow:
+          "0 0 0 rgba(0,0,0,0)"
+      },
+      {
+        /*
+          Collapse the diagonal cuts to zero over the SAME movement
+          lifetime, leaving a normal rectangular fullscreen image.
+        */
+        clipPath:
+          rectangularSixPointClip,
+
+        boxShadow:
+          "0 18px 60px rgba(0,0,0,0.58)"
+      }
+    ).catch(
+      () => {}
+    );
+
+
+    imageProxy.remove();
+
+    buttonMorph?.proxy.remove();
+
+
+    lightbox.classList.add(
+      "is-settled"
+    );
+
+
+    const previousButton =
+      lightbox.querySelector(
+        ".media-lightbox-arrow--previous"
+      );
+
+    const nextButton =
+      lightbox.querySelector(
+        ".media-lightbox-arrow--next"
+      );
+
+
+    if (previousButton) {
+      previousButton.disabled =
+        mediaLightboxState.imageIndex <= 0;
+    }
+
+
+    if (nextButton) {
+      nextButton.disabled =
+        mediaLightboxState.imageIndex < 0 ||
+        mediaLightboxState.imageIndex >=
+          mediaLightboxState.imageItems.length - 1;
+    }
+
+
+    mediaLightboxState.isAnimating =
+      false;
+
+
+    closeButton?.focus({
+      preventScroll: true
+    });
+  };
+
+
 
 
   const initializeMediaBrowser = (
@@ -9323,30 +12916,184 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-    const centerThumbnail = (
-      item,
-      behavior = "smooth"
-    ) => {
-      const targetLeft =
-        item.offsetLeft
-        -
-        (
-          thumbnails.clientWidth
-          -
-          item.offsetWidth
-        ) / 2;
+    /*
+      Thumbnail navigation is index-based rather than pixel-centered.
+
+      The previous version centered the active thumbnail using offsetLeft.
+      That could leave the rail at fractional / in-between positions, and
+      those pixel positions became stale when the page changed size after
+      resizing or leaving fullscreen.
+
+      We always show three items and store the logical FIRST visible item.
+      The actual scrollLeft is recalculated from current element geometry.
+    */
+    const visibleThumbnailCount = 3;
 
 
-      thumbnails.scrollTo({
-        left:
+    let railStartIndex =
+      Math.max(
+        0,
+        Math.min(
           Math.max(
             0,
-            targetLeft
+            items.length -
+            visibleThumbnailCount
           ),
+          activeIndex -
+          1
+        )
+      );
 
-        behavior
-      });
+
+    const clampRailStart = (
+      index
+    ) => {
+      return Math.max(
+        0,
+        Math.min(
+          Math.max(
+            0,
+            items.length -
+            visibleThumbnailCount
+          ),
+          index
+        )
+      );
     };
+
+
+    const getRailTargetLeft = () => {
+      const firstItem =
+        items[0];
+
+      const startItem =
+        items[railStartIndex];
+
+
+      if (
+        !firstItem ||
+        !startItem
+      ) {
+        return 0;
+      }
+
+
+      return Math.max(
+        0,
+        startItem.offsetLeft -
+        firstItem.offsetLeft
+      );
+    };
+
+
+    const syncRailToLayout = () => {
+      /*
+        Direct assignment is intentional for layout correction.
+        It cannot queue a smooth scroll toward stale geometry.
+      */
+      thumbnails.scrollLeft =
+        getRailTargetLeft();
+    };
+
+
+    const scrollRailToStart = (
+      behavior = "auto"
+    ) => {
+      const targetLeft =
+        getRailTargetLeft();
+
+
+      if (behavior === "smooth") {
+        thumbnails.scrollTo({
+          left:
+            targetLeft,
+
+          behavior:
+            "smooth"
+        });
+
+        return;
+      }
+
+
+      thumbnails.scrollLeft =
+        targetLeft;
+    };
+
+
+    const ensureActiveThumbnailVisible = (
+      behavior = "smooth"
+    ) => {
+      if (
+        activeIndex <
+        railStartIndex
+      ) {
+        railStartIndex =
+          activeIndex;
+      }
+
+      else if (
+        activeIndex >=
+        railStartIndex +
+        visibleThumbnailCount
+      ) {
+        railStartIndex =
+          activeIndex -
+          visibleThumbnailCount +
+          1;
+      }
+
+
+      railStartIndex =
+        clampRailStart(
+          railStartIndex
+        );
+
+
+      scrollRailToStart(
+        behavior
+      );
+    };
+
+
+    /*
+      Keep the rail locked to its logical item position whenever its
+      geometry changes — including browser resize and video fullscreen
+      enter/exit. The correction is immediate, not animated.
+    */
+    const thumbnailResizeObserver =
+      new ResizeObserver(() => {
+        syncRailToLayout();
+      });
+
+
+    thumbnailResizeObserver.observe(
+      thumbnails
+    );
+
+
+    /*
+      Crucial for BOTH directions of the desktop/tablet handoff:
+      the outer page-frame animation calls this on every RAF immediately
+      after changing the frame's real width/height.
+    */
+    mediaRailLayoutSyncCallbacks.add(
+      syncRailToLayout
+    );
+
+
+    document.addEventListener(
+      "fullscreenchange",
+      () => {
+        requestAnimationFrame(() => {
+          syncRailToLayout();
+
+          requestAnimationFrame(
+            syncRailToLayout
+          );
+        });
+      }
+    );
 
 
     const renderItem = (
@@ -9428,8 +13175,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
 
-      centerThumbnail(
-        activeItem,
+      ensureActiveThumbnailVisible(
         scrollBehavior
       );
 
@@ -9524,12 +13270,403 @@ document.addEventListener("DOMContentLoaded", () => {
         scrollBehavior: "auto"
       }
     );
+
+
+    /*
+      One extra post-layout alignment handles fonts/images affecting the
+      first measured thumbnail geometry during initial page load.
+    */
+    requestAnimationFrame(() => {
+      scrollRailToStart(
+        "auto"
+      );
+    });
   };
 
 
   mediaBrowsers.forEach(
     initializeMediaBrowser
   );
+
+
+  /* =======================================================
+     Etherian feature-card crowding guard
+     ======================================================= */
+
+  const etherianFeatureGrid =
+    document.querySelector(
+      "#etherian-page-frame .game-info-features"
+    );
+
+
+  const updateEtherianInfoLayout = () => {
+    const frame =
+      document.querySelector(
+        "#etherian-page-frame"
+      );
+
+
+    if (!frame) {
+      return;
+    }
+
+
+    /*
+      The information panel now uses one continuous proportional grid.
+      Keep legacy state classes cleared so they cannot create resize pops.
+    */
+    frame.classList.remove(
+      "is-info-compact",
+      "is-info-tight"
+    );
+  };
+
+
+  let etherianFeaturesCollapsed =
+    false;
+
+
+  const getEtherianNaturalFeatureHeight = () => {
+    if (!etherianFeatureGrid) {
+      return 0;
+    }
+
+
+    const cards =
+      Array.from(
+        etherianFeatureGrid.querySelectorAll(
+          ".game-info-feature"
+        )
+      );
+
+
+    if (cards.length === 0) {
+      return 0;
+    }
+
+
+    const styles =
+      getComputedStyle(
+        etherianFeatureGrid
+      );
+
+
+    const rowGap =
+      parseFloat(
+        styles.rowGap
+      ) || 0;
+
+
+    /*
+      The feature grid is two columns. Measure each visual row from its
+      tallest card instead of measuring the animated parent track.
+      This stays stable even while that parent is collapsing toward 0px.
+    */
+    const cardHeights =
+      cards.map(
+        (card) =>
+          card.getBoundingClientRect().height
+      );
+
+
+    const firstRowHeight =
+      Math.max(
+        cardHeights[0] || 0,
+        cardHeights[1] || 0
+      );
+
+
+    const secondRowHeight =
+      Math.max(
+        cardHeights[2] || 0,
+        cardHeights[3] || 0
+      );
+
+
+    return (
+      firstRowHeight +
+      secondRowHeight +
+      (
+        secondRowHeight > 0
+          ? rowGap
+          : 0
+      )
+    );
+  };
+
+
+  const updateEtherianFeatureCrowding = () => {
+    if (!etherianFeatureGrid) {
+      return;
+    }
+
+
+    updateEtherianInfoLayout();
+
+
+    const surface =
+      etherianFeatureGrid.closest(
+        ".game-info-surface"
+      );
+
+
+    const topZone =
+      surface?.querySelector(
+        ".game-info-top-zone"
+      );
+
+
+    const bottomZone =
+      surface?.querySelector(
+        ".game-info-bottom-zone"
+      );
+
+
+    if (
+      !surface ||
+      !topZone ||
+      !bottomZone
+    ) {
+      return;
+    }
+
+
+    const surfaceStyles =
+      getComputedStyle(
+        surface
+      );
+
+
+    const surfaceRect =
+      surface.getBoundingClientRect();
+
+
+    const topHeight =
+      topZone.getBoundingClientRect().height;
+
+
+    const bottomHeight =
+      bottomZone.getBoundingClientRect().height;
+
+
+    const naturalFeatureHeight =
+      Math.max(
+        getEtherianNaturalFeatureHeight(),
+        1
+      );
+
+
+    const rowGap =
+      parseFloat(
+        surfaceStyles.rowGap
+      ) || 0;
+
+
+    const paddingTop =
+      parseFloat(
+        surfaceStyles.paddingTop
+      ) || 0;
+
+
+    const paddingBottom =
+      parseFloat(
+        surfaceStyles.paddingBottom
+      ) || 0;
+
+
+    const requiredExpandedHeight =
+      paddingTop +
+      topHeight +
+      rowGap +
+      naturalFeatureHeight +
+      rowGap +
+      bottomHeight +
+      paddingBottom;
+
+
+    const availableHeight =
+      surfaceRect.height;
+
+
+    /*
+      The feature grid is allowed to remain visible right up until the
+      complete three-zone composition genuinely stops fitting.
+    */
+    const freeSpace =
+      availableHeight -
+      requiredExpandedHeight;
+
+
+    /*
+      Monotonic capacity test.
+
+      `freeSpace` is NOT monotonic because the responsive layout itself
+      changes while the window resizes: fonts, padding, line wrapping and
+      gaps can all get smaller. That meant the feature section could hide,
+      then become "fit" again at an even smaller window.
+
+      Instead, use a capacity score based only on the surface dimensions.
+      If either dimension shrinks, this score can only stay the same or get
+      smaller, so the feature section cannot disappear and then reappear
+      while continuously resizing in one direction.
+    */
+    /*
+      Use hard dimensional floors rather than letting a very wide panel
+      compensate for being too short (or a very tall panel compensate for
+      being too narrow).
+
+      This matches the visual rule we actually care about:
+      once the logo / blurb and the facts / CTA block begin crowding the
+      popout's top and bottom edges, the optional feature zone should retire.
+    */
+    const minimumFeatureHeight =
+      575;
+
+
+    /*
+      Feature culling should respond only to genuine VERTICAL pressure.
+
+      surfaceRect.height by itself is not enough, because on desktop the
+      entire page frame is almost square and its height can shrink when the
+      viewport gets narrower. That means an X-only resize can indirectly
+      make this surface shorter even though the browser's Y space has not
+      changed.
+
+      Normalize the surface height against the maximum frame height allowed
+      by the current viewport Y-axis. In other words: "how tall would this
+      info surface be if width were not the thing constraining the frame?"
+
+      When height is the real constraint, this resolves back to the actual
+      surface height, preserving the existing 575px Y threshold.
+    */
+    const frame =
+      document.querySelector(
+        "#etherian-page-frame"
+      );
+
+
+    let verticalPressureHeight =
+      surfaceRect.height;
+
+
+    if (
+      frame &&
+      fullTextDesktopMode.matches &&
+      !pageLayoutTransitionActive
+    ) {
+      const frameRect =
+        frame.getBoundingClientRect();
+
+
+      const frameStyles =
+        getComputedStyle(
+          frame
+        );
+
+
+      const pageShiftY =
+        parseFloat(
+          frameStyles.getPropertyValue(
+            "--page-frame-shift-y"
+          )
+        ) || 0;
+
+
+      /*
+        Desktop frame vertical placement is:
+
+          areaTop
+          + (availableHeight - frameHeight) / 2
+          + pageShiftY
+
+        Rearranging that lets us recover availableHeight from the live frame
+        rectangle without duplicating the header/gap CSS calculations.
+      */
+      const availableFrameHeight =
+        Math.max(
+          frameRect.height,
+          (
+            2 *
+            (
+              window.innerHeight -
+              frameRect.top +
+              pageShiftY
+            )
+          ) -
+          frameRect.height
+        );
+
+
+      if (
+        frameRect.height > 0 &&
+        availableFrameHeight > 0
+      ) {
+        verticalPressureHeight =
+          surfaceRect.height *
+          (
+            availableFrameHeight /
+            frameRect.height
+          );
+      }
+    }
+
+
+    etherianFeaturesCollapsed =
+      verticalPressureHeight <
+        minimumFeatureHeight;
+
+
+    surface.classList.toggle(
+      "is-features-collapsed",
+      etherianFeaturesCollapsed
+    );
+
+
+    surface.style.setProperty(
+      "--feature-zone-height",
+      etherianFeaturesCollapsed
+        ? "0px"
+        : `${naturalFeatureHeight}px`
+    );
+  };
+
+
+  if (etherianFeatureGrid) {
+    requestAnimationFrame(
+      updateEtherianFeatureCrowding
+    );
+
+
+    if (
+      typeof ResizeObserver ===
+      "function"
+    ) {
+      const etherianFeatureObserver =
+        new ResizeObserver(() => {
+          requestAnimationFrame(
+            updateEtherianFeatureCrowding
+          );
+        });
+
+
+      etherianFeatureObserver.observe(
+        etherianFeatureGrid
+      );
+
+
+      const etherianInfoSurface =
+        etherianFeatureGrid.closest(
+          ".game-info-surface"
+        );
+
+
+      if (etherianInfoSurface) {
+        etherianFeatureObserver.observe(
+          etherianInfoSurface
+        );
+      }
+    }
+  }
 
 
   /* =======================================================
@@ -9542,6 +13679,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     requestAnimationFrame(() => {
       rememberStablePageRect();
+
+      captureEtherianDesktopInfoSnapshot();
     });
   });
 
@@ -9560,9 +13699,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateAllPrototypePageFrameGeometry();
 
+        updateEtherianFeatureCrowding();
+
         checkRealPageInvariant();
 
         rememberStablePageRect();
+
+        captureEtherianDesktopInfoSnapshot();
+
+
+        /*
+          If a screenshot lightbox is open, re-read the source banner
+          button AFTER the responsive header geometry updates. This keeps
+          the X width/height/shear in lockstep with desktop/compact scaling.
+        */
+        syncLightboxCloseButtonToSource();
 
 
         menuMorph.setAttribute(
@@ -9578,7 +13729,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener(
     "resize",
-    scheduleGeometryUpdate
+    () => {
+      scheduleGeometryUpdate();
+
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          syncLightboxCloseButtonToSource();
+        });
+      });
+    }
   );
 
 

@@ -1,15 +1,14 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Simulacrum Header Prototype</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Simulacrum Header Prototype</title>
+<link href="styles.css" rel="stylesheet"/>
 </head>
-
 <body>
-
-  <!-- =====================================================
+<!-- =====================================================
        Fixed viewport-frame anchor pieces
        =====================================================
 
@@ -18,190 +17,68 @@
        use one reusable horizontal strip asset that can be rotated for
        the other three sides.
   -->
-  <div class="viewport-frame" aria-hidden="true">
-    <!-- Stretchable border fill strips.
+<div aria-hidden="true" class="viewport-frame">
+<!-- Stretchable border fill strips.
          Put the provided strip asset at: assets/header/border-stretch.webp -->
-    <img
-      class="viewport-frame-stretch viewport-frame-stretch--top"
-      src="assets/header/border-stretch.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-stretch viewport-frame-stretch--right"
-      src="assets/header/border-stretch.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-stretch viewport-frame-stretch--bottom"
-      src="assets/header/border-stretch.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-stretch viewport-frame-stretch--left"
-      src="assets/header/border-stretch.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-piece viewport-frame-piece--top-left"
-      src="assets/header/border-topleft.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-piece viewport-frame-piece--top"
-      src="assets/header/border-top.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-piece viewport-frame-piece--top-right"
-      src="assets/header/border-topright.webp"
-      alt=""
-      draggable="false"
-    >
-
-
-    <img
-      class="viewport-frame-piece viewport-frame-piece--left-center"
-      src="assets/header/border-centerleft.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-piece viewport-frame-piece--right-center"
-      src="assets/header/border-centerright.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-piece viewport-frame-piece--bottom-left"
-      src="assets/header/border-bottomleft.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-piece viewport-frame-piece--bottom"
-      src="assets/header/border-bottom.webp"
-      alt=""
-      draggable="false"
-    >
-
-    <img
-      class="viewport-frame-piece viewport-frame-piece--bottom-right"
-      src="assets/header/border-bottomright.webp"
-      alt=""
-      draggable="false"
-    >
-  </div>
-
-
-
-  <!-- Global blurred looping background video -->
-  <div class="site-background" aria-hidden="true">
-    <video
-      class="site-background-video"
-      autoplay
-      muted
-      loop
-      playsinline
-      webkit-playsinline
-      preload="metadata"
-      disablepictureinpicture
-      disableremoteplayback
-      aria-hidden="true"
-      tabindex="-1"
-    >
-      <source
-        src="assets/simulacrum-loop.mp4"
-        type="video/mp4"
-      >
-    </video>
-  </div>
-
+<img alt="" class="viewport-frame-stretch viewport-frame-stretch--top" draggable="false" src="assets/header/border-stretch.webp"/>
+<img alt="" class="viewport-frame-stretch viewport-frame-stretch--right" draggable="false" src="assets/header/border-stretch.webp"/>
+<img alt="" class="viewport-frame-stretch viewport-frame-stretch--bottom" draggable="false" src="assets/header/border-stretch.webp"/>
+<img alt="" class="viewport-frame-stretch viewport-frame-stretch--left" draggable="false" src="assets/header/border-stretch.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--top-left" draggable="false" src="assets/header/border-topleft.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--top" draggable="false" src="assets/header/border-top.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--top-right" draggable="false" src="assets/header/border-topright.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--left-center" draggable="false" src="assets/header/border-centerleft.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--right-center" draggable="false" src="assets/header/border-centerright.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--bottom-left" draggable="false" src="assets/header/border-bottomleft.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--bottom" draggable="false" src="assets/header/border-bottom.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--bottom-right" draggable="false" src="assets/header/border-bottomright.webp"/>
+</div>
+<!-- Global blurred looping background video -->
+<div aria-hidden="true" class="site-background">
+<video aria-hidden="true" autoplay="" class="site-background-video" disablepictureinpicture="" disableremoteplayback="" loop="" muted="" playsinline="" preload="metadata" tabindex="-1" webkit-playsinline="">
+<source src="assets/simulacrum-loop.mp4" type="video/mp4"/>
+</video>
+</div>
 <header class="site-header">
-
-  <div class="banner-frame" aria-hidden="true">
-    <div class="banner-piece banner-left"></div>
-    <div class="banner-piece banner-left-stretch"></div>
-    <div class="banner-piece banner-center"></div>
-    <div class="banner-piece banner-right-stretch"></div>
-    <div class="banner-piece banner-right"></div>
-  </div>
-
-  <div class="header-content">
-
-    <a class="brand" href="#">
-      <img
-        class="brand-logo"
-        src="assets/header/simulacrum-logo.png"
-        alt="Simulacrum Interactive"
-      >
-    </a>
-
-    <nav class="main-nav" aria-label="Main navigation">
-      <a class="nav-button" href="#about">
-        <span class="nav-icon" aria-hidden="true">◆</span>
-        <span class="nav-label">About</span>
-      </a>
-
-      <a class="nav-button" href="#brobots">
-        <span class="nav-icon" aria-hidden="true">▲</span>
-        <span class="nav-label">Brobots</span>
-      </a>
-
-      <a class="nav-button" href="#etherian">
-        <span class="nav-icon" aria-hidden="true">✦</span>
-        <span class="nav-label">Etherian</span>
-      </a>
-
-      <a class="nav-button" href="#halodoom">
-        <span class="nav-icon" aria-hidden="true">■</span>
-        <span class="nav-label">Halodoom</span>
-      </a>
-
-      <a class="nav-button" href="#contact">
-        <span class="nav-icon" aria-hidden="true">●</span>
-        <span class="nav-label">Contact</span>
-      </a>
-    </nav>
-
-    <button
-      class="menu-toggle"
-      type="button"
-      aria-label="Open menu"
-      aria-expanded="false"
-      aria-controls="mobile-menu"
-    >
-      <span class="menu-toggle-lines" aria-hidden="true"></span>
-    </button>
-
-    <nav
-      class="mobile-menu"
-      id="mobile-menu"
-      aria-label="Mobile navigation"
-    >
-      <svg
-        class="mobile-menu-shell"
-        viewBox="0 0 320 420"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <path
-          class="mobile-menu-shell-path mobile-menu-shell-path--outer"
-          d="
+<div aria-hidden="true" class="banner-frame">
+<div class="banner-piece banner-left"></div>
+<div class="banner-piece banner-left-stretch"></div>
+<div class="banner-piece banner-center"></div>
+<div class="banner-piece banner-right-stretch"></div>
+<div class="banner-piece banner-right"></div>
+</div>
+<div class="header-content">
+<a class="brand" href="#">
+<img alt="Simulacrum Interactive" class="brand-logo" src="assets/header/simulacrum-logo.png"/>
+</a>
+<nav aria-label="Main navigation" class="main-nav">
+<a class="nav-button" href="#about">
+<span aria-hidden="true" class="nav-icon">◆</span>
+<span class="nav-label">About</span>
+</a>
+<a class="nav-button" href="#brobots">
+<span aria-hidden="true" class="nav-icon">▲</span>
+<span class="nav-label">Brobots</span>
+</a>
+<a class="nav-button" href="#etherian">
+<span aria-hidden="true" class="nav-icon">✦</span>
+<span class="nav-label">Etherian</span>
+</a>
+<a class="nav-button" href="#halodoom">
+<span aria-hidden="true" class="nav-icon">■</span>
+<span class="nav-label">Halodoom</span>
+</a>
+<a class="nav-button" href="#contact">
+<span aria-hidden="true" class="nav-icon">●</span>
+<span class="nav-label">Contact</span>
+</a>
+</nav>
+<button aria-controls="mobile-menu" aria-expanded="false" aria-label="Open menu" class="menu-toggle" type="button">
+<span aria-hidden="true" class="menu-toggle-lines"></span>
+</button>
+<nav aria-label="Mobile navigation" class="mobile-menu" id="mobile-menu">
+<svg aria-hidden="true" class="mobile-menu-shell" preserveaspectratio="none" viewbox="0 0 320 420">
+<path class="mobile-menu-shell-path mobile-menu-shell-path--outer" d="
             M 28 1
             H 319
             V 389
@@ -209,12 +86,8 @@
             H 1
             V 29
             Z
-          "
-        />
-
-        <path
-          class="mobile-menu-shell-path mobile-menu-shell-path--inner"
-          d="
+          "></path>
+<path class="mobile-menu-shell-path mobile-menu-shell-path--inner" d="
             M 36 11
             H 309
             V 383
@@ -222,37 +95,15 @@
             H 11
             V 35
             Z
-          "
-        />
-
-        <path
-          class="mobile-menu-shell-accent mobile-menu-shell-accent--top"
-          d="M 35 11 H 132"
-        />
-
-        <path
-          class="mobile-menu-shell-accent mobile-menu-shell-accent--bottom"
-          d="M 11 408 H 122"
-        />
-
-        <path
-          class="mobile-menu-shell-accent mobile-menu-shell-accent--corner"
-          d="M 282 408 L 309 382"
-        />
-      </svg>
-
-      <div class="mobile-menu-links">
-
-        <a class="mobile-menu-link" href="#about">
-          <svg
-            class="mobile-menu-link-shell"
-            viewBox="0 0 280 62"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path
-              class="mobile-menu-link-shell-path"
-              d="
+          "></path>
+<path class="mobile-menu-shell-accent mobile-menu-shell-accent--top" d="M 35 11 H 132"></path>
+<path class="mobile-menu-shell-accent mobile-menu-shell-accent--bottom" d="M 11 408 H 122"></path>
+<path class="mobile-menu-shell-accent mobile-menu-shell-accent--corner" d="M 282 408 L 309 382"></path>
+</svg>
+<div class="mobile-menu-links">
+<a class="mobile-menu-link" href="#about">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
                 M 10 1
                 H 279
                 V 47
@@ -260,47 +111,32 @@
                 H 1
                 V 11
                 Z
-              "
-            />
-          </svg>
-
-          <span class="mobile-menu-link-motif" aria-hidden="true">
-            <svg viewBox="0 0 34 30">
-              <circle cx="17" cy="4" r="1.5" />
-
-              <circle cx="13" cy="9" r="1.5" />
-              <circle cx="21" cy="9" r="1.5" />
-
-              <circle cx="9" cy="14" r="1.5" />
-              <circle cx="17" cy="14" r="1.5" />
-              <circle cx="25" cy="14" r="1.5" />
-
-              <circle cx="5" cy="19" r="1.5" />
-              <circle cx="13" cy="19" r="1.5" />
-              <circle cx="21" cy="19" r="1.5" />
-              <circle cx="29" cy="19" r="1.5" />
-
-              <circle cx="1.5" cy="24" r="1.5" />
-              <circle cx="9" cy="24" r="1.5" />
-              <circle cx="17" cy="24" r="1.5" />
-              <circle cx="25" cy="24" r="1.5" />
-              <circle cx="32.5" cy="24" r="1.5" />
-            </svg>
-          </span>
-
-          <span class="mobile-menu-link-text">About</span>
-        </a>
-
-        <a class="mobile-menu-link" href="#brobots">
-          <svg
-            class="mobile-menu-link-shell"
-            viewBox="0 0 280 62"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path
-              class="mobile-menu-link-shell-path"
-              d="
+              "></path>
+</svg>
+<span aria-hidden="true" class="mobile-menu-link-motif">
+<svg viewbox="0 0 34 30">
+<circle cx="17" cy="4" r="1.5"></circle>
+<circle cx="13" cy="9" r="1.5"></circle>
+<circle cx="21" cy="9" r="1.5"></circle>
+<circle cx="9" cy="14" r="1.5"></circle>
+<circle cx="17" cy="14" r="1.5"></circle>
+<circle cx="25" cy="14" r="1.5"></circle>
+<circle cx="5" cy="19" r="1.5"></circle>
+<circle cx="13" cy="19" r="1.5"></circle>
+<circle cx="21" cy="19" r="1.5"></circle>
+<circle cx="29" cy="19" r="1.5"></circle>
+<circle cx="1.5" cy="24" r="1.5"></circle>
+<circle cx="9" cy="24" r="1.5"></circle>
+<circle cx="17" cy="24" r="1.5"></circle>
+<circle cx="25" cy="24" r="1.5"></circle>
+<circle cx="32.5" cy="24" r="1.5"></circle>
+</svg>
+</span>
+<span class="mobile-menu-link-text">About</span>
+</a>
+<a class="mobile-menu-link" href="#brobots">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
                 M 10 1
                 H 279
                 V 47
@@ -308,47 +144,32 @@
                 H 1
                 V 11
                 Z
-              "
-            />
-          </svg>
-
-          <span class="mobile-menu-link-text">Brobots</span>
-
-          <span class="mobile-menu-link-motif" aria-hidden="true">
-            <svg viewBox="0 0 34 30">
-              <circle cx="17" cy="4" r="1.5" />
-
-              <circle cx="13" cy="9" r="1.5" />
-              <circle cx="21" cy="9" r="1.5" />
-
-              <circle cx="9" cy="14" r="1.5" />
-              <circle cx="17" cy="14" r="1.5" />
-              <circle cx="25" cy="14" r="1.5" />
-
-              <circle cx="5" cy="19" r="1.5" />
-              <circle cx="13" cy="19" r="1.5" />
-              <circle cx="21" cy="19" r="1.5" />
-              <circle cx="29" cy="19" r="1.5" />
-
-              <circle cx="1.5" cy="24" r="1.5" />
-              <circle cx="9" cy="24" r="1.5" />
-              <circle cx="17" cy="24" r="1.5" />
-              <circle cx="25" cy="24" r="1.5" />
-              <circle cx="32.5" cy="24" r="1.5" />
-            </svg>
-          </span>
-        </a>
-
-        <a class="mobile-menu-link" href="#etherian">
-          <svg
-            class="mobile-menu-link-shell"
-            viewBox="0 0 280 62"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path
-              class="mobile-menu-link-shell-path"
-              d="
+              "></path>
+</svg>
+<span class="mobile-menu-link-text">Brobots</span>
+<span aria-hidden="true" class="mobile-menu-link-motif">
+<svg viewbox="0 0 34 30">
+<circle cx="17" cy="4" r="1.5"></circle>
+<circle cx="13" cy="9" r="1.5"></circle>
+<circle cx="21" cy="9" r="1.5"></circle>
+<circle cx="9" cy="14" r="1.5"></circle>
+<circle cx="17" cy="14" r="1.5"></circle>
+<circle cx="25" cy="14" r="1.5"></circle>
+<circle cx="5" cy="19" r="1.5"></circle>
+<circle cx="13" cy="19" r="1.5"></circle>
+<circle cx="21" cy="19" r="1.5"></circle>
+<circle cx="29" cy="19" r="1.5"></circle>
+<circle cx="1.5" cy="24" r="1.5"></circle>
+<circle cx="9" cy="24" r="1.5"></circle>
+<circle cx="17" cy="24" r="1.5"></circle>
+<circle cx="25" cy="24" r="1.5"></circle>
+<circle cx="32.5" cy="24" r="1.5"></circle>
+</svg>
+</span>
+</a>
+<a class="mobile-menu-link" href="#etherian">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
                 M 10 1
                 H 279
                 V 47
@@ -356,47 +177,32 @@
                 H 1
                 V 11
                 Z
-              "
-            />
-          </svg>
-
-          <span class="mobile-menu-link-text">Etherian</span>
-
-          <span class="mobile-menu-link-motif" aria-hidden="true">
-            <svg viewBox="0 0 34 30">
-              <circle cx="17" cy="4" r="1.5" />
-
-              <circle cx="13" cy="9" r="1.5" />
-              <circle cx="21" cy="9" r="1.5" />
-
-              <circle cx="9" cy="14" r="1.5" />
-              <circle cx="17" cy="14" r="1.5" />
-              <circle cx="25" cy="14" r="1.5" />
-
-              <circle cx="5" cy="19" r="1.5" />
-              <circle cx="13" cy="19" r="1.5" />
-              <circle cx="21" cy="19" r="1.5" />
-              <circle cx="29" cy="19" r="1.5" />
-
-              <circle cx="1.5" cy="24" r="1.5" />
-              <circle cx="9" cy="24" r="1.5" />
-              <circle cx="17" cy="24" r="1.5" />
-              <circle cx="25" cy="24" r="1.5" />
-              <circle cx="32.5" cy="24" r="1.5" />
-            </svg>
-          </span>
-        </a>
-
-        <a class="mobile-menu-link" href="#halodoom">
-          <svg
-            class="mobile-menu-link-shell"
-            viewBox="0 0 280 62"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path
-              class="mobile-menu-link-shell-path"
-              d="
+              "></path>
+</svg>
+<span class="mobile-menu-link-text">Etherian</span>
+<span aria-hidden="true" class="mobile-menu-link-motif">
+<svg viewbox="0 0 34 30">
+<circle cx="17" cy="4" r="1.5"></circle>
+<circle cx="13" cy="9" r="1.5"></circle>
+<circle cx="21" cy="9" r="1.5"></circle>
+<circle cx="9" cy="14" r="1.5"></circle>
+<circle cx="17" cy="14" r="1.5"></circle>
+<circle cx="25" cy="14" r="1.5"></circle>
+<circle cx="5" cy="19" r="1.5"></circle>
+<circle cx="13" cy="19" r="1.5"></circle>
+<circle cx="21" cy="19" r="1.5"></circle>
+<circle cx="29" cy="19" r="1.5"></circle>
+<circle cx="1.5" cy="24" r="1.5"></circle>
+<circle cx="9" cy="24" r="1.5"></circle>
+<circle cx="17" cy="24" r="1.5"></circle>
+<circle cx="25" cy="24" r="1.5"></circle>
+<circle cx="32.5" cy="24" r="1.5"></circle>
+</svg>
+</span>
+</a>
+<a class="mobile-menu-link" href="#halodoom">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
                 M 10 1
                 H 279
                 V 47
@@ -404,47 +210,32 @@
                 H 1
                 V 11
                 Z
-              "
-            />
-          </svg>
-
-          <span class="mobile-menu-link-text">Halodoom</span>
-
-          <span class="mobile-menu-link-motif" aria-hidden="true">
-            <svg viewBox="0 0 34 30">
-              <circle cx="17" cy="4" r="1.5" />
-
-              <circle cx="13" cy="9" r="1.5" />
-              <circle cx="21" cy="9" r="1.5" />
-
-              <circle cx="9" cy="14" r="1.5" />
-              <circle cx="17" cy="14" r="1.5" />
-              <circle cx="25" cy="14" r="1.5" />
-
-              <circle cx="5" cy="19" r="1.5" />
-              <circle cx="13" cy="19" r="1.5" />
-              <circle cx="21" cy="19" r="1.5" />
-              <circle cx="29" cy="19" r="1.5" />
-
-              <circle cx="1.5" cy="24" r="1.5" />
-              <circle cx="9" cy="24" r="1.5" />
-              <circle cx="17" cy="24" r="1.5" />
-              <circle cx="25" cy="24" r="1.5" />
-              <circle cx="32.5" cy="24" r="1.5" />
-            </svg>
-          </span>
-        </a>
-
-        <a class="mobile-menu-link" href="#contact">
-          <svg
-            class="mobile-menu-link-shell"
-            viewBox="0 0 280 62"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path
-              class="mobile-menu-link-shell-path"
-              d="
+              "></path>
+</svg>
+<span class="mobile-menu-link-text">Halodoom</span>
+<span aria-hidden="true" class="mobile-menu-link-motif">
+<svg viewbox="0 0 34 30">
+<circle cx="17" cy="4" r="1.5"></circle>
+<circle cx="13" cy="9" r="1.5"></circle>
+<circle cx="21" cy="9" r="1.5"></circle>
+<circle cx="9" cy="14" r="1.5"></circle>
+<circle cx="17" cy="14" r="1.5"></circle>
+<circle cx="25" cy="14" r="1.5"></circle>
+<circle cx="5" cy="19" r="1.5"></circle>
+<circle cx="13" cy="19" r="1.5"></circle>
+<circle cx="21" cy="19" r="1.5"></circle>
+<circle cx="29" cy="19" r="1.5"></circle>
+<circle cx="1.5" cy="24" r="1.5"></circle>
+<circle cx="9" cy="24" r="1.5"></circle>
+<circle cx="17" cy="24" r="1.5"></circle>
+<circle cx="25" cy="24" r="1.5"></circle>
+<circle cx="32.5" cy="24" r="1.5"></circle>
+</svg>
+</span>
+</a>
+<a class="mobile-menu-link" href="#contact">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
                 M 10 1
                 H 279
                 V 47
@@ -452,748 +243,682 @@
                 H 1
                 V 11
                 Z
-              "
-            />
-          </svg>
-
-          <span class="mobile-menu-link-text">Contact</span>
-
-          <span class="mobile-menu-link-motif" aria-hidden="true">
-            <svg viewBox="0 0 34 30">
-              <circle cx="17" cy="4" r="1.5" />
-
-              <circle cx="13" cy="9" r="1.5" />
-              <circle cx="21" cy="9" r="1.5" />
-
-              <circle cx="9" cy="14" r="1.5" />
-              <circle cx="17" cy="14" r="1.5" />
-              <circle cx="25" cy="14" r="1.5" />
-
-              <circle cx="5" cy="19" r="1.5" />
-              <circle cx="13" cy="19" r="1.5" />
-              <circle cx="21" cy="19" r="1.5" />
-              <circle cx="29" cy="19" r="1.5" />
-
-              <circle cx="1.5" cy="24" r="1.5" />
-              <circle cx="9" cy="24" r="1.5" />
-              <circle cx="17" cy="24" r="1.5" />
-              <circle cx="25" cy="24" r="1.5" />
-              <circle cx="32.5" cy="24" r="1.5" />
-            </svg>
-          </span>
-        </a>
-
-      </div>
-    </nav>
-
-  </div>
-
+              "></path>
+</svg>
+<span class="mobile-menu-link-text">Contact</span>
+<span aria-hidden="true" class="mobile-menu-link-motif">
+<svg viewbox="0 0 34 30">
+<circle cx="17" cy="4" r="1.5"></circle>
+<circle cx="13" cy="9" r="1.5"></circle>
+<circle cx="21" cy="9" r="1.5"></circle>
+<circle cx="9" cy="14" r="1.5"></circle>
+<circle cx="17" cy="14" r="1.5"></circle>
+<circle cx="25" cy="14" r="1.5"></circle>
+<circle cx="5" cy="19" r="1.5"></circle>
+<circle cx="13" cy="19" r="1.5"></circle>
+<circle cx="21" cy="19" r="1.5"></circle>
+<circle cx="29" cy="19" r="1.5"></circle>
+<circle cx="1.5" cy="24" r="1.5"></circle>
+<circle cx="9" cy="24" r="1.5"></circle>
+<circle cx="17" cy="24" r="1.5"></circle>
+<circle cx="25" cy="24" r="1.5"></circle>
+<circle cx="32.5" cy="24" r="1.5"></circle>
+</svg>
+</span>
+</a>
+</div>
+</nav>
+</div>
 </header>
-
 <main class="page-demo">
-
-  <!--
+<!--
     Temporary page-frame targets for the five middle/icon-mode buttons.
 
     They intentionally all share the same visual shell for now. The
     current task is to establish page-to-page transition behavior before
     introducing unique content/designs.
   -->
-  <section
-    class="prototype-page-frame"
-    id="about-page-frame"
-    data-page="about"
-    aria-hidden="true"
-  >
-    <svg
-      class="prototype-page-frame-shell"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <!--
+<section aria-hidden="true" class="prototype-page-frame" data-page="about" id="about-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
         Structural frame layers.
         JavaScript redraws these from the same live rectangle used by
         the morph target, so the real frame stays aligned to the fake one.
       -->
-      <path
-        class="page-frame-ring"
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-      />
-
-      <path class="page-frame-edge page-frame-edge--outer" />
-      <path class="page-frame-edge page-frame-edge--chrome" />
-      <path class="page-frame-edge page-frame-edge--inner" />
-
-      <path class="page-frame-orange-rail" />
-      <path class="page-frame-orange-highlight" />
-
-      <!-- Decorative rails / micro-HUD details -->
-      <g class="page-frame-side-details page-frame-side-details--left">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-      <g class="page-frame-side-details page-frame-side-details--right">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-
-      <!-- Bottom-center notch / indicator treatment -->
-      <path class="page-frame-bottom-notch" />
-
-      <g class="page-frame-bottom-dots">
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-      </g>
-    </svg>
-
-    <!--
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
       Real HTML page content will eventually live here.
       It is intentionally empty for now.
     -->
-    <div class="prototype-page-frame-content" aria-label="About page content"></div>
-
-    <!-- Desktop-only secondary glass panel -->
-    <div class="desktop-secondary-panel" aria-hidden="true">
-      <div class="desktop-secondary-panel-glass"></div>
-      <div class="desktop-secondary-panel-content"></div>
-    </div>
-  </section>
-
-  <section
-    class="prototype-page-frame"
-    id="brobots-page-frame"
-    data-page="brobots"
-    aria-hidden="true"
-  >
-    <svg
-      class="prototype-page-frame-shell"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <!--
+<div aria-label="About page content" class="prototype-page-frame-content"></div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-hidden="true" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div>
+<div class="desktop-secondary-panel-content"></div>
+</div>
+</section>
+<section aria-hidden="true" class="prototype-page-frame" data-page="brobots" id="brobots-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
         Structural frame layers.
         JavaScript redraws these from the same live rectangle used by
         the morph target, so the real frame stays aligned to the fake one.
       -->
-      <path
-        class="page-frame-ring"
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-      />
-
-      <path class="page-frame-edge page-frame-edge--outer" />
-      <path class="page-frame-edge page-frame-edge--chrome" />
-      <path class="page-frame-edge page-frame-edge--inner" />
-
-      <path class="page-frame-orange-rail" />
-      <path class="page-frame-orange-highlight" />
-
-      <!-- Decorative rails / micro-HUD details -->
-      <g class="page-frame-side-details page-frame-side-details--left">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-      <g class="page-frame-side-details page-frame-side-details--right">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-
-      <!-- Bottom-center notch / indicator treatment -->
-      <path class="page-frame-bottom-notch" />
-
-      <g class="page-frame-bottom-dots">
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-      </g>
-    </svg>
-
-    <!--
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
       Real HTML page content will eventually live here.
       It is intentionally empty for now.
     -->
-    <div class="prototype-page-frame-content" aria-label="Brobots page content"></div>
-
-    <!-- Desktop-only secondary glass panel -->
-    <div class="desktop-secondary-panel" aria-hidden="true">
-      <div class="desktop-secondary-panel-glass"></div>
-      <div class="desktop-secondary-panel-content"></div>
-    </div>
-  </section>
-
-  <section
-    class="prototype-page-frame"
-    id="etherian-page-frame"
-    data-page="etherian"
-    aria-hidden="true"
-  >
-    <svg
-      class="prototype-page-frame-shell"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <!--
-        Structural frame layers.
-        JavaScript redraws these from the same live rectangle used by
-        the morph target, so the real frame stays aligned to the fake one.
-      -->
-      <path
-        class="page-frame-ring"
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-      />
-
-      <path class="page-frame-edge page-frame-edge--outer" />
-      <path class="page-frame-edge page-frame-edge--chrome" />
-      <path class="page-frame-edge page-frame-edge--inner" />
-
-      <path class="page-frame-orange-rail" />
-      <path class="page-frame-orange-highlight" />
-
-      <!-- Decorative rails / micro-HUD details -->
-      <g class="page-frame-side-details page-frame-side-details--left">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-      <g class="page-frame-side-details page-frame-side-details--right">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-
-      <!-- Bottom-center notch / indicator treatment -->
-      <path class="page-frame-bottom-notch" />
-
-      <g class="page-frame-bottom-dots">
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-      </g>
-    </svg>
-
-    <!--
-      Etherian page module.
-
-      The outer .prototype-page-frame-content remains owned by the global
-      frame/morph system. Everything inside .game-page is page-specific and
-      can later be swapped independently of the frame itself.
-    -->
-    <div
-      class="prototype-page-frame-content"
-      aria-label="Etherian page content"
-    >
-      <div class="game-page game-page--etherian">
-
-        <!--
+<div aria-label="Brobots page content" class="prototype-page-frame-content"><div class="game-page game-page--brobots">
+<!--
           Step 1 prototype:
           structural media-browser shell only.
 
           No real media or carousel behavior yet; these temporary regions
           let us verify sizing in tablet and desktop frame layouts first.
         -->
-        <section
-          class="media-browser"
-          data-media-browser
-          aria-label="Etherian media gallery"
-        >
-
-          <div
-            class="media-viewer"
-            data-media-viewer
-            aria-live="polite"
-          >
-            <div class="media-viewer-stage" data-media-viewer-stage></div>
-          </div>
-
-          <div class="media-strip">
-            <button
-              class="media-arrow media-arrow--previous"
-              type="button"
-              data-media-prev
-              aria-label="Previous media"
-            >
+<section aria-label="Etherian media gallery" class="media-browser" data-media-browser="">
+<div aria-live="polite" class="media-viewer" data-media-viewer="">
+<div class="media-viewer-stage" data-media-viewer-stage=""></div>
+</div>
+<div class="media-strip">
+<button aria-label="Previous media" class="media-arrow media-arrow--previous" data-media-prev="" type="button">
               ‹
             </button>
-
-            <div
-              class="media-thumbnails"
-              data-media-thumbnails
-              aria-label="Etherian media thumbnails"
-            >
-              <button
-                class="media-thumbnail is-selected"
-                type="button"
-                data-media-item
-                data-media-type="youtube"
-                data-media-title="Announcement Trailer"
-                aria-label="Show Announcement Trailer"
-                data-youtube-id="f1XcuUs06lQ"
-                data-media-thumb="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-play" aria-hidden="true">▶</span>
-                    <span class="media-thumbnail-type">VIDEO</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="youtube"
-                data-media-title="Release Trailer"
-                aria-label="Show Release Trailer"
-                data-youtube-id="mz-zPOR3cC4"
-                data-media-thumb="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-play" aria-hidden="true">▶</span>
-                    <span class="media-thumbnail-type">VIDEO</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="image"
-                data-media-title="Etherian Screenshot 1"
-                aria-label="Show Etherian Screenshot 1"
-                data-media-src="assets/etherian/etherian-screenshot-0.jpg"
-                data-media-thumb="assets/etherian/etherian-screenshot-0.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="assets/etherian/etherian-screenshot-0.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-type">IMAGE</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="image"
-                data-media-title="Etherian Screenshot 2"
-                aria-label="Show Etherian Screenshot 2"
-                data-media-src="assets/etherian/etherian-screenshot-1.jpg"
-                data-media-thumb="assets/etherian/etherian-screenshot-1.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="assets/etherian/etherian-screenshot-1.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-type">IMAGE</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="image"
-                data-media-title="Etherian Screenshot 3"
-                aria-label="Show Etherian Screenshot 3"
-                data-media-src="assets/etherian/etherian-screenshot-2.jpg"
-                data-media-thumb="assets/etherian/etherian-screenshot-2.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="assets/etherian/etherian-screenshot-2.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-type">IMAGE</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="image"
-                data-media-title="Etherian Screenshot 4"
-                aria-label="Show Etherian Screenshot 4"
-                data-media-src="assets/etherian/etherian-screenshot-3.jpg"
-                data-media-thumb="assets/etherian/etherian-screenshot-3.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="assets/etherian/etherian-screenshot-3.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-type">IMAGE</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="image"
-                data-media-title="Etherian Screenshot 5"
-                aria-label="Show Etherian Screenshot 5"
-                data-media-src="assets/etherian/etherian-screenshot-4.jpg"
-                data-media-thumb="assets/etherian/etherian-screenshot-4.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="assets/etherian/etherian-screenshot-4.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-type">IMAGE</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="image"
-                data-media-title="Etherian Screenshot 6"
-                aria-label="Show Etherian Screenshot 6"
-                data-media-src="assets/etherian/etherian-screenshot-5.jpg"
-                data-media-thumb="assets/etherian/etherian-screenshot-5.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="assets/etherian/etherian-screenshot-5.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-type">IMAGE</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="image"
-                data-media-title="Etherian Screenshot 7"
-                aria-label="Show Etherian Screenshot 7"
-                data-media-src="assets/etherian/etherian-screenshot-6.jpg"
-                data-media-thumb="assets/etherian/etherian-screenshot-6.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="assets/etherian/etherian-screenshot-6.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-type">IMAGE</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="image"
-                data-media-title="Etherian Screenshot 8"
-                aria-label="Show Etherian Screenshot 8"
-                data-media-src="assets/etherian/etherian-screenshot-7.jpg"
-                data-media-thumb="assets/etherian/etherian-screenshot-7.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="assets/etherian/etherian-screenshot-7.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-type">IMAGE</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="image"
-                data-media-title="Etherian Screenshot 9"
-                aria-label="Show Etherian Screenshot 9"
-                data-media-src="assets/etherian/etherian-screenshot-8.jpg"
-                data-media-thumb="assets/etherian/etherian-screenshot-8.jpg"
-              >
-                  <img
-                    class="media-thumbnail-image"
-                    src="assets/etherian/etherian-screenshot-8.jpg"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  >
-                  <span class="media-thumbnail-overlay">
-                    <span class="media-thumbnail-type">IMAGE</span>
-                  </span>
-              </button>
-              <button
-                class="media-thumbnail"
-                type="button"
-                data-media-item
-                data-media-type="video"
-                data-media-title="Local Video Test"
-                aria-label="Show Local Video Test"
-                data-media-src="assets/simulacrum-loop.mp4"
-              >
-                  <span class="media-thumbnail-local-video">
-                    <span class="media-thumbnail-play" aria-hidden="true">▶</span>
-                    <span class="media-thumbnail-type">LOCAL VIDEO</span>
-                  </span>
-              </button>
-            </div>
-
-            <button
-              class="media-arrow media-arrow--next"
-              type="button"
-              data-media-next
-              aria-label="Next media"
-            >
+<div aria-label="Etherian media thumbnails" class="media-thumbnails" data-media-thumbnails="">
+<button aria-label="Show Announcement Trailer" class="media-thumbnail is-selected" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg" data-media-title="Announcement Trailer" data-media-type="youtube" data-youtube-id="f1XcuUs06lQ" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg"/>
+<span class="media-thumbnail-overlay">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">VIDEO</span>
+</span>
+</button>
+<button aria-label="Show Release Trailer" class="media-thumbnail" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg" data-media-title="Release Trailer" data-media-type="youtube" data-youtube-id="mz-zPOR3cC4" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg"/>
+<span class="media-thumbnail-overlay">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">VIDEO</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 1" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-0.jpg" data-media-thumb="assets/etherian/etherian-screenshot-0.jpg" data-media-title="Etherian Screenshot 1" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-0.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 2" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-1.jpg" data-media-thumb="assets/etherian/etherian-screenshot-1.jpg" data-media-title="Etherian Screenshot 2" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-1.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 3" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-2.jpg" data-media-thumb="assets/etherian/etherian-screenshot-2.jpg" data-media-title="Etherian Screenshot 3" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-2.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 4" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-3.jpg" data-media-thumb="assets/etherian/etherian-screenshot-3.jpg" data-media-title="Etherian Screenshot 4" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-3.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 5" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-4.jpg" data-media-thumb="assets/etherian/etherian-screenshot-4.jpg" data-media-title="Etherian Screenshot 5" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-4.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 6" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-5.jpg" data-media-thumb="assets/etherian/etherian-screenshot-5.jpg" data-media-title="Etherian Screenshot 6" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-5.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 7" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-6.jpg" data-media-thumb="assets/etherian/etherian-screenshot-6.jpg" data-media-title="Etherian Screenshot 7" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-6.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 8" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-7.jpg" data-media-thumb="assets/etherian/etherian-screenshot-7.jpg" data-media-title="Etherian Screenshot 8" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-7.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 9" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-8.jpg" data-media-thumb="assets/etherian/etherian-screenshot-8.jpg" data-media-title="Etherian Screenshot 9" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-8.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Local Video Test" class="media-thumbnail" data-media-item="" data-media-src="assets/simulacrum-loop.mp4" data-media-title="Local Video Test" data-media-type="video" type="button">
+<span class="media-thumbnail-local-video">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">LOCAL VIDEO</span>
+</span>
+</button>
+</div>
+<button aria-label="Next media" class="media-arrow media-arrow--next" data-media-next="" type="button">
               ›
             </button>
-          </div>
-
-        </section>
-
-      </div>
-    </div>
-
-    <!-- Desktop-only secondary glass panel -->
-    <div class="desktop-secondary-panel" aria-hidden="true">
-      <div class="desktop-secondary-panel-glass"></div>
-      <div class="desktop-secondary-panel-content"></div>
-    </div>
-  </section>
-
-  <section
-    class="prototype-page-frame"
-    id="halodoom-page-frame"
-    data-page="halodoom"
-    aria-hidden="true"
-  >
-    <svg
-      class="prototype-page-frame-shell"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <!--
+</div>
+</section>
+</div></div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-hidden="true" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div>
+<div class="desktop-secondary-panel-content"></div>
+</div>
+</section>
+<section aria-hidden="true" class="prototype-page-frame" data-page="etherian" id="etherian-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
         Structural frame layers.
         JavaScript redraws these from the same live rectangle used by
         the morph target, so the real frame stays aligned to the fake one.
       -->
-      <path
-        class="page-frame-ring"
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-      />
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
+      Etherian page module.
 
-      <path class="page-frame-edge page-frame-edge--outer" />
-      <path class="page-frame-edge page-frame-edge--chrome" />
-      <path class="page-frame-edge page-frame-edge--inner" />
-
-      <path class="page-frame-orange-rail" />
-      <path class="page-frame-orange-highlight" />
-
-      <!-- Decorative rails / micro-HUD details -->
-      <g class="page-frame-side-details page-frame-side-details--left">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-      <g class="page-frame-side-details page-frame-side-details--right">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-
-      <!-- Bottom-center notch / indicator treatment -->
-      <path class="page-frame-bottom-notch" />
-
-      <g class="page-frame-bottom-dots">
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-      </g>
-    </svg>
-
-    <!--
-      Real HTML page content will eventually live here.
-      It is intentionally empty for now.
+      The outer .prototype-page-frame-content remains owned by the global
+      frame/morph system. Everything inside .game-page is page-specific and
+      can later be swapped independently of the frame itself.
     -->
-    <div class="prototype-page-frame-content" aria-label="Halodoom page content"></div>
+<div aria-label="Etherian page content" class="prototype-page-frame-content">
+<div class="game-page game-page--etherian">
+<!--
+          Step 1 prototype:
+          structural media-browser shell only.
 
-    <!-- Desktop-only secondary glass panel -->
-    <div class="desktop-secondary-panel" aria-hidden="true">
-      <div class="desktop-secondary-panel-glass"></div>
-      <div class="desktop-secondary-panel-content"></div>
-    </div>
-  </section>
-
-  <section
-    class="prototype-page-frame"
-    id="contact-page-frame"
-    data-page="contact"
-    aria-hidden="true"
-  >
-    <svg
-      class="prototype-page-frame-shell"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <!--
+          No real media or carousel behavior yet; these temporary regions
+          let us verify sizing in tablet and desktop frame layouts first.
+        -->
+<section aria-label="Etherian media gallery" class="media-browser" data-media-browser="">
+<div aria-live="polite" class="media-viewer" data-media-viewer="">
+<div class="media-viewer-stage" data-media-viewer-stage=""></div>
+</div>
+<div class="media-strip">
+<button aria-label="Previous media" class="media-arrow media-arrow--previous" data-media-prev="" type="button">
+              ‹
+            </button>
+<div aria-label="Etherian media thumbnails" class="media-thumbnails" data-media-thumbnails="">
+<button aria-label="Show Announcement Trailer" class="media-thumbnail is-selected" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg" data-media-title="Announcement Trailer" data-media-type="youtube" data-youtube-id="f1XcuUs06lQ" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg"/>
+<span class="media-thumbnail-overlay">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">VIDEO</span>
+</span>
+</button>
+<button aria-label="Show Release Trailer" class="media-thumbnail" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg" data-media-title="Release Trailer" data-media-type="youtube" data-youtube-id="mz-zPOR3cC4" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg"/>
+<span class="media-thumbnail-overlay">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">VIDEO</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 1" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-0.jpg" data-media-thumb="assets/etherian/etherian-screenshot-0.jpg" data-media-title="Etherian Screenshot 1" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-0.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 2" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-1.jpg" data-media-thumb="assets/etherian/etherian-screenshot-1.jpg" data-media-title="Etherian Screenshot 2" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-1.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 3" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-2.jpg" data-media-thumb="assets/etherian/etherian-screenshot-2.jpg" data-media-title="Etherian Screenshot 3" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-2.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 4" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-3.jpg" data-media-thumb="assets/etherian/etherian-screenshot-3.jpg" data-media-title="Etherian Screenshot 4" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-3.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 5" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-4.jpg" data-media-thumb="assets/etherian/etherian-screenshot-4.jpg" data-media-title="Etherian Screenshot 5" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-4.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 6" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-5.jpg" data-media-thumb="assets/etherian/etherian-screenshot-5.jpg" data-media-title="Etherian Screenshot 6" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-5.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 7" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-6.jpg" data-media-thumb="assets/etherian/etherian-screenshot-6.jpg" data-media-title="Etherian Screenshot 7" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-6.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 8" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-7.jpg" data-media-thumb="assets/etherian/etherian-screenshot-7.jpg" data-media-title="Etherian Screenshot 8" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-7.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 9" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-8.jpg" data-media-thumb="assets/etherian/etherian-screenshot-8.jpg" data-media-title="Etherian Screenshot 9" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-8.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Local Video Test" class="media-thumbnail" data-media-item="" data-media-src="assets/simulacrum-loop.mp4" data-media-title="Local Video Test" data-media-type="video" type="button">
+<span class="media-thumbnail-local-video">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">LOCAL VIDEO</span>
+</span>
+</button>
+</div>
+<button aria-label="Next media" class="media-arrow media-arrow--next" data-media-next="" type="button">
+              ›
+            </button>
+</div>
+</section>
+</div>
+</div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-label="Etherian game information" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div><div aria-hidden="true" class="etherian-popout-layer-stack">
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--1"><img alt="" aria-hidden="true" class="etherian-popout-layer-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-5.jpg"/></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--2"></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--3"></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--4"></div>
+</div>
+<div class="desktop-secondary-panel-content">
+<div class="game-info game-info--etherian">
+<div aria-hidden="true" class="game-info-background">
+<img alt="" class="game-info-background-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-0.jpg"/>
+</div>
+<div aria-hidden="true" class="game-info-layer game-info-layer--rear"></div>
+<div aria-hidden="true" class="game-info-layer game-info-layer--mid"></div>
+<div class="game-info-surface">
+<div class="game-info-top-zone"><header class="game-info-header">
+<img alt="Etherian" class="game-info-logo" src="assets/etherian/etherian-logo.png"/>
+<p class="game-info-kicker">VR ADVENTURE-PLATFORMER</p>
+</header><p class="game-info-blurb">
+      Etherian is an adventure-platforming game with puzzle solving elements
+      where you will have to jump, swing, swim, slide, and climb your way
+      through the beautiful floating world of Etheria. Traverse the fractured
+      scapes to test your skills, uncover the stories of the ancients, or
+      explore the mystical world around you in search of secrets.
+    </p></div>
+<div aria-label="Etherian highlights" class="game-info-features">
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">↗</span>
+<span class="game-info-feature-copy">
+<strong>PHYSICAL TRAVERSAL</strong>
+<small>Climb · Swim · Throw · Zip-line · Hop</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">◇</span>
+<span class="game-info-feature-copy">
+<strong>FOUR SCAPES</strong>
+<small>Orchard · Desert · Winter · Lava</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">◉</span>
+<span class="game-info-feature-copy">
+<strong>ANCIENT RECORDS</strong>
+<small>Discover Etheria through glyph tablets</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">△</span>
+<span class="game-info-feature-copy">
+<strong>EXPLORATION</strong>
+<small>Hidden paths, hand patterns, secrets</small>
+</span>
+</div>
+</div>
+<div class="game-info-bottom-zone"><div class="game-info-facts">
+<div class="game-info-fact">
+<span>PLATFORM</span>
+<strong>PC VR</strong>
+</div>
+<div class="game-info-fact">
+<span>MODE</span>
+<strong>Single Player</strong>
+</div>
+<div class="game-info-fact">
+<span>WORLDS</span>
+<strong>Four Scapes</strong>
+</div>
+</div><div aria-label="Etherian links" class="game-info-actions">
+<button class="game-info-action game-info-action--primary" type="button">VIEW ON STEAM <span aria-hidden="true">›</span>
+</button>
+<button class="game-info-action game-info-action--secondary" type="button">WATCH TRAILER <span aria-hidden="true">›</span>
+</button>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section aria-hidden="true" class="prototype-page-frame" data-page="halodoom" id="halodoom-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
         Structural frame layers.
         JavaScript redraws these from the same live rectangle used by
         the morph target, so the real frame stays aligned to the fake one.
       -->
-      <path
-        class="page-frame-ring"
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-      />
-
-      <path class="page-frame-edge page-frame-edge--outer" />
-      <path class="page-frame-edge page-frame-edge--chrome" />
-      <path class="page-frame-edge page-frame-edge--inner" />
-
-      <path class="page-frame-orange-rail" />
-      <path class="page-frame-orange-highlight" />
-
-      <!-- Decorative rails / micro-HUD details -->
-      <g class="page-frame-side-details page-frame-side-details--left">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-      <g class="page-frame-side-details page-frame-side-details--right">
-        <line class="page-frame-detail-line page-frame-detail-line--long" />
-        <line class="page-frame-detail-line page-frame-detail-line--short" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-        <circle class="page-frame-detail-dot" r="1.4" />
-      </g>
-
-
-      <!-- Bottom-center notch / indicator treatment -->
-      <path class="page-frame-bottom-notch" />
-
-      <g class="page-frame-bottom-dots">
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-        <circle r="1.5" />
-      </g>
-    </svg>
-
-    <!--
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
       Real HTML page content will eventually live here.
       It is intentionally empty for now.
     -->
-    <div class="prototype-page-frame-content" aria-label="Contact page content"></div>
+<div aria-label="Halodoom page content" class="prototype-page-frame-content"><div class="game-page game-page--halodoom">
+<!--
+          Step 1 prototype:
+          structural media-browser shell only.
 
-    <!-- Desktop-only secondary glass panel -->
-    <div class="desktop-secondary-panel" aria-hidden="true">
-      <div class="desktop-secondary-panel-glass"></div>
-      <div class="desktop-secondary-panel-content"></div>
-    </div>
-  </section>
-
+          No real media or carousel behavior yet; these temporary regions
+          let us verify sizing in tablet and desktop frame layouts first.
+        -->
+<section aria-label="Etherian media gallery" class="media-browser" data-media-browser="">
+<div aria-live="polite" class="media-viewer" data-media-viewer="">
+<div class="media-viewer-stage" data-media-viewer-stage=""></div>
+</div>
+<div class="media-strip">
+<button aria-label="Previous media" class="media-arrow media-arrow--previous" data-media-prev="" type="button">
+              ‹
+            </button>
+<div aria-label="Etherian media thumbnails" class="media-thumbnails" data-media-thumbnails="">
+<button aria-label="Show Announcement Trailer" class="media-thumbnail is-selected" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg" data-media-title="Announcement Trailer" data-media-type="youtube" data-youtube-id="f1XcuUs06lQ" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg"/>
+<span class="media-thumbnail-overlay">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">VIDEO</span>
+</span>
+</button>
+<button aria-label="Show Release Trailer" class="media-thumbnail" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg" data-media-title="Release Trailer" data-media-type="youtube" data-youtube-id="mz-zPOR3cC4" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg"/>
+<span class="media-thumbnail-overlay">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">VIDEO</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 1" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-0.jpg" data-media-thumb="assets/etherian/etherian-screenshot-0.jpg" data-media-title="Etherian Screenshot 1" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-0.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 2" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-1.jpg" data-media-thumb="assets/etherian/etherian-screenshot-1.jpg" data-media-title="Etherian Screenshot 2" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-1.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 3" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-2.jpg" data-media-thumb="assets/etherian/etherian-screenshot-2.jpg" data-media-title="Etherian Screenshot 3" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-2.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 4" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-3.jpg" data-media-thumb="assets/etherian/etherian-screenshot-3.jpg" data-media-title="Etherian Screenshot 4" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-3.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 5" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-4.jpg" data-media-thumb="assets/etherian/etherian-screenshot-4.jpg" data-media-title="Etherian Screenshot 5" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-4.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 6" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-5.jpg" data-media-thumb="assets/etherian/etherian-screenshot-5.jpg" data-media-title="Etherian Screenshot 6" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-5.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 7" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-6.jpg" data-media-thumb="assets/etherian/etherian-screenshot-6.jpg" data-media-title="Etherian Screenshot 7" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-6.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 8" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-7.jpg" data-media-thumb="assets/etherian/etherian-screenshot-7.jpg" data-media-title="Etherian Screenshot 8" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-7.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Etherian Screenshot 9" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-8.jpg" data-media-thumb="assets/etherian/etherian-screenshot-8.jpg" data-media-title="Etherian Screenshot 9" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-8.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button>
+<button aria-label="Show Local Video Test" class="media-thumbnail" data-media-item="" data-media-src="assets/simulacrum-loop.mp4" data-media-title="Local Video Test" data-media-type="video" type="button">
+<span class="media-thumbnail-local-video">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">LOCAL VIDEO</span>
+</span>
+</button>
+</div>
+<button aria-label="Next media" class="media-arrow media-arrow--next" data-media-next="" type="button">
+              ›
+            </button>
+</div>
+</section>
+</div></div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-hidden="true" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div>
+<div class="desktop-secondary-panel-content"></div>
+</div>
+</section>
+<section aria-hidden="true" class="prototype-page-frame" data-page="contact" id="contact-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+<div aria-label="Contact page content" class="prototype-page-frame-content"></div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-hidden="true" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div>
+<div class="desktop-secondary-panel-content"></div>
+</div>
+</section>
 </main>
-
 <script src="header-menu.js"></script>
-
 </body>
 </html>
