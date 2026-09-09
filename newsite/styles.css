@@ -9568,3 +9568,7354 @@ body.is-media-lightbox-open {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+
+
+/* =========================================================
+   HALODOOM — first-pass info layout
+   Mirrors the established Etherian layout/material system for now.
+   ========================================================= */
+
+@media (min-width: 1401px){
+#halodoom-page-frame .desktop-secondary-panel-content {
+    top: 3.5%;
+    right: 4.5%;
+    bottom: 3.5%;
+
+    left:
+      calc(
+        var(--secondary-panel-overlap) +
+        3%
+      );
+
+    overflow: visible;
+  }
+#halodoom-page-frame .game-info {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    color: rgba(244, 248, 250, 0.96);
+
+    isolation: isolate;
+  }
+#halodoom-page-frame .game-info-background {
+    position: absolute;
+    inset: 2% 0 4% 14%;
+
+    z-index: 0;
+
+    overflow: hidden;
+
+    opacity: 0.33;
+
+    clip-path:
+      polygon(
+        7% 0,
+        100% 0,
+        100% 90%,
+        93% 100%,
+        0 100%,
+        0 8%
+      );
+
+    pointer-events: none;
+  }
+#halodoom-page-frame .game-info-background-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: 58% 44%;
+
+    filter:
+      saturate(0.88)
+      contrast(0.94)
+      brightness(0.72);
+
+    -webkit-mask-image:
+      linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.16) 18%,
+        rgba(0, 0, 0, 0.70) 54%,
+        rgba(0, 0, 0, 0.92) 100%
+      );
+
+    mask-image:
+      linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.16) 18%,
+        rgba(0, 0, 0, 0.70) 54%,
+        rgba(0, 0, 0, 0.92) 100%
+      );
+  }
+#halodoom-page-frame .game-info-layer {
+    position: absolute;
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.17
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.025
+      );
+
+    clip-path:
+      polygon(
+        5% 0,
+        100% 0,
+        100% 91%,
+        94% 100%,
+        0 100%,
+        0 7%
+      );
+  }
+#halodoom-page-frame .game-info-layer--rear {
+    inset: 0.5% 1.5% 1.5% 5.5%;
+
+    transform:
+      translate(1.6%, -1.4%);
+
+    opacity: 0.58;
+  }
+#halodoom-page-frame .game-info-layer--mid {
+    inset: 2.5% 3.5% 3% 2%;
+
+    transform:
+      translate(-0.8%, 0.7%);
+
+    opacity: 0.78;
+  }
+#halodoom-page-frame .game-info-surface {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto
+      auto;
+
+    align-content: center;
+
+    gap:
+      clamp(10px, 1.15vh, 18px);
+
+    padding:
+      clamp(22px, 2.15vw, 38px)
+      clamp(22px, 2.25vw, 42px)
+      clamp(20px, 2vw, 34px)
+      clamp(24px, 2.4vw, 46px);
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.26
+      );
+
+    background:
+      linear-gradient(
+        105deg,
+        rgba(20, 29, 34, 0.72) 0%,
+        rgba(22, 34, 40, 0.60) 48%,
+        rgba(19, 31, 37, 0.40) 100%
+      );
+
+    backdrop-filter:
+      blur(10px)
+      saturate(112%);
+
+    -webkit-backdrop-filter:
+      blur(10px)
+      saturate(112%);
+
+    clip-path:
+      polygon(
+        5% 0,
+        100% 0,
+        100% 90%,
+        94% 100%,
+        0 100%,
+        0 7%
+      );
+
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+      inset 18px 0 42px rgba(255, 255, 255, 0.018);
+  }
+#halodoom-page-frame .game-info-header {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap:
+      clamp(5px, 0.65vh, 10px);
+
+    min-width: 0;
+  }
+#halodoom-page-frame .game-info-logo {
+    display: block;
+
+    width:
+      min(
+        68%,
+        440px
+      );
+
+    max-height:
+      clamp(70px, 12vh, 132px);
+
+    object-fit: contain;
+    object-position: left center;
+  }
+#halodoom-page-frame .game-info-kicker {
+    margin: 0;
+
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.93
+      );
+
+    font-size:
+      clamp(9px, 0.72vw, 13px);
+
+    font-weight: 700;
+
+    letter-spacing:
+      0.34em;
+  }
+#halodoom-page-frame .game-info-blurb {
+    max-width: 94%;
+
+    margin: 0;
+
+    color:
+      rgba(246, 249, 251, 0.92);
+
+    font-size:
+      clamp(12px, 0.86vw, 16px);
+
+    line-height: 1.48;
+  }
+#halodoom-page-frame .game-info-features {
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    align-content: center;
+
+    gap:
+      clamp(8px, 0.75vw, 14px);
+  }
+#halodoom-page-frame .game-info-feature {
+    min-width: 0;
+
+    display: grid;
+
+    grid-template-columns:
+      clamp(34px, 2.7vw, 48px)
+      minmax(0, 1fr);
+
+    align-items: center;
+
+    gap:
+      clamp(8px, 0.7vw, 13px);
+
+    padding:
+      clamp(7px, 0.65vw, 11px);
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      );
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.075
+        ),
+        rgba(16, 22, 26, 0.18)
+      );
+
+    clip-path:
+      polygon(
+        8px 0,
+        100% 0,
+        100% calc(100% - 8px),
+        calc(100% - 8px) 100%,
+        0 100%,
+        0 8px
+      );
+  }
+#halodoom-page-frame .game-info-feature-icon {
+    display: grid;
+    place-items: center;
+
+    aspect-ratio: 1;
+
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.96
+      );
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.45
+      );
+
+    font-size:
+      clamp(18px, 1.5vw, 26px);
+
+    line-height: 1;
+
+    clip-path:
+      polygon(
+        25% 0,
+        75% 0,
+        100% 25%,
+        100% 75%,
+        75% 100%,
+        25% 100%,
+        0 75%,
+        0 25%
+      );
+  }
+#halodoom-page-frame .game-info-feature-copy {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+  }
+#halodoom-page-frame .game-info-feature-copy strong {
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.96
+      );
+
+    font-size:
+      clamp(8px, 0.61vw, 11px);
+
+    letter-spacing:
+      0.13em;
+  }
+#halodoom-page-frame .game-info-feature-copy small {
+    overflow: hidden;
+
+    color: rgba(232, 239, 243, 0.70);
+
+    font-size:
+      clamp(8px, 0.58vw, 10px);
+
+    line-height: 1.25;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+  }
+#halodoom-page-frame .game-info-facts {
+    display: grid;
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    border-top:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    border-bottom:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      );
+  }
+#halodoom-page-frame .game-info-fact {
+    position: relative;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding:
+      clamp(9px, 0.75vw, 13px)
+      clamp(8px, 0.8vw, 14px);
+  }
+#halodoom-page-frame
+  .game-info-fact +
+  .game-info-fact::before {
+    content: "";
+
+    position: absolute;
+
+    top: 22%;
+    bottom: 22%;
+    left: 0;
+
+    width: 1px;
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+  }
+#halodoom-page-frame .game-info-fact span {
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.78
+      );
+
+    font-size:
+      clamp(8px, 0.58vw, 10px);
+
+    letter-spacing:
+      0.18em;
+  }
+#halodoom-page-frame .game-info-fact strong {
+    overflow: hidden;
+
+    color: rgba(244, 248, 250, 0.92);
+
+    font-size:
+      clamp(10px, 0.72vw, 13px);
+
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+  }
+#halodoom-page-frame .game-info-actions {
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1.35fr)
+      minmax(0, 0.9fr);
+
+    gap:
+      clamp(10px, 0.85vw, 16px);
+  }
+#halodoom-page-frame .game-info-action {
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding:
+      clamp(10px, 0.8vw, 14px)
+      clamp(14px, 1vw, 18px);
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.48
+      );
+
+    background:
+      rgba(15, 21, 25, 0.42);
+
+    color: rgba(248, 251, 252, 0.96);
+
+    font: inherit;
+
+    font-size:
+      clamp(9px, 0.68vw, 12px);
+
+    font-weight: 700;
+
+    letter-spacing:
+      0.11em;
+
+    cursor: default;
+
+    clip-path:
+      polygon(
+        10px 0,
+        100% 0,
+        100% calc(100% - 10px),
+        calc(100% - 10px) 100%,
+        0 100%,
+        0 10px
+      );
+  }
+#halodoom-page-frame .game-info-action--primary {
+    background:
+      linear-gradient(
+        110deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.30
+        ),
+        rgba(
+          var(--page-accent-rgb),
+          0.10
+        )
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 0.78fr)
+      auto
+      auto;
+
+    gap:
+      clamp(12px, 1.35vh, 20px);
+
+    padding-top:
+      clamp(26px, 2.55vw, 44px);
+  }
+#halodoom-page-frame .game-info-header {
+    gap:
+      clamp(7px, 0.8vh, 12px);
+  }
+#halodoom-page-frame .game-info-logo {
+    width:
+      min(
+        70%,
+        460px
+      );
+  }
+#halodoom-page-frame .game-info-blurb {
+    max-width: 91%;
+
+    line-height: 1.54;
+  }
+#halodoom-page-frame .game-info-background {
+    inset: 0.5% -0.5% 1.5% 9%;
+
+    opacity: 0.47;
+  }
+#halodoom-page-frame .game-info-background-image {
+    object-position: 60% 42%;
+
+    filter:
+      saturate(0.94)
+      contrast(0.96)
+      brightness(0.78);
+
+    -webkit-mask-image:
+      linear-gradient(
+        102deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.06) 13%,
+        rgba(0, 0, 0, 0.36) 35%,
+        rgba(0, 0, 0, 0.82) 66%,
+        rgba(0, 0, 0, 0.96) 100%
+      );
+
+    mask-image:
+      linear-gradient(
+        102deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.06) 13%,
+        rgba(0, 0, 0, 0.36) 35%,
+        rgba(0, 0, 0, 0.82) 66%,
+        rgba(0, 0, 0, 0.96) 100%
+      );
+  }
+#halodoom-page-frame .game-info-features {
+    gap:
+      clamp(6px, 0.55vw, 10px)
+      clamp(14px, 1.05vw, 20px);
+
+    padding:
+      clamp(5px, 0.4vw, 8px)
+      0;
+
+    border-top:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    border-bottom:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.14
+      );
+  }
+#halodoom-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(30px, 2.35vw, 42px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(8px, 0.65vw, 12px);
+
+    padding:
+      clamp(7px, 0.5vw, 9px)
+      clamp(5px, 0.4vw, 8px);
+
+    border: 0;
+
+    background: transparent;
+
+    clip-path: none;
+  }
+#halodoom-page-frame .game-info-feature-icon {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.34
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.045
+      );
+
+    font-size:
+      clamp(16px, 1.25vw, 22px);
+  }
+#halodoom-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(8px, 0.59vw, 10.5px);
+
+    letter-spacing:
+      0.14em;
+  }
+#halodoom-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(7.5px, 0.54vw, 9.5px);
+
+    color:
+      rgba(232, 239, 243, 0.64);
+  }
+#halodoom-page-frame .game-info-facts {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.035
+        ),
+        rgba(12, 18, 22, 0.08)
+      );
+  }
+#halodoom-page-frame .game-info-fact {
+    padding-top:
+      clamp(8px, 0.65vw, 11px);
+
+    padding-bottom:
+      clamp(8px, 0.65vw, 11px);
+  }
+#halodoom-page-frame .game-info-action--primary {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.62
+      );
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.34
+        ),
+        rgba(
+          var(--page-accent-rgb),
+          0.12
+        )
+      );
+  }
+#halodoom-page-frame .game-info-action--secondary {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    color:
+      rgba(238, 244, 247, 0.84);
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-background {
+    
+    inset:
+      -1.2%
+      -0.8%
+      8%
+      31%;
+
+    opacity: 0.54;
+
+    overflow: hidden;
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.028
+      );
+
+    clip-path:
+      polygon(
+        7% 0,
+        100% 0,
+        100% 86%,
+        93% 100%,
+        0 100%,
+        0 10%
+      );
+
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.018);
+  }
+#halodoom-page-frame .game-info-background::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(17, 27, 32, 0.92) 0%,
+        rgba(17, 27, 32, 0.60) 27%,
+        rgba(17, 27, 32, 0.22) 58%,
+        rgba(17, 27, 32, 0.08) 100%
+      );
+  }
+#halodoom-page-frame .game-info-background-image {
+    width: 112%;
+    height: 112%;
+
+    transform:
+      translate(
+        -4%,
+        -5%
+      );
+
+    object-fit: cover;
+
+    
+    object-position: 69% 30%;
+
+    filter:
+      saturate(0.90)
+      contrast(0.92)
+      brightness(0.74);
+
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+#halodoom-page-frame .game-info-layer--rear {
+    inset:
+      -1.3%
+      0.4%
+      0.8%
+      6.8%;
+
+    transform:
+      translate(
+        2.2%,
+        -1.2%
+      );
+
+    opacity: 0.64;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.15
+      );
+  }
+#halodoom-page-frame .game-info-layer--mid {
+    inset:
+      1.4%
+      2.3%
+      2%
+      1.2%;
+
+    transform:
+      translate(
+        -0.5%,
+        0.9%
+      );
+
+    opacity: 0.82;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      );
+  }
+#halodoom-page-frame .game-info::after {
+    content: "";
+
+    position: absolute;
+
+    z-index: 3;
+
+    top: 18%;
+    right: 0.35%;
+
+    width: 2px;
+    height: 28%;
+
+    background:
+      linear-gradient(
+        to bottom,
+        transparent,
+        rgba(
+          var(--page-accent-rgb),
+          0.62
+        ) 18%,
+        rgba(
+          var(--page-accent-rgb),
+          0.28
+        ) 76%,
+        transparent
+      );
+
+    box-shadow:
+      0 0 14px
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    pointer-events: none;
+  }
+#halodoom-page-frame .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 0.70fr)
+      auto
+      auto;
+
+    gap:
+      clamp(11px, 1.22vh, 18px);
+
+    padding:
+      clamp(26px, 2.35vw, 42px)
+      clamp(24px, 2.2vw, 40px)
+      clamp(22px, 1.9vw, 34px)
+      clamp(28px, 2.55vw, 48px);
+
+    background:
+      linear-gradient(
+        102deg,
+        rgba(18, 27, 32, 0.80) 0%,
+        rgba(20, 31, 36, 0.67) 43%,
+        rgba(18, 30, 35, 0.47) 72%,
+        rgba(18, 30, 35, 0.34) 100%
+      );
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.30
+      );
+
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.032),
+      inset 28px 0 56px rgba(255,255,255,0.012),
+      inset -1px 0 0
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      );
+  }
+#halodoom-page-frame .game-info-logo {
+    width:
+      min(
+        67%,
+        450px
+      );
+
+    margin-left:
+      -0.6%;
+  }
+#halodoom-page-frame .game-info-kicker {
+    letter-spacing:
+      0.31em;
+
+    opacity: 0.94;
+  }
+#halodoom-page-frame .game-info-blurb {
+    max-width: 89%;
+
+    font-size:
+      clamp(12px, 0.84vw, 15px);
+
+    line-height: 1.52;
+  }
+#halodoom-page-frame .game-info-features {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    column-gap:
+      clamp(18px, 1.3vw, 24px);
+
+    row-gap:
+      clamp(7px, 0.6vw, 11px);
+
+    padding:
+      clamp(7px, 0.55vw, 10px)
+      0;
+
+    border-top-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      );
+
+    border-bottom-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.13
+      );
+  }
+#halodoom-page-frame .game-info-feature {
+    position: relative;
+
+    padding:
+      clamp(6px, 0.48vw, 9px)
+      clamp(4px, 0.3vw, 6px);
+  }
+#halodoom-page-frame .game-info-feature::after {
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+    bottom: 0;
+
+    width:
+      clamp(18px, 1.8vw, 30px);
+
+    height: 1px;
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.13
+      );
+  }
+#halodoom-page-frame .game-info-feature-icon {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.08
+        ),
+        rgba(12, 18, 22, 0.05)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.035
+      );
+  }
+#halodoom-page-frame .game-info-feature-copy strong {
+    line-height: 1.15;
+  }
+#halodoom-page-frame .game-info-feature-copy small {
+    line-height: 1.22;
+  }
+#halodoom-page-frame .game-info-facts {
+    border-top-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+
+    border-bottom-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.028
+        ),
+        rgba(12, 18, 22, 0.055)
+      );
+  }
+#halodoom-page-frame .game-info-fact span {
+    font-size:
+      clamp(7.5px, 0.54vw, 9.5px);
+
+    letter-spacing:
+      0.19em;
+  }
+#halodoom-page-frame .game-info-fact strong {
+    font-size:
+      clamp(9.5px, 0.68vw, 12.5px);
+  }
+#halodoom-page-frame .game-info-actions {
+    grid-template-columns:
+      minmax(0, 1.42fr)
+      minmax(0, 0.88fr);
+
+    gap:
+      clamp(11px, 0.9vw, 17px);
+  }
+#halodoom-page-frame .game-info-action {
+    padding-top:
+      clamp(10px, 0.72vw, 13px);
+
+    padding-bottom:
+      clamp(10px, 0.72vw, 13px);
+  }
+#halodoom-page-frame .game-info-action--primary {
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.12
+      ),
+      0 0 18px
+      rgba(
+        var(--page-accent-rgb),
+        0.055
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-background,
+  #halodoom-page-frame .game-info-layer--rear,
+  #halodoom-page-frame .game-info-layer--mid,
+  #halodoom-page-frame .game-info::after {
+    display: none !important;
+  }
+#halodoom-page-frame .game-info-surface {
+    border: 0;
+
+    background: transparent;
+
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    clip-path: none;
+
+    box-shadow: none;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .desktop-secondary-panel {
+    --etherian-glass-angle:
+      calc(
+        var(--button-shear-angle) * -1
+      );
+
+    
+    --etherian-stack-cut-rise:
+      clamp(42px, 4.1vw, 68px);
+
+    --etherian-stack-cut-run:
+      calc(
+        var(--etherian-stack-cut-rise)
+        *
+        tan(
+          var(--etherian-glass-angle)
+        )
+      );
+  }
+#halodoom-page-frame .etherian-popout-layer-stack {
+    position: absolute;
+    inset: 0;
+
+    z-index: 1;
+
+    overflow: hidden;
+
+    
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--etherian-stack-cut-run)
+        ) 0,
+        100%
+        var(--etherian-stack-cut-rise),
+        100%
+        calc(
+          100% -
+          var(--etherian-stack-cut-rise)
+        ),
+        calc(
+          100% -
+          var(--etherian-stack-cut-run)
+        ) 100%,
+        0 100%
+      );
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transition:
+      opacity 220ms ease;
+
+    
+  }
+#halodoom-page-frame.is-secondary-open
+  .etherian-popout-layer-stack {
+    opacity: 1;
+
+    transition-delay:
+      calc(
+        var(--secondary-panel-duration) * 0.74
+      );
+  }
+#halodoom-page-frame .etherian-popout-glass-layer {
+    position: absolute;
+
+    
+    --layer-cut-rise:
+      clamp(44px, 4.8vw, 78px);
+
+    --layer-cut-run:
+      calc(
+        var(--layer-cut-rise)
+        *
+        tan(
+          var(--etherian-glass-angle)
+        )
+      );
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(255,255,255,0.022),
+        rgba(
+          var(--page-accent-rgb),
+          0.034
+        ) 45%,
+        rgba(20,28,34,0.020)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255,255,255,0.018);
+
+    backdrop-filter:
+      blur(2px)
+      saturate(108%);
+
+    -webkit-backdrop-filter:
+      blur(2px)
+      saturate(108%);
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--1 {
+    z-index: 1;
+
+    inset:
+      2.5%
+      1.7%
+      5.5%
+      0;
+
+    --layer-cut-rise:
+      clamp(54px, 5.4vw, 86px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100%
+        calc(
+          100% -
+          var(--layer-cut-rise)
+        ),
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 100%,
+        0 100%
+      );
+
+    opacity: 0.42;
+
+    border-color:
+      rgba(
+        220, 230, 242,
+        0.18
+      );
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--2 {
+    z-index: 2;
+
+    inset:
+      7.5%
+      6.2%
+      8.5%
+      0;
+
+    --layer-cut-rise:
+      clamp(62px, 6.1vw, 96px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100%
+        calc(
+          100% -
+          var(--layer-cut-rise) * 0.42
+        ),
+        calc(
+          100% -
+          var(--layer-cut-run) * 0.42
+        ) 100%,
+        0 100%
+      );
+
+    opacity: 0.50;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      );
+
+    background:
+      linear-gradient(
+        118deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.022
+        ),
+        rgba(255,255,255,0.018)
+      );
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--3 {
+    z-index: 3;
+
+    inset:
+      11.5%
+      12.2%
+      13.5%
+      0;
+
+    --layer-cut-rise:
+      clamp(70px, 7vw, 110px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100% 100%,
+        0 100%
+      );
+
+    opacity: 0.58;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(255,255,255,0.016),
+        rgba(
+          var(--page-accent-rgb),
+          0.045
+        )
+      );
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--4 {
+    z-index: 4;
+
+    left: 0;
+    right: 13.6%;
+    top: 49%;
+    bottom: 0;
+
+    --layer-cut-rise:
+      clamp(46px, 4.8vw, 76px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100% 100%,
+        0 100%
+      );
+
+    opacity: 0.66;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+
+    background:
+      linear-gradient(
+        108deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.040
+        ),
+        rgba(255,255,255,0.018)
+      );
+  }
+#halodoom-page-frame .desktop-secondary-panel-glass {
+    z-index: 0;
+  }
+#halodoom-page-frame .desktop-secondary-panel-content {
+    z-index: 2;
+  }
+#halodoom-page-frame .game-info {
+    z-index: 2;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .etherian-popout-glass-layer {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(255,255,255,0.055),
+        rgba(
+          var(--page-accent-rgb),
+          0.085
+        ) 44%,
+        rgba(26,36,42,0.055)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255,255,255,0.032);
+
+    backdrop-filter:
+      blur(4px)
+      saturate(112%);
+
+    -webkit-backdrop-filter:
+      blur(4px)
+      saturate(112%);
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--1 {
+    opacity: 0.62;
+
+    border-color:
+      rgba(
+        220, 230, 242,
+        0.26
+      );
+
+    background:
+      linear-gradient(
+        116deg,
+        rgba(255,255,255,0.060),
+        rgba(177,202,216,0.065) 52%,
+        rgba(28,36,42,0.040)
+      );
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--2 {
+    opacity: 0.70;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    background:
+      linear-gradient(
+        118deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.070
+        ),
+        rgba(255,255,255,0.050)
+      );
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--3 {
+    opacity: 0.76;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.32
+      );
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(255,255,255,0.045),
+        rgba(
+          var(--page-accent-rgb),
+          0.095
+        )
+      );
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--4 {
+    opacity: 0.82;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.35
+      );
+
+    background:
+      linear-gradient(
+        108deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.105
+        ),
+        rgba(255,255,255,0.048)
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .etherian-popout-glass-layer--1 {
+    opacity: 0.50;
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--2 {
+    opacity: 0.58;
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--3 {
+    opacity: 0.64;
+  }
+#halodoom-page-frame .etherian-popout-glass-layer--4 {
+    right: 20%;
+    opacity: 0.70;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .etherian-popout-glass-layer {
+    border-color: transparent !important;
+    border-width: 0 !important;
+  }
+#halodoom-page-frame .etherian-popout-glass-layer {
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255, 255, 255, 0.018);
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .etherian-popout-glass-layer--3 {
+    clip-path:
+      polygon(
+        0 0,
+
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+
+        100%
+        var(--layer-cut-rise),
+
+        100%
+        calc(
+          100% -
+          var(--layer-cut-rise) * 0.42
+        ),
+
+        calc(
+          100% -
+          var(--layer-cut-run) * 0.42
+        ) 100%,
+
+        0 100%
+      );
+  }
+#halodoom-page-frame .game-info-features {
+    transition:
+      opacity 120ms ease;
+  }
+#halodoom-page-frame
+  .game-info-features.is-crowded {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-surface {
+    align-content: stretch;
+
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto
+      auto;
+  }
+#halodoom-page-frame .game-info-header {
+    align-self: start;
+  }
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        250px,
+        30vw,
+        430px
+      );
+
+    max-width: 62%;
+
+    max-height:
+      clamp(
+        76px,
+        11vh,
+        126px
+      );
+
+    margin-left: 0;
+  }
+#halodoom-page-frame .game-info-blurb {
+    width: min(100%, 76ch);
+    max-width: 76ch;
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-surface {
+    gap:
+      clamp(8px, 0.9vh, 13px);
+
+    padding:
+      clamp(20px, 1.75vw, 30px)
+      clamp(20px, 1.7vw, 30px)
+      clamp(18px, 1.55vw, 27px)
+      clamp(22px, 1.9vw, 34px);
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-header {
+    gap:
+      clamp(4px, 0.5vh, 7px);
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-logo {
+    width:
+      clamp(
+        220px,
+        25vw,
+        350px
+      );
+
+    max-width: 58%;
+
+    max-height:
+      clamp(
+        66px,
+        9.5vh,
+        104px
+      );
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-kicker {
+    font-size:
+      clamp(8px, 0.62vw, 11px);
+
+    letter-spacing: 0.27em;
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-blurb {
+    width: min(100%, 70ch);
+    max-width: 70ch;
+
+    font-size:
+      clamp(11px, 0.76vw, 13.5px);
+
+    line-height: 1.43;
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-features {
+    column-gap:
+      clamp(12px, 0.9vw, 18px);
+
+    row-gap:
+      clamp(5px, 0.42vw, 8px);
+
+    padding:
+      clamp(4px, 0.36vw, 7px)
+      0;
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-feature {
+    grid-template-columns:
+      clamp(27px, 2.15vw, 36px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(6px, 0.5vw, 9px);
+
+    padding:
+      clamp(4px, 0.34vw, 6px)
+      clamp(3px, 0.26vw, 5px);
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-feature-icon {
+    font-size:
+      clamp(14px, 1.12vw, 20px);
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-feature-copy strong {
+    font-size:
+      clamp(7.5px, 0.53vw, 9.5px);
+
+    letter-spacing: 0.12em;
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-feature-copy small {
+    font-size:
+      clamp(7px, 0.49vw, 8.8px);
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-fact {
+    gap: 2px;
+
+    padding:
+      clamp(6px, 0.48vw, 8px)
+      clamp(6px, 0.58vw, 10px);
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-actions {
+    gap:
+      clamp(8px, 0.62vw, 11px);
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-action {
+    padding:
+      clamp(8px, 0.6vw, 10px)
+      clamp(11px, 0.8vw, 14px);
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-surface {
+    gap:
+      clamp(6px, 0.68vh, 9px);
+
+    padding:
+      clamp(16px, 1.35vw, 22px)
+      clamp(17px, 1.4vw, 24px)
+      clamp(15px, 1.25vw, 21px)
+      clamp(18px, 1.55vw, 27px);
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-logo {
+    width:
+      clamp(
+        190px,
+        21vw,
+        290px
+      );
+
+    max-width: 54%;
+
+    max-height:
+      clamp(
+        58px,
+        8vh,
+        86px
+      );
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-kicker {
+    font-size:
+      clamp(7.5px, 0.56vw, 9.5px);
+
+    letter-spacing: 0.23em;
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-blurb {
+    width: min(100%, 64ch);
+    max-width: 64ch;
+
+    font-size:
+      clamp(10.5px, 0.7vw, 12.5px);
+
+    line-height: 1.38;
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-features {
+    column-gap:
+      clamp(9px, 0.65vw, 13px);
+
+    row-gap: 4px;
+
+    padding: 3px 0;
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-feature {
+    grid-template-columns:
+      clamp(24px, 1.85vw, 31px)
+      minmax(0, 1fr);
+
+    gap: 5px;
+
+    padding: 3px 2px;
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-feature-icon {
+    font-size:
+      clamp(12px, 0.92vw, 17px);
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-feature-copy strong {
+    font-size:
+      clamp(7px, 0.48vw, 8.5px);
+
+    letter-spacing: 0.10em;
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-feature-copy small {
+    font-size:
+      clamp(6.7px, 0.45vw, 8px);
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-fact {
+    padding:
+      5px
+      clamp(5px, 0.46vw, 8px);
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-fact span {
+    font-size:
+      clamp(7px, 0.48vw, 8.5px);
+
+    letter-spacing: 0.15em;
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-fact strong {
+    font-size:
+      clamp(9px, 0.6vw, 11px);
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-action {
+    padding:
+      7px
+      clamp(9px, 0.68vw, 12px);
+
+    font-size:
+      clamp(8px, 0.58vw, 10px);
+
+    letter-spacing: 0.09em;
+  }
+#halodoom-page-frame
+  .game-info-features.is-crowded {
+    transition:
+      opacity 130ms ease;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-surface,
+  #halodoom-page-frame .game-info-header,
+  #halodoom-page-frame .game-info-logo,
+  #halodoom-page-frame .game-info-kicker,
+  #halodoom-page-frame .game-info-blurb,
+  #halodoom-page-frame .game-info-features,
+  #halodoom-page-frame .game-info-feature,
+  #halodoom-page-frame .game-info-feature-icon,
+  #halodoom-page-frame .game-info-feature-copy strong,
+  #halodoom-page-frame .game-info-feature-copy small,
+  #halodoom-page-frame .game-info-fact,
+  #halodoom-page-frame .game-info-fact span,
+  #halodoom-page-frame .game-info-fact strong,
+  #halodoom-page-frame .game-info-actions,
+  #halodoom-page-frame .game-info-action {
+    transition:
+      width 210ms ease,
+      max-width 210ms ease,
+      max-height 210ms ease,
+      padding 210ms ease,
+      gap 210ms ease,
+      font-size 210ms ease,
+      line-height 210ms ease,
+      letter-spacing 210ms ease,
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+#halodoom-page-frame .game-info-surface {
+    padding:
+      clamp(16px, 1.65cqw, 34px)
+      clamp(17px, 1.55cqw, 32px)
+      clamp(15px, 1.45cqw, 29px)
+      clamp(18px, 1.75cqw, 36px);
+
+    gap:
+      clamp(7px, 0.78cqh, 14px);
+  }
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        220px,
+        27cqw,
+        390px
+      );
+
+    max-width: 60%;
+
+    max-height:
+      clamp(
+        66px,
+        10cqh,
+        112px
+      );
+  }
+#halodoom-page-frame .game-info-kicker {
+    font-size:
+      clamp(8px, 0.60cqw, 11px);
+
+    letter-spacing:
+      clamp(0.22em, 0.26em, 0.28em);
+  }
+#halodoom-page-frame .game-info-blurb {
+    width:
+      min(
+        100%,
+        clamp(
+          58ch,
+          67cqw,
+          76ch
+        )
+      );
+
+    max-width: 76ch;
+
+    font-size:
+      clamp(10.8px, 0.70cqw, 13.5px);
+
+    line-height:
+      clamp(1.38, 1.42, 1.46);
+  }
+#halodoom-page-frame .game-info-features {
+    column-gap:
+      clamp(10px, 0.85cqw, 18px);
+
+    row-gap:
+      clamp(4px, 0.38cqw, 8px);
+
+    padding:
+      clamp(3px, 0.32cqw, 7px)
+      0;
+  }
+#halodoom-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(25px, 2cqw, 36px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(5px, 0.46cqw, 9px);
+
+    padding:
+      clamp(3px, 0.3cqw, 6px)
+      clamp(2px, 0.24cqw, 5px);
+  }
+#halodoom-page-frame .game-info-feature-icon {
+    font-size:
+      clamp(13px, 1.02cqw, 20px);
+  }
+#halodoom-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(7.3px, 0.50cqw, 9.5px);
+
+    letter-spacing:
+      clamp(0.10em, 0.115em, 0.12em);
+  }
+#halodoom-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(6.9px, 0.46cqw, 8.8px);
+  }
+#halodoom-page-frame .game-info-fact {
+    padding:
+      clamp(5px, 0.44cqw, 8px)
+      clamp(5px, 0.54cqw, 10px);
+  }
+#halodoom-page-frame .game-info-action {
+    padding:
+      clamp(7px, 0.56cqw, 10px)
+      clamp(9px, 0.74cqw, 14px);
+
+    font-size:
+      clamp(8px, 0.55cqw, 10px);
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-logo {
+    max-width: 57%;
+  }
+#halodoom-page-frame.is-info-compact
+  .game-info-blurb {
+    max-width: 70ch;
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-features {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform:
+      translateY(-4px);
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 0.18fr)
+      auto
+      auto;
+  }
+#halodoom-page-frame
+  .game-info-features.is-crowded {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform:
+      translateY(-4px);
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-logo,
+  #halodoom-page-frame.is-info-compact .game-info-logo,
+  #halodoom-page-frame.is-info-tight .game-info-logo {
+    width:
+      clamp(
+        270px,
+        29cqw,
+        410px
+      );
+
+    max-width: 61%;
+
+    max-height:
+      clamp(
+        78px,
+        10.5cqh,
+        116px
+      );
+  }
+#halodoom-page-frame .game-info-kicker,
+  #halodoom-page-frame.is-info-compact .game-info-kicker,
+  #halodoom-page-frame.is-info-tight .game-info-kicker {
+    font-size:
+      clamp(
+        9px,
+        0.60cqw,
+        11px
+      );
+
+    letter-spacing: 0.27em;
+  }
+#halodoom-page-frame .game-info-blurb,
+  #halodoom-page-frame.is-info-compact .game-info-blurb,
+  #halodoom-page-frame.is-info-tight .game-info-blurb {
+    width:
+      min(
+        100%,
+        clamp(
+          62ch,
+          68cqw,
+          76ch
+        )
+      );
+
+    max-width: 76ch;
+
+    font-size:
+      clamp(
+        11.8px,
+        0.72cqw,
+        13.8px
+      );
+
+    line-height: 1.44;
+  }
+#halodoom-page-frame .game-info-feature,
+  #halodoom-page-frame.is-info-compact .game-info-feature,
+  #halodoom-page-frame.is-info-tight .game-info-feature {
+    grid-template-columns:
+      clamp(30px, 2.05cqw, 38px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(6px, 0.46cqw, 9px);
+
+    padding:
+      clamp(4px, 0.32cqw, 7px)
+      clamp(3px, 0.25cqw, 6px);
+  }
+#halodoom-page-frame .game-info-feature-icon,
+  #halodoom-page-frame.is-info-compact .game-info-feature-icon,
+  #halodoom-page-frame.is-info-tight .game-info-feature-icon {
+    font-size:
+      clamp(
+        15px,
+        1.02cqw,
+        20px
+      );
+  }
+#halodoom-page-frame .game-info-feature-copy strong,
+  #halodoom-page-frame.is-info-compact .game-info-feature-copy strong,
+  #halodoom-page-frame.is-info-tight .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        8px,
+        0.51cqw,
+        9.5px
+      );
+  }
+#halodoom-page-frame .game-info-feature-copy small,
+  #halodoom-page-frame.is-info-compact .game-info-feature-copy small,
+  #halodoom-page-frame.is-info-tight .game-info-feature-copy small {
+    font-size:
+      clamp(
+        7.5px,
+        0.47cqw,
+        8.8px
+      );
+  }
+#halodoom-page-frame.is-info-tight .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto
+      auto;
+  }
+#halodoom-page-frame.is-info-tight .game-info-features,
+  #halodoom-page-frame .game-info-features.is-crowded {
+    opacity: 0;
+
+    
+    visibility: visible;
+
+    pointer-events: none;
+
+    transform:
+      translateY(-3px);
+  }
+#halodoom-page-frame .game-info-fact,
+  #halodoom-page-frame.is-info-compact .game-info-fact,
+  #halodoom-page-frame.is-info-tight .game-info-fact {
+    padding:
+      clamp(7px, 0.46cqw, 10px)
+      clamp(7px, 0.55cqw, 11px);
+  }
+#halodoom-page-frame .game-info-fact span,
+  #halodoom-page-frame.is-info-compact .game-info-fact span,
+  #halodoom-page-frame.is-info-tight .game-info-fact span {
+    font-size:
+      clamp(
+        8px,
+        0.49cqw,
+        9.5px
+      );
+  }
+#halodoom-page-frame .game-info-fact strong,
+  #halodoom-page-frame.is-info-compact .game-info-fact strong,
+  #halodoom-page-frame.is-info-tight .game-info-fact strong {
+    font-size:
+      clamp(
+        10px,
+        0.62cqw,
+        12px
+      );
+  }
+#halodoom-page-frame .game-info-actions,
+  #halodoom-page-frame.is-info-compact .game-info-actions,
+  #halodoom-page-frame.is-info-tight .game-info-actions {
+    grid-template-columns:
+      minmax(0, 1.25fr)
+      minmax(0, 0.95fr);
+
+    gap:
+      clamp(
+        9px,
+        0.65cqw,
+        13px
+      );
+  }
+#halodoom-page-frame .game-info-action,
+  #halodoom-page-frame.is-info-compact .game-info-action,
+  #halodoom-page-frame.is-info-tight .game-info-action {
+    min-height:
+      clamp(
+        40px,
+        4.7cqh,
+        48px
+      );
+
+    padding:
+      0
+      clamp(
+        12px,
+        0.78cqw,
+        16px
+      );
+
+    gap:
+      clamp(
+        8px,
+        0.55cqw,
+        12px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.57cqw,
+        11px
+      );
+
+    letter-spacing: 0.10em;
+  }
+#halodoom-page-frame .game-info-surface,
+  #halodoom-page-frame .game-info-header,
+  #halodoom-page-frame .game-info-logo,
+  #halodoom-page-frame .game-info-kicker,
+  #halodoom-page-frame .game-info-blurb,
+  #halodoom-page-frame .game-info-feature,
+  #halodoom-page-frame .game-info-feature-icon,
+  #halodoom-page-frame .game-info-feature-copy strong,
+  #halodoom-page-frame .game-info-feature-copy small,
+  #halodoom-page-frame .game-info-fact,
+  #halodoom-page-frame .game-info-fact span,
+  #halodoom-page-frame .game-info-fact strong,
+  #halodoom-page-frame .game-info-actions,
+  #halodoom-page-frame .game-info-action {
+    transition: none;
+  }
+#halodoom-page-frame .game-info-features {
+    transition:
+      opacity 190ms ease,
+      transform 190ms ease;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-surface {
+    align-content: start;
+
+    grid-template-rows:
+      auto
+      auto
+      auto
+      auto
+      auto;
+
+    row-gap:
+      clamp(
+        8px,
+        0.72cqh,
+        14px
+      );
+  }
+#halodoom-page-frame .game-info-features {
+    align-content: start;
+
+    min-height: 0;
+
+    max-height: 180px;
+
+    margin-block:
+      clamp(
+        2px,
+        0.22cqh,
+        5px
+      );
+
+    overflow: hidden;
+
+    transition:
+      opacity 190ms ease,
+      transform 190ms ease,
+      max-height 220ms ease,
+      margin 220ms ease;
+  }
+#halodoom-page-frame
+  .game-info-features.is-crowded,
+  #halodoom-page-frame
+  .game-info-features.is-structure-hidden {
+    opacity: 0;
+
+    max-height: 0;
+
+    margin-block: 0;
+
+    transform:
+      translateY(-3px);
+
+    pointer-events: none;
+  }
+#halodoom-page-frame.is-info-tight
+  .game-info-features {
+    opacity: 1;
+
+    max-height: 180px;
+
+    margin-block:
+      clamp(
+        1px,
+        0.15cqh,
+        4px
+      );
+
+    transform: none;
+
+    pointer-events: auto;
+  }
+#halodoom-page-frame .game-info-header {
+    margin-bottom:
+      clamp(
+        1px,
+        0.18cqh,
+        4px
+      );
+  }
+#halodoom-page-frame .game-info-blurb {
+    margin-bottom:
+      clamp(
+        2px,
+        0.25cqh,
+        5px
+      );
+  }
+#halodoom-page-frame .game-info-facts {
+    margin-top:
+      clamp(
+        2px,
+        0.22cqh,
+        5px
+      );
+  }
+#halodoom-page-frame .game-info-actions {
+    margin-top:
+      clamp(
+        1px,
+        0.16cqh,
+        4px
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-surface {
+    --feature-zone-height: 118px;
+
+    display: grid;
+
+    grid-template-rows:
+      auto
+      var(--feature-zone-height)
+      auto;
+
+    align-content: center;
+
+    row-gap:
+      clamp(
+        11px,
+        1.25cqh,
+        20px
+      );
+
+    padding:
+      clamp(22px, 3.2cqh, 40px)
+      clamp(20px, 1.65cqw, 34px)
+      clamp(20px, 2.9cqh, 36px)
+      clamp(22px, 1.8cqw, 38px);
+
+    transition:
+      grid-template-rows 230ms
+      cubic-bezier(0.2, 0.78, 0.24, 1),
+      row-gap 180ms ease,
+      padding 180ms ease;
+  }
+#halodoom-page-frame.is-info-compact .game-info-surface,
+  #halodoom-page-frame.is-info-tight .game-info-surface {
+    grid-template-rows:
+      auto
+      var(--feature-zone-height)
+      auto;
+
+    align-content: center;
+  }
+#halodoom-page-frame .game-info-top-zone,
+  #halodoom-page-frame .game-info-bottom-zone {
+    min-width: 0;
+
+    display: grid;
+
+    align-content: start;
+  }
+#halodoom-page-frame .game-info-top-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.68cqh,
+        11px
+      );
+  }
+#halodoom-page-frame .game-info-bottom-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.62cqh,
+        11px
+      );
+  }
+#halodoom-page-frame .game-info-header,
+  #halodoom-page-frame .game-info-blurb,
+  #halodoom-page-frame .game-info-facts,
+  #halodoom-page-frame .game-info-actions {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+#halodoom-page-frame .game-info-logo,
+  #halodoom-page-frame.is-info-compact .game-info-logo,
+  #halodoom-page-frame.is-info-tight .game-info-logo {
+    width:
+      clamp(
+        280px,
+        28cqw,
+        405px
+      );
+
+    max-width: 60%;
+
+    max-height:
+      clamp(
+        80px,
+        10.5cqh,
+        116px
+      );
+  }
+#halodoom-page-frame .game-info-blurb,
+  #halodoom-page-frame.is-info-compact .game-info-blurb,
+  #halodoom-page-frame.is-info-tight .game-info-blurb {
+    width:
+      min(
+        100%,
+        74ch
+      );
+
+    max-width: 74ch;
+
+    font-size:
+      clamp(
+        11.8px,
+        0.72cqw,
+        13.8px
+      );
+
+    line-height: 1.44;
+  }
+#halodoom-page-frame .game-info-features,
+  #halodoom-page-frame.is-info-tight .game-info-features,
+  #halodoom-page-frame
+  .game-info-features.is-crowded {
+    min-height: 0;
+    height: 100%;
+    max-height: none;
+
+    margin: 0;
+
+    align-content: center;
+
+    overflow: hidden;
+
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+
+    transition:
+      opacity 170ms ease;
+  }
+#halodoom-page-frame
+  .game-info-surface.is-features-collapsed
+  .game-info-features {
+    opacity: 0;
+
+    pointer-events: none;
+  }
+#halodoom-page-frame .game-info-fact,
+  #halodoom-page-frame.is-info-compact .game-info-fact,
+  #halodoom-page-frame.is-info-tight .game-info-fact {
+    padding:
+      clamp(7px, 0.48cqw, 10px)
+      clamp(7px, 0.56cqw, 11px);
+  }
+#halodoom-page-frame .game-info-action,
+  #halodoom-page-frame.is-info-compact .game-info-action,
+  #halodoom-page-frame.is-info-tight .game-info-action {
+    min-height:
+      clamp(
+        40px,
+        4.7cqh,
+        48px
+      );
+
+    padding:
+      0
+      clamp(
+        12px,
+        0.78cqw,
+        16px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.57cqw,
+        11px
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        285px,
+        30cqw,
+        500px
+      );
+
+    max-width: 63%;
+
+    max-height:
+      clamp(
+        82px,
+        11.5cqh,
+        142px
+      );
+  }
+#halodoom-page-frame .game-info-kicker {
+    font-size:
+      clamp(
+        9px,
+        0.66cqw,
+        13px
+      );
+
+    letter-spacing:
+      clamp(
+        0.25em,
+        0.28em,
+        0.30em
+      );
+  }
+#halodoom-page-frame .game-info-blurb {
+    width:
+      min(
+        100%,
+        76ch
+      );
+
+    max-width: 76ch;
+
+    font-size:
+      clamp(
+        12px,
+        0.78cqw,
+        16.5px
+      );
+
+    line-height: 1.46;
+  }
+#halodoom-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(
+        32px,
+        2.2cqw,
+        46px
+      )
+      minmax(0, 1fr);
+
+    gap:
+      clamp(
+        7px,
+        0.52cqw,
+        11px
+      );
+
+    padding:
+      clamp(
+        5px,
+        0.36cqw,
+        8px
+      )
+      clamp(
+        4px,
+        0.3cqw,
+        7px
+      );
+  }
+#halodoom-page-frame .game-info-feature-icon {
+    font-size:
+      clamp(
+        16px,
+        1.1cqw,
+        23px
+      );
+  }
+#halodoom-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        8px,
+        0.56cqw,
+        10.5px
+      );
+  }
+#halodoom-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(
+        7.5px,
+        0.50cqw,
+        9.5px
+      );
+  }
+#halodoom-page-frame .game-info-fact span {
+    font-size:
+      clamp(
+        8px,
+        0.54cqw,
+        10px
+      );
+  }
+#halodoom-page-frame .game-info-fact strong {
+    font-size:
+      clamp(
+        10px,
+        0.68cqw,
+        13px
+      );
+  }
+#halodoom-page-frame .game-info-action {
+    min-height:
+      clamp(
+        41px,
+        5cqh,
+        54px
+      );
+
+    padding:
+      0
+      clamp(
+        13px,
+        0.86cqw,
+        19px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.62cqw,
+        12px
+      );
+  }
+#halodoom-page-frame .game-info-surface {
+    row-gap:
+      clamp(
+        12px,
+        1.45cqh,
+        24px
+      );
+
+    padding:
+      clamp(
+        24px,
+        3.5cqh,
+        46px
+      )
+      clamp(
+        22px,
+        1.85cqw,
+        38px
+      )
+      clamp(
+        22px,
+        3.2cqh,
+        42px
+      )
+      clamp(
+        24px,
+        2cqw,
+        42px
+      );
+  }
+#halodoom-page-frame .game-info-surface {
+    transition:
+      grid-template-rows 260ms
+      cubic-bezier(0.2, 0.78, 0.24, 1),
+      row-gap 180ms ease,
+      padding 180ms ease;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        285px,
+        36cqw,
+        540px
+      );
+
+    max-width: 66%;
+
+    max-height:
+      clamp(
+        82px,
+        13cqh,
+        150px
+      );
+  }
+#halodoom-page-frame .game-info-kicker {
+    font-size:
+      clamp(
+        9px,
+        0.78cqw,
+        13.5px
+      );
+  }
+#halodoom-page-frame .game-info-blurb {
+    max-width: 78ch;
+
+    font-size:
+      clamp(
+        12px,
+        0.98cqw,
+        17px
+      );
+
+    line-height: 1.46;
+  }
+#halodoom-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(
+        32px,
+        2.65cqw,
+        50px
+      )
+      minmax(0, 1fr);
+
+    gap:
+      clamp(
+        7px,
+        0.66cqw,
+        12px
+      );
+
+    padding:
+      clamp(
+        5px,
+        0.46cqw,
+        9px
+      )
+      clamp(
+        4px,
+        0.38cqw,
+        8px
+      );
+  }
+#halodoom-page-frame .game-info-feature-icon {
+    font-size:
+      clamp(
+        16px,
+        1.35cqw,
+        25px
+      );
+  }
+#halodoom-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        8px,
+        0.68cqw,
+        11px
+      );
+  }
+#halodoom-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(
+        7.5px,
+        0.60cqw,
+        10px
+      );
+  }
+#halodoom-page-frame .game-info-fact span {
+    font-size:
+      clamp(
+        8px,
+        0.63cqw,
+        10.5px
+      );
+  }
+#halodoom-page-frame .game-info-fact strong {
+    font-size:
+      clamp(
+        10px,
+        0.78cqw,
+        13.5px
+      );
+  }
+#halodoom-page-frame .game-info-action {
+    min-height:
+      clamp(
+        41px,
+        5.8cqh,
+        58px
+      );
+
+    padding:
+      0
+      clamp(
+        13px,
+        1.02cqw,
+        21px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.75cqw,
+        12.5px
+      );
+  }
+#halodoom-page-frame .game-info-surface {
+    row-gap:
+      clamp(
+        12px,
+        1.7cqh,
+        28px
+      );
+
+    padding:
+      clamp(
+        24px,
+        4.1cqh,
+        52px
+      )
+      clamp(
+        22px,
+        2.15cqw,
+        44px
+      )
+      clamp(
+        22px,
+        3.7cqh,
+        48px
+      )
+      clamp(
+        24px,
+        2.35cqw,
+        48px
+      );
+  }
+#halodoom-page-frame .game-info-top-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.9cqh,
+        13px
+      );
+  }
+#halodoom-page-frame .game-info-bottom-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.78cqh,
+        13px
+      );
+  }
+}
+
+@media (min-width: 1900px){
+#halodoom-page-frame .game-info-logo {
+    max-width: 68%;
+  }
+#halodoom-page-frame .game-info-blurb {
+    max-width: 80ch;
+  }
+#halodoom-page-frame .game-info-surface {
+    padding-left:
+      clamp(
+        28px,
+        2.55cqw,
+        54px
+      );
+
+    padding-right:
+      clamp(
+        26px,
+        2.35cqw,
+        50px
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-blurb {
+    width: 64ch;
+    max-width: none;
+
+    font-size:
+      clamp(
+        12px,
+        0.98cqw,
+        17px
+      );
+
+    line-height: 1.46;
+  }
+#halodoom-page-frame .game-info-top-zone {
+    min-width: 0;
+  }
+#halodoom-page-frame .game-info-blurb {
+    max-inline-size:
+      min(
+        64ch,
+        calc(100cqw - 48px)
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-blurb {
+    width: 64ch;
+
+    max-inline-size:
+      min(
+        64ch,
+        calc(100cqw - 40px)
+      );
+
+    font-size:
+      clamp(
+        11.4px,
+        0.84cqw,
+        17px
+      );
+
+    line-height: 1.45;
+  }
+#halodoom-page-frame .game-info-surface {
+    row-gap:
+      clamp(
+        9px,
+        min(
+          1.65cqh,
+          1.05cqw
+        ),
+        26px
+      );
+
+    padding-top:
+      clamp(
+        20px,
+        min(
+          3.8cqh,
+          2.4cqw
+        ),
+        48px
+      );
+
+    padding-bottom:
+      clamp(
+        18px,
+        min(
+          3.4cqh,
+          2.15cqw
+        ),
+        44px
+      );
+  }
+#halodoom-page-frame .game-info-top-zone {
+    row-gap:
+      clamp(
+        6px,
+        min(
+          0.85cqh,
+          0.62cqw
+        ),
+        12px
+      );
+  }
+#halodoom-page-frame .game-info-bottom-zone {
+    row-gap:
+      clamp(
+        6px,
+        min(
+          0.74cqh,
+          0.56cqw
+        ),
+        12px
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        320px,
+        31cqw,
+        420px
+      );
+
+    max-width: 64%;
+
+    max-height:
+      clamp(
+        92px,
+        11.5cqh,
+        122px
+      );
+  }
+#halodoom-page-frame .game-info-blurb {
+    font-size:
+      clamp(
+        10.8px,
+        0.82cqw,
+        16.5px
+      );
+  }
+#halodoom-page-frame .game-info-kicker {
+    font-size:
+      clamp(
+        8.5px,
+        0.60cqw,
+        12.5px
+      );
+  }
+#halodoom-page-frame .game-info-fact span {
+    font-size:
+      clamp(
+        7.5px,
+        0.50cqw,
+        10px
+      );
+  }
+#halodoom-page-frame .game-info-fact strong {
+    font-size:
+      clamp(
+        9.5px,
+        0.64cqw,
+        13px
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        320px,
+        31cqw,
+        420px
+      );
+  }
+}
+
+@container (min-width: 980px){
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        390px,
+        38cqw,
+        520px
+      );
+
+    max-width: 68%;
+
+    max-height:
+      clamp(
+        108px,
+        13cqh,
+        148px
+      );
+  }
+}
+
+@container (min-width: 1180px){
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        430px,
+        40cqw,
+        560px
+      );
+
+    max-width: 70%;
+  }
+}
+
+@media (min-width: 1900px){
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        410px,
+        23vw,
+        520px
+      );
+
+    max-width: 68%;
+
+    max-height:
+      clamp(
+        112px,
+        12.5vh,
+        148px
+      );
+  }
+}
+
+@media (min-width: 2200px){
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        470px,
+        24vw,
+        560px
+      );
+
+    max-width: 70%;
+
+    max-height: 156px;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame .game-info-logo {
+    width:
+      clamp(
+        320px,
+        calc(27.2vw - 118px),
+        483px
+      );
+
+    max-width: 68%;
+
+    max-height:
+      clamp(
+        92px,
+        calc(7.8vw - 18px),
+        140px
+      );
+
+    transition:
+      width 140ms ease-out,
+      max-height 140ms ease-out;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame
+  .game-info-surface.is-features-collapsed
+  .game-info-logo {
+    width:
+      clamp(
+        340px,
+        calc(29.5vw - 122px),
+        520px
+      );
+
+    max-width: 70%;
+
+    max-height:
+      clamp(
+        100px,
+        calc(8.6vw - 18px),
+        150px
+      );
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame
+  .etherian-popout-glass-layer--1 {
+    overflow: hidden;
+  }
+#halodoom-page-frame
+  .etherian-popout-layer-image {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    height: 100%;
+    width: auto;
+
+    max-width: none;
+
+    display: block;
+
+    object-fit: contain;
+    object-position: top right;
+
+    pointer-events: none;
+
+    
+    opacity: 0.40;
+
+    filter:
+      saturate(0.92)
+      contrast(0.96)
+      brightness(0.88);
+  }
+#halodoom-page-frame
+  .etherian-popout-glass-layer--1::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 1;
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(18, 30, 34, 0.22),
+        rgba(
+          var(--page-accent-rgb),
+          0.055
+        ) 48%,
+        rgba(10, 18, 22, 0.10)
+      );
+
+    pointer-events: none;
+  }
+#halodoom-page-frame
+  .etherian-popout-layer-image {
+    z-index: 0;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame
+  .etherian-popout-layer-image {
+    
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      );
+
+    mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      );
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+  }
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame
+  .etherian-popout-layer-image {
+    opacity: 0.30;
+  }
+}
+
+#halodoom-page-frame.is-layout-transitioning.is-secondary-open
+.etherian-popout-layer-stack {
+  opacity: 0 !important;
+  transition-delay: 0ms !important;
+}
+
+@media (min-width: 1401px){
+#halodoom-page-frame
+  .desktop-secondary-panel-content {
+    transition:
+      opacity 650ms ease !important;
+  }
+#halodoom-page-frame.is-secondary-open
+  .desktop-secondary-panel-content {
+    transition:
+      opacity 650ms ease !important;
+
+    
+    transition-delay:
+      calc(
+        var(--secondary-panel-duration) * 0.78
+      ) !important;
+  }
+}
+
+#halodoom-page-frame.is-layout-transitioning
+.etherian-popout-layer-image {
+  opacity: 0 !important;
+
+  transition:
+    opacity 220ms ease !important;
+
+  transition-delay: 0ms !important;
+
+  pointer-events: none !important;
+}
+
+#halodoom-page-frame.is-layout-transitioning
+.etherian-popout-layer-stack {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+#halodoom-page-frame.is-layout-transitioning
+.etherian-popout-layer-image {
+  position: absolute !important;
+
+  top: 0 !important;
+  right: 0 !important;
+
+  height: 100% !important;
+  width: auto !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  display: block !important;
+
+  object-fit: contain !important;
+  object-position: top right !important;
+
+  z-index: 0 !important;
+
+  opacity: 0 !important;
+
+  filter:
+    saturate(0.92)
+    contrast(0.96)
+    brightness(0.88) !important;
+
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse 78% 72%
+      at 100% 0%,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.96) 30%,
+      rgba(0, 0, 0, 0.72) 48%,
+      rgba(0, 0, 0, 0.30) 66%,
+      rgba(0, 0, 0, 0) 84%
+    ) !important;
+
+  mask-image:
+    radial-gradient(
+      ellipse 78% 72%
+      at 100% 0%,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.96) 30%,
+      rgba(0, 0, 0, 0.72) 48%,
+      rgba(0, 0, 0, 0.30) 66%,
+      rgba(0, 0, 0, 0) 84%
+    ) !important;
+
+  -webkit-mask-repeat: no-repeat !important;
+  mask-repeat: no-repeat !important;
+
+  -webkit-mask-size: 100% 100% !important;
+  mask-size: 100% 100% !important;
+
+  transition:
+    opacity 220ms ease !important;
+
+  transition-delay: 0ms !important;
+
+  pointer-events: none !important;
+}
+
+@media (max-width: 1400px){
+#halodoom-page-frame:not(.is-layout-transitioning)
+  .etherian-popout-layer-image {
+    display: none !important;
+  }
+}
+
+#halodoom-page-frame .game-info-background,
+#halodoom-page-frame .game-info-layer--rear,
+#halodoom-page-frame .game-info-layer--mid,
+#halodoom-page-frame .game-info::after {
+  display: none !important;
+}
+
+#halodoom-page-frame .desktop-secondary-panel-glass,
+#halodoom-page-frame .etherian-popout-glass-layer,
+#halodoom-page-frame .game-info-surface {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================================================
+   Media viewer — preserve selected image aspect ratio
+   ========================================================= */
+
+/*
+  The old viewer was always 16:9. Images were already object-fit: contain,
+  but the FRAME itself remained landscape.
+
+  This keeps the same maximum 16:9 footprint while allowing the viewer
+  shell to shrink to the selected image's real aspect ratio:
+    - portrait/square images become narrower, not taller
+    - very wide images become shorter, not wider
+    - videos/YouTube remain 16:9
+    - thumbnail strip width stays unchanged
+*/
+.media-viewer {
+  --media-viewer-aspect-number:
+    1.7777777778;
+
+  width:
+    min(
+      var(--media-composition-width),
+      calc(
+        var(--media-composition-width)
+        * 0.5625
+        * var(--media-viewer-aspect-number)
+      )
+    );
+
+  max-width: 100%;
+
+  aspect-ratio:
+    var(--media-viewer-aspect-number);
+
+  transition:
+    width 220ms ease,
+    aspect-ratio 220ms ease;
+}
+
+
+.media-viewer-image {
+  object-fit: contain !important;
+  object-position: center center;
+}
+
+
+/* =========================================================
+   BROBOTS — first-pass info styling aliases
+   Uses the same established game-info template for now.
+   ========================================================= */
+
+#brobots-page-frame .desktop-secondary-panel-content {
+    top: 3.5%;
+    right: 4.5%;
+    bottom: 3.5%;
+
+    left:
+      calc(
+        var(--secondary-panel-overlap) +
+        3%
+      );
+
+    overflow: visible;
+  }
+
+#brobots-page-frame .game-info {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    color: rgba(244, 248, 250, 0.96);
+
+    isolation: isolate;
+  }
+
+#brobots-page-frame .game-info-background {
+    position: absolute;
+    inset: 2% 0 4% 14%;
+
+    z-index: 0;
+
+    overflow: hidden;
+
+    opacity: 0.33;
+
+    clip-path:
+      polygon(
+        7% 0,
+        100% 0,
+        100% 90%,
+        93% 100%,
+        0 100%,
+        0 8%
+      );
+
+    pointer-events: none;
+  }
+
+#brobots-page-frame .game-info-background-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: 58% 44%;
+
+    filter:
+      saturate(0.88)
+      contrast(0.94)
+      brightness(0.72);
+
+    -webkit-mask-image:
+      linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.16) 18%,
+        rgba(0, 0, 0, 0.70) 54%,
+        rgba(0, 0, 0, 0.92) 100%
+      );
+
+    mask-image:
+      linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.16) 18%,
+        rgba(0, 0, 0, 0.70) 54%,
+        rgba(0, 0, 0, 0.92) 100%
+      );
+  }
+
+#brobots-page-frame .game-info-layer {
+    position: absolute;
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.17
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.025
+      );
+
+    clip-path:
+      polygon(
+        5% 0,
+        100% 0,
+        100% 91%,
+        94% 100%,
+        0 100%,
+        0 7%
+      );
+  }
+
+#brobots-page-frame .game-info-layer--rear {
+    inset: 0.5% 1.5% 1.5% 5.5%;
+
+    transform:
+      translate(1.6%, -1.4%);
+
+    opacity: 0.58;
+  }
+
+#brobots-page-frame .game-info-layer--mid {
+    inset: 2.5% 3.5% 3% 2%;
+
+    transform:
+      translate(-0.8%, 0.7%);
+
+    opacity: 0.78;
+  }
+
+#brobots-page-frame .game-info-surface {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto
+      auto;
+
+    align-content: center;
+
+    gap:
+      clamp(10px, 1.15vh, 18px);
+
+    padding:
+      clamp(22px, 2.15vw, 38px)
+      clamp(22px, 2.25vw, 42px)
+      clamp(20px, 2vw, 34px)
+      clamp(24px, 2.4vw, 46px);
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.26
+      );
+
+    background:
+      linear-gradient(
+        105deg,
+        rgba(20, 29, 34, 0.72) 0%,
+        rgba(22, 34, 40, 0.60) 48%,
+        rgba(19, 31, 37, 0.40) 100%
+      );
+
+    backdrop-filter:
+      blur(10px)
+      saturate(112%);
+
+    -webkit-backdrop-filter:
+      blur(10px)
+      saturate(112%);
+
+    clip-path:
+      polygon(
+        5% 0,
+        100% 0,
+        100% 90%,
+        94% 100%,
+        0 100%,
+        0 7%
+      );
+
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+      inset 18px 0 42px rgba(255, 255, 255, 0.018);
+  }
+
+#brobots-page-frame .game-info-header {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap:
+      clamp(5px, 0.65vh, 10px);
+
+    min-width: 0;
+  }
+
+#brobots-page-frame .game-info-logo {
+    display: block;
+
+    width:
+      min(
+        68%,
+        440px
+      );
+
+    max-height:
+      clamp(70px, 12vh, 132px);
+
+    object-fit: contain;
+    object-position: left center;
+  }
+
+#brobots-page-frame .game-info-kicker {
+    margin: 0;
+
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.93
+      );
+
+    font-size:
+      clamp(9px, 0.72vw, 13px);
+
+    font-weight: 700;
+
+    letter-spacing:
+      0.34em;
+  }
+
+#brobots-page-frame .game-info-blurb {
+    max-width: 94%;
+
+    margin: 0;
+
+    color:
+      rgba(246, 249, 251, 0.92);
+
+    font-size:
+      clamp(12px, 0.86vw, 16px);
+
+    line-height: 1.48;
+  }
+
+#brobots-page-frame .game-info-features {
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    align-content: center;
+
+    gap:
+      clamp(8px, 0.75vw, 14px);
+  }
+
+#brobots-page-frame .game-info-feature {
+    min-width: 0;
+
+    display: grid;
+
+    grid-template-columns:
+      clamp(34px, 2.7vw, 48px)
+      minmax(0, 1fr);
+
+    align-items: center;
+
+    gap:
+      clamp(8px, 0.7vw, 13px);
+
+    padding:
+      clamp(7px, 0.65vw, 11px);
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      );
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.075
+        ),
+        rgba(16, 22, 26, 0.18)
+      );
+
+    clip-path:
+      polygon(
+        8px 0,
+        100% 0,
+        100% calc(100% - 8px),
+        calc(100% - 8px) 100%,
+        0 100%,
+        0 8px
+      );
+  }
+
+#brobots-page-frame .game-info-feature-icon {
+    display: grid;
+    place-items: center;
+
+    aspect-ratio: 1;
+
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.96
+      );
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.45
+      );
+
+    font-size:
+      clamp(18px, 1.5vw, 26px);
+
+    line-height: 1;
+
+    clip-path:
+      polygon(
+        25% 0,
+        75% 0,
+        100% 25%,
+        100% 75%,
+        75% 100%,
+        25% 100%,
+        0 75%,
+        0 25%
+      );
+  }
+
+#brobots-page-frame .game-info-feature-copy {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+  }
+
+#brobots-page-frame .game-info-feature-copy strong {
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.96
+      );
+
+    font-size:
+      clamp(8px, 0.61vw, 11px);
+
+    letter-spacing:
+      0.13em;
+  }
+
+#brobots-page-frame .game-info-feature-copy small {
+    overflow: hidden;
+
+    color: rgba(232, 239, 243, 0.70);
+
+    font-size:
+      clamp(8px, 0.58vw, 10px);
+
+    line-height: 1.25;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+  }
+
+#brobots-page-frame .game-info-facts {
+    display: grid;
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    border-top:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    border-bottom:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      );
+  }
+
+#brobots-page-frame .game-info-fact {
+    position: relative;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding:
+      clamp(9px, 0.75vw, 13px)
+      clamp(8px, 0.8vw, 14px);
+  }
+
+#brobots-page-frame
+  .game-info-fact +
+  .game-info-fact::before {
+    content: "";
+
+    position: absolute;
+
+    top: 22%;
+    bottom: 22%;
+    left: 0;
+
+    width: 1px;
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+  }
+
+#brobots-page-frame .game-info-fact span {
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.78
+      );
+
+    font-size:
+      clamp(8px, 0.58vw, 10px);
+
+    letter-spacing:
+      0.18em;
+  }
+
+#brobots-page-frame .game-info-fact strong {
+    overflow: hidden;
+
+    color: rgba(244, 248, 250, 0.92);
+
+    font-size:
+      clamp(10px, 0.72vw, 13px);
+
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+  }
+
+#brobots-page-frame .game-info-actions {
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1.35fr)
+      minmax(0, 0.9fr);
+
+    gap:
+      clamp(10px, 0.85vw, 16px);
+  }
+
+#brobots-page-frame .game-info-action {
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding:
+      clamp(10px, 0.8vw, 14px)
+      clamp(14px, 1vw, 18px);
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.48
+      );
+
+    background:
+      rgba(15, 21, 25, 0.42);
+
+    color: rgba(248, 251, 252, 0.96);
+
+    font: inherit;
+
+    font-size:
+      clamp(9px, 0.68vw, 12px);
+
+    font-weight: 700;
+
+    letter-spacing:
+      0.11em;
+
+    cursor: default;
+
+    clip-path:
+      polygon(
+        10px 0,
+        100% 0,
+        100% calc(100% - 10px),
+        calc(100% - 10px) 100%,
+        0 100%,
+        0 10px
+      );
+  }
+
+#brobots-page-frame .game-info-action--primary {
+    background:
+      linear-gradient(
+        110deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.30
+        ),
+        rgba(
+          var(--page-accent-rgb),
+          0.10
+        )
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      );
+  }
+
+#brobots-page-frame .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 0.78fr)
+      auto
+      auto;
+
+    gap:
+      clamp(12px, 1.35vh, 20px);
+
+    padding-top:
+      clamp(26px, 2.55vw, 44px);
+  }
+
+#brobots-page-frame .game-info-header {
+    gap:
+      clamp(7px, 0.8vh, 12px);
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      min(
+        70%,
+        460px
+      );
+  }
+
+#brobots-page-frame .game-info-blurb {
+    max-width: 91%;
+
+    line-height: 1.54;
+  }
+
+#brobots-page-frame .game-info-background {
+    inset: 0.5% -0.5% 1.5% 9%;
+
+    opacity: 0.47;
+  }
+
+#brobots-page-frame .game-info-background-image {
+    object-position: 60% 42%;
+
+    filter:
+      saturate(0.94)
+      contrast(0.96)
+      brightness(0.78);
+
+    -webkit-mask-image:
+      linear-gradient(
+        102deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.06) 13%,
+        rgba(0, 0, 0, 0.36) 35%,
+        rgba(0, 0, 0, 0.82) 66%,
+        rgba(0, 0, 0, 0.96) 100%
+      );
+
+    mask-image:
+      linear-gradient(
+        102deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.06) 13%,
+        rgba(0, 0, 0, 0.36) 35%,
+        rgba(0, 0, 0, 0.82) 66%,
+        rgba(0, 0, 0, 0.96) 100%
+      );
+  }
+
+#brobots-page-frame .game-info-features {
+    gap:
+      clamp(6px, 0.55vw, 10px)
+      clamp(14px, 1.05vw, 20px);
+
+    padding:
+      clamp(5px, 0.4vw, 8px)
+      0;
+
+    border-top:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    border-bottom:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.14
+      );
+  }
+
+#brobots-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(30px, 2.35vw, 42px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(8px, 0.65vw, 12px);
+
+    padding:
+      clamp(7px, 0.5vw, 9px)
+      clamp(5px, 0.4vw, 8px);
+
+    border: 0;
+
+    background: transparent;
+
+    clip-path: none;
+  }
+
+#brobots-page-frame .game-info-feature-icon {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.34
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.045
+      );
+
+    font-size:
+      clamp(16px, 1.25vw, 22px);
+  }
+
+#brobots-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(8px, 0.59vw, 10.5px);
+
+    letter-spacing:
+      0.14em;
+  }
+
+#brobots-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(7.5px, 0.54vw, 9.5px);
+
+    color:
+      rgba(232, 239, 243, 0.64);
+  }
+
+#brobots-page-frame .game-info-facts {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.035
+        ),
+        rgba(12, 18, 22, 0.08)
+      );
+  }
+
+#brobots-page-frame .game-info-fact {
+    padding-top:
+      clamp(8px, 0.65vw, 11px);
+
+    padding-bottom:
+      clamp(8px, 0.65vw, 11px);
+  }
+
+#brobots-page-frame .game-info-action--primary {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.62
+      );
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.34
+        ),
+        rgba(
+          var(--page-accent-rgb),
+          0.12
+        )
+      );
+  }
+
+#brobots-page-frame .game-info-action--secondary {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    color:
+      rgba(238, 244, 247, 0.84);
+  }
+
+#brobots-page-frame .game-info-background {
+    
+    inset:
+      -1.2%
+      -0.8%
+      8%
+      31%;
+
+    opacity: 0.54;
+
+    overflow: hidden;
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.028
+      );
+
+    clip-path:
+      polygon(
+        7% 0,
+        100% 0,
+        100% 86%,
+        93% 100%,
+        0 100%,
+        0 10%
+      );
+
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.018);
+  }
+
+#brobots-page-frame .game-info-background::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(17, 27, 32, 0.92) 0%,
+        rgba(17, 27, 32, 0.60) 27%,
+        rgba(17, 27, 32, 0.22) 58%,
+        rgba(17, 27, 32, 0.08) 100%
+      );
+  }
+
+#brobots-page-frame .game-info-background-image {
+    width: 112%;
+    height: 112%;
+
+    transform:
+      translate(
+        -4%,
+        -5%
+      );
+
+    object-fit: cover;
+
+    
+    object-position: 69% 30%;
+
+    filter:
+      saturate(0.90)
+      contrast(0.92)
+      brightness(0.74);
+
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+#brobots-page-frame .game-info-layer--rear {
+    inset:
+      -1.3%
+      0.4%
+      0.8%
+      6.8%;
+
+    transform:
+      translate(
+        2.2%,
+        -1.2%
+      );
+
+    opacity: 0.64;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.15
+      );
+  }
+
+#brobots-page-frame .game-info-layer--mid {
+    inset:
+      1.4%
+      2.3%
+      2%
+      1.2%;
+
+    transform:
+      translate(
+        -0.5%,
+        0.9%
+      );
+
+    opacity: 0.82;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      );
+  }
+
+#brobots-page-frame .game-info::after {
+    content: "";
+
+    position: absolute;
+
+    z-index: 3;
+
+    top: 18%;
+    right: 0.35%;
+
+    width: 2px;
+    height: 28%;
+
+    background:
+      linear-gradient(
+        to bottom,
+        transparent,
+        rgba(
+          var(--page-accent-rgb),
+          0.62
+        ) 18%,
+        rgba(
+          var(--page-accent-rgb),
+          0.28
+        ) 76%,
+        transparent
+      );
+
+    box-shadow:
+      0 0 14px
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    pointer-events: none;
+  }
+
+#brobots-page-frame .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 0.70fr)
+      auto
+      auto;
+
+    gap:
+      clamp(11px, 1.22vh, 18px);
+
+    padding:
+      clamp(26px, 2.35vw, 42px)
+      clamp(24px, 2.2vw, 40px)
+      clamp(22px, 1.9vw, 34px)
+      clamp(28px, 2.55vw, 48px);
+
+    background:
+      linear-gradient(
+        102deg,
+        rgba(18, 27, 32, 0.80) 0%,
+        rgba(20, 31, 36, 0.67) 43%,
+        rgba(18, 30, 35, 0.47) 72%,
+        rgba(18, 30, 35, 0.34) 100%
+      );
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.30
+      );
+
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.032),
+      inset 28px 0 56px rgba(255,255,255,0.012),
+      inset -1px 0 0
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      );
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      min(
+        67%,
+        450px
+      );
+
+    margin-left:
+      -0.6%;
+  }
+
+#brobots-page-frame .game-info-kicker {
+    letter-spacing:
+      0.31em;
+
+    opacity: 0.94;
+  }
+
+#brobots-page-frame .game-info-blurb {
+    max-width: 89%;
+
+    font-size:
+      clamp(12px, 0.84vw, 15px);
+
+    line-height: 1.52;
+  }
+
+#brobots-page-frame .game-info-features {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    column-gap:
+      clamp(18px, 1.3vw, 24px);
+
+    row-gap:
+      clamp(7px, 0.6vw, 11px);
+
+    padding:
+      clamp(7px, 0.55vw, 10px)
+      0;
+
+    border-top-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      );
+
+    border-bottom-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.13
+      );
+  }
+
+#brobots-page-frame .game-info-feature {
+    position: relative;
+
+    padding:
+      clamp(6px, 0.48vw, 9px)
+      clamp(4px, 0.3vw, 6px);
+  }
+
+#brobots-page-frame .game-info-feature::after {
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+    bottom: 0;
+
+    width:
+      clamp(18px, 1.8vw, 30px);
+
+    height: 1px;
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.13
+      );
+  }
+
+#brobots-page-frame .game-info-feature-icon {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.08
+        ),
+        rgba(12, 18, 22, 0.05)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.035
+      );
+  }
+
+#brobots-page-frame .game-info-feature-copy strong {
+    line-height: 1.15;
+  }
+
+#brobots-page-frame .game-info-feature-copy small {
+    line-height: 1.22;
+  }
+
+#brobots-page-frame .game-info-facts {
+    border-top-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+
+    border-bottom-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.028
+        ),
+        rgba(12, 18, 22, 0.055)
+      );
+  }
+
+#brobots-page-frame .game-info-fact span {
+    font-size:
+      clamp(7.5px, 0.54vw, 9.5px);
+
+    letter-spacing:
+      0.19em;
+  }
+
+#brobots-page-frame .game-info-fact strong {
+    font-size:
+      clamp(9.5px, 0.68vw, 12.5px);
+  }
+
+#brobots-page-frame .game-info-actions {
+    grid-template-columns:
+      minmax(0, 1.42fr)
+      minmax(0, 0.88fr);
+
+    gap:
+      clamp(11px, 0.9vw, 17px);
+  }
+
+#brobots-page-frame .game-info-action {
+    padding-top:
+      clamp(10px, 0.72vw, 13px);
+
+    padding-bottom:
+      clamp(10px, 0.72vw, 13px);
+  }
+
+#brobots-page-frame .game-info-action--primary {
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.12
+      ),
+      0 0 18px
+      rgba(
+        var(--page-accent-rgb),
+        0.055
+      );
+  }
+
+#brobots-page-frame .game-info-background,
+  #brobots-page-frame .game-info-layer--rear,
+  #brobots-page-frame .game-info-layer--mid,
+  #brobots-page-frame .game-info::after {
+    display: none !important;
+  }
+
+#brobots-page-frame .game-info-surface {
+    border: 0;
+
+    background: transparent;
+
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    clip-path: none;
+
+    box-shadow: none;
+  }
+
+#brobots-page-frame .etherian-popout-layer-stack {
+    position: absolute;
+    inset: 0;
+
+    z-index: 1;
+
+    overflow: hidden;
+
+    
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--etherian-stack-cut-run)
+        ) 0,
+        100%
+        var(--etherian-stack-cut-rise),
+        100%
+        calc(
+          100% -
+          var(--etherian-stack-cut-rise)
+        ),
+        calc(
+          100% -
+          var(--etherian-stack-cut-run)
+        ) 100%,
+        0 100%
+      );
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transition:
+      opacity 220ms ease;
+
+    
+  }
+
+#brobots-page-frame.is-secondary-open
+  .etherian-popout-layer-stack {
+    opacity: 1;
+
+    transition-delay:
+      calc(
+        var(--secondary-panel-duration) * 0.74
+      );
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer {
+    position: absolute;
+
+    
+    --layer-cut-rise:
+      clamp(44px, 4.8vw, 78px);
+
+    --layer-cut-run:
+      calc(
+        var(--layer-cut-rise)
+        *
+        tan(
+          var(--etherian-glass-angle)
+        )
+      );
+
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(255,255,255,0.022),
+        rgba(
+          var(--page-accent-rgb),
+          0.034
+        ) 45%,
+        rgba(20,28,34,0.020)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255,255,255,0.018);
+
+    backdrop-filter:
+      blur(2px)
+      saturate(108%);
+
+    -webkit-backdrop-filter:
+      blur(2px)
+      saturate(108%);
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--1 {
+    z-index: 1;
+
+    inset:
+      2.5%
+      1.7%
+      5.5%
+      0;
+
+    --layer-cut-rise:
+      clamp(54px, 5.4vw, 86px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100%
+        calc(
+          100% -
+          var(--layer-cut-rise)
+        ),
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 100%,
+        0 100%
+      );
+
+    opacity: 0.42;
+
+    border-color:
+      rgba(
+        220, 230, 242,
+        0.18
+      );
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--2 {
+    z-index: 2;
+
+    inset:
+      7.5%
+      6.2%
+      8.5%
+      0;
+
+    --layer-cut-rise:
+      clamp(62px, 6.1vw, 96px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100%
+        calc(
+          100% -
+          var(--layer-cut-rise) * 0.42
+        ),
+        calc(
+          100% -
+          var(--layer-cut-run) * 0.42
+        ) 100%,
+        0 100%
+      );
+
+    opacity: 0.50;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      );
+
+    background:
+      linear-gradient(
+        118deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.022
+        ),
+        rgba(255,255,255,0.018)
+      );
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--3 {
+    z-index: 3;
+
+    inset:
+      11.5%
+      12.2%
+      13.5%
+      0;
+
+    --layer-cut-rise:
+      clamp(70px, 7vw, 110px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100% 100%,
+        0 100%
+      );
+
+    opacity: 0.58;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(255,255,255,0.016),
+        rgba(
+          var(--page-accent-rgb),
+          0.045
+        )
+      );
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--4 {
+    z-index: 4;
+
+    left: 0;
+    right: 13.6%;
+    top: 49%;
+    bottom: 0;
+
+    --layer-cut-rise:
+      clamp(46px, 4.8vw, 76px);
+
+    clip-path:
+      polygon(
+        0 0,
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+        100%
+        var(--layer-cut-rise),
+        100% 100%,
+        0 100%
+      );
+
+    opacity: 0.66;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+
+    background:
+      linear-gradient(
+        108deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.040
+        ),
+        rgba(255,255,255,0.018)
+      );
+  }
+
+#brobots-page-frame .desktop-secondary-panel-content {
+    z-index: 2;
+  }
+
+#brobots-page-frame .game-info {
+    z-index: 2;
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      );
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(255,255,255,0.055),
+        rgba(
+          var(--page-accent-rgb),
+          0.085
+        ) 44%,
+        rgba(26,36,42,0.055)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255,255,255,0.032);
+
+    backdrop-filter:
+      blur(4px)
+      saturate(112%);
+
+    -webkit-backdrop-filter:
+      blur(4px)
+      saturate(112%);
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--1 {
+    opacity: 0.62;
+
+    border-color:
+      rgba(
+        220, 230, 242,
+        0.26
+      );
+
+    background:
+      linear-gradient(
+        116deg,
+        rgba(255,255,255,0.060),
+        rgba(177,202,216,0.065) 52%,
+        rgba(28,36,42,0.040)
+      );
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--2 {
+    opacity: 0.70;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    background:
+      linear-gradient(
+        118deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.070
+        ),
+        rgba(255,255,255,0.050)
+      );
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--3 {
+    opacity: 0.76;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.32
+      );
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(255,255,255,0.045),
+        rgba(
+          var(--page-accent-rgb),
+          0.095
+        )
+      );
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--4 {
+    opacity: 0.82;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.35
+      );
+
+    background:
+      linear-gradient(
+        108deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.105
+        ),
+        rgba(255,255,255,0.048)
+      );
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--1 {
+    opacity: 0.50;
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--2 {
+    opacity: 0.58;
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--3 {
+    opacity: 0.64;
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--4 {
+    right: 20%;
+    opacity: 0.70;
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer {
+    border-color: transparent !important;
+    border-width: 0 !important;
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer {
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255, 255, 255, 0.018);
+  }
+
+#brobots-page-frame .etherian-popout-glass-layer--3 {
+    clip-path:
+      polygon(
+        0 0,
+
+        calc(
+          100% -
+          var(--layer-cut-run)
+        ) 0,
+
+        100%
+        var(--layer-cut-rise),
+
+        100%
+        calc(
+          100% -
+          var(--layer-cut-rise) * 0.42
+        ),
+
+        calc(
+          100% -
+          var(--layer-cut-run) * 0.42
+        ) 100%,
+
+        0 100%
+      );
+  }
+
+#brobots-page-frame .game-info-features {
+    transition:
+      opacity 120ms ease;
+  }
+
+#brobots-page-frame
+  .game-info-features.is-crowded {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+#brobots-page-frame .game-info-surface {
+    align-content: stretch;
+
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto
+      auto;
+  }
+
+#brobots-page-frame .game-info-header {
+    align-self: start;
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        250px,
+        30vw,
+        430px
+      );
+
+    max-width: 62%;
+
+    max-height:
+      clamp(
+        76px,
+        11vh,
+        126px
+      );
+
+    margin-left: 0;
+  }
+
+#brobots-page-frame .game-info-blurb {
+    width: min(100%, 76ch);
+    max-width: 76ch;
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-surface {
+    gap:
+      clamp(8px, 0.9vh, 13px);
+
+    padding:
+      clamp(20px, 1.75vw, 30px)
+      clamp(20px, 1.7vw, 30px)
+      clamp(18px, 1.55vw, 27px)
+      clamp(22px, 1.9vw, 34px);
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-header {
+    gap:
+      clamp(4px, 0.5vh, 7px);
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-logo {
+    width:
+      clamp(
+        220px,
+        25vw,
+        350px
+      );
+
+    max-width: 58%;
+
+    max-height:
+      clamp(
+        66px,
+        9.5vh,
+        104px
+      );
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-kicker {
+    font-size:
+      clamp(8px, 0.62vw, 11px);
+
+    letter-spacing: 0.27em;
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-blurb {
+    width: min(100%, 70ch);
+    max-width: 70ch;
+
+    font-size:
+      clamp(11px, 0.76vw, 13.5px);
+
+    line-height: 1.43;
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-features {
+    column-gap:
+      clamp(12px, 0.9vw, 18px);
+
+    row-gap:
+      clamp(5px, 0.42vw, 8px);
+
+    padding:
+      clamp(4px, 0.36vw, 7px)
+      0;
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-feature {
+    grid-template-columns:
+      clamp(27px, 2.15vw, 36px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(6px, 0.5vw, 9px);
+
+    padding:
+      clamp(4px, 0.34vw, 6px)
+      clamp(3px, 0.26vw, 5px);
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-feature-icon {
+    font-size:
+      clamp(14px, 1.12vw, 20px);
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-feature-copy strong {
+    font-size:
+      clamp(7.5px, 0.53vw, 9.5px);
+
+    letter-spacing: 0.12em;
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-feature-copy small {
+    font-size:
+      clamp(7px, 0.49vw, 8.8px);
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-fact {
+    gap: 2px;
+
+    padding:
+      clamp(6px, 0.48vw, 8px)
+      clamp(6px, 0.58vw, 10px);
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-actions {
+    gap:
+      clamp(8px, 0.62vw, 11px);
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-action {
+    padding:
+      clamp(8px, 0.6vw, 10px)
+      clamp(11px, 0.8vw, 14px);
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-surface {
+    gap:
+      clamp(6px, 0.68vh, 9px);
+
+    padding:
+      clamp(16px, 1.35vw, 22px)
+      clamp(17px, 1.4vw, 24px)
+      clamp(15px, 1.25vw, 21px)
+      clamp(18px, 1.55vw, 27px);
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-logo {
+    width:
+      clamp(
+        190px,
+        21vw,
+        290px
+      );
+
+    max-width: 54%;
+
+    max-height:
+      clamp(
+        58px,
+        8vh,
+        86px
+      );
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-kicker {
+    font-size:
+      clamp(7.5px, 0.56vw, 9.5px);
+
+    letter-spacing: 0.23em;
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-blurb {
+    width: min(100%, 64ch);
+    max-width: 64ch;
+
+    font-size:
+      clamp(10.5px, 0.7vw, 12.5px);
+
+    line-height: 1.38;
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-features {
+    column-gap:
+      clamp(9px, 0.65vw, 13px);
+
+    row-gap: 4px;
+
+    padding: 3px 0;
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-feature {
+    grid-template-columns:
+      clamp(24px, 1.85vw, 31px)
+      minmax(0, 1fr);
+
+    gap: 5px;
+
+    padding: 3px 2px;
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-feature-icon {
+    font-size:
+      clamp(12px, 0.92vw, 17px);
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-feature-copy strong {
+    font-size:
+      clamp(7px, 0.48vw, 8.5px);
+
+    letter-spacing: 0.10em;
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-feature-copy small {
+    font-size:
+      clamp(6.7px, 0.45vw, 8px);
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-fact {
+    padding:
+      5px
+      clamp(5px, 0.46vw, 8px);
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-fact span {
+    font-size:
+      clamp(7px, 0.48vw, 8.5px);
+
+    letter-spacing: 0.15em;
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-fact strong {
+    font-size:
+      clamp(9px, 0.6vw, 11px);
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-action {
+    padding:
+      7px
+      clamp(9px, 0.68vw, 12px);
+
+    font-size:
+      clamp(8px, 0.58vw, 10px);
+
+    letter-spacing: 0.09em;
+  }
+
+#brobots-page-frame
+  .game-info-features.is-crowded {
+    transition:
+      opacity 130ms ease;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+#brobots-page-frame .game-info-surface,
+  #brobots-page-frame .game-info-header,
+  #brobots-page-frame .game-info-logo,
+  #brobots-page-frame .game-info-kicker,
+  #brobots-page-frame .game-info-blurb,
+  #brobots-page-frame .game-info-features,
+  #brobots-page-frame .game-info-feature,
+  #brobots-page-frame .game-info-feature-icon,
+  #brobots-page-frame .game-info-feature-copy strong,
+  #brobots-page-frame .game-info-feature-copy small,
+  #brobots-page-frame .game-info-fact,
+  #brobots-page-frame .game-info-fact span,
+  #brobots-page-frame .game-info-fact strong,
+  #brobots-page-frame .game-info-actions,
+  #brobots-page-frame .game-info-action {
+    transition:
+      width 210ms ease,
+      max-width 210ms ease,
+      max-height 210ms ease,
+      padding 210ms ease,
+      gap 210ms ease,
+      font-size 210ms ease,
+      line-height 210ms ease,
+      letter-spacing 210ms ease,
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+
+#brobots-page-frame .game-info-surface {
+    padding:
+      clamp(16px, 1.65cqw, 34px)
+      clamp(17px, 1.55cqw, 32px)
+      clamp(15px, 1.45cqw, 29px)
+      clamp(18px, 1.75cqw, 36px);
+
+    gap:
+      clamp(7px, 0.78cqh, 14px);
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        220px,
+        27cqw,
+        390px
+      );
+
+    max-width: 60%;
+
+    max-height:
+      clamp(
+        66px,
+        10cqh,
+        112px
+      );
+  }
+
+#brobots-page-frame .game-info-kicker {
+    font-size:
+      clamp(8px, 0.60cqw, 11px);
+
+    letter-spacing:
+      clamp(0.22em, 0.26em, 0.28em);
+  }
+
+#brobots-page-frame .game-info-blurb {
+    width:
+      min(
+        100%,
+        clamp(
+          58ch,
+          67cqw,
+          76ch
+        )
+      );
+
+    max-width: 76ch;
+
+    font-size:
+      clamp(10.8px, 0.70cqw, 13.5px);
+
+    line-height:
+      clamp(1.38, 1.42, 1.46);
+  }
+
+#brobots-page-frame .game-info-features {
+    column-gap:
+      clamp(10px, 0.85cqw, 18px);
+
+    row-gap:
+      clamp(4px, 0.38cqw, 8px);
+
+    padding:
+      clamp(3px, 0.32cqw, 7px)
+      0;
+  }
+
+#brobots-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(25px, 2cqw, 36px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(5px, 0.46cqw, 9px);
+
+    padding:
+      clamp(3px, 0.3cqw, 6px)
+      clamp(2px, 0.24cqw, 5px);
+  }
+
+#brobots-page-frame .game-info-feature-icon {
+    font-size:
+      clamp(13px, 1.02cqw, 20px);
+  }
+
+#brobots-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(7.3px, 0.50cqw, 9.5px);
+
+    letter-spacing:
+      clamp(0.10em, 0.115em, 0.12em);
+  }
+
+#brobots-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(6.9px, 0.46cqw, 8.8px);
+  }
+
+#brobots-page-frame .game-info-fact {
+    padding:
+      clamp(5px, 0.44cqw, 8px)
+      clamp(5px, 0.54cqw, 10px);
+  }
+
+#brobots-page-frame .game-info-action {
+    padding:
+      clamp(7px, 0.56cqw, 10px)
+      clamp(9px, 0.74cqw, 14px);
+
+    font-size:
+      clamp(8px, 0.55cqw, 10px);
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-logo {
+    max-width: 57%;
+  }
+
+#brobots-page-frame.is-info-compact
+  .game-info-blurb {
+    max-width: 70ch;
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-features {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform:
+      translateY(-4px);
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 0.18fr)
+      auto
+      auto;
+  }
+
+#brobots-page-frame
+  .game-info-features.is-crowded {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform:
+      translateY(-4px);
+  }
+
+#brobots-page-frame .game-info-logo,
+  #brobots-page-frame.is-info-compact .game-info-logo,
+  #brobots-page-frame.is-info-tight .game-info-logo {
+    width:
+      clamp(
+        270px,
+        29cqw,
+        410px
+      );
+
+    max-width: 61%;
+
+    max-height:
+      clamp(
+        78px,
+        10.5cqh,
+        116px
+      );
+  }
+
+#brobots-page-frame .game-info-kicker,
+  #brobots-page-frame.is-info-compact .game-info-kicker,
+  #brobots-page-frame.is-info-tight .game-info-kicker {
+    font-size:
+      clamp(
+        9px,
+        0.60cqw,
+        11px
+      );
+
+    letter-spacing: 0.27em;
+  }
+
+#brobots-page-frame .game-info-blurb,
+  #brobots-page-frame.is-info-compact .game-info-blurb,
+  #brobots-page-frame.is-info-tight .game-info-blurb {
+    width:
+      min(
+        100%,
+        clamp(
+          62ch,
+          68cqw,
+          76ch
+        )
+      );
+
+    max-width: 76ch;
+
+    font-size:
+      clamp(
+        11.8px,
+        0.72cqw,
+        13.8px
+      );
+
+    line-height: 1.44;
+  }
+
+#brobots-page-frame .game-info-feature,
+  #brobots-page-frame.is-info-compact .game-info-feature,
+  #brobots-page-frame.is-info-tight .game-info-feature {
+    grid-template-columns:
+      clamp(30px, 2.05cqw, 38px)
+      minmax(0, 1fr);
+
+    gap:
+      clamp(6px, 0.46cqw, 9px);
+
+    padding:
+      clamp(4px, 0.32cqw, 7px)
+      clamp(3px, 0.25cqw, 6px);
+  }
+
+#brobots-page-frame .game-info-feature-icon,
+  #brobots-page-frame.is-info-compact .game-info-feature-icon,
+  #brobots-page-frame.is-info-tight .game-info-feature-icon {
+    font-size:
+      clamp(
+        15px,
+        1.02cqw,
+        20px
+      );
+  }
+
+#brobots-page-frame .game-info-feature-copy strong,
+  #brobots-page-frame.is-info-compact .game-info-feature-copy strong,
+  #brobots-page-frame.is-info-tight .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        8px,
+        0.51cqw,
+        9.5px
+      );
+  }
+
+#brobots-page-frame .game-info-feature-copy small,
+  #brobots-page-frame.is-info-compact .game-info-feature-copy small,
+  #brobots-page-frame.is-info-tight .game-info-feature-copy small {
+    font-size:
+      clamp(
+        7.5px,
+        0.47cqw,
+        8.8px
+      );
+  }
+
+#brobots-page-frame.is-info-tight .game-info-surface {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto
+      auto;
+  }
+
+#brobots-page-frame.is-info-tight .game-info-features,
+  #brobots-page-frame .game-info-features.is-crowded {
+    opacity: 0;
+
+    
+    visibility: visible;
+
+    pointer-events: none;
+
+    transform:
+      translateY(-3px);
+  }
+
+#brobots-page-frame .game-info-fact,
+  #brobots-page-frame.is-info-compact .game-info-fact,
+  #brobots-page-frame.is-info-tight .game-info-fact {
+    padding:
+      clamp(7px, 0.46cqw, 10px)
+      clamp(7px, 0.55cqw, 11px);
+  }
+
+#brobots-page-frame .game-info-fact span,
+  #brobots-page-frame.is-info-compact .game-info-fact span,
+  #brobots-page-frame.is-info-tight .game-info-fact span {
+    font-size:
+      clamp(
+        8px,
+        0.49cqw,
+        9.5px
+      );
+  }
+
+#brobots-page-frame .game-info-fact strong,
+  #brobots-page-frame.is-info-compact .game-info-fact strong,
+  #brobots-page-frame.is-info-tight .game-info-fact strong {
+    font-size:
+      clamp(
+        10px,
+        0.62cqw,
+        12px
+      );
+  }
+
+#brobots-page-frame .game-info-actions,
+  #brobots-page-frame.is-info-compact .game-info-actions,
+  #brobots-page-frame.is-info-tight .game-info-actions {
+    grid-template-columns:
+      minmax(0, 1.25fr)
+      minmax(0, 0.95fr);
+
+    gap:
+      clamp(
+        9px,
+        0.65cqw,
+        13px
+      );
+  }
+
+#brobots-page-frame .game-info-action,
+  #brobots-page-frame.is-info-compact .game-info-action,
+  #brobots-page-frame.is-info-tight .game-info-action {
+    min-height:
+      clamp(
+        40px,
+        4.7cqh,
+        48px
+      );
+
+    padding:
+      0
+      clamp(
+        12px,
+        0.78cqw,
+        16px
+      );
+
+    gap:
+      clamp(
+        8px,
+        0.55cqw,
+        12px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.57cqw,
+        11px
+      );
+
+    letter-spacing: 0.10em;
+  }
+
+#brobots-page-frame .game-info-surface,
+  #brobots-page-frame .game-info-header,
+  #brobots-page-frame .game-info-logo,
+  #brobots-page-frame .game-info-kicker,
+  #brobots-page-frame .game-info-blurb,
+  #brobots-page-frame .game-info-feature,
+  #brobots-page-frame .game-info-feature-icon,
+  #brobots-page-frame .game-info-feature-copy strong,
+  #brobots-page-frame .game-info-feature-copy small,
+  #brobots-page-frame .game-info-fact,
+  #brobots-page-frame .game-info-fact span,
+  #brobots-page-frame .game-info-fact strong,
+  #brobots-page-frame .game-info-actions,
+  #brobots-page-frame .game-info-action {
+    transition: none;
+  }
+
+#brobots-page-frame .game-info-features {
+    transition:
+      opacity 190ms ease,
+      transform 190ms ease;
+  }
+
+#brobots-page-frame .game-info-surface {
+    align-content: start;
+
+    grid-template-rows:
+      auto
+      auto
+      auto
+      auto
+      auto;
+
+    row-gap:
+      clamp(
+        8px,
+        0.72cqh,
+        14px
+      );
+  }
+
+#brobots-page-frame .game-info-features {
+    align-content: start;
+
+    min-height: 0;
+
+    max-height: 180px;
+
+    margin-block:
+      clamp(
+        2px,
+        0.22cqh,
+        5px
+      );
+
+    overflow: hidden;
+
+    transition:
+      opacity 190ms ease,
+      transform 190ms ease,
+      max-height 220ms ease,
+      margin 220ms ease;
+  }
+
+#brobots-page-frame
+  .game-info-features.is-crowded,
+  #brobots-page-frame
+  .game-info-features.is-structure-hidden {
+    opacity: 0;
+
+    max-height: 0;
+
+    margin-block: 0;
+
+    transform:
+      translateY(-3px);
+
+    pointer-events: none;
+  }
+
+#brobots-page-frame.is-info-tight
+  .game-info-features {
+    opacity: 1;
+
+    max-height: 180px;
+
+    margin-block:
+      clamp(
+        1px,
+        0.15cqh,
+        4px
+      );
+
+    transform: none;
+
+    pointer-events: auto;
+  }
+
+#brobots-page-frame .game-info-header {
+    margin-bottom:
+      clamp(
+        1px,
+        0.18cqh,
+        4px
+      );
+  }
+
+#brobots-page-frame .game-info-blurb {
+    margin-bottom:
+      clamp(
+        2px,
+        0.25cqh,
+        5px
+      );
+  }
+
+#brobots-page-frame .game-info-facts {
+    margin-top:
+      clamp(
+        2px,
+        0.22cqh,
+        5px
+      );
+  }
+
+#brobots-page-frame .game-info-actions {
+    margin-top:
+      clamp(
+        1px,
+        0.16cqh,
+        4px
+      );
+  }
+
+#brobots-page-frame .game-info-surface {
+    --feature-zone-height: 118px;
+
+    display: grid;
+
+    grid-template-rows:
+      auto
+      var(--feature-zone-height)
+      auto;
+
+    align-content: center;
+
+    row-gap:
+      clamp(
+        11px,
+        1.25cqh,
+        20px
+      );
+
+    padding:
+      clamp(22px, 3.2cqh, 40px)
+      clamp(20px, 1.65cqw, 34px)
+      clamp(20px, 2.9cqh, 36px)
+      clamp(22px, 1.8cqw, 38px);
+
+    transition:
+      grid-template-rows 230ms
+      cubic-bezier(0.2, 0.78, 0.24, 1),
+      row-gap 180ms ease,
+      padding 180ms ease;
+  }
+
+#brobots-page-frame.is-info-compact .game-info-surface,
+  #brobots-page-frame.is-info-tight .game-info-surface {
+    grid-template-rows:
+      auto
+      var(--feature-zone-height)
+      auto;
+
+    align-content: center;
+  }
+
+#brobots-page-frame .game-info-top-zone,
+  #brobots-page-frame .game-info-bottom-zone {
+    min-width: 0;
+
+    display: grid;
+
+    align-content: start;
+  }
+
+#brobots-page-frame .game-info-top-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.68cqh,
+        11px
+      );
+  }
+
+#brobots-page-frame .game-info-bottom-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.62cqh,
+        11px
+      );
+  }
+
+#brobots-page-frame .game-info-header,
+  #brobots-page-frame .game-info-blurb,
+  #brobots-page-frame .game-info-facts,
+  #brobots-page-frame .game-info-actions {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+#brobots-page-frame .game-info-logo,
+  #brobots-page-frame.is-info-compact .game-info-logo,
+  #brobots-page-frame.is-info-tight .game-info-logo {
+    width:
+      clamp(
+        280px,
+        28cqw,
+        405px
+      );
+
+    max-width: 60%;
+
+    max-height:
+      clamp(
+        80px,
+        10.5cqh,
+        116px
+      );
+  }
+
+#brobots-page-frame .game-info-blurb,
+  #brobots-page-frame.is-info-compact .game-info-blurb,
+  #brobots-page-frame.is-info-tight .game-info-blurb {
+    width:
+      min(
+        100%,
+        74ch
+      );
+
+    max-width: 74ch;
+
+    font-size:
+      clamp(
+        11.8px,
+        0.72cqw,
+        13.8px
+      );
+
+    line-height: 1.44;
+  }
+
+#brobots-page-frame .game-info-features,
+  #brobots-page-frame.is-info-tight .game-info-features,
+  #brobots-page-frame
+  .game-info-features.is-crowded {
+    min-height: 0;
+    height: 100%;
+    max-height: none;
+
+    margin: 0;
+
+    align-content: center;
+
+    overflow: hidden;
+
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+
+    transition:
+      opacity 170ms ease;
+  }
+
+#brobots-page-frame
+  .game-info-surface.is-features-collapsed
+  .game-info-features {
+    opacity: 0;
+
+    pointer-events: none;
+  }
+
+#brobots-page-frame .game-info-fact,
+  #brobots-page-frame.is-info-compact .game-info-fact,
+  #brobots-page-frame.is-info-tight .game-info-fact {
+    padding:
+      clamp(7px, 0.48cqw, 10px)
+      clamp(7px, 0.56cqw, 11px);
+  }
+
+#brobots-page-frame .game-info-action,
+  #brobots-page-frame.is-info-compact .game-info-action,
+  #brobots-page-frame.is-info-tight .game-info-action {
+    min-height:
+      clamp(
+        40px,
+        4.7cqh,
+        48px
+      );
+
+    padding:
+      0
+      clamp(
+        12px,
+        0.78cqw,
+        16px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.57cqw,
+        11px
+      );
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        285px,
+        30cqw,
+        500px
+      );
+
+    max-width: 63%;
+
+    max-height:
+      clamp(
+        82px,
+        11.5cqh,
+        142px
+      );
+  }
+
+#brobots-page-frame .game-info-kicker {
+    font-size:
+      clamp(
+        9px,
+        0.66cqw,
+        13px
+      );
+
+    letter-spacing:
+      clamp(
+        0.25em,
+        0.28em,
+        0.30em
+      );
+  }
+
+#brobots-page-frame .game-info-blurb {
+    width:
+      min(
+        100%,
+        76ch
+      );
+
+    max-width: 76ch;
+
+    font-size:
+      clamp(
+        12px,
+        0.78cqw,
+        16.5px
+      );
+
+    line-height: 1.46;
+  }
+
+#brobots-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(
+        32px,
+        2.2cqw,
+        46px
+      )
+      minmax(0, 1fr);
+
+    gap:
+      clamp(
+        7px,
+        0.52cqw,
+        11px
+      );
+
+    padding:
+      clamp(
+        5px,
+        0.36cqw,
+        8px
+      )
+      clamp(
+        4px,
+        0.3cqw,
+        7px
+      );
+  }
+
+#brobots-page-frame .game-info-feature-icon {
+    font-size:
+      clamp(
+        16px,
+        1.1cqw,
+        23px
+      );
+  }
+
+#brobots-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        8px,
+        0.56cqw,
+        10.5px
+      );
+  }
+
+#brobots-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(
+        7.5px,
+        0.50cqw,
+        9.5px
+      );
+  }
+
+#brobots-page-frame .game-info-fact span {
+    font-size:
+      clamp(
+        8px,
+        0.54cqw,
+        10px
+      );
+  }
+
+#brobots-page-frame .game-info-fact strong {
+    font-size:
+      clamp(
+        10px,
+        0.68cqw,
+        13px
+      );
+  }
+
+#brobots-page-frame .game-info-action {
+    min-height:
+      clamp(
+        41px,
+        5cqh,
+        54px
+      );
+
+    padding:
+      0
+      clamp(
+        13px,
+        0.86cqw,
+        19px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.62cqw,
+        12px
+      );
+  }
+
+#brobots-page-frame .game-info-surface {
+    row-gap:
+      clamp(
+        12px,
+        1.45cqh,
+        24px
+      );
+
+    padding:
+      clamp(
+        24px,
+        3.5cqh,
+        46px
+      )
+      clamp(
+        22px,
+        1.85cqw,
+        38px
+      )
+      clamp(
+        22px,
+        3.2cqh,
+        42px
+      )
+      clamp(
+        24px,
+        2cqw,
+        42px
+      );
+  }
+
+#brobots-page-frame .game-info-surface {
+    transition:
+      grid-template-rows 260ms
+      cubic-bezier(0.2, 0.78, 0.24, 1),
+      row-gap 180ms ease,
+      padding 180ms ease;
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        285px,
+        36cqw,
+        540px
+      );
+
+    max-width: 66%;
+
+    max-height:
+      clamp(
+        82px,
+        13cqh,
+        150px
+      );
+  }
+
+#brobots-page-frame .game-info-kicker {
+    font-size:
+      clamp(
+        9px,
+        0.78cqw,
+        13.5px
+      );
+  }
+
+#brobots-page-frame .game-info-blurb {
+    max-width: 78ch;
+
+    font-size:
+      clamp(
+        12px,
+        0.98cqw,
+        17px
+      );
+
+    line-height: 1.46;
+  }
+
+#brobots-page-frame .game-info-feature {
+    grid-template-columns:
+      clamp(
+        32px,
+        2.65cqw,
+        50px
+      )
+      minmax(0, 1fr);
+
+    gap:
+      clamp(
+        7px,
+        0.66cqw,
+        12px
+      );
+
+    padding:
+      clamp(
+        5px,
+        0.46cqw,
+        9px
+      )
+      clamp(
+        4px,
+        0.38cqw,
+        8px
+      );
+  }
+
+#brobots-page-frame .game-info-feature-icon {
+    font-size:
+      clamp(
+        16px,
+        1.35cqw,
+        25px
+      );
+  }
+
+#brobots-page-frame .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        8px,
+        0.68cqw,
+        11px
+      );
+  }
+
+#brobots-page-frame .game-info-feature-copy small {
+    font-size:
+      clamp(
+        7.5px,
+        0.60cqw,
+        10px
+      );
+  }
+
+#brobots-page-frame .game-info-fact span {
+    font-size:
+      clamp(
+        8px,
+        0.63cqw,
+        10.5px
+      );
+  }
+
+#brobots-page-frame .game-info-fact strong {
+    font-size:
+      clamp(
+        10px,
+        0.78cqw,
+        13.5px
+      );
+  }
+
+#brobots-page-frame .game-info-action {
+    min-height:
+      clamp(
+        41px,
+        5.8cqh,
+        58px
+      );
+
+    padding:
+      0
+      clamp(
+        13px,
+        1.02cqw,
+        21px
+      );
+
+    font-size:
+      clamp(
+        9.5px,
+        0.75cqw,
+        12.5px
+      );
+  }
+
+#brobots-page-frame .game-info-surface {
+    row-gap:
+      clamp(
+        12px,
+        1.7cqh,
+        28px
+      );
+
+    padding:
+      clamp(
+        24px,
+        4.1cqh,
+        52px
+      )
+      clamp(
+        22px,
+        2.15cqw,
+        44px
+      )
+      clamp(
+        22px,
+        3.7cqh,
+        48px
+      )
+      clamp(
+        24px,
+        2.35cqw,
+        48px
+      );
+  }
+
+#brobots-page-frame .game-info-top-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.9cqh,
+        13px
+      );
+  }
+
+#brobots-page-frame .game-info-bottom-zone {
+    row-gap:
+      clamp(
+        7px,
+        0.78cqh,
+        13px
+      );
+  }
+
+#brobots-page-frame .game-info-logo {
+    max-width: 68%;
+  }
+
+#brobots-page-frame .game-info-blurb {
+    max-width: 80ch;
+  }
+
+#brobots-page-frame .game-info-surface {
+    padding-left:
+      clamp(
+        28px,
+        2.55cqw,
+        54px
+      );
+
+    padding-right:
+      clamp(
+        26px,
+        2.35cqw,
+        50px
+      );
+  }
+
+#brobots-page-frame .game-info-blurb {
+    width: 64ch;
+    max-width: none;
+
+    font-size:
+      clamp(
+        12px,
+        0.98cqw,
+        17px
+      );
+
+    line-height: 1.46;
+  }
+
+#brobots-page-frame .game-info-top-zone {
+    min-width: 0;
+  }
+
+#brobots-page-frame .game-info-blurb {
+    max-inline-size:
+      min(
+        64ch,
+        calc(100cqw - 48px)
+      );
+  }
+
+#brobots-page-frame .game-info-blurb {
+    width: 64ch;
+
+    max-inline-size:
+      min(
+        64ch,
+        calc(100cqw - 40px)
+      );
+
+    font-size:
+      clamp(
+        11.4px,
+        0.84cqw,
+        17px
+      );
+
+    line-height: 1.45;
+  }
+
+#brobots-page-frame .game-info-surface {
+    row-gap:
+      clamp(
+        9px,
+        min(
+          1.65cqh,
+          1.05cqw
+        ),
+        26px
+      );
+
+    padding-top:
+      clamp(
+        20px,
+        min(
+          3.8cqh,
+          2.4cqw
+        ),
+        48px
+      );
+
+    padding-bottom:
+      clamp(
+        18px,
+        min(
+          3.4cqh,
+          2.15cqw
+        ),
+        44px
+      );
+  }
+
+#brobots-page-frame .game-info-top-zone {
+    row-gap:
+      clamp(
+        6px,
+        min(
+          0.85cqh,
+          0.62cqw
+        ),
+        12px
+      );
+  }
+
+#brobots-page-frame .game-info-bottom-zone {
+    row-gap:
+      clamp(
+        6px,
+        min(
+          0.74cqh,
+          0.56cqw
+        ),
+        12px
+      );
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        320px,
+        31cqw,
+        420px
+      );
+
+    max-width: 64%;
+
+    max-height:
+      clamp(
+        92px,
+        11.5cqh,
+        122px
+      );
+  }
+
+#brobots-page-frame .game-info-blurb {
+    font-size:
+      clamp(
+        10.8px,
+        0.82cqw,
+        16.5px
+      );
+  }
+
+#brobots-page-frame .game-info-kicker {
+    font-size:
+      clamp(
+        8.5px,
+        0.60cqw,
+        12.5px
+      );
+  }
+
+#brobots-page-frame .game-info-fact span {
+    font-size:
+      clamp(
+        7.5px,
+        0.50cqw,
+        10px
+      );
+  }
+
+#brobots-page-frame .game-info-fact strong {
+    font-size:
+      clamp(
+        9.5px,
+        0.64cqw,
+        13px
+      );
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        320px,
+        31cqw,
+        420px
+      );
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        390px,
+        38cqw,
+        520px
+      );
+
+    max-width: 68%;
+
+    max-height:
+      clamp(
+        108px,
+        13cqh,
+        148px
+      );
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        430px,
+        40cqw,
+        560px
+      );
+
+    max-width: 70%;
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        410px,
+        23vw,
+        520px
+      );
+
+    max-width: 68%;
+
+    max-height:
+      clamp(
+        112px,
+        12.5vh,
+        148px
+      );
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        470px,
+        24vw,
+        560px
+      );
+
+    max-width: 70%;
+
+    max-height: 156px;
+  }
+
+#brobots-page-frame .game-info-logo {
+    width:
+      clamp(
+        320px,
+        calc(27.2vw - 118px),
+        483px
+      );
+
+    max-width: 68%;
+
+    max-height:
+      clamp(
+        92px,
+        calc(7.8vw - 18px),
+        140px
+      );
+
+    transition:
+      width 140ms ease-out,
+      max-height 140ms ease-out;
+  }
+
+#brobots-page-frame
+  .game-info-surface.is-features-collapsed
+  .game-info-logo {
+    width:
+      clamp(
+        340px,
+        calc(29.5vw - 122px),
+        520px
+      );
+
+    max-width: 70%;
+
+    max-height:
+      clamp(
+        100px,
+        calc(8.6vw - 18px),
+        150px
+      );
+  }
+
+#brobots-page-frame
+  .etherian-popout-glass-layer--1 {
+    overflow: hidden;
+  }
+
+#brobots-page-frame
+  .etherian-popout-layer-image {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    height: 100%;
+    width: auto;
+
+    max-width: none;
+
+    display: block;
+
+    object-fit: contain;
+    object-position: top right;
+
+    pointer-events: none;
+
+    
+    opacity: 0.40;
+
+    filter:
+      saturate(0.92)
+      contrast(0.96)
+      brightness(0.88);
+  }
+
+#brobots-page-frame
+  .etherian-popout-glass-layer--1::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 1;
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(18, 30, 34, 0.22),
+        rgba(
+          var(--page-accent-rgb),
+          0.055
+        ) 48%,
+        rgba(10, 18, 22, 0.10)
+      );
+
+    pointer-events: none;
+  }
+
+#brobots-page-frame
+  .etherian-popout-layer-image {
+    z-index: 0;
+  }
+
+#brobots-page-frame
+  .etherian-popout-layer-image {
+    
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      );
+
+    mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      );
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+  }
+
+#brobots-page-frame
+  .etherian-popout-layer-image {
+    opacity: 0.30;
+  }
+
+#brobots-page-frame.is-layout-transitioning.is-secondary-open
+.etherian-popout-layer-stack {
+  opacity: 0 !important;
+  transition-delay: 0ms !important;
+}
+
+#brobots-page-frame
+  .desktop-secondary-panel-content {
+    transition:
+      opacity 650ms ease !important;
+  }
+
+#brobots-page-frame.is-secondary-open
+  .desktop-secondary-panel-content {
+    transition:
+      opacity 650ms ease !important;
+
+    
+    transition-delay:
+      calc(
+        var(--secondary-panel-duration) * 0.78
+      ) !important;
+  }
+
+#brobots-page-frame.is-layout-transitioning
+.etherian-popout-layer-image {
+  opacity: 0 !important;
+
+  transition:
+    opacity 220ms ease !important;
+
+  transition-delay: 0ms !important;
+
+  pointer-events: none !important;
+}
+
+#brobots-page-frame.is-layout-transitioning
+.etherian-popout-layer-stack {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+#brobots-page-frame.is-layout-transitioning
+.etherian-popout-layer-image {
+  position: absolute !important;
+
+  top: 0 !important;
+  right: 0 !important;
+
+  height: 100% !important;
+  width: auto !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  display: block !important;
+
+  object-fit: contain !important;
+  object-position: top right !important;
+
+  z-index: 0 !important;
+
+  opacity: 0 !important;
+
+  filter:
+    saturate(0.92)
+    contrast(0.96)
+    brightness(0.88) !important;
+
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse 78% 72%
+      at 100% 0%,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.96) 30%,
+      rgba(0, 0, 0, 0.72) 48%,
+      rgba(0, 0, 0, 0.30) 66%,
+      rgba(0, 0, 0, 0) 84%
+    ) !important;
+
+  mask-image:
+    radial-gradient(
+      ellipse 78% 72%
+      at 100% 0%,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.96) 30%,
+      rgba(0, 0, 0, 0.72) 48%,
+      rgba(0, 0, 0, 0.30) 66%,
+      rgba(0, 0, 0, 0) 84%
+    ) !important;
+
+  -webkit-mask-repeat: no-repeat !important;
+  mask-repeat: no-repeat !important;
+
+  -webkit-mask-size: 100% 100% !important;
+  mask-size: 100% 100% !important;
+
+  transition:
+    opacity 220ms ease !important;
+
+  transition-delay: 0ms !important;
+
+  pointer-events: none !important;
+}
+
+
+#brobots-page-frame .game-info-background,
+#brobots-page-frame .game-info-layer--rear,
+#brobots-page-frame .game-info-layer--mid,
+#brobots-page-frame .game-info::after {
+  display: none !important;
+}
+
+#brobots-page-frame .desktop-secondary-panel-glass,
+#brobots-page-frame .etherian-popout-glass-layer,
+#brobots-page-frame .game-info-surface {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+#brobots-page-frame .brobots-popout-layer-image {
+  opacity: 0.30;
+}
+
+
+/* =========================================================
+   Generic game-info layered-glass geometry tokens
+   ========================================================= */
+
+/*
+  These geometry variables were originally scoped to the Etherian panel,
+  then copied to Halodoom. Brobots exposed the flaw: its layered panes were
+  present, but the shared stack clip was missing the angle/run variables,
+  so the outer diagonal edge treatment became invalid.
+
+  Define them on the generic secondary-panel container instead. Existing
+  Etherian-prefixed variable names are retained as compatibility aliases for
+  the current pane CSS; future cleanup can rename those structural classes
+  without changing behavior.
+*/
+@media (min-width: 1401px) {
+  .prototype-page-frame .desktop-secondary-panel {
+    --game-info-glass-angle:
+      calc(
+        var(--button-shear-angle) * -1
+      );
+
+    --game-info-stack-cut-rise:
+      clamp(42px, 4.1vw, 68px);
+
+    --game-info-stack-cut-run:
+      calc(
+        var(--game-info-stack-cut-rise)
+        *
+        tan(
+          var(--game-info-glass-angle)
+        )
+      );
+
+    /* Compatibility aliases used by the current shared pane rules. */
+    --etherian-glass-angle:
+      var(--game-info-glass-angle);
+
+    --etherian-stack-cut-rise:
+      var(--game-info-stack-cut-rise);
+
+    --etherian-stack-cut-run:
+      var(--game-info-stack-cut-run);
+  }
+}
+
+
+/* =========================================================
+   Generic game-info decorative screenshot layer
+   ========================================================= */
+
+/*
+  The decorative image itself was still styled only through page-scoped
+  Etherian/Halodoom selectors. Brobots therefore had the <img> element but
+  not the positioning, clipping/mask, z-index, or overflow rules that make
+  it appear as atmosphere inside pane 1.
+
+  Keep the current structural class names for compatibility, but make the
+  actual behavior generic for every game page.
+*/
+@media (min-width: 1401px) {
+  .prototype-page-frame
+  .etherian-popout-glass-layer--1 {
+    overflow: hidden;
+  }
+
+
+  .prototype-page-frame
+  .etherian-popout-layer-image {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    height: 100%;
+    width: auto;
+
+    max-width: none;
+    max-height: none;
+
+    display: block;
+
+    object-fit: contain;
+    object-position: top right;
+
+    z-index: 0;
+
+    opacity: 0.30;
+
+    filter:
+      saturate(0.92)
+      contrast(0.96)
+      brightness(0.88);
+
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      );
+
+    mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      );
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+
+    pointer-events: none;
+  }
+
+
+  /*
+    Preserve a soft glass veil above the screenshot.
+  */
+  .prototype-page-frame
+  .etherian-popout-glass-layer--1::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 1;
+
+    background:
+      linear-gradient(
+        110deg,
+        rgba(18, 30, 34, 0.22),
+        rgba(
+          var(--page-accent-rgb),
+          0.055
+        ) 48%,
+        rgba(10, 18, 22, 0.10)
+      );
+
+    pointer-events: none;
+  }
+}
+
+
+/*
+  Shared desktop -> tablet handoff behavior for the decorative screenshot.
+*/
+.prototype-page-frame.is-layout-transitioning
+.etherian-popout-layer-image {
+  position: absolute !important;
+
+  top: 0 !important;
+  right: 0 !important;
+
+  height: 100% !important;
+  width: auto !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  display: block !important;
+
+  object-fit: contain !important;
+  object-position: top right !important;
+
+  z-index: 0 !important;
+
+  opacity: 0 !important;
+
+  pointer-events: none !important;
+
+  transition:
+    opacity 220ms ease !important;
+
+  transition-delay: 0ms !important;
+}
+
+
+@media (max-width: 1400px) {
+  .prototype-page-frame:not(.is-layout-transitioning)
+  .etherian-popout-layer-image {
+    display: none !important;
+  }
+}
+
+
+/* =========================================================
+   Brobots decorative screenshot — correct responsive visibility
+   ========================================================= */
+
+/*
+  IMPORTANT:
+  A previous selector-cloning pass accidentally stripped the original
+  @media (max-width: 1400px) wrapper and made this display:none rule global.
+  That meant the image had the correct src and styling but was literally
+  hidden on desktop.
+
+  Desktop: show it.
+  Tablet: hide it once the responsive handoff has completed.
+*/
+@media (min-width: 1401px) {
+  #brobots-page-frame:not(.is-layout-transitioning)
+  .brobots-popout-layer-image {
+    display: block !important;
+  }
+}
+
+
+@media (max-width: 1400px) {
+  #brobots-page-frame:not(.is-layout-transitioning)
+  .brobots-popout-layer-image {
+    display: none !important;
+  }
+}
+
+
+/* =========================================================
+   Game info — stronger background image + base glass test
+   ========================================================= */
+
+/*
+  Dedicated info artwork is intentionally more visible for this pass.
+  Previous final value was 0.30.
+*/
+@media (min-width: 1401px) {
+  #etherian-page-frame .etherian-popout-layer-image,
+  #halodoom-page-frame .etherian-popout-layer-image,
+  #brobots-page-frame .etherian-popout-layer-image {
+    opacity: 0.60;
+  }
+}
+
+
+/*
+  The ORIGINAL morphing popout glass sits behind the decorative pane stack.
+  Previous final fill was rgba(105, 118, 138, 0.24).
+
+  JS reads --secondary-panel-fill when it builds the morph keyframes, so
+  changing this variable updates both the resting panel and the final frame
+  of the open/close animation without any separate JS timing changes.
+*/
+#etherian-page-frame,
+#halodoom-page-frame,
+#brobots-page-frame {
+  --secondary-panel-fill:
+    rgba(105, 118, 138, 0.48);
+}
+
+
+/* =========================================================
+   Game info — 2x secondary layered-glass opacity test
+   ========================================================= */
+
+/*
+  Current final pane opacities were:
+    Layer 1: 0.50
+    Layer 2: 0.58
+    Layer 3: 0.64
+    Layer 4: 0.70
+
+  Doubling those values would exceed CSS's maximum opacity of 1 for layers
+  2–4, so this test clamps each result to 1. The pane fills themselves
+  remain translucent gradients; this only removes the extra whole-element
+  transparency that was being applied on top of those fills.
+*/
+@media (min-width: 1401px) {
+  #etherian-page-frame .etherian-popout-glass-layer--1,
+  #halodoom-page-frame .etherian-popout-glass-layer--1,
+  #brobots-page-frame .etherian-popout-glass-layer--1 {
+    opacity: 1;
+  }
+
+
+  #etherian-page-frame .etherian-popout-glass-layer--2,
+  #halodoom-page-frame .etherian-popout-glass-layer--2,
+  #brobots-page-frame .etherian-popout-glass-layer--2 {
+    opacity: 1;
+  }
+
+
+  #etherian-page-frame .etherian-popout-glass-layer--3,
+  #halodoom-page-frame .etherian-popout-glass-layer--3,
+  #brobots-page-frame .etherian-popout-glass-layer--3 {
+    opacity: 1;
+  }
+
+
+  #etherian-page-frame .etherian-popout-glass-layer--4,
+  #halodoom-page-frame .etherian-popout-glass-layer--4,
+  #brobots-page-frame .etherian-popout-glass-layer--4 {
+    opacity: 1;
+  }
+}
+
+
+/* =========================================================
+   Site background video — generic two-buffer crossfade
+   ========================================================= */
+
+:root {
+  --background-video-crossfade-duration: 700ms;
+}
+
+
+/*
+  Both video buffers occupy the exact same existing background aperture.
+  The old visual opacity (0.62) now belongs only to the active buffer.
+*/
+.site-background-video {
+  opacity: 0;
+
+  transition:
+    opacity
+    var(--background-video-crossfade-duration)
+    ease;
+
+  will-change: opacity;
+}
+
+
+.site-background-video.is-background-active {
+  opacity: 0.62;
+}
+
+
+/*
+  Keep both buffers under the existing neutral veil.
+*/
+.site-background-video--a,
+.site-background-video--b {
+  z-index: 0;
+}
+
+
+.site-background::after {
+  z-index: 1;
+}
+
+
+/*
+  Avoid an animated fade for users who request reduced motion.
+  The existing reduced-motion rule still suppresses decorative video.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .site-background-video {
+    transition: none;
+  }
+}

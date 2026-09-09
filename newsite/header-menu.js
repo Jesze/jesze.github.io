@@ -401,6 +401,318 @@ document.addEventListener("DOMContentLoaded", () => {
   */
   let selectedPageName = null;
 
+
+  /* =======================================================
+     Site background video
+     ======================================================= */
+
+  /*
+    Background selection intentionally follows selectedPageName:
+      selectedPageName = immediate user intent
+      activePageName   = page currently committed/animating
+
+    That means the background begins changing on the SAME state change as
+    the nav selection, rather than waiting for the page morph to finish.
+    Rapid retargeting therefore uses the same source of truth as the page
+    controller instead of introducing a second page-state machine.
+  */
+  const defaultBackgroundVideoSrc =
+    "assets/simulacrum-loop.mp4";
+
+
+  const pageBackgroundVideoSources =
+    new Map([
+      [
+        "brobots",
+        "assets/brobots/brobots-loop.mp4"
+      ],
+      [
+        "etherian",
+        "assets/etherian/etherian-loop.mp4"
+      ],
+      [
+        "halodoom",
+        "assets/halodoom/halodoom-loop.mp4"
+      ]
+    ]);
+
+
+  const backgroundVideoBuffers =
+    Array.from(
+      document.querySelectorAll(
+        ".site-background-video"
+      )
+    );
+
+
+  let activeBackgroundVideo =
+    backgroundVideoBuffers.find(
+      (video) =>
+        video.classList.contains(
+          "is-background-active"
+        )
+    ) ||
+    backgroundVideoBuffers[0] ||
+    null;
+
+
+  let backgroundVideoRunId = 0;
+  let requestedBackgroundVideoSrc =
+    defaultBackgroundVideoSrc;
+
+
+  const getBackgroundVideoSrc = (
+    pageName
+  ) => {
+    return (
+      pageBackgroundVideoSources.get(
+        pageName
+      ) ||
+      defaultBackgroundVideoSrc
+    );
+  };
+
+
+  const getBackgroundCrossfadeDuration = () => {
+    const styles =
+      getComputedStyle(
+        document.documentElement
+      );
+
+
+    return parseCssTime(
+      styles.getPropertyValue(
+        "--background-video-crossfade-duration"
+      ),
+      700
+    );
+  };
+
+
+  const safelyPlayBackgroundVideo = (
+    video
+  ) => {
+    if (!video) {
+      return;
+    }
+
+
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+
+
+    const playPromise =
+      video.play();
+
+
+    if (
+      playPromise &&
+      typeof playPromise.catch ===
+        "function"
+    ) {
+      playPromise.catch(() => {
+        video.classList.add(
+          "is-autoplay-blocked"
+        );
+      });
+    }
+  };
+
+
+  const requestBackgroundVideo = (
+    pageName
+  ) => {
+    if (backgroundVideoBuffers.length < 2) {
+      return;
+    }
+
+
+    const nextSrc =
+      getBackgroundVideoSrc(
+        pageName
+      );
+
+
+    requestedBackgroundVideoSrc =
+      nextSrc;
+
+
+    /*
+      If the current front buffer already owns this requested source,
+      simply keep it active. This is important when several rapid page
+      clicks resolve back to the same destination.
+    */
+    if (
+      activeBackgroundVideo &&
+      activeBackgroundVideo.dataset
+        .backgroundSrc === nextSrc
+    ) {
+      backgroundVideoRunId += 1;
+
+
+      backgroundVideoBuffers.forEach(
+        (video) => {
+          video.classList.toggle(
+            "is-background-active",
+            video === activeBackgroundVideo
+          );
+        }
+      );
+
+
+      safelyPlayBackgroundVideo(
+        activeBackgroundVideo
+      );
+
+      return;
+    }
+
+
+    backgroundVideoRunId += 1;
+
+    const runId =
+      backgroundVideoRunId;
+
+
+    const outgoingVideo =
+      activeBackgroundVideo;
+
+
+    const incomingVideo =
+      backgroundVideoBuffers.find(
+        (video) =>
+          video !== outgoingVideo
+      );
+
+
+    if (!incomingVideo) {
+      return;
+    }
+
+
+    /*
+      Retarget the spare buffer immediately on the button press.
+      We do NOT wait for the page morph or for a canplay event before
+      beginning the opacity transition; the video element starts loading
+      and playing at the same moment the user's page intent changes.
+    */
+    incomingVideo.classList.remove(
+      "is-autoplay-blocked"
+    );
+
+    incomingVideo.dataset.backgroundSrc =
+      nextSrc;
+
+    incomingVideo.src =
+      nextSrc;
+
+    incomingVideo.load();
+
+
+    try {
+      incomingVideo.currentTime = 0;
+    }
+
+    catch (_) {
+      /* Some browsers disallow seeking before metadata exists. */
+    }
+
+
+    safelyPlayBackgroundVideo(
+      incomingVideo
+    );
+
+
+    /*
+      Force the incoming buffer to begin from the hidden state before
+      switching which layer owns the visible opacity transition.
+    */
+    incomingVideo.classList.remove(
+      "is-background-active"
+    );
+
+    void incomingVideo.offsetWidth;
+
+
+    outgoingVideo?.classList.remove(
+      "is-background-active"
+    );
+
+    incomingVideo.classList.add(
+      "is-background-active"
+    );
+
+
+    activeBackgroundVideo =
+      incomingVideo;
+
+
+    const fadeDuration =
+      getBackgroundCrossfadeDuration();
+
+
+    /*
+      Pause the old buffer only AFTER the fade. The run id makes old
+      callbacks harmless if the user clicks again before this finishes.
+    */
+    window.setTimeout(
+      () => {
+        if (
+          runId !== backgroundVideoRunId
+        ) {
+          return;
+        }
+
+
+        backgroundVideoBuffers.forEach(
+          (video) => {
+            const isCurrent =
+              video === activeBackgroundVideo &&
+              video.dataset.backgroundSrc ===
+                requestedBackgroundVideoSrc;
+
+
+            if (!isCurrent) {
+              video.pause();
+            }
+          }
+        );
+      },
+      fadeDuration + 80
+    );
+  };
+
+
+  const setSelectedPageIntent = (
+    name
+  ) => {
+    selectedPageName =
+      name;
+
+
+    requestBackgroundVideo(
+      selectedPageName
+    );
+  };
+
+
+  /*
+    Start the default layer if autoplay is available.
+  */
+  if (activeBackgroundVideo) {
+    activeBackgroundVideo.dataset.backgroundSrc =
+      activeBackgroundVideo.getAttribute(
+        "src"
+      ) ||
+      defaultBackgroundVideoSrc;
+
+
+    safelyPlayBackgroundVideo(
+      activeBackgroundVideo
+    );
+  }
+
   let pageFrameIsAnimating = false;
   let pageFrameTargetOpen = false;
   let pageFrameProgress = 0;
@@ -6024,7 +6336,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     activePageName = null;
-    selectedPageName = null;
+    setSelectedPageIntent(
+      null
+    );
 
     setActivePageButtonState(
       null
@@ -6098,8 +6412,9 @@ document.addEventListener("DOMContentLoaded", () => {
       !selectedPageName ||
       selectedPageName === name
     ) {
-      selectedPageName =
-        name;
+      setSelectedPageIntent(
+        name
+      );
 
       setActivePageButtonState(
         name
@@ -6573,8 +6888,9 @@ document.addEventListener("DOMContentLoaded", () => {
         !selectedPageName ||
         selectedPageName === name
       ) {
-        selectedPageName =
-          name;
+        setSelectedPageIntent(
+          name
+        );
 
         setActivePageButtonState(
           name
@@ -7523,8 +7839,9 @@ document.addEventListener("DOMContentLoaded", () => {
       else {
         activePageName =
           null;
-        selectedPageName =
-          null;
+        setSelectedPageIntent(
+          null
+        );
 
         setActivePageButtonState(
           null
@@ -7810,8 +8127,11 @@ document.addEventListener("DOMContentLoaded", () => {
           activePageName =
             null;
 
-          selectedPageName =
-            null;
+          setSelectedPageIntent(
+
+            null
+
+          );
         }
       }
     });
@@ -7841,8 +8161,9 @@ document.addEventListener("DOMContentLoaded", () => {
       No active page yet: open immediately.
     */
     if (!activePageName) {
-      selectedPageName =
-        name;
+      setSelectedPageIntent(
+        name
+      );
 
       setActivePageButtonState(
         name
@@ -7869,8 +8190,9 @@ document.addEventListener("DOMContentLoaded", () => {
             Keep the current button pressed while its full reverse morph
             plays. startPageClose() releases it only at the very end.
           */
-          selectedPageName =
-            null;
+          setSelectedPageIntent(
+            null
+          );
 
 
           startPageClose(
@@ -7879,8 +8201,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         else {
-          selectedPageName =
-            activePageName;
+          setSelectedPageIntent(
+            activePageName
+          );
 
           setActivePageButtonState(
             activePageName
@@ -7901,8 +8224,9 @@ document.addEventListener("DOMContentLoaded", () => {
           Keep the current button pressed until the reverse morph has been
           completely absorbed back into it.
         */
-        selectedPageName =
-          null;
+        setSelectedPageIntent(
+          null
+        );
 
 
         startPageClose(
@@ -7911,8 +8235,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       else {
-        selectedPageName =
-          activePageName;
+        setSelectedPageIntent(
+          activePageName
+        );
 
         setActivePageButtonState(
           activePageName
@@ -7937,8 +8262,9 @@ document.addEventListener("DOMContentLoaded", () => {
       immediately while activePageName continues to represent the outgoing
       page until its return animation hands off to the incoming page.
     */
-    selectedPageName =
-      name;
+    setSelectedPageIntent(
+      name
+    );
 
 
     setActivePageButtonState(
@@ -8191,28 +8517,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /*
-    Etherian responsive content snapshot
+    Game-info responsive content snapshot
     -------------------------------------
-    The desktop Etherian info styling itself lives inside min-width:1401px.
-    Therefore, once the breakpoint is crossed, the LIVE info surface has
-    already reflowed into its tablet styling before our transition callback
-    can fade it.
-
-    Cache a frozen, fully-computed copy while we are still genuinely on the
-    desktop side. Desktop -> tablet then fades that frozen copy, while the
-    live tablet version stays hidden until the frame has finished resizing.
+    Shared by Etherian, Halodoom, and future game pages that use
+    .game-info-surface.
   */
-  let etherianDesktopInfoSnapshot =
-    null;
+  const gameInfoDesktopSnapshots =
+    new Map();
 
-  let etherianResponsiveOverlay =
-    null;
+  const gameInfoResponsiveOverlays =
+    new Map();
 
-  let etherianResponsiveOverlayAnimation =
-    null;
+  const gameInfoResponsiveOverlayAnimations =
+    new Map();
 
-  let etherianTabletInfoFadeAnimation =
-    null;
+  const gameInfoTabletFadeAnimations =
+    new Map();
+
+
+  const getGameInfoSurface = (
+    frame
+  ) => {
+    return (
+      frame?.querySelector(
+        ".game-info-surface"
+      ) ||
+      null
+    );
+  };
 
 
   const copyComputedStyleTree = (
@@ -8280,11 +8612,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const captureEtherianDesktopInfoSnapshot = () => {
+  const captureActiveGameInfoDesktopSnapshot = () => {
     if (
       !fullTextDesktopMode.matches ||
       pageLayoutTransitionActive ||
-      activePageName !== "etherian"
+      !activePageName
     ) {
       return;
     }
@@ -8292,7 +8624,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const frame =
       getPageFrame(
-        "etherian"
+        activePageName
       );
 
 
@@ -8307,8 +8639,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const surface =
-      frame.querySelector(
-        ".game-info-surface"
+      getGameInfoSurface(
+        frame
       );
 
 
@@ -8344,10 +8676,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    /*
-      Root geometry will be supplied from the cached viewport rect when the
-      overlay is actually shown.
-    */
     clone.removeAttribute(
       "id"
     );
@@ -8364,58 +8692,74 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    etherianDesktopInfoSnapshot = {
-      clone,
-      rect,
-      viewportWidth:
-        window.innerWidth
-    };
+    gameInfoDesktopSnapshots.set(
+      frame,
+      {
+        clone,
+        rect,
+        viewportWidth:
+          window.innerWidth
+      }
+    );
   };
 
 
-  const clearEtherianResponsiveFadeArtifacts = (
-    frame = null
+  const clearGameInfoResponsiveFadeArtifacts = (
+    frame
   ) => {
-    if (
-      etherianResponsiveOverlayAnimation
-    ) {
-      etherianResponsiveOverlayAnimation.cancel();
-
-      etherianResponsiveOverlayAnimation =
-        null;
+    if (!frame) {
+      return;
     }
 
 
-    if (
-      etherianResponsiveOverlay
-    ) {
-      etherianResponsiveOverlay.remove();
-
-      etherianResponsiveOverlay =
-        null;
-    }
-
-
-    if (
-      etherianTabletInfoFadeAnimation
-    ) {
-      etherianTabletInfoFadeAnimation.cancel();
-
-      etherianTabletInfoFadeAnimation =
-        null;
-    }
-
-
-    const targetFrame =
-      frame ||
-      getPageFrame(
-        "etherian"
+    const overlayAnimation =
+      gameInfoResponsiveOverlayAnimations.get(
+        frame
       );
 
 
+    if (overlayAnimation) {
+      overlayAnimation.cancel();
+
+      gameInfoResponsiveOverlayAnimations.delete(
+        frame
+      );
+    }
+
+
+    const overlay =
+      gameInfoResponsiveOverlays.get(
+        frame
+      );
+
+
+    if (overlay) {
+      overlay.remove();
+
+      gameInfoResponsiveOverlays.delete(
+        frame
+      );
+    }
+
+
+    const tabletAnimation =
+      gameInfoTabletFadeAnimations.get(
+        frame
+      );
+
+
+    if (tabletAnimation) {
+      tabletAnimation.cancel();
+
+      gameInfoTabletFadeAnimations.delete(
+        frame
+      );
+    }
+
+
     const surface =
-      targetFrame?.querySelector(
-        ".game-info-surface"
+      getGameInfoSurface(
+        frame
       );
 
 
@@ -8427,45 +8771,45 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const showEtherianDesktopInfoSnapshot = (
+  const showGameInfoDesktopSnapshot = (
     frame,
     duration = 650
   ) => {
+    const snapshot =
+      gameInfoDesktopSnapshots.get(
+        frame
+      );
+
+
+    const surface =
+      getGameInfoSurface(
+        frame
+      );
+
+
     if (
       !frame ||
-      frame.dataset.page !== "etherian" ||
-      !etherianDesktopInfoSnapshot
+      !surface ||
+      !snapshot
     ) {
       return Promise.resolve();
     }
 
 
-    clearEtherianResponsiveFadeArtifacts(
+    clearGameInfoResponsiveFadeArtifacts(
       frame
     );
 
 
-    const surface =
-      frame.querySelector(
-        ".game-info-surface"
-      );
-
-
-    if (surface) {
-      /*
-        Hide the newly-reflowed live tablet content immediately. The frozen
-        desktop snapshot now supplies the outgoing visual.
-      */
-      surface.style.opacity =
-        "0";
-    }
+    surface.style.opacity =
+      "0";
 
 
     const {
       clone,
       rect
     } =
-      etherianDesktopInfoSnapshot;
+      snapshot;
 
 
     const overlay =
@@ -8524,8 +8868,10 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    etherianResponsiveOverlay =
-      overlay;
+    gameInfoResponsiveOverlays.set(
+      frame,
+      overlay
+    );
 
 
     const animation =
@@ -8554,8 +8900,10 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    etherianResponsiveOverlayAnimation =
-      animation;
+    gameInfoResponsiveOverlayAnimations.set(
+      frame,
+      animation
+    );
 
 
     return animation.finished
@@ -8565,23 +8913,27 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(
         () => {
           if (
-            etherianResponsiveOverlayAnimation !==
-            animation
+            gameInfoResponsiveOverlayAnimations.get(
+              frame
+            ) !== animation
           ) {
             return;
           }
 
 
-          etherianResponsiveOverlayAnimation =
-            null;
+          gameInfoResponsiveOverlayAnimations.delete(
+            frame
+          );
 
 
           if (
-            etherianResponsiveOverlay ===
-            overlay
+            gameInfoResponsiveOverlays.get(
+              frame
+            ) === overlay
           ) {
-            etherianResponsiveOverlay =
-              null;
+            gameInfoResponsiveOverlays.delete(
+              frame
+            );
           }
 
 
@@ -8591,22 +8943,14 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const fadeEtherianTabletInfoIn = (
+  const fadeGameInfoTabletIn = (
     frame,
     runId,
     duration = 650
   ) => {
-    if (
-      !frame ||
-      frame.dataset.page !== "etherian"
-    ) {
-      return;
-    }
-
-
     const surface =
-      frame.querySelector(
-        ".game-info-surface"
+      getGameInfoSurface(
+        frame
       );
 
 
@@ -8615,13 +8959,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    if (
-      etherianTabletInfoFadeAnimation
-    ) {
-      etherianTabletInfoFadeAnimation.cancel();
+    const oldAnimation =
+      gameInfoTabletFadeAnimations.get(
+        frame
+      );
 
-      etherianTabletInfoFadeAnimation =
-        null;
+
+    if (oldAnimation) {
+      oldAnimation.cancel();
+
+      gameInfoTabletFadeAnimations.delete(
+        frame
+      );
     }
 
 
@@ -8658,8 +9007,10 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    etherianTabletInfoFadeAnimation =
-      animation;
+    gameInfoTabletFadeAnimations.set(
+      frame,
+      animation
+    );
 
 
     animation.finished
@@ -8669,21 +9020,19 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(
         () => {
           if (
-            etherianTabletInfoFadeAnimation !==
-            animation
+            gameInfoTabletFadeAnimations.get(
+              frame
+            ) !== animation
           ) {
             return;
           }
 
 
-          etherianTabletInfoFadeAnimation =
-            null;
+          gameInfoTabletFadeAnimations.delete(
+            frame
+          );
 
 
-          /*
-            A rapid breakpoint reversal may have started a newer handoff.
-            Never let an old fade callback overwrite that newer state.
-          */
           if (
             runId !==
             pageLayoutTransitionRunId
@@ -9281,7 +9630,7 @@ document.addEventListener("DOMContentLoaded", () => {
       A breakpoint can reverse before the previous fade has completed.
       Always start from a clean visual ownership state.
     */
-    clearEtherianResponsiveFadeArtifacts(
+    clearGameInfoResponsiveFadeArtifacts(
       frame
     );
 
@@ -9394,7 +9743,7 @@ document.addEventListener("DOMContentLoaded", () => {
             runId
           ),
 
-          showEtherianDesktopInfoSnapshot(
+          showGameInfoDesktopSnapshot(
             frame,
             340
           )
@@ -9403,7 +9752,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       if (runId !== pageLayoutTransitionRunId) {
-        clearEtherianResponsiveFadeArtifacts(
+        clearGameInfoResponsiveFadeArtifacts(
           frame
         );
 
@@ -9515,7 +9864,7 @@ document.addEventListener("DOMContentLoaded", () => {
       /*
         Preserve the known-good tablet -> desktop reveal behavior.
       */
-      clearEtherianResponsiveFadeArtifacts(
+      clearGameInfoResponsiveFadeArtifacts(
         frame
       );
 
@@ -9530,7 +9879,7 @@ document.addEventListener("DOMContentLoaded", () => {
         The real tablet layout is now settled. Bring its content in only
         after the frozen desktop snapshot has completely disappeared.
       */
-      fadeEtherianTabletInfoIn(
+      fadeGameInfoTabletIn(
         frame,
         runId,
         360
@@ -12857,6 +13206,39 @@ document.addEventListener("DOMContentLoaded", () => {
         "[data-media-viewer-stage]"
       );
 
+
+
+    const viewer =
+      browser.querySelector(
+        ".media-viewer"
+      );
+
+
+    const setViewerAspectRatio = (
+      ratio = 16 / 9
+    ) => {
+      if (!viewer) {
+        return;
+      }
+
+
+      const safeRatio =
+        Number.isFinite(
+          ratio
+        ) &&
+        ratio > 0
+          ? ratio
+          : 16 / 9;
+
+
+      viewer.style.setProperty(
+        "--media-viewer-aspect-number",
+        String(
+          safeRatio
+        )
+      );
+    };
+
     const thumbnails =
       browser.querySelector(
         "[data-media-thumbnails]"
@@ -13155,6 +13537,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       /*
+        Videos and YouTube retain the established 16:9 viewer.
+        Images replace that ratio with their intrinsic dimensions once the
+        file is available.
+      */
+      setViewerAspectRatio(
+        16 / 9
+      );
+
+
+      /*
         Replacing the child also stops any previous YouTube/local-video
         playback automatically, so media never keeps playing off-screen.
       */
@@ -13168,11 +13560,66 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
 
-      requestAnimationFrame(() => {
-        stage.classList.add(
-          "is-ready"
-        );
-      });
+      if (
+        mediaElement instanceof HTMLImageElement
+      ) {
+        const revealImage = () => {
+          if (
+            mediaElement.naturalWidth > 0 &&
+            mediaElement.naturalHeight > 0
+          ) {
+            setViewerAspectRatio(
+              mediaElement.naturalWidth /
+              mediaElement.naturalHeight
+            );
+          }
+
+
+          requestAnimationFrame(() => {
+            stage.classList.add(
+              "is-ready"
+            );
+          });
+        };
+
+
+        if (mediaElement.complete) {
+          revealImage();
+        }
+
+        else {
+          mediaElement.addEventListener(
+            "load",
+            revealImage,
+            {
+              once: true
+            }
+          );
+
+
+          mediaElement.addEventListener(
+            "error",
+            () => {
+              requestAnimationFrame(() => {
+                stage.classList.add(
+                  "is-ready"
+                );
+              });
+            },
+            {
+              once: true
+            }
+          );
+        }
+      }
+
+      else {
+        requestAnimationFrame(() => {
+          stage.classList.add(
+            "is-ready"
+          );
+        });
+      }
 
 
       ensureActiveThumbnailVisible(
@@ -13290,29 +13737,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =======================================================
-     Etherian feature-card crowding guard
+     Game-info feature-card crowding guard
      ======================================================= */
 
-  const etherianFeatureGrid =
-    document.querySelector(
-      "#etherian-page-frame .game-info-features"
+  /*
+    This used to be wired specifically to #etherian-page-frame even though
+    the visual layout itself was already reusable. Make the behavior truly
+    modular now: every .game-info-features block gets the same vertical-
+    pressure culling logic.
+  */
+  const gameInfoFeatureGrids =
+    Array.from(
+      document.querySelectorAll(
+        ".game-info-features"
+      )
     );
 
 
-  const updateEtherianInfoLayout = () => {
-    const frame =
-      document.querySelector(
-        "#etherian-page-frame"
-      );
-
-
+  const updateGameInfoLayout = (
+    frame
+  ) => {
     if (!frame) {
       return;
     }
 
 
     /*
-      The information panel now uses one continuous proportional grid.
       Keep legacy state classes cleared so they cannot create resize pops.
     */
     frame.classList.remove(
@@ -13322,19 +13772,17 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  let etherianFeaturesCollapsed =
-    false;
-
-
-  const getEtherianNaturalFeatureHeight = () => {
-    if (!etherianFeatureGrid) {
+  const getNaturalFeatureHeight = (
+    featureGrid
+  ) => {
+    if (!featureGrid) {
       return 0;
     }
 
 
     const cards =
       Array.from(
-        etherianFeatureGrid.querySelectorAll(
+        featureGrid.querySelectorAll(
           ".game-info-feature"
         )
       );
@@ -13347,7 +13795,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const styles =
       getComputedStyle(
-        etherianFeatureGrid
+        featureGrid
       );
 
 
@@ -13358,9 +13806,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /*
-      The feature grid is two columns. Measure each visual row from its
-      tallest card instead of measuring the animated parent track.
-      This stays stable even while that parent is collapsing toward 0px.
+      The current info layout uses two columns. Measure each visual row from
+      its tallest card so the height remains stable while the parent track
+      animates toward zero.
     */
     const cardHeights =
       cards.map(
@@ -13369,44 +13817,58 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    const firstRowHeight =
-      Math.max(
-        cardHeights[0] || 0,
-        cardHeights[1] || 0
-      );
+    let totalHeight = 0;
 
 
-    const secondRowHeight =
-      Math.max(
-        cardHeights[2] || 0,
-        cardHeights[3] || 0
-      );
+    for (
+      let index = 0;
+      index < cardHeights.length;
+      index += 2
+    ) {
+      const rowHeight =
+        Math.max(
+          cardHeights[index] || 0,
+          cardHeights[index + 1] || 0
+        );
 
 
-    return (
-      firstRowHeight +
-      secondRowHeight +
-      (
-        secondRowHeight > 0
-          ? rowGap
-          : 0
-      )
-    );
+      if (rowHeight <= 0) {
+        continue;
+      }
+
+
+      if (totalHeight > 0) {
+        totalHeight +=
+          rowGap;
+      }
+
+
+      totalHeight +=
+        rowHeight;
+    }
+
+
+    return totalHeight;
   };
 
 
-  const updateEtherianFeatureCrowding = () => {
-    if (!etherianFeatureGrid) {
+  const updateGameInfoFeatureCrowding = (
+    featureGrid
+  ) => {
+    if (!featureGrid) {
       return;
     }
 
 
-    updateEtherianInfoLayout();
-
-
     const surface =
-      etherianFeatureGrid.closest(
+      featureGrid.closest(
         ".game-info-surface"
+      );
+
+
+    const frame =
+      featureGrid.closest(
+        ".prototype-page-frame"
       );
 
 
@@ -13424,6 +13886,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (
       !surface ||
+      !frame ||
       !topZone ||
       !bottomZone
     ) {
@@ -13431,118 +13894,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    const surfaceStyles =
-      getComputedStyle(
-        surface
-      );
+    updateGameInfoLayout(
+      frame
+    );
 
 
     const surfaceRect =
       surface.getBoundingClientRect();
 
 
-    const topHeight =
-      topZone.getBoundingClientRect().height;
-
-
-    const bottomHeight =
-      bottomZone.getBoundingClientRect().height;
-
-
     const naturalFeatureHeight =
       Math.max(
-        getEtherianNaturalFeatureHeight(),
+        getNaturalFeatureHeight(
+          featureGrid
+        ),
         1
       );
 
 
-    const rowGap =
-      parseFloat(
-        surfaceStyles.rowGap
-      ) || 0;
-
-
-    const paddingTop =
-      parseFloat(
-        surfaceStyles.paddingTop
-      ) || 0;
-
-
-    const paddingBottom =
-      parseFloat(
-        surfaceStyles.paddingBottom
-      ) || 0;
-
-
-    const requiredExpandedHeight =
-      paddingTop +
-      topHeight +
-      rowGap +
-      naturalFeatureHeight +
-      rowGap +
-      bottomHeight +
-      paddingBottom;
-
-
-    const availableHeight =
-      surfaceRect.height;
-
-
     /*
-      The feature grid is allowed to remain visible right up until the
-      complete three-zone composition genuinely stops fitting.
-    */
-    const freeSpace =
-      availableHeight -
-      requiredExpandedHeight;
-
-
-    /*
-      Monotonic capacity test.
-
-      `freeSpace` is NOT monotonic because the responsive layout itself
-      changes while the window resizes: fonts, padding, line wrapping and
-      gaps can all get smaller. That meant the feature section could hide,
-      then become "fit" again at an even smaller window.
-
-      Instead, use a capacity score based only on the surface dimensions.
-      If either dimension shrinks, this score can only stay the same or get
-      smaller, so the feature section cannot disappear and then reappear
-      while continuously resizing in one direction.
-    */
-    /*
-      Use hard dimensional floors rather than letting a very wide panel
-      compensate for being too short (or a very tall panel compensate for
-      being too narrow).
-
-      This matches the visual rule we actually care about:
-      once the logo / blurb and the facts / CTA block begin crowding the
-      popout's top and bottom edges, the optional feature zone should retire.
+      Same threshold that was tuned for Etherian.
+      The important part is that the decision responds only to genuine
+      vertical pressure, not to X-axis compression.
     */
     const minimumFeatureHeight =
       575;
-
-
-    /*
-      Feature culling should respond only to genuine VERTICAL pressure.
-
-      surfaceRect.height by itself is not enough, because on desktop the
-      entire page frame is almost square and its height can shrink when the
-      viewport gets narrower. That means an X-only resize can indirectly
-      make this surface shorter even though the browser's Y space has not
-      changed.
-
-      Normalize the surface height against the maximum frame height allowed
-      by the current viewport Y-axis. In other words: "how tall would this
-      info surface be if width were not the thing constraining the frame?"
-
-      When height is the real constraint, this resolves back to the actual
-      surface height, preserving the existing 575px Y threshold.
-    */
-    const frame =
-      document.querySelector(
-        "#etherian-page-frame"
-      );
 
 
     let verticalPressureHeight =
@@ -13550,7 +13926,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (
-      frame &&
       fullTextDesktopMode.matches &&
       !pageLayoutTransitionActive
     ) {
@@ -13572,16 +13947,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ) || 0;
 
 
-      /*
-        Desktop frame vertical placement is:
-
-          areaTop
-          + (availableHeight - frameHeight) / 2
-          + pageShiftY
-
-        Rearranging that lets us recover availableHeight from the live frame
-        rectangle without duplicating the header/gap CSS calculations.
-      */
       const availableFrameHeight =
         Math.max(
           frameRect.height,
@@ -13611,29 +13976,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    etherianFeaturesCollapsed =
+    const featuresCollapsed =
       verticalPressureHeight <
         minimumFeatureHeight;
 
 
     surface.classList.toggle(
       "is-features-collapsed",
-      etherianFeaturesCollapsed
+      featuresCollapsed
     );
 
 
     surface.style.setProperty(
       "--feature-zone-height",
-      etherianFeaturesCollapsed
+      featuresCollapsed
         ? "0px"
         : `${naturalFeatureHeight}px`
     );
   };
 
 
-  if (etherianFeatureGrid) {
+  const updateAllGameInfoFeatureCrowding = () => {
+    gameInfoFeatureGrids.forEach(
+      updateGameInfoFeatureCrowding
+    );
+  };
+
+
+  if (
+    gameInfoFeatureGrids.length > 0
+  ) {
     requestAnimationFrame(
-      updateEtherianFeatureCrowding
+      updateAllGameInfoFeatureCrowding
     );
 
 
@@ -13641,30 +14015,65 @@ document.addEventListener("DOMContentLoaded", () => {
       typeof ResizeObserver ===
       "function"
     ) {
-      const etherianFeatureObserver =
-        new ResizeObserver(() => {
-          requestAnimationFrame(
-            updateEtherianFeatureCrowding
+      const gameInfoFeatureObserver =
+        new ResizeObserver(
+          (entries) => {
+            const gridsToUpdate =
+              new Set();
+
+
+            entries.forEach(
+              (entry) => {
+                const grid =
+                  entry.target.matches(
+                    ".game-info-features"
+                  )
+                    ? entry.target
+                    : entry.target.querySelector(
+                        ".game-info-features"
+                      );
+
+
+                if (grid) {
+                  gridsToUpdate.add(
+                    grid
+                  );
+                }
+              }
+            );
+
+
+            requestAnimationFrame(
+              () => {
+                gridsToUpdate.forEach(
+                  updateGameInfoFeatureCrowding
+                );
+              }
+            );
+          }
+        );
+
+
+      gameInfoFeatureGrids.forEach(
+        (featureGrid) => {
+          gameInfoFeatureObserver.observe(
+            featureGrid
           );
-        });
 
 
-      etherianFeatureObserver.observe(
-        etherianFeatureGrid
+          const surface =
+            featureGrid.closest(
+              ".game-info-surface"
+            );
+
+
+          if (surface) {
+            gameInfoFeatureObserver.observe(
+              surface
+            );
+          }
+        }
       );
-
-
-      const etherianInfoSurface =
-        etherianFeatureGrid.closest(
-          ".game-info-surface"
-        );
-
-
-      if (etherianInfoSurface) {
-        etherianFeatureObserver.observe(
-          etherianInfoSurface
-        );
-      }
     }
   }
 
@@ -13680,7 +14089,7 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(() => {
       rememberStablePageRect();
 
-      captureEtherianDesktopInfoSnapshot();
+      captureActiveGameInfoDesktopSnapshot();
     });
   });
 
@@ -13699,13 +14108,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateAllPrototypePageFrameGeometry();
 
-        updateEtherianFeatureCrowding();
+        updateAllGameInfoFeatureCrowding();
 
         checkRealPageInvariant();
 
         rememberStablePageRect();
 
-        captureEtherianDesktopInfoSnapshot();
+        captureActiveGameInfoDesktopSnapshot();
 
 
         /*
