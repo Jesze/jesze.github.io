@@ -171,6 +171,296 @@ document.addEventListener("DOMContentLoaded", () => {
     new Map();
 
 
+  const isBrobotsPageMorph = (
+    geometry
+  ) => {
+    return (
+      geometry?.target?.shapeType ===
+      "brobots-page"
+    );
+  };
+
+
+  const getBrobotsFinalEightPoints = (
+    geometry
+  ) => {
+    const {
+      settings,
+      menuRect,
+      topCornerHeight,
+      bottomCornerHeight
+    } = geometry;
+
+
+    /*
+      The hidden Simulacrum page frame is still the structural target for
+      layout / breakpoint handoff, but the VISIBLE Brobots page now lives
+      inside .prototype-page-frame-content.
+
+      Aim the morph at that real visible box instead of the larger hidden
+      shell. This lets the raster frame return to its safer pre-v38 size
+      without leaving the opening animation oversized.
+    */
+    const targetElement =
+      geometry?.target
+        ?.getTargetElement?.();
+
+
+    const visibleFrameElement =
+      targetElement
+        ?.querySelector(
+          ".prototype-page-frame-content"
+        );
+
+
+    const measuredVisibleRect =
+      visibleFrameElement
+        ?.getBoundingClientRect();
+
+
+    const targetRect =
+      (
+        measuredVisibleRect &&
+        measuredVisibleRect.width > 0 &&
+        measuredVisibleRect.height > 0
+      )
+        ? measuredVisibleRect
+        : menuRect;
+
+
+    /*
+      Keep the enlarged Brobots chamfers from v38. Their HORIZONTAL run is
+      still derived only from vertical rise × the site's master slope.
+    */
+    const topRise =
+      Math.min(
+        targetRect.height * 0.30,
+        topCornerHeight * 2.75
+      );
+
+
+    const bottomRise =
+      Math.min(
+        targetRect.height * 0.30,
+        bottomCornerHeight * 2.75
+      );
+
+
+    const topRun =
+      topRise *
+      settings.slope;
+
+
+    const bottomRun =
+      bottomRise *
+      settings.slope;
+
+
+    return [
+      {
+        x: targetRect.left + topRun,
+        y: targetRect.top
+      },
+
+      {
+        x: targetRect.right - topRun,
+        y: targetRect.top
+      },
+
+      {
+        x: targetRect.right,
+        y: targetRect.top + topRise
+      },
+
+      {
+        x: targetRect.right,
+        y: targetRect.bottom - bottomRise
+      },
+
+      {
+        x: targetRect.right - bottomRun,
+        y: targetRect.bottom
+      },
+
+      {
+        x: targetRect.left + bottomRun,
+        y: targetRect.bottom
+      },
+
+      {
+        x: targetRect.left,
+        y: targetRect.bottom - bottomRise
+      },
+
+      {
+        x: targetRect.left,
+        y: targetRect.top + topRise
+      }
+    ];
+  };
+
+
+  const getBrobotsLaunchEightPoints = (
+    geometry
+  ) => {
+    const launch =
+      getLaunchParallelogram(
+        geometry
+      );
+
+
+    return [
+      { x: launch.topLeft,     y: launch.topY },
+      { x: launch.topRight,    y: launch.topY },
+      { x: launch.topRight,    y: launch.topY },
+      { x: launch.topRight,    y: launch.topY },
+      { x: launch.bottomRight, y: launch.bottomY },
+      { x: launch.bottomLeft,  y: launch.bottomY },
+      { x: launch.bottomLeft,  y: launch.bottomY },
+      { x: launch.bottomLeft,  y: launch.bottomY }
+    ];
+  };
+
+
+  const getBrobotsButtonReattachEightPoints = (
+    geometry,
+    depthRatio = 0.48
+  ) => {
+    const {
+      topEdge,
+      fullStemDepth,
+      stemXAtY
+    } = geometry;
+
+
+    const bottomY =
+      topEdge.y +
+      (
+        fullStemDepth *
+        depthRatio
+      );
+
+
+    const bottomLeft =
+      stemXAtY(
+        topEdge.left,
+        bottomY
+      );
+
+
+    const bottomRight =
+      stemXAtY(
+        topEdge.right,
+        bottomY
+      );
+
+
+    return [
+      { x: topEdge.left,  y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: bottomRight,   y: bottomY },
+      { x: bottomLeft,    y: bottomY },
+      { x: bottomLeft,    y: bottomY },
+      { x: bottomLeft,    y: bottomY }
+    ];
+  };
+
+
+  const getBrobotsButtonAbsorbEightPoints = (
+    geometry
+  ) => {
+    const {
+      topEdge
+    } = geometry;
+
+
+    return [
+      { x: topEdge.left,  y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.right, y: topEdge.y },
+      { x: topEdge.left,  y: topEdge.y },
+      { x: topEdge.left,  y: topEdge.y },
+      { x: topEdge.left,  y: topEdge.y }
+    ];
+  };
+
+
+  const brobotsEightPointsToPath = (
+    points
+  ) => {
+    return `
+      M ${points[0].x} ${points[0].y}
+      L ${points[1].x} ${points[1].y}
+      L ${points[2].x} ${points[2].y}
+      L ${points[3].x} ${points[3].y}
+      L ${points[4].x} ${points[4].y}
+      L ${points[5].x} ${points[5].y}
+      L ${points[6].x} ${points[6].y}
+      L ${points[7].x} ${points[7].y}
+      Z
+    `;
+  };
+
+
+  const buildBrobotsFormPath = (
+    geometry,
+    progress
+  ) => {
+    const startPoints =
+      getBrobotsLaunchEightPoints(
+        geometry
+      );
+
+
+    const finalPoints =
+      getBrobotsFinalEightPoints(
+        geometry
+      );
+
+
+    const t =
+      easeInOutCubic(
+        progress
+      );
+
+
+    const points =
+      startPoints.map(
+        (
+          point,
+          index
+        ) => {
+          return {
+            x:
+              lerp(
+                point.x,
+                finalPoints[index].x,
+                t
+              ),
+
+            y:
+              lerp(
+                point.y,
+                finalPoints[index].y,
+                t
+              )
+          };
+        }
+      );
+
+
+    return brobotsEightPointsToPath(
+      points
+    );
+  };
+
+
+
+
   pageNames.forEach((name) => {
     const button =
       document.querySelector(
@@ -3942,13 +4232,17 @@ document.addEventListener("DOMContentLoaded", () => {
           getFinalElementRect,
 
         buildFormPath:
-          buildFormPath,
+          name === "brobots"
+            ? buildBrobotsFormPath
+            : buildFormPath,
 
         settingsFamily:
           "page",
 
         shapeType:
-          "page"
+          name === "brobots"
+            ? "brobots-page"
+            : "page"
       }
     );
   });
@@ -6961,6 +7255,7 @@ document.addEventListener("DOMContentLoaded", () => {
     normal open animation unchanged.
   */
 
+
   const getPageFinalSixPoints = (
     geometry
   ) => {
@@ -7226,9 +7521,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     menuMorphPath.setAttribute(
       "d",
-      pagePointsToPath(
-        points
+      isBrobotsPageMorph(
+        geometry
       )
+        ? brobotsEightPointsToPath(
+            points
+          )
+        : pagePointsToPath(
+            points
+          )
     );
 
 
@@ -7504,25 +7805,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const pagePoints =
-      getPageFinalSixPoints(
+      isBrobotsPageMorph(
         geometry
-      );
+      )
+        ? getBrobotsFinalEightPoints(
+            geometry
+          )
+        : getPageFinalSixPoints(
+            geometry
+          );
 
     const launchPoints =
-      getPageLaunchSixPoints(
+      isBrobotsPageMorph(
         geometry
-      );
+      )
+        ? getBrobotsLaunchEightPoints(
+            geometry
+          )
+        : getPageLaunchSixPoints(
+            geometry
+          );
 
     const reattachPoints =
-      getButtonReattachSixPoints(
-        geometry,
-        0.48
-      );
+      isBrobotsPageMorph(
+        geometry
+      )
+        ? getBrobotsButtonReattachEightPoints(
+            geometry,
+            0.48
+          )
+        : getButtonReattachSixPoints(
+            geometry,
+            0.48
+          );
 
     const absorbPoints =
-      getButtonAbsorbSixPoints(
+      isBrobotsPageMorph(
         geometry
-      );
+      )
+        ? getBrobotsButtonAbsorbEightPoints(
+            geometry
+          )
+        : getButtonAbsorbSixPoints(
+            geometry
+          );
 
 
     cancelIncomingPageOverlap();
@@ -10145,7 +10471,18 @@ document.addEventListener("DOMContentLoaded", () => {
       Keep the REAL page visible just long enough to crossfade into the
       temporary reverse-morph shell. Mobile CSS would otherwise make it
       disappear instantly at the breakpoint.
+
+      IMPORTANT:
+      The viewport has already crossed <=840px at this point, so child
+      elements would normally reflow into their mobile layout BEFORE the
+      real page fades. Freeze the outgoing Brobots interior in its
+      tablet/desktop composition for the duration of this handoff.
     */
+    frame.classList.add(
+      "is-mobile-collapse-hold"
+    );
+
+
     const savedFrameInline = {
       display:
         frame.style.display,
@@ -10460,6 +10797,11 @@ document.addEventListener("DOMContentLoaded", () => {
     restoreInline(
       "pointer-events",
       savedFrameInline.pointerEvents
+    );
+
+
+    frame.classList.remove(
+      "is-mobile-collapse-hold"
     );
 
 
@@ -11372,6 +11714,215 @@ document.addEventListener("DOMContentLoaded", () => {
     )
       ? clipPath
       : rectangularSixPointClip;
+  };
+
+
+
+  const getLightboxSourceMorphGeometry = (
+    sourceImage
+  ) => {
+    if (!sourceImage) {
+      return null;
+    }
+
+
+    const viewer =
+      sourceImage.closest(
+        ".media-viewer"
+      );
+
+
+    const pageFrame =
+      sourceImage.closest(
+        ".prototype-page-frame"
+      );
+
+
+    /*
+      Brobots desktop/tablet uses an edge-to-edge COVER hero.
+      getBoundingClientRect() only reports the <img> element box, not the
+      larger painted image created by object-fit: cover.
+
+      Reconstruct that painted rectangle from the natural image ratio, then
+      clip it back to the visible viewer cavity. This makes the morph begin
+      and end on the exact pixels the user is actually seeing.
+    */
+    const isBrobotsCoverHero =
+      pageFrame?.dataset.page ===
+        "brobots" &&
+      viewer &&
+      window.matchMedia(
+        "(min-width: 841px)"
+      ).matches;
+
+
+    if (
+      isBrobotsCoverHero &&
+      sourceImage.naturalWidth > 0 &&
+      sourceImage.naturalHeight > 0
+    ) {
+      const viewerRect =
+        viewer.getBoundingClientRect();
+
+
+      const heroZone =
+        viewer.closest(
+          ".brobots-media-zone--hero"
+        );
+
+
+      /*
+        The viewer is deliberately oversized by 2% on every side so it
+        tucks underneath the raster frame. That means the viewer's own box
+        is NOT the visible source boundary.
+
+        Use the measured hero zone as the actual aperture through which the
+        image is seen. This matters most when the frame becomes unusually
+        wide, because the 4% overscan becomes a much larger horizontal pixel
+        difference.
+      */
+      const apertureRect =
+        heroZone
+          ? heroZone.getBoundingClientRect()
+          : viewerRect;
+
+
+      const scale =
+        Math.max(
+          viewerRect.width /
+            sourceImage.naturalWidth,
+
+          viewerRect.height /
+            sourceImage.naturalHeight
+        );
+
+
+      const paintedWidth =
+        sourceImage.naturalWidth *
+        scale;
+
+      const paintedHeight =
+        sourceImage.naturalHeight *
+        scale;
+
+
+      const paintedLeft =
+        viewerRect.left +
+        (
+          viewerRect.width -
+          paintedWidth
+        ) / 2;
+
+      const paintedTop =
+        viewerRect.top +
+        (
+          viewerRect.height -
+          paintedHeight
+        ) / 2;
+
+
+      const paintedRect = {
+        left:
+          paintedLeft,
+
+        top:
+          paintedTop,
+
+        width:
+          paintedWidth,
+
+        height:
+          paintedHeight,
+
+        right:
+          paintedLeft +
+          paintedWidth,
+
+        bottom:
+          paintedTop +
+          paintedHeight
+      };
+
+
+      const topInset =
+        Math.max(
+          0,
+          (
+            apertureRect.top -
+            paintedRect.top
+          ) /
+          paintedRect.height *
+          100
+        );
+
+      const rightInset =
+        Math.max(
+          0,
+          (
+            paintedRect.right -
+            apertureRect.right
+          ) /
+          paintedRect.width *
+          100
+        );
+
+      const bottomInset =
+        Math.max(
+          0,
+          (
+            paintedRect.bottom -
+            apertureRect.bottom
+          ) /
+          paintedRect.height *
+          100
+        );
+
+      const leftInset =
+        Math.max(
+          0,
+          (
+            apertureRect.left -
+            paintedRect.left
+          ) /
+          paintedRect.width *
+          100
+        );
+
+
+      const radius =
+        parseFloat(
+          getComputedStyle(
+            viewer
+          ).borderTopLeftRadius
+        ) || 0;
+
+
+      return {
+        rect:
+          paintedRect,
+
+        clipPath:
+          `inset(${topInset}% ${rightInset}% ${bottomInset}% ${leftInset}% round ${radius}px)`,
+
+        flatClipPath:
+          "inset(0% 0% 0% 0% round 0px)"
+      };
+    }
+
+
+    return {
+      rect:
+        sourceImage
+          .getBoundingClientRect(),
+
+      clipPath:
+        getSourceMediaClipPath(
+          sourceImage
+        ),
+
+      flatClipPath:
+        rectangularSixPointClip
+    };
   };
 
 
@@ -12422,19 +12973,33 @@ document.addEventListener("DOMContentLoaded", () => {
       image.getBoundingClientRect();
 
 
-    const sourceClipPath =
-      getSourceMediaClipPath(
-        sourceImage
-      );
-
-
-    const toRect =
+    const sourceGeometry =
       (
         sourceImage &&
         sourceImage.isConnected
       )
-        ? sourceImage.getBoundingClientRect()
-        : fromRect;
+        ? getLightboxSourceMorphGeometry(
+            sourceImage
+          )
+        : null;
+
+
+    const sourceClipPath =
+      sourceGeometry
+        ?.clipPath ||
+      rectangularSixPointClip;
+
+
+    const sourceFlatClipPath =
+      sourceGeometry
+        ?.flatClipPath ||
+      rectangularSixPointClip;
+
+
+    const toRect =
+      sourceGeometry
+        ?.rect ||
+      fromRect;
 
 
     Object.assign(
@@ -12457,7 +13022,7 @@ document.addEventListener("DOMContentLoaded", () => {
           that state before the reverse animation begins as well.
         */
         clipPath:
-          rectangularSixPointClip
+          sourceFlatClipPath
       }
     );
 
@@ -12629,14 +13194,14 @@ document.addEventListener("DOMContentLoaded", () => {
         easing,
         {
           clipPath:
-            rectangularSixPointClip,
+            sourceFlatClipPath,
 
           boxShadow:
             "0 18px 60px rgba(0,0,0,0.58)"
         },
         {
           /*
-            Restore the in-page viewer's angled cuts gradually as the
+            Restore the in-page viewer's visible crop gradually as the
             screenshot returns to the frame.
           */
           clipPath:
@@ -12646,6 +13211,72 @@ document.addEventListener("DOMContentLoaded", () => {
             "0 0 0 rgba(0,0,0,0)"
         }
       );
+
+
+    /*
+      Fade the proxy away during the final sliver of the return journey.
+      By the time it reaches the frame edge, its outer boundary is already
+      invisible; the real clickable hero image is revealed only after the
+      morph finishes.
+    */
+    const returnFadeDuration =
+      Math.min(
+        200,
+        duration * 0.40
+      );
+
+
+    const returnFadeDelay =
+      Math.max(
+        0,
+        duration -
+        returnFadeDuration
+      );
+
+
+    /*
+      Hand visual ownership back to the real framed hero immediately BEFORE
+      the proxy begins its final fade. The proxy is still fully opaque at
+      that instant, so the handoff is invisible; as it fades, the real
+      clickable hero is already waiting underneath it.
+    */
+    if (
+      sourceImage &&
+      sourceImage.isConnected
+    ) {
+      window.setTimeout(
+        () => {
+          if (
+            sourceImage.isConnected
+          ) {
+            sourceImage.style.visibility =
+              "";
+          }
+        },
+        returnFadeDelay
+      );
+    }
+
+
+    imageProxy.animate(
+      [
+        { opacity: 1 },
+        { opacity: 0 }
+      ],
+      {
+        duration:
+          returnFadeDuration,
+
+        delay:
+          returnFadeDelay,
+
+        easing:
+          "ease-in",
+
+        fill:
+          "forwards"
+      }
+    );
 
 
     /*
@@ -12861,20 +13492,32 @@ document.addEventListener("DOMContentLoaded", () => {
       getMediaLightboxTiming();
 
 
-    const sourceClipPath =
-      getSourceMediaClipPath(
+    const sourceGeometry =
+      getLightboxSourceMorphGeometry(
         sourceImage
       );
 
 
+    const sourceClipPath =
+      sourceGeometry
+        ?.clipPath ||
+      rectangularSixPointClip;
+
+
+    const sourceFlatClipPath =
+      sourceGeometry
+        ?.flatClipPath ||
+      rectangularSixPointClip;
+
+
     const startRect =
-      sourceImage
-        ? sourceImage.getBoundingClientRect()
-        : getContainedRect(
-            image.naturalWidth,
-            image.naturalHeight,
-            24
-          );
+      sourceGeometry
+        ?.rect ||
+      getContainedRect(
+        image.naturalWidth,
+        image.naturalHeight,
+        24
+      );
 
 
     /*
@@ -12968,9 +13611,57 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
+    /*
+      The hero media lives underneath the raster frame. Fade the morph proxy
+      in quickly so its oversized cover bounds never visibly "emerge" from
+      behind the frame before the motion has cleared the border.
+    */
+    imageProxy.style.opacity =
+      "0";
+
+
+    const openingProxyFade =
+      imageProxy.animate(
+        [
+          { opacity: 0 },
+          { opacity: 1 }
+        ],
+        {
+          duration:
+            Math.min(
+              180,
+              duration * 0.36
+            ),
+
+          easing:
+            "ease-out",
+
+          fill:
+            "forwards"
+        }
+      );
+
+
+    /*
+      Keep the real framed hero visible UNDER the proxy while the proxy
+      fades in. Once the proxy is fully opaque, it can safely take complete
+      ownership of the image without creating a blank frame underneath.
+    */
     if (sourceImage) {
-      sourceImage.style.visibility =
-        "hidden";
+      openingProxyFade.finished
+        .then(
+          () => {
+            if (
+              sourceImage.isConnected
+            ) {
+              sourceImage.style.visibility =
+                "hidden";
+            }
+          }
+        )
+        .catch(
+          () => {}
+        );
     }
 
 
@@ -13141,7 +13832,7 @@ document.addEventListener("DOMContentLoaded", () => {
           lifetime, leaving a normal rectangular fullscreen image.
         */
         clipPath:
-          rectangularSixPointClip,
+          sourceFlatClipPath,
 
         boxShadow:
           "0 18px 60px rgba(0,0,0,0.58)"
@@ -13406,29 +14097,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const ensureActiveThumbnailVisible = (
       behavior = "smooth"
     ) => {
-      if (
-        activeIndex <
-        railStartIndex
-      ) {
-        railStartIndex =
-          activeIndex;
-      }
+      /*
+        Keep the active item in the CENTER slot whenever the rail has enough
+        items on both sides.
 
-      else if (
-        activeIndex >=
-        railStartIndex +
-        visibleThumbnailCount
-      ) {
-        railStartIndex =
-          activeIndex -
-          visibleThumbnailCount +
-          1;
-      }
+        With three visible thumbnails:
+          desired first visible item = activeIndex - 1
 
+        clampRailStart() naturally handles the edges:
+          first item  -> [0, 1, 2]
+          middle item -> [n-1, n, n+1]
+          last item   -> [last-2, last-1, last]
 
+        So "center whenever possible" falls out of one continuous rule
+        instead of needing special cases.
+      */
       railStartIndex =
         clampRailStart(
-          railStartIndex
+          activeIndex - 1
         );
 
 
@@ -14165,4 +14851,759 @@ document.addEventListener("DOMContentLoaded", () => {
       mobileMenu
     );
   }
+
+  /* =======================================================
+     Brobots inner-frame native canvas scaling
+     ======================================================= */
+
+  const brobotsInnerFrameArea =
+    document.querySelector(
+      "#brobots-page-frame .brobots-inner-frame-area"
+    );
+
+
+  /* =======================================================
+     Brobots frame — dynamic raster dimensions
+     ======================================================= */
+
+  const brobotsFrameDimensionState = {
+    fixed:
+      new Map(),
+
+    stretchers:
+      new Map(),
+
+    derived:
+      null
+  };
+
+
+  const getCssBackgroundUrl = (
+    element
+  ) => {
+    const inline =
+      element.style
+        .getPropertyValue(
+          "--brobots-stretcher-image"
+        )
+        .trim();
+
+
+    const match =
+      inline.match(
+        /url\(["']?(.*?)["']?\)/
+      );
+
+
+    return (
+      match?.[1] ||
+      ""
+    );
+  };
+
+
+  const measureImageSource = (
+    src
+  ) => {
+    return new Promise(
+      (resolve) => {
+        if (!src) {
+          resolve(
+            {
+              width: 0,
+              height: 0
+            }
+          );
+
+          return;
+        }
+
+
+        const probe =
+          new Image();
+
+
+        probe.onload = () => {
+          resolve(
+            {
+              width:
+                probe.naturalWidth,
+
+              height:
+                probe.naturalHeight
+            }
+          );
+        };
+
+
+        probe.onerror = () => {
+          resolve(
+            {
+              width: 0,
+              height: 0
+            }
+          );
+        };
+
+
+        probe.src =
+          src;
+      }
+    );
+  };
+
+
+  const measureBrobotsFrameAssets =
+    async () => {
+      if (!brobotsInnerFrameArea) {
+        return;
+      }
+
+
+      const fixedElements =
+        Array.from(
+          brobotsInnerFrameArea
+            .querySelectorAll(
+              "[data-brobots-frame-piece]"
+            )
+        );
+
+
+      for (
+        const element
+        of fixedElements
+      ) {
+        let width =
+          0;
+
+        let height =
+          0;
+
+
+        if (
+          element instanceof
+            HTMLImageElement
+        ) {
+          if (
+            !element.complete ||
+            element.naturalWidth <= 0
+          ) {
+            await new Promise(
+              (resolve) => {
+                element.addEventListener(
+                  "load",
+                  resolve,
+                  {
+                    once: true
+                  }
+                );
+
+                element.addEventListener(
+                  "error",
+                  resolve,
+                  {
+                    once: true
+                  }
+                );
+              }
+            );
+          }
+
+
+          width =
+            element.naturalWidth;
+
+          height =
+            element.naturalHeight;
+        }
+
+
+        brobotsFrameDimensionState
+          .fixed
+          .set(
+            element.dataset
+              .brobotsFramePiece,
+
+            {
+              element,
+              width,
+              height
+            }
+          );
+      }
+
+
+      const stretcherElements =
+        Array.from(
+          brobotsInnerFrameArea
+            .querySelectorAll(
+              "[data-brobots-frame-stretcher]"
+            )
+        );
+
+
+      for (
+        const element
+        of stretcherElements
+      ) {
+        const dimensions =
+          await measureImageSource(
+            getCssBackgroundUrl(
+              element
+            )
+          );
+
+
+        brobotsFrameDimensionState
+          .stretchers
+          .set(
+            element.dataset
+              .brobotsFrameStretcher,
+
+            {
+              element,
+              ...dimensions
+            }
+          );
+      }
+    };
+
+
+  const deriveBrobotsFrameGeometry =
+    () => {
+      const fixed =
+        brobotsFrameDimensionState.fixed;
+
+      const stretchers =
+        brobotsFrameDimensionState.stretchers;
+
+
+      const f =
+        (key) =>
+          fixed.get(key) || {
+            width: 0,
+            height: 0
+          };
+
+
+      const s =
+        (key) =>
+          stretchers.get(key) || {
+            width: 0,
+            height: 0
+          };
+
+
+      /*
+        Reconstruct the UNSTRETCHED source frame directly from the 17 files.
+
+        Horizontal rows:
+          fixed-left + horizontal-stretcher + fixed-right
+
+        Vertical columns:
+          fixed-top + vertical-stretcher + fixed-bottom
+
+        If the cut set is authored consistently, the corresponding
+        measurements on both sides/rows are identical.
+      */
+      const widths = {
+        heroTop:
+          f("hero-top-left").width +
+          s("hero-stretch-top").width +
+          f("hero-top-right").width,
+
+        heroBottom:
+          f("hero-bottom-left").width +
+          s("hero-stretch-bottom").width +
+          f("hero-bottom-right").width,
+
+        thumbTop:
+          f("thumb-top-left").width +
+          s("thumb-stretch-top").width +
+          f("thumb-top-right").width,
+
+        thumbBottom:
+          f("thumb-bottom-left").width +
+          s("thumb-stretch-bottom").width +
+          f("thumb-bottom-right").width,
+
+        separator:
+          s("separator").width
+      };
+
+
+      const heroHeights = {
+        left:
+          f("hero-top-left").height +
+          s("hero-stretch-left").height +
+          f("hero-bottom-left").height,
+
+        right:
+          f("hero-top-right").height +
+          s("hero-stretch-right").height +
+          f("hero-bottom-right").height
+      };
+
+
+      const thumbHeights = {
+        left:
+          f("thumb-top-left").height +
+          s("thumb-stretch-left").height +
+          f("thumb-bottom-left").height,
+
+        right:
+          f("thumb-top-right").height +
+          s("thumb-stretch-right").height +
+          f("thumb-bottom-right").height
+      };
+
+
+      const widthCandidates =
+        Object.values(widths)
+          .filter(
+            (value) =>
+              Number.isFinite(value) &&
+              value > 0
+          );
+
+
+      const heroHeightCandidates =
+        Object.values(heroHeights)
+          .filter(
+            (value) =>
+              Number.isFinite(value) &&
+              value > 0
+          );
+
+
+      const thumbHeightCandidates =
+        Object.values(thumbHeights)
+          .filter(
+            (value) =>
+              Number.isFinite(value) &&
+              value > 0
+          );
+
+
+      if (
+        widthCandidates.length === 0 ||
+        heroHeightCandidates.length === 0 ||
+        thumbHeightCandidates.length === 0
+      ) {
+        return null;
+      }
+
+
+      /*
+        Well-authored skins should make these values identical.
+        Use the rounded average as a harmless fallback while also warning
+        about any discrepancy so bad cuts are easy to spot.
+      */
+      const average =
+        (values) =>
+          values.reduce(
+            (sum, value) =>
+              sum + value,
+            0
+          ) /
+          values.length;
+
+
+      const nativeWidth =
+        Math.round(
+          average(
+            widthCandidates
+          )
+        );
+
+
+      const nativeHeroHeight =
+        Math.round(
+          average(
+            heroHeightCandidates
+          )
+        );
+
+
+      const nativeThumbHeight =
+        Math.round(
+          average(
+            thumbHeightCandidates
+          )
+        );
+
+
+      const nativeSeparatorHeight =
+        s("separator").height;
+
+
+      const nativeHeight =
+        nativeHeroHeight +
+        nativeSeparatorHeight +
+        nativeThumbHeight;
+
+
+      const warnIfMismatch =
+        (
+          label,
+          entries
+        ) => {
+          const values =
+            Object.values(entries)
+              .filter(
+                (value) =>
+                  Number.isFinite(value) &&
+                  value > 0
+              );
+
+
+          if (values.length < 2) {
+            return;
+          }
+
+
+          const min =
+            Math.min(...values);
+
+          const max =
+            Math.max(...values);
+
+
+          if (
+            Math.abs(
+              max - min
+            ) >
+            0.01
+          ) {
+            console.warn(
+              `[Brobots frame] ${label} source dimensions do not agree:`,
+              entries
+            );
+          }
+        };
+
+
+      warnIfMismatch(
+        "native widths",
+        widths
+      );
+
+
+      warnIfMismatch(
+        "hero heights",
+        heroHeights
+      );
+
+
+      warnIfMismatch(
+        "thumbnail heights",
+        thumbHeights
+      );
+
+
+      const derived = {
+        nativeWidth,
+        nativeHeight,
+        nativeHeroHeight,
+        nativeSeparatorHeight,
+        nativeThumbHeight,
+
+        heroEndRatio:
+          nativeHeroHeight /
+          nativeHeight,
+
+        thumbStartRatio:
+          (
+            nativeHeroHeight +
+            nativeSeparatorHeight
+          ) /
+          nativeHeight,
+
+        widths,
+        heroHeights,
+        thumbHeights
+      };
+
+
+      brobotsFrameDimensionState.derived =
+        derived;
+
+
+      return derived;
+    };
+
+
+
+  const applyBrobotsMeasuredFrameDimensions =
+    () => {
+      if (!brobotsInnerFrameArea) {
+        return;
+      }
+
+
+      const derived =
+        brobotsFrameDimensionState
+          .derived;
+
+
+      if (
+        !derived ||
+        derived.nativeWidth <= 0 ||
+        derived.nativeHeight <= 0
+      ) {
+        return;
+      }
+
+
+      /*
+        One uniform art scale, expressed entirely in CSS:
+
+          min(
+            container width  / native width,
+            container height / native height
+          )
+
+        Rather than storing the scale itself, each required dimension is
+        emitted as the equivalent min(cqw, cqh) expression. This keeps the
+        raster frame synchronized with the container in the browser's own
+        layout pass and removes resize-frame latency.
+      */
+      const responsiveLength =
+        (nativePixels) =>
+          `min(` +
+          `calc(100cqw * ${nativePixels / derived.nativeWidth}), ` +
+          `calc(100cqh * ${nativePixels / derived.nativeHeight})` +
+          `)`;
+
+
+      const fixed =
+        brobotsFrameDimensionState
+          .fixed;
+
+
+      fixed.forEach(
+        (record) => {
+          record.element.style
+            .setProperty(
+              "--brobots-piece-w",
+              responsiveLength(
+                record.width
+              )
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-piece-h",
+              responsiveLength(
+                record.height
+              )
+            );
+        }
+      );
+
+
+      const exposeFixed =
+        (
+          key,
+          prefix
+        ) => {
+          const record =
+            fixed.get(key);
+
+
+          if (!record) {
+            return;
+          }
+
+
+          brobotsInnerFrameArea.style
+            .setProperty(
+              `--${prefix}-w`,
+              responsiveLength(
+                record.width
+              )
+            );
+
+
+          brobotsInnerFrameArea.style
+            .setProperty(
+              `--${prefix}-h`,
+              responsiveLength(
+                record.height
+              )
+            );
+        };
+
+
+      exposeFixed(
+        "hero-top-left",
+        "brobots-hero-top-left"
+      );
+
+
+      exposeFixed(
+        "hero-top-right",
+        "brobots-hero-top-right"
+      );
+
+
+      exposeFixed(
+        "hero-bottom-left",
+        "brobots-hero-bottom-left"
+      );
+
+
+      exposeFixed(
+        "hero-bottom-right",
+        "brobots-hero-bottom-right"
+      );
+
+
+      exposeFixed(
+        "thumb-top-left",
+        "brobots-thumb-top-left"
+      );
+
+
+      exposeFixed(
+        "thumb-top-right",
+        "brobots-thumb-top-right"
+      );
+
+
+      exposeFixed(
+        "thumb-bottom-left",
+        "brobots-thumb-bottom-left"
+      );
+
+
+      exposeFixed(
+        "thumb-bottom-right",
+        "brobots-thumb-bottom-right"
+      );
+
+
+      const stretchers =
+        brobotsFrameDimensionState
+          .stretchers;
+
+
+      stretchers.forEach(
+        (record, key) => {
+          const width =
+            responsiveLength(
+              record.width
+            );
+
+          const height =
+            responsiveLength(
+              record.height
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-stretcher-w",
+              width
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-stretcher-h",
+              height
+            );
+
+
+          /*
+            Expose the aperture-defining stretcher thicknesses on the frame
+            container itself. The media zones can then follow the frame
+            continuously in CSS without re-measuring rendered rectangles.
+          */
+          const exposedNames = {
+            "hero-stretch-left":
+              "--brobots-hero-left-rail-w",
+
+            "hero-stretch-right":
+              "--brobots-hero-right-rail-w",
+
+            "hero-stretch-top":
+              "--brobots-hero-top-bar-h",
+
+            "hero-stretch-bottom":
+              "--brobots-hero-bottom-bar-h",
+
+            "thumb-stretch-left":
+              "--brobots-thumb-left-rail-w",
+
+            "thumb-stretch-right":
+              "--brobots-thumb-right-rail-w",
+
+            "thumb-stretch-top":
+              "--brobots-thumb-top-bar-h",
+
+            "thumb-stretch-bottom":
+              "--brobots-thumb-bottom-bar-h"
+          };
+
+
+          const exposedName =
+            exposedNames[key];
+
+
+          if (exposedName) {
+            brobotsInnerFrameArea.style
+              .setProperty(
+                exposedName,
+                key.endsWith(
+                  "left"
+                ) ||
+                key.endsWith(
+                  "right"
+                )
+                  ? width
+                  : height
+              );
+          }
+        }
+      );
+
+
+      /*
+        These anchors intentionally use the FULL current frame height,
+        exactly like the previous JS calculation:
+          rect.height * derived ratio
+
+        They are not uniform-art-scaled dimensions; they divide the flexible
+        page cavity into hero / separator / thumbnail regions.
+      */
+      brobotsInnerFrameArea.style
+        .setProperty(
+          "--brobots-hero-end-y",
+          `calc(100cqh * ${derived.heroEndRatio})`
+        );
+
+
+      brobotsInnerFrameArea.style
+        .setProperty(
+          "--brobots-thumb-start-y",
+          `calc(100cqh * ${derived.thumbStartRatio})`
+        );
+    };
+
+
+  if (brobotsInnerFrameArea) {
+    measureBrobotsFrameAssets()
+      .then(() => {
+        deriveBrobotsFrameGeometry();
+
+        /*
+          Write the asset-derived responsive formulas ONCE. From here the
+          raster frame itself requires no resize-time JS.
+        */
+        applyBrobotsMeasuredFrameDimensions();
+      });
+  }
+
 });

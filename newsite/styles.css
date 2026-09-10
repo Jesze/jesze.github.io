@@ -16919,3 +16919,2693 @@ body.is-media-lightbox-open {
     transition: none;
   }
 }
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME — fixed pieces only v1
+   =========================================================
+   New sizing model:
+   - The Brobots raster art belongs to ONE shared inner-frame area.
+   - That area fills the available game-page media region inside the
+     existing SVG page frame.
+   - The media browser lives INSIDE that border.
+   - No spacer assets yet.
+   - No desktop/tablet layout promotion. Existing page behavior stays intact.
+   ========================================================= */
+
+#brobots-page-frame .brobots-inner-frame-area {
+  position: relative;
+
+  /*
+    Fill the available media region inside the existing page-frame content.
+    The outer SVG/page frame remains the owner of the page geometry.
+  */
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  box-sizing: border-box;
+
+  display: grid;
+  place-items: center;
+}
+
+
+/*
+  Keep the existing generic media browser as the live content layer.
+  It is now inset inside the Brobots raster border instead of determining
+  the border's outer dimensions.
+*/
+#brobots-page-frame .brobots-inner-frame-area > .media-browser {
+  position: relative;
+  z-index: 1;
+
+  width: min(78%, var(--media-composition-width));
+  max-width: 100%;
+
+  /*
+    Give the whole gallery room within the raster border.
+    Height remains content-driven by the existing media system.
+  */
+  margin: auto;
+}
+
+
+/* Shared border-piece behavior */
+#brobots-page-frame .brobots-inner-frame-piece {
+  position: absolute;
+  z-index: 2;
+
+  display: block;
+
+  max-width: none;
+  max-height: none;
+
+  height: auto;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =========================================================
+   Native design canvas
+   Full original frame: 1164 × 1149
+
+   All fixed pieces scale against THIS shared inner-frame box.
+   That makes the entire raster treatment shrink/grow with the existing
+   SVG/page frame instead of with the media viewer.
+   ========================================================= */
+
+/* ---------------- HERO REGION ---------------- */
+
+/*
+  Native full-frame vertical split:
+    Hero: 796
+    Separator: 3
+    Thumbs: 350
+    Total: 1149
+
+  So hero region occupies the top 796/1149 of this shared canvas.
+*/
+#brobots-page-frame .brobots-inner-frame-piece--hero-top-left {
+  top: 0;
+  left: 0;
+
+  width:
+    calc(
+      816 / 1164 * 100%
+    );
+}
+
+
+#brobots-page-frame .brobots-inner-frame-piece--hero-top-right {
+  top: 0;
+  right: 0;
+
+  width:
+    calc(
+      344 / 1164 * 100%
+    );
+}
+
+
+#brobots-page-frame .brobots-inner-frame-piece--hero-bottom-left {
+  /*
+    Native hero bottom sits at y = 796.
+    Place this piece relative to the shared full frame.
+  */
+  top:
+    calc(
+      (796 - 185) / 1149 * 100%
+    );
+
+  left: 0;
+
+  width:
+    calc(
+      606 / 1164 * 100%
+    );
+}
+
+
+#brobots-page-frame .brobots-inner-frame-piece--hero-bottom-right {
+  top:
+    calc(
+      (796 - 185) / 1149 * 100%
+    );
+
+  right: 0;
+
+  width:
+    calc(
+      554 / 1164 * 100%
+    );
+}
+
+
+/* ---------------- THUMB REGION ---------------- */
+
+/*
+  Thumbnail region begins at y = 799
+  (796 hero + 3 separator).
+*/
+#brobots-page-frame .brobots-inner-frame-piece--thumb-top-left {
+  top:
+    calc(
+      799 / 1149 * 100%
+    );
+
+  left: 0;
+
+  width:
+    calc(
+      588 / 1164 * 100%
+    );
+}
+
+
+#brobots-page-frame .brobots-inner-frame-piece--thumb-top-right {
+  top:
+    calc(
+      799 / 1149 * 100%
+    );
+
+  right: 0;
+
+  width:
+    calc(
+      567 / 1164 * 100%
+    );
+}
+
+
+#brobots-page-frame .brobots-inner-frame-piece--thumb-bottom-left {
+  bottom: 0;
+  left: 0;
+
+  width:
+    calc(
+      590 / 1164 * 100%
+    );
+}
+
+
+#brobots-page-frame .brobots-inner-frame-piece--thumb-bottom-right {
+  right: 0;
+  bottom: 0;
+
+  width:
+    calc(
+      568 / 1164 * 100%
+    );
+}
+
+
+/* =========================================================
+   Desktop/tablet fit inside the existing SVG frame
+   ========================================================= */
+
+/*
+  Let the inner Brobots border behave like a genuine second page border.
+  On desktop it occupies the available left/media side.
+*/
+@media (min-width: 1401px) {
+  #brobots-page-frame .brobots-inner-frame-area {
+    /*
+      The desktop page still has its normal two-column game layout.
+      This wrapper only fills the media column it already receives.
+    */
+    align-self: stretch;
+  }
+}
+
+
+/*
+  Tablet keeps the original stacked layout and SVG frame.
+  The raster border simply scales with the full available content box.
+*/
+@media (min-width: 841px) and (max-width: 1400px) {
+  #brobots-page-frame .brobots-inner-frame-area {
+    width: 100%;
+
+    /*
+      Give the border a responsive aspect based on its native full design.
+      Cap it by available content height so it remains inside the SVG frame.
+    */
+    aspect-ratio: 1164 / 1149;
+
+    height: auto;
+
+    max-height: 100%;
+
+    margin: auto;
+  }
+
+
+  #brobots-page-frame .brobots-inner-frame-area > .media-browser {
+    width: 72%;
+  }
+}
+
+
+/*
+  Mobile remains untouched for now.
+*/
+@media (max-width: 840px) {
+  #brobots-page-frame .brobots-inner-frame-area {
+    display: contents;
+  }
+
+  #brobots-page-frame .brobots-inner-frame-piece {
+    display: none;
+  }
+
+  #brobots-page-frame .brobots-inner-frame-area > .media-browser {
+    width: auto;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v2 — ONE uniformly scaled canvas
+   =========================================================
+   Key rule:
+   the fixed border art is authored on a 1164 × 1149 canvas and that
+   ENTIRE canvas scales as one object.
+
+   scale = min(
+     available inner-frame width  / 1164,
+     available inner-frame height / 1149
+   )
+
+   Therefore height can become the limiting dimension just like width,
+   and the fixed pieces can never run into/overlap one another merely
+   because the page became shorter.
+   ========================================================= */
+
+#brobots-page-frame .brobots-inner-frame-area {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+
+  /*
+    JS writes this. Keeping a harmless default avoids a flash of giant
+    native-size artwork before the first ResizeObserver pass.
+  */
+  --brobots-inner-frame-scale: 0.5;
+}
+
+
+/*
+  This is the actual 1164 × 1149 design coordinate system.
+  Nothing inside it is independently responsive.
+*/
+#brobots-page-frame .brobots-inner-frame-canvas {
+  position: absolute;
+  z-index: 2;
+
+  left: 50%;
+  top: 50%;
+
+  width: 1164px;
+  height: 1149px;
+
+  transform:
+    translate(-50%, -50%)
+    scale(var(--brobots-inner-frame-scale));
+
+  transform-origin: center center;
+
+  pointer-events: none;
+}
+
+
+/*
+  Override the earlier percentage-based piece sizing completely.
+  Every piece now renders at its actual source pixel size inside the
+  native canvas. The canvas transform scales ALL of them together.
+*/
+#brobots-page-frame
+.brobots-inner-frame-canvas
+.brobots-inner-frame-piece {
+  position: absolute;
+
+  width: auto !important;
+  height: auto !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  transform: none !important;
+}
+
+
+/* ---------------- HERO native positions ---------------- */
+
+#brobots-page-frame
+.brobots-inner-frame-canvas
+.brobots-inner-frame-piece--hero-top-left {
+  left: 0 !important;
+  right: auto !important;
+  top: 0 !important;
+  bottom: auto !important;
+
+  width: 816px !important;
+  height: 606px !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-canvas
+.brobots-inner-frame-piece--hero-top-right {
+  left: auto !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: auto !important;
+
+  width: 344px !important;
+  height: 607px !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-canvas
+.brobots-inner-frame-piece--hero-bottom-left {
+  left: 0 !important;
+  right: auto !important;
+  top: 611px !important;
+  bottom: auto !important;
+
+  width: 606px !important;
+  height: 185px !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-canvas
+.brobots-inner-frame-piece--hero-bottom-right {
+  left: auto !important;
+  right: 0 !important;
+  top: 611px !important;
+  bottom: auto !important;
+
+  width: 554px !important;
+  height: 185px !important;
+}
+
+
+/* ---------------- THUMB native positions ---------------- */
+
+#brobots-page-frame
+.brobots-inner-frame-canvas
+.brobots-inner-frame-piece--thumb-top-left {
+  left: 0 !important;
+  right: auto !important;
+  top: 799px !important;
+  bottom: auto !important;
+
+  width: 588px !important;
+  height: 144px !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-canvas
+.brobots-inner-frame-piece--thumb-top-right {
+  left: auto !important;
+  right: 0 !important;
+  top: 799px !important;
+  bottom: auto !important;
+
+  width: 567px !important;
+  height: 144px !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-canvas
+.brobots-inner-frame-piece--thumb-bottom-left {
+  left: 0 !important;
+  right: auto !important;
+  top: 946px !important;
+  bottom: auto !important;
+
+  width: 590px !important;
+  height: 203px !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-canvas
+.brobots-inner-frame-piece--thumb-bottom-right {
+  left: auto !important;
+  right: 0 !important;
+  top: 946px !important;
+  bottom: auto !important;
+
+  width: 568px !important;
+  height: 203px !important;
+}
+
+
+/*
+  The live gallery remains an independent content layer.
+  We are deliberately NOT making its dimensions control the border.
+*/
+#brobots-page-frame
+.brobots-inner-frame-area > .media-browser {
+  position: relative;
+  z-index: 1;
+
+  width: min(78%, var(--media-composition-width));
+  max-width: 100%;
+
+  margin: auto;
+}
+
+
+/*
+  Critical correction to v1:
+  tablet must NOT force the Brobots inner frame to the 1164:1149 aspect.
+  It fills whatever interior rectangle the existing SVG/page layout gives
+  it; the native canvas then uniformly contains itself inside that area.
+*/
+@media (min-width: 841px) and (max-width: 1400px) {
+  #brobots-page-frame .brobots-inner-frame-area {
+    width: 100%;
+    height: 100%;
+
+    aspect-ratio: auto;
+
+    margin: 0;
+  }
+
+  #brobots-page-frame
+  .brobots-inner-frame-area > .media-browser {
+    width: 72%;
+  }
+}
+
+
+@media (max-width: 840px) {
+  #brobots-page-frame .brobots-inner-frame-canvas {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v3 — uniformly scaled, edge pinned
+   =========================================================
+
+   This is the intended behavior:
+
+   1. Determine ONE uniform art scale from whichever available dimension
+      is tighter:
+        scale = min(width / 1164, height / 1149)
+
+   2. Scale every fixed raster piece by that same scale.
+
+   3. DO NOT center a scaled 1164×1149 canvas.
+      Instead, pin left pieces to the ACTUAL left edge and right pieces
+      to the ACTUAL right edge of the available inner-frame area.
+
+   Therefore:
+   - if width is limiting, the pieces nearly meet as in the native art
+   - if height is limiting, the pieces shrink but remain edge-pinned,
+     intentionally creating large horizontal gaps for future spacers
+   ========================================================= */
+
+#brobots-page-frame .brobots-inner-frame-area {
+  --brobots-fixed-scale: 0.5;
+
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+
+/*
+  Kill the v2 native-canvas geometry if any stale selector remains earlier
+  in the stylesheet. The v3 HTML no longer contains that element.
+*/
+#brobots-page-frame .brobots-inner-frame-canvas {
+  display: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   Fixed pieces use the ONE shared art scale.
+   Positioning is against the real inner-frame area.
+   --------------------------------------------------------- */
+
+#brobots-page-frame
+.brobots-inner-frame-area > .brobots-inner-frame-piece {
+  position: absolute;
+  z-index: 2;
+
+  display: block;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+
+  pointer-events: none;
+  user-select: none;
+
+  transform: none !important;
+}
+
+
+/* ---------------- HERO ---------------- */
+
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-top-left {
+  left: 0 !important;
+  right: auto !important;
+  top: 0 !important;
+  bottom: auto !important;
+
+  width:
+    calc(
+      816px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  height:
+    calc(
+      606px *
+      var(--brobots-fixed-scale)
+    ) !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-top-right {
+  left: auto !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: auto !important;
+
+  width:
+    calc(
+      344px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  height:
+    calc(
+      607px *
+      var(--brobots-fixed-scale)
+    ) !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-bottom-left {
+  left: 0 !important;
+  right: auto !important;
+
+  top:
+    calc(
+      611px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  bottom: auto !important;
+
+  width:
+    calc(
+      606px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  height:
+    calc(
+      185px *
+      var(--brobots-fixed-scale)
+    ) !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-bottom-right {
+  left: auto !important;
+  right: 0 !important;
+
+  top:
+    calc(
+      611px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  bottom: auto !important;
+
+  width:
+    calc(
+      554px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  height:
+    calc(
+      185px *
+      var(--brobots-fixed-scale)
+    ) !important;
+}
+
+
+/* ---------------- THUMBNAILS ---------------- */
+
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-top-left {
+  left: 0 !important;
+  right: auto !important;
+
+  top:
+    calc(
+      799px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  bottom: auto !important;
+
+  width:
+    calc(
+      588px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  height:
+    calc(
+      144px *
+      var(--brobots-fixed-scale)
+    ) !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-top-right {
+  left: auto !important;
+  right: 0 !important;
+
+  top:
+    calc(
+      799px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  bottom: auto !important;
+
+  width:
+    calc(
+      567px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  height:
+    calc(
+      144px *
+      var(--brobots-fixed-scale)
+    ) !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-bottom-left {
+  left: 0 !important;
+  right: auto !important;
+
+  top:
+    calc(
+      946px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  bottom: auto !important;
+
+  width:
+    calc(
+      590px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  height:
+    calc(
+      203px *
+      var(--brobots-fixed-scale)
+    ) !important;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-bottom-right {
+  left: auto !important;
+  right: 0 !important;
+
+  top:
+    calc(
+      946px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  bottom: auto !important;
+
+  width:
+    calc(
+      568px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  height:
+    calc(
+      203px *
+      var(--brobots-fixed-scale)
+    ) !important;
+}
+
+
+/*
+  Existing live gallery remains independent for this fixed-piece test.
+*/
+#brobots-page-frame
+.brobots-inner-frame-area > .media-browser {
+  position: relative;
+  z-index: 1;
+
+  width: min(78%, var(--media-composition-width));
+  max-width: 100%;
+
+  margin: auto;
+}
+
+
+@media (min-width: 841px) and (max-width: 1400px) {
+  #brobots-page-frame .brobots-inner-frame-area {
+    width: 100%;
+    height: 100%;
+
+    aspect-ratio: auto;
+
+    margin: 0;
+  }
+
+  #brobots-page-frame
+  .brobots-inner-frame-area > .media-browser {
+    width: 72%;
+  }
+}
+
+
+@media (max-width: 840px) {
+  #brobots-page-frame
+  .brobots-inner-frame-area > .brobots-inner-frame-piece {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v4 — pin vertically as well
+   =========================================================
+
+   Horizontal behavior from v3 stays exactly the same:
+   left pieces hug the real left edge, right pieces hug the real right edge.
+
+   Vertical behavior now follows the same idea:
+
+   HERO REGION
+     top pieces    -> pin to real top edge
+     bottom pieces -> pin to the hero-region bottom anchor
+
+   THUMB REGION
+     top pieces    -> pin to the thumb-region top anchor
+     bottom pieces -> pin to the real bottom edge
+
+   The hero/thumb anchors preserve the original 1164×1149 design's
+   vertical division, while every raster piece keeps the same uniform
+   --brobots-fixed-scale.
+
+   If extra height exists, it becomes empty vertical space BETWEEN pieces
+   rather than moving the whole native composition upward.
+   ========================================================= */
+
+#brobots-page-frame .brobots-inner-frame-area {
+  /*
+    Original native vertical landmarks:
+      hero end:    796 / 1149
+      thumb start: 799 / 1149
+
+    These are positions within the ACTUAL available inner-frame height,
+    not within a centered 1149px canvas.
+  */
+  --brobots-hero-end-y:
+    calc(796 / 1149 * 100%);
+
+  --brobots-thumb-start-y:
+    calc(799 / 1149 * 100%);
+}
+
+
+/* ---------------- HERO TOP: real top edge ---------------- */
+
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-top-left,
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-top-right {
+  top: 0 !important;
+  bottom: auto !important;
+}
+
+
+/* ---------------- HERO BOTTOM: pin to hero split ---------------- */
+
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-bottom-left,
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-bottom-right {
+  top:
+    calc(
+      var(--brobots-hero-end-y)
+      -
+      (
+        185px *
+        var(--brobots-fixed-scale)
+      )
+    ) !important;
+
+  bottom: auto !important;
+}
+
+
+/* ---------------- THUMB TOP: pin to thumb split ---------------- */
+
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-top-left,
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-top-right {
+  top:
+    var(--brobots-thumb-start-y) !important;
+
+  bottom: auto !important;
+}
+
+
+/* ---------------- THUMB BOTTOM: real bottom edge ---------------- */
+
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-bottom-left,
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-bottom-right {
+  top: auto !important;
+  bottom: 0 !important;
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v5 — stretchers restored
+   =========================================================
+
+   This keeps the successful v4 model:
+   - one uniform art scale
+   - left/right fixed pieces pinned to real left/right edges
+   - top/bottom fixed pieces pinned to their real vertical anchors
+
+   The stretchers now simply occupy the EMPTY gaps between those pinned
+   pieces. Their thickness uses the exact same --brobots-fixed-scale.
+   Only their flexible axis is stretched.
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-area > .brobots-inner-frame-piece {
+  z-index: 3;
+}
+
+
+#brobots-page-frame .brobots-inner-frame-stretcher {
+  position: absolute;
+  z-index: 2;
+
+  display: block;
+
+  margin: 0;
+  padding: 0;
+
+  pointer-events: none;
+  user-select: none;
+
+  background-image: var(--brobots-stretcher-image);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+
+/* =========================================================
+   HERO — horizontal stretchers
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-top {
+  top: 0;
+
+  left:
+    calc(
+      816px *
+      var(--brobots-fixed-scale)
+    );
+
+  right:
+    calc(
+      344px *
+      var(--brobots-fixed-scale)
+    );
+
+  height:
+    calc(
+      125px *
+      var(--brobots-fixed-scale)
+    );
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-bottom {
+  left:
+    calc(
+      606px *
+      var(--brobots-fixed-scale)
+    );
+
+  right:
+    calc(
+      554px *
+      var(--brobots-fixed-scale)
+    );
+
+  top:
+    calc(
+      var(--brobots-hero-end-y)
+      -
+      (
+        37px *
+        var(--brobots-fixed-scale)
+      )
+    );
+
+  height:
+    calc(
+      37px *
+      var(--brobots-fixed-scale)
+    );
+}
+
+
+/* =========================================================
+   HERO — vertical stretchers
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-left {
+  left: 0;
+
+  top:
+    calc(
+      606px *
+      var(--brobots-fixed-scale)
+    );
+
+  width:
+    calc(
+      145px *
+      var(--brobots-fixed-scale)
+    );
+
+  height:
+    calc(
+      var(--brobots-hero-end-y)
+      -
+      (
+        185px *
+        var(--brobots-fixed-scale)
+      )
+      -
+      (
+        606px *
+        var(--brobots-fixed-scale)
+      )
+    );
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-right {
+  right: 0;
+
+  top:
+    calc(
+      607px *
+      var(--brobots-fixed-scale)
+    );
+
+  width:
+    calc(
+      145px *
+      var(--brobots-fixed-scale)
+    );
+
+  height:
+    calc(
+      var(--brobots-hero-end-y)
+      -
+      (
+        185px *
+        var(--brobots-fixed-scale)
+      )
+      -
+      (
+        607px *
+        var(--brobots-fixed-scale)
+      )
+    );
+}
+
+
+/* =========================================================
+   THUMBNAILS — horizontal stretchers
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-top {
+  left:
+    calc(
+      588px *
+      var(--brobots-fixed-scale)
+    );
+
+  right:
+    calc(
+      567px *
+      var(--brobots-fixed-scale)
+    );
+
+  top:
+    var(--brobots-thumb-start-y);
+
+  height:
+    calc(
+      51px *
+      var(--brobots-fixed-scale)
+    );
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-bottom {
+  left:
+    calc(
+      590px *
+      var(--brobots-fixed-scale)
+    );
+
+  right:
+    calc(
+      568px *
+      var(--brobots-fixed-scale)
+    );
+
+  bottom: 0;
+
+  height:
+    calc(
+      105px *
+      var(--brobots-fixed-scale)
+    );
+}
+
+
+/* =========================================================
+   THUMBNAILS — vertical stretchers
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-left {
+  left: 0;
+
+  top:
+    calc(
+      var(--brobots-thumb-start-y)
+      +
+      (
+        144px *
+        var(--brobots-fixed-scale)
+      )
+    );
+
+  bottom:
+    calc(
+      203px *
+      var(--brobots-fixed-scale)
+    );
+
+  width:
+    calc(
+      98px *
+      var(--brobots-fixed-scale)
+    );
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-right {
+  right: 0;
+
+  top:
+    calc(
+      var(--brobots-thumb-start-y)
+      +
+      (
+        144px *
+        var(--brobots-fixed-scale)
+      )
+    );
+
+  bottom:
+    calc(
+      203px *
+      var(--brobots-fixed-scale)
+    );
+
+  width:
+    calc(
+      100px *
+      var(--brobots-fixed-scale)
+    );
+}
+
+
+/* =========================================================
+   CENTER SEPARATOR
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--separator {
+  left: 0;
+  right: 0;
+
+  top:
+    calc(
+      (
+        var(--brobots-hero-end-y)
+        +
+        var(--brobots-thumb-start-y)
+      )
+      / 2
+      -
+      (
+        1px *
+        var(--brobots-fixed-scale)
+      )
+    );
+
+  height:
+    calc(
+      2px *
+      var(--brobots-fixed-scale)
+    );
+}
+
+
+/* Hide the raster frame experiment on mobile exactly as before. */
+@media (max-width: 840px) {
+  #brobots-page-frame .brobots-inner-frame-stretcher {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v10 — dynamic piece dimensions
+   =========================================================
+   Overall frame reference remains 1164 × 1149.
+
+   Individual fixed-piece and stretcher dimensions are now supplied by JS
+   from the ACTUAL raster files at runtime.
+
+   This means adding/removing transparent padding around a cut asset no
+   longer requires updating hardcoded CSS width/height values.
+   ========================================================= */
+
+/* Fixed pieces: JS writes width/height and some anchor dimensions. */
+#brobots-page-frame
+.brobots-inner-frame-area > [data-brobots-frame-piece] {
+  width: var(--brobots-piece-w, auto) !important;
+  height: var(--brobots-piece-h, auto) !important;
+}
+
+
+/* Hero bottom rows use measured piece height for vertical pinning. */
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-bottom-left,
+#brobots-page-frame
+.brobots-inner-frame-piece--hero-bottom-right {
+  top:
+    calc(
+      var(--brobots-hero-end-y)
+      -
+      var(--brobots-piece-h)
+    ) !important;
+}
+
+
+/* Thumb top rows still use the shared split anchor. */
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-top-left,
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-top-right {
+  top:
+    var(--brobots-thumb-start-y) !important;
+}
+
+
+/* Bottom thumb pieces stay pinned to the actual bottom edge. */
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-bottom-left,
+#brobots-page-frame
+.brobots-inner-frame-piece--thumb-bottom-right {
+  top: auto !important;
+  bottom: 0 !important;
+}
+
+
+/* =========================================================
+   Stretchers use measured natural cross-axis dimensions.
+   Their flexible axis is still defined entirely by pinned neighbors.
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-top {
+  left:
+    var(--brobots-hero-top-left-w);
+
+  right:
+    var(--brobots-hero-top-right-w);
+
+  height:
+    var(--brobots-stretcher-h);
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-bottom {
+  left:
+    var(--brobots-hero-bottom-left-w);
+
+  right:
+    var(--brobots-hero-bottom-right-w);
+
+  top:
+    calc(
+      var(--brobots-hero-end-y)
+      -
+      var(--brobots-stretcher-h)
+    );
+
+  height:
+    var(--brobots-stretcher-h);
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-left {
+  top:
+    var(--brobots-hero-top-left-h);
+
+  width:
+    var(--brobots-stretcher-w);
+
+  height:
+    calc(
+      var(--brobots-hero-end-y)
+      -
+      var(--brobots-hero-bottom-left-h)
+      -
+      var(--brobots-hero-top-left-h)
+    );
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-right {
+  top:
+    var(--brobots-hero-top-right-h);
+
+  width:
+    var(--brobots-stretcher-w);
+
+  height:
+    calc(
+      var(--brobots-hero-end-y)
+      -
+      var(--brobots-hero-bottom-right-h)
+      -
+      var(--brobots-hero-top-right-h)
+    );
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-top {
+  left:
+    var(--brobots-thumb-top-left-w);
+
+  right:
+    var(--brobots-thumb-top-right-w);
+
+  top:
+    var(--brobots-thumb-start-y);
+
+  height:
+    var(--brobots-stretcher-h);
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-bottom {
+  left:
+    var(--brobots-thumb-bottom-left-w);
+
+  right:
+    var(--brobots-thumb-bottom-right-w);
+
+  bottom: 0;
+
+  height:
+    var(--brobots-stretcher-h);
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-left {
+  top:
+    calc(
+      var(--brobots-thumb-start-y)
+      +
+      var(--brobots-thumb-top-left-h)
+    );
+
+  bottom:
+    var(--brobots-thumb-bottom-left-h);
+
+  width:
+    var(--brobots-stretcher-w);
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-right {
+  top:
+    calc(
+      var(--brobots-thumb-start-y)
+      +
+      var(--brobots-thumb-top-right-h)
+    );
+
+  bottom:
+    var(--brobots-thumb-bottom-right-h);
+
+  width:
+    var(--brobots-stretcher-w);
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v11 — restore crisp stretchers
+   =========================================================
+
+   Keep v10's dynamic natural-size measurement.
+
+   Restore ONLY the rendering change that fixed the blurry bars:
+   - horizontal spacer samples repeat along X
+   - vertical spacer samples repeat along Y
+   - only their cross-axis thickness is scaled
+   - do NOT stretch a 3px/5px sample across the entire flexible gap
+
+   No seam overlap, phase anchoring, or pixel snapping is reintroduced.
+   ========================================================= */
+
+
+/* Horizontal stretcher samples */
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-top,
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-bottom,
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-top,
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-bottom {
+  background-repeat: repeat-x !important;
+  background-position: center !important;
+
+  /*
+    Natural source width remains unscaled by CSS.
+    JS supplies the measured/scaled source HEIGHT through
+    --brobots-stretcher-h.
+  */
+  background-size:
+    auto
+    var(--brobots-stretcher-h) !important;
+}
+
+
+/* Vertical stretcher samples */
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-left,
+#brobots-page-frame
+.brobots-inner-frame-stretcher--hero-right,
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-left,
+#brobots-page-frame
+.brobots-inner-frame-stretcher--thumb-right {
+  background-repeat: repeat-y !important;
+  background-position: center !important;
+
+  /*
+    JS supplies the measured/scaled source WIDTH through
+    --brobots-stretcher-w.
+  */
+  background-size:
+    var(--brobots-stretcher-w)
+    auto !important;
+}
+
+
+/*
+  Separator is already a long source strip, so keep stretching it once.
+*/
+#brobots-page-frame
+.brobots-inner-frame-stretcher--separator {
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 100% 100% !important;
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v12 — full-width center separator
+   =========================================================
+
+   The separator source is already essentially the full native frame width.
+   Treat it as one continuous strip and force its element to span the entire
+   available Brobots inner-frame width.
+
+   Its source image is stretched once to that width; no tiling.
+   Its height comes from the runtime-measured natural image height.
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--separator {
+  left: 0 !important;
+  right: auto !important;
+
+  width: 100% !important;
+
+  height:
+    var(--brobots-stretcher-h) !important;
+
+  background-repeat: no-repeat !important;
+  background-position: left center !important;
+  background-size: 100% 100% !important;
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v13 — separator actually measured
+   =========================================================
+
+   v12 referenced --brobots-stretcher-h on the center separator, but the
+   separator was never included in the runtime-measured stretcher set.
+
+   v13 adds it to that set in HTML and ensures it renders as the intended
+   full-width stretch-separator.webp strip.
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--separator {
+  left: 0 !important;
+  right: auto !important;
+
+  width: 100% !important;
+
+  /*
+    Now populated from stretch-separator.webp's real natural height.
+  */
+  height: var(--brobots-stretcher-h) !important;
+
+  background-image:
+    var(--brobots-stretcher-image) !important;
+
+  background-repeat: no-repeat !important;
+  background-position: left center !important;
+  background-size: 100% 100% !important;
+
+  /*
+    Keep it visible above the surrounding fixed bars. The image itself
+    supplies the visual seam; this does not alter its geometry.
+  */
+  z-index: 4 !important;
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v14 — corrected native separator
+   =========================================================
+
+   stretch-separator.webp has now been corrected to the full native
+   1164px frame width.
+
+   Remove the previous compensation behavior. The separator now follows
+   the same native-scale model as the rest of the frame:
+     rendered width  = 1164px * --brobots-fixed-scale
+     rendered height = naturalHeight * --brobots-fixed-scale
+
+   Because the source itself matches the full-frame reference width,
+   internal details keep their original X positions.
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--separator {
+  left: 0 !important;
+  right: auto !important;
+
+  width:
+    calc(
+      1164px *
+      var(--brobots-fixed-scale)
+    ) !important;
+
+  height:
+    var(--brobots-stretcher-h) !important;
+
+  background-image:
+    var(--brobots-stretcher-image) !important;
+
+  background-repeat: no-repeat !important;
+  background-position: left center !important;
+  background-size: 100% 100% !important;
+
+  z-index: 4 !important;
+}
+
+
+/* =========================================================
+   BROBOTS INNER PAGE FRAME v15 — separator fills its anchor gap
+   =========================================================
+
+   The two dark lines were not caused by the separator image height itself.
+
+   Earlier versions still positioned the separator using the old 2px-source
+   assumption:
+      midpoint of the 3px native gap - 1px
+
+   So changing the source image height could not remove the empty sliver(s).
+
+   The separator is a true flexible bridge, so its BOX should span the exact
+   vertical gap between the hero and thumbnail regions, then stretch the
+   raster to fill that box.
+   ========================================================= */
+
+#brobots-page-frame
+.brobots-inner-frame-stretcher--separator {
+  left: 0 !important;
+  right: 0 !important;
+
+  width: auto !important;
+
+  top:
+    var(--brobots-hero-end-y) !important;
+
+  bottom:
+    calc(
+      100%
+      -
+      var(--brobots-thumb-start-y)
+    ) !important;
+
+  height: auto !important;
+
+  background-image:
+    var(--brobots-stretcher-image) !important;
+
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 100% 100% !important;
+
+  z-index: 4 !important;
+}
+
+/* =========================================================
+   BROBOTS — FINAL DESKTOP/TABLET MEDIA FRAME
+   Stable checkpoint before tablet integration
+   =========================================================
+
+   Architecture
+   ------------
+   - 17 raster pieces form the visible Brobots media frame.
+   - JS reads source-image dimensions once.
+   - CSS container units resize the raster frame continuously.
+   - Hero + thumbnail apertures derive from the SAME frame geometry.
+   - The old Simulacrum SVG page shell remains in the DOM as the hidden
+     page/button + PC/tablet morph target.
+   - Mobile keeps the generic gallery layout, except during the outgoing
+     collapse handoff where the last tablet/desktop composition is frozen.
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   Frame area + layer ownership
+   --------------------------------------------------------- */
+
+#brobots-page-frame .brobots-inner-frame-area {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+
+  container-type: size;
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-area > .media-browser {
+  position: absolute;
+
+  z-index: 1;
+
+  inset: 0;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: none;
+
+  margin: 0;
+  padding: 0;
+
+  display: block;
+
+  overflow: visible;
+
+  /*
+    Generic thumbnail typography / small metrics still read this token.
+    The actual Brobots rail geometry is controlled independently below.
+  */
+  --media-composition-width:
+    var(
+      --brobots-thumb-strip-width,
+      520px
+    );
+
+  pointer-events: none;
+}
+
+
+#brobots-page-frame .brobots-inner-frame-piece,
+#brobots-page-frame .brobots-inner-frame-stretcher {
+  z-index: 3;
+}
+
+
+/* ---------------------------------------------------------
+   Media zones
+   --------------------------------------------------------- */
+
+#brobots-page-frame .brobots-media-zone {
+  position: absolute;
+
+  display: grid;
+  place-items: center;
+
+  min-width: 0;
+  min-height: 0;
+
+  container-type: size;
+
+  pointer-events: none;
+}
+
+
+/*
+  Hero aperture = exact space between the four hero stretchers.
+*/
+#brobots-page-frame .brobots-media-zone--hero {
+  left:
+    var(
+      --brobots-hero-left-rail-w,
+      0px
+    );
+
+  right:
+    var(
+      --brobots-hero-right-rail-w,
+      0px
+    );
+
+  top:
+    var(
+      --brobots-hero-top-bar-h,
+      0px
+    );
+
+  bottom:
+    calc(
+      100%
+      -
+      var(--brobots-hero-end-y)
+      +
+      var(
+        --brobots-hero-bottom-bar-h,
+        0px
+      )
+    );
+
+  width: auto;
+  height: auto;
+}
+
+
+/*
+  Thumbnail aperture = exact space between the four thumbnail stretchers.
+*/
+#brobots-page-frame .brobots-media-zone--thumbs {
+  left:
+    var(
+      --brobots-thumb-left-rail-w,
+      0px
+    );
+
+  right:
+    var(
+      --brobots-thumb-right-rail-w,
+      0px
+    );
+
+  top:
+    calc(
+      var(--brobots-thumb-start-y)
+      +
+      var(
+        --brobots-thumb-top-bar-h,
+        0px
+      )
+    );
+
+  bottom:
+    var(
+      --brobots-thumb-bottom-bar-h,
+      0px
+    );
+
+  width: auto;
+  height: auto;
+
+  container-type: size;
+  container-name: brobots-thumb-cavity;
+
+
+  /*
+    Arrow positions remain tied continuously to the current side-rail
+    thicknesses rather than to viewport breakpoints.
+  */
+  --brobots-thumb-left-arrow-offset:
+    max(
+      8px,
+      calc(
+        var(
+          --brobots-thumb-left-rail-w,
+          0px
+        )
+        * 0.18
+      )
+    );
+
+  --brobots-thumb-right-arrow-offset:
+    max(
+      8px,
+      calc(
+        var(
+          --brobots-thumb-right-rail-w,
+          0px
+        )
+        * 0.18
+      )
+    );
+
+  --brobots-thumb-arrow-size:
+    clamp(
+      28px,
+      min(
+        5.2cqw,
+        34cqh
+      ),
+      64px
+    );
+
+  --brobots-thumb-arrow-card-gap:
+    clamp(
+      10px,
+      1.35cqw,
+      24px
+    );
+
+  --brobots-thumb-card-gap:
+    clamp(
+      12px,
+      1.45cqw,
+      28px
+    );
+}
+
+
+/* ---------------------------------------------------------
+   Hero viewer
+   --------------------------------------------------------- */
+
+#brobots-page-frame
+.brobots-media-zone--hero
+.media-viewer {
+  width: 100cqw !important;
+  height: 100cqh !important;
+
+  max-width: none;
+  max-height: none;
+
+  aspect-ratio: auto !important;
+
+  margin: 0;
+
+  justify-self: stretch;
+  align-self: stretch;
+
+  /*
+    Small centered bleed hides antialiasing / measurement slivers beneath
+    the raster artwork without changing the layout box itself.
+  */
+  transform:
+    scale(1.04);
+
+  transform-origin:
+    50% 50%;
+
+  clip-path: none !important;
+
+  border-radius:
+    clamp(
+      28px,
+      4.4cqw,
+      48px
+    );
+
+  border:
+    1px solid
+    rgba(
+      var(--page-accent-rgb),
+      0.60
+    );
+
+  box-shadow:
+    inset 0 0 0 1px
+      rgba(255, 255, 255, 0.08);
+
+  overflow: hidden;
+
+  /*
+    Resize must track the raster frame directly; generic gallery width /
+    aspect easing would visibly lag during a fast drag.
+  */
+  transition: none !important;
+
+  pointer-events: auto;
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--hero
+.media-viewer-stage {
+  position: absolute;
+
+  inset: 0;
+
+  display: block;
+
+  border-radius: inherit;
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--hero
+.media-viewer-image,
+#brobots-page-frame
+.brobots-media-zone--hero
+.media-viewer-video {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: none;
+  max-height: none;
+
+  display: block;
+
+  transform:
+    translate(-50%, -50%);
+
+  object-fit: cover !important;
+  object-position: 50% 50% !important;
+
+  border-radius: inherit;
+}
+
+
+/*
+  YouTube equivalent of object-fit: cover.
+*/
+#brobots-page-frame
+.brobots-media-zone--hero
+.media-viewer-youtube {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width:
+    max(
+      100%,
+      calc(100cqh * 16 / 9)
+    );
+
+  height:
+    max(
+      100%,
+      calc(100cqw * 9 / 16)
+    );
+
+  max-width: none;
+  max-height: none;
+
+  aspect-ratio: 16 / 9;
+
+  transform:
+    translate(-50%, -50%);
+
+  border-radius: inherit;
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--hero
+.media-youtube-local-fallback,
+#brobots-page-frame
+.brobots-media-zone--hero
+.media-youtube-local-fallback-image {
+  border-radius: inherit;
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--hero
+.media-youtube-local-fallback-image {
+  object-fit: cover;
+  object-position: center center;
+}
+
+
+/* ---------------------------------------------------------
+   Thumbnail composition
+   --------------------------------------------------------- */
+
+/*
+  Full aperture becomes the thumbnail composition canvas.
+*/
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-strip {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100% !important;
+  height: 100%;
+
+  max-width: none;
+
+  display: block;
+
+  margin: 0;
+
+  transition: none !important;
+
+  pointer-events: auto;
+}
+
+
+/*
+  Arrows are fixed relative to the live aperture / side rails.
+*/
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-arrow {
+  position: absolute;
+
+  z-index: 3;
+
+  top: 50%;
+
+  width:
+    var(--brobots-thumb-arrow-size);
+
+  height:
+    var(--brobots-thumb-arrow-size);
+
+  margin: 0;
+  padding: 0;
+
+  font-size:
+    clamp(
+      24px,
+      min(
+        3.6cqw,
+        24cqh
+      ),
+      54px
+    );
+
+  line-height: 1;
+
+  transform:
+    translateY(-50%);
+
+  pointer-events: auto;
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-arrow--previous {
+  left:
+    var(--brobots-thumb-left-arrow-offset);
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-arrow--next {
+  right:
+    var(--brobots-thumb-right-arrow-offset);
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-arrow:hover,
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-arrow:focus-visible {
+  transform:
+    translateY(-50%)
+    scale(1.06);
+}
+
+
+/*
+  Exactly three visible cards live continuously between the anchored arrows.
+*/
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-thumbnails {
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  left:
+    calc(
+      var(--brobots-thumb-left-arrow-offset)
+      +
+      var(--brobots-thumb-arrow-size)
+      +
+      var(--brobots-thumb-arrow-card-gap)
+    );
+
+  right:
+    calc(
+      var(--brobots-thumb-right-arrow-offset)
+      +
+      var(--brobots-thumb-arrow-size)
+      +
+      var(--brobots-thumb-arrow-card-gap)
+    );
+
+  width: auto;
+  height: 100%;
+
+  container-type: size;
+  container-name: brobots-thumb-rail;
+
+  grid-auto-columns:
+    calc(
+      (
+        100%
+        -
+        (
+          var(--brobots-thumb-card-gap)
+          *
+          2
+        )
+      )
+      /
+      3
+    );
+
+  gap:
+    var(--brobots-thumb-card-gap);
+
+  align-items: center;
+
+  transition: none !important;
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-thumbnail {
+  width: 100%;
+
+  height:
+    76cqh;
+
+  max-height:
+    calc(
+      100cqh
+      -
+      8px
+    );
+
+  aspect-ratio: auto;
+
+  padding:
+    clamp(
+      4px,
+      0.55cqh,
+      8px
+    );
+
+  clip-path: none !important;
+
+  border-radius:
+    clamp(
+      7px,
+      1.2cqw,
+      12px
+    );
+
+  overflow: hidden;
+
+  pointer-events: auto;
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-thumbnail-image,
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-thumbnail-local-video {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: 50% 50%;
+
+  border-radius: inherit;
+}
+
+
+#brobots-page-frame
+.brobots-media-zone--thumbs
+.media-thumbnail-overlay {
+  border-radius: inherit;
+}
+
+
+/* ---------------------------------------------------------
+   Raster frame replaces visible Simulacrum shell
+   --------------------------------------------------------- */
+
+/*
+  Keep the SVG shell alive as geometry / animation infrastructure.
+*/
+#brobots-page-frame .prototype-page-frame-shell {
+  opacity: 0;
+}
+
+
+/*
+  The visible raster frame reclaims almost all of the old SVG-border space.
+*/
+#brobots-page-frame .prototype-page-frame-content {
+  top:
+    clamp(
+      6px,
+      0.65cqw,
+      12px
+    );
+
+  right:
+    clamp(
+      6px,
+      0.65cqw,
+      12px
+    );
+
+  bottom:
+    clamp(
+      6px,
+      0.65cqw,
+      12px
+    );
+
+  left:
+    clamp(
+      6px,
+      0.65cqw,
+      12px
+    );
+}
+
+
+#brobots-page-frame .game-page--brobots,
+#brobots-page-frame .brobots-inner-frame-area {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* ---------------------------------------------------------
+   Desktop info-popout alignment
+   --------------------------------------------------------- */
+
+@media (min-width: 1401px) {
+  #brobots-page-frame .desktop-secondary-panel {
+    top: 7.75%;
+    bottom: 7.75%;
+  }
+}
+
+
+/*
+  This MUST remain outside the desktop query: when PC -> tablet crosses the
+  breakpoint, the outgoing popout is still alive for its reverse morph.
+*/
+#brobots-page-frame.is-layout-transitioning
+.desktop-secondary-panel {
+  top: 7.75% !important;
+  bottom: 7.75% !important;
+}
+
+
+/* ---------------------------------------------------------
+   Mobile base layout
+   --------------------------------------------------------- */
+
+@media (max-width: 840px) {
+
+  /*
+    Mobile currently uses the generic gallery rather than the 17-piece
+    raster frame.
+  */
+  #brobots-page-frame .prototype-page-frame-shell {
+    opacity: 1;
+  }
+
+
+  #brobots-page-frame .prototype-page-frame-content {
+    top:
+      var(--page-content-top, 48px);
+
+    right:
+      var(--page-content-right, 48px);
+
+    bottom:
+      var(--page-content-bottom, 48px);
+
+    left:
+      var(--page-content-left, 48px);
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area > .media-browser {
+    position: static;
+
+    width: auto !important;
+    height: auto !important;
+
+    display: flex;
+
+    padding:
+      var(--media-browser-outer-padding);
+
+    overflow: hidden;
+
+    pointer-events: auto;
+  }
+
+
+  #brobots-page-frame .brobots-media-zone {
+    position: static;
+
+    display: contents;
+
+    container-type: normal;
+  }
+
+
+  #brobots-page-frame .media-viewer {
+    width:
+      min(
+        var(--media-composition-width),
+        calc(
+          var(--media-composition-width)
+          * 0.5625
+          * var(--media-viewer-aspect-number)
+        )
+      ) !important;
+
+    height: auto !important;
+
+    aspect-ratio:
+      var(--media-viewer-aspect-number)
+      !important;
+
+    transform: none;
+  }
+
+
+  #brobots-page-frame
+  .brobots-media-zone--hero
+  .media-viewer-stage {
+    position: absolute;
+
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+  }
+
+
+  #brobots-page-frame
+  .brobots-media-zone--hero
+  .media-viewer-image,
+  #brobots-page-frame
+  .brobots-media-zone--hero
+  .media-viewer-video {
+    position: static;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    transform: none;
+
+    object-fit: contain !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-media-zone--hero
+  .media-viewer-youtube {
+    position: static;
+
+    width: 100%;
+    height: 100%;
+
+    transform: none;
+  }
+
+
+  #brobots-page-frame .media-strip {
+    width:
+      var(--media-composition-width)
+      !important;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   Outgoing tablet/desktop -> mobile handoff hold
+   --------------------------------------------------------- */
+
+@media (max-width: 840px) {
+
+  /*
+    The real page stays visible briefly while it crossfades into the fake
+    hamburger-collapse shape. Freeze its pre-mobile internal composition so
+    mobile CSS cannot pop/reflow before visual ownership transfers.
+  */
+  #brobots-page-frame.is-mobile-collapse-hold
+  .prototype-page-frame-shell {
+    opacity: 0 !important;
+  }
+
+
+  #brobots-page-frame.is-mobile-collapse-hold
+  .prototype-page-frame-content {
+    top:
+      clamp(
+        6px,
+        0.65cqw,
+        12px
+      ) !important;
+
+    right:
+      clamp(
+        6px,
+        0.65cqw,
+        12px
+      ) !important;
+
+    bottom:
+      clamp(
+        6px,
+        0.65cqw,
+        12px
+      ) !important;
+
+    left:
+      clamp(
+        6px,
+        0.65cqw,
+        12px
+      ) !important;
+  }
+
+
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-inner-frame-area > .media-browser {
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    pointer-events: none !important;
+  }
+
+
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-media-zone {
+    position: absolute !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    container-type: size !important;
+
+    min-width: 0;
+    min-height: 0;
+  }
+
+
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-media-zone--hero {
+    left:
+      var(
+        --brobots-hero-left-rail-w,
+        0px
+      ) !important;
+
+    right:
+      var(
+        --brobots-hero-right-rail-w,
+        0px
+      ) !important;
+
+    top:
+      var(
+        --brobots-hero-top-bar-h,
+        0px
+      ) !important;
+
+    bottom:
+      calc(
+        100%
+        -
+        var(--brobots-hero-end-y)
+        +
+        var(
+          --brobots-hero-bottom-bar-h,
+          0px
+        )
+      ) !important;
+
+    width: auto !important;
+    height: auto !important;
+  }
+
+
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-media-zone--thumbs {
+    left:
+      var(
+        --brobots-thumb-left-rail-w,
+        0px
+      ) !important;
+
+    right:
+      var(
+        --brobots-thumb-right-rail-w,
+        0px
+      ) !important;
+
+    top:
+      calc(
+        var(--brobots-thumb-start-y)
+        +
+        var(
+          --brobots-thumb-top-bar-h,
+          0px
+        )
+      ) !important;
+
+    bottom:
+      var(
+        --brobots-thumb-bottom-bar-h,
+        0px
+      ) !important;
+
+    width: auto !important;
+    height: auto !important;
+  }
+
+
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-media-zone--hero
+  .media-viewer {
+    width: 100cqw !important;
+    height: 100cqh !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    aspect-ratio: auto !important;
+
+    transform:
+      scale(1.04) !important;
+
+    transform-origin:
+      50% 50% !important;
+  }
+
+
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-media-zone--hero
+  .media-viewer-stage {
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    display: block !important;
+  }
+
+
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-media-zone--hero
+  .media-viewer-image,
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-media-zone--hero
+  .media-viewer-video {
+    position: absolute !important;
+
+    left: 50% !important;
+    top: 50% !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    transform:
+      translate(-50%, -50%) !important;
+
+    object-fit: cover !important;
+    object-position: 50% 50% !important;
+  }
+
+
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-media-zone--thumbs
+  .media-strip {
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    display: block !important;
+  }
+}
