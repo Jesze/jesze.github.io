@@ -171,17 +171,17 @@ document.addEventListener("DOMContentLoaded", () => {
     new Map();
 
 
-  const isBrobotsPageMorph = (
+  const isGamePageMorph = (
     geometry
   ) => {
     return (
       geometry?.target?.shapeType ===
-      "brobots-page"
+      "game-page"
     );
   };
 
 
-  const getBrobotsFinalEightPoints = (
+  const getGameFinalEightPoints = (
     geometry
   ) => {
     const {
@@ -300,7 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const getBrobotsLaunchEightPoints = (
+  const getGameLaunchEightPoints = (
     geometry
   ) => {
     const launch =
@@ -322,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const getBrobotsButtonReattachEightPoints = (
+  const getGameButtonReattachEightPoints = (
     geometry,
     depthRatio = 0.48
   ) => {
@@ -368,7 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const getBrobotsButtonAbsorbEightPoints = (
+  const getGameButtonAbsorbEightPoints = (
     geometry
   ) => {
     const {
@@ -389,7 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const brobotsEightPointsToPath = (
+  const gameEightPointsToPath = (
     points
   ) => {
     return `
@@ -406,18 +406,18 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const buildBrobotsFormPath = (
+  const buildGameFormPath = (
     geometry,
     progress
   ) => {
     const startPoints =
-      getBrobotsLaunchEightPoints(
+      getGameLaunchEightPoints(
         geometry
       );
 
 
     const finalPoints =
-      getBrobotsFinalEightPoints(
+      getGameFinalEightPoints(
         geometry
       );
 
@@ -453,7 +453,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    return brobotsEightPointsToPath(
+    return gameEightPointsToPath(
       points
     );
   };
@@ -4232,16 +4232,24 @@ document.addEventListener("DOMContentLoaded", () => {
           getFinalElementRect,
 
         buildFormPath:
-          name === "brobots"
-            ? buildBrobotsFormPath
+          (
+            name === "brobots" ||
+            name === "etherian" ||
+            name === "halodoom"
+          )
+            ? buildGameFormPath
             : buildFormPath,
 
         settingsFamily:
           "page",
 
         shapeType:
-          name === "brobots"
-            ? "brobots-page"
+          (
+            name === "brobots" ||
+            name === "etherian" ||
+            name === "halodoom"
+          )
+            ? "game-page"
             : "page"
       }
     );
@@ -7521,10 +7529,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     menuMorphPath.setAttribute(
       "d",
-      isBrobotsPageMorph(
+      isGamePageMorph(
         geometry
       )
-        ? brobotsEightPointsToPath(
+        ? gameEightPointsToPath(
             points
           )
         : pagePointsToPath(
@@ -7805,10 +7813,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const pagePoints =
-      isBrobotsPageMorph(
+      isGamePageMorph(
         geometry
       )
-        ? getBrobotsFinalEightPoints(
+        ? getGameFinalEightPoints(
             geometry
           )
         : getPageFinalSixPoints(
@@ -7816,10 +7824,10 @@ document.addEventListener("DOMContentLoaded", () => {
           );
 
     const launchPoints =
-      isBrobotsPageMorph(
+      isGamePageMorph(
         geometry
       )
-        ? getBrobotsLaunchEightPoints(
+        ? getGameLaunchEightPoints(
             geometry
           )
         : getPageLaunchSixPoints(
@@ -7827,10 +7835,10 @@ document.addEventListener("DOMContentLoaded", () => {
           );
 
     const reattachPoints =
-      isBrobotsPageMorph(
+      isGamePageMorph(
         geometry
       )
-        ? getBrobotsButtonReattachEightPoints(
+        ? getGameButtonReattachEightPoints(
             geometry,
             0.48
           )
@@ -7840,10 +7848,10 @@ document.addEventListener("DOMContentLoaded", () => {
           );
 
     const absorbPoints =
-      isBrobotsPageMorph(
+      isGamePageMorph(
         geometry
       )
-        ? getBrobotsButtonAbsorbEightPoints(
+        ? getGameButtonAbsorbEightPoints(
             geometry
           )
         : getButtonAbsorbSixPoints(
@@ -11747,17 +11755,19 @@ document.addEventListener("DOMContentLoaded", () => {
       clip it back to the visible viewer cavity. This makes the morph begin
       and end on the exact pixels the user is actually seeing.
     */
-    const isBrobotsCoverHero =
-      pageFrame?.dataset.page ===
-        "brobots" &&
-      viewer &&
+    const isGameFrameCoverHero =
+      Boolean(
+        viewer?.closest(
+          "[data-game-frame]"
+        )
+      ) &&
       window.matchMedia(
         "(min-width: 841px)"
       ).matches;
 
 
     if (
-      isBrobotsCoverHero &&
+      isGameFrameCoverHero &&
       sourceImage.naturalWidth > 0 &&
       sourceImage.naturalHeight > 0
     ) {
@@ -11767,7 +11777,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const heroZone =
         viewer.closest(
-          ".brobots-media-zone--hero"
+          '[data-game-frame-zone="hero"]'
         );
 
 
@@ -13966,7 +13976,7 @@ document.addEventListener("DOMContentLoaded", () => {
     */
     const heroZone =
       browser.querySelector(
-        ".brobots-media-zone--hero"
+        '[data-game-frame-zone="hero"]'
       );
 
 
@@ -13985,9 +13995,18 @@ document.addEventListener("DOMContentLoaded", () => {
       heroNavigation.className =
         "media-hero-navigation";
 
+      const owningGamePage =
+        browser.closest(
+          ".prototype-page-frame"
+        );
+
+      const owningGameName =
+        owningGamePage?.dataset.page ||
+        "game";
+
       heroNavigation.setAttribute(
         "aria-label",
-        "Brobots media navigation"
+        `${owningGameName} media navigation`
       );
 
 
@@ -15116,7 +15135,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const brobotsInnerFrameArea =
     document.querySelector(
-      "#brobots-page-frame .brobots-inner-frame-area"
+      '[data-game-frame="brobots"]'
     );
 
 
@@ -15222,7 +15241,7 @@ document.addEventListener("DOMContentLoaded", () => {
         Array.from(
           brobotsInnerFrameArea
             .querySelectorAll(
-              "[data-brobots-frame-piece]"
+              "[data-game-frame-piece]"
             )
         );
 
@@ -15280,7 +15299,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .fixed
           .set(
             element.dataset
-              .brobotsFramePiece,
+              .gameFramePiece,
 
             {
               element,
@@ -15295,7 +15314,7 @@ document.addEventListener("DOMContentLoaded", () => {
         Array.from(
           brobotsInnerFrameArea
             .querySelectorAll(
-              "[data-brobots-frame-stretcher]"
+              "[data-game-frame-stretcher]"
             )
         );
 
@@ -15316,7 +15335,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .stretchers
           .set(
             element.dataset
-              .brobotsFrameStretcher,
+              .gameFrameStretcher,
 
             {
               element,
@@ -16053,1188 +16072,1318 @@ document.addEventListener("DOMContentLoaded", () => {
           raster frame itself requires no resize-time JS.
         */
         applyBrobotsMeasuredFrameDimensions();
+
+        /*
+          All current game-frame instances use the same raster skin. Measure
+          that skin once, then mirror only its generated custom properties to
+          each instance. The formulas still resolve against each instance's
+          own cqw/cqh, so every page scales independently.
+        */
+        const sourceAreaStyle =
+          brobotsInnerFrameArea.style;
+
+
+        document.querySelectorAll(
+          '[data-game-frame]'
+        ).forEach((targetArea) => {
+          if (targetArea === brobotsInnerFrameArea) {
+            return;
+          }
+
+
+          for (
+            let index = 0;
+            index < sourceAreaStyle.length;
+            index += 1
+          ) {
+            const property =
+              sourceAreaStyle[index];
+
+
+            if (
+              property?.startsWith(
+                "--brobots-"
+              )
+            ) {
+              targetArea.style.setProperty(
+                property,
+                sourceAreaStyle.getPropertyValue(
+                  property
+                )
+              );
+            }
+          }
+
+
+          brobotsInnerFrameArea
+            .querySelectorAll(
+              '[data-game-frame-piece], [data-game-frame-stretcher]'
+            )
+            .forEach((sourcePiece) => {
+              const key =
+                sourcePiece.dataset.gameFramePiece ||
+                sourcePiece.dataset.gameFrameStretcher;
+
+              const attribute =
+                sourcePiece.dataset.gameFramePiece
+                  ? 'data-game-frame-piece'
+                  : 'data-game-frame-stretcher';
+
+              const targetPiece =
+                targetArea.querySelector(
+                  `[${attribute}="${key}"]`
+                );
+
+
+              if (!targetPiece) {
+                return;
+              }
+
+
+              const sourceStyle =
+                sourcePiece.style;
+
+
+              for (
+                let styleIndex = 0;
+                styleIndex < sourceStyle.length;
+                styleIndex += 1
+              ) {
+                const property =
+                  sourceStyle[styleIndex];
+
+
+                if (
+                  property?.startsWith(
+                    "--brobots-"
+                  ) &&
+                  property !==
+                    "--brobots-stretcher-image"
+                ) {
+                  targetPiece.style.setProperty(
+                    property,
+                    sourceStyle.getPropertyValue(
+                      property
+                    )
+                  );
+                }
+              }
+            });
+        });
       });
   }
 
   /* =======================================================
-     Brobots tablet info geometry — clean STEP 1 test
+     Reusable game-frame tablet controller
      ======================================================= */
 
-  const brobotsTabletMode =
+  const gameFrameTabletMode =
     window.matchMedia(
       "(min-width: 841px) and (max-width: 1400px)"
     );
 
 
-  /*
-    Tablet info host
-    ----------------
-    Keep desktop popout markup completely untouched.
-
-    The tablet surface is cloned from the existing Brobots .game-info node,
-    so there is still only one authored content source in HTML. This avoids
-    reparenting the desktop secondary panel during breakpoint transitions
-    and keeps the proven PC popout system isolated.
-  */
-  const brobotsFrame =
-    getPageFrame(
-      "brobots"
-    );
-
-
-  const brobotsDesktopInfo =
-    brobotsFrame
-      ?.querySelector(
-        ".desktop-secondary-panel .game-info"
-      ) ||
-    null;
-
-
-  const brobotsDesktopGlassStack =
-    brobotsFrame
-      ?.querySelector(
-        ".desktop-secondary-panel .etherian-popout-layer-stack"
-      ) ||
-    null;
-
-
-  const brobotsTabletInfoHost =
-    document.createElement(
-      "section"
-    );
-
-
-  brobotsTabletInfoHost.className =
-    "brobots-tablet-info-host";
-
-  brobotsTabletInfoHost.setAttribute(
-    "aria-label",
-    "Brobots game information"
-  );
-
-  brobotsTabletInfoHost.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-
-  if (brobotsDesktopGlassStack) {
-    const tabletGlassClone =
-      brobotsDesktopGlassStack.cloneNode(
-        true
-      );
-
-
-    tabletGlassClone.classList.add(
-      "brobots-tablet-glass-stack"
-    );
-
-
-    brobotsTabletInfoHost.appendChild(
-      tabletGlassClone
-    );
-  }
-
-
-  let brobotsTabletFeatureGrid =
-    null;
-
-
-  if (brobotsDesktopInfo) {
-    const tabletInfoClone =
-      brobotsDesktopInfo.cloneNode(
-        true
-      );
-
-
-    tabletInfoClone.classList.add(
-      "game-info--tablet"
-    );
-
-
-    brobotsTabletInfoHost.appendChild(
-      tabletInfoClone
-    );
-
-
-    brobotsTabletFeatureGrid =
-      tabletInfoClone.querySelector(
-        ".game-info-features"
-      );
-  }
-
-
-  if (brobotsInnerFrameArea) {
-    brobotsInnerFrameArea.appendChild(
-      brobotsTabletInfoHost
-    );
-  }
-
-
-  /*
-    Register the tablet clone through the SAME generic crowding function and
-    observer used by the desktop popout.
-  */
-  registerGameInfoFeatureGrid(
-    brobotsTabletFeatureGrid
-  );
-
-
-  /*
-    Tablet landing identity
-    -----------------------
-    The collapsed tablet state no longer uses the thumbnail strip as its
-    primary lower-region content. Instead, show the Brobots logo plus a
-    simple interaction cue.
-
-    Clone the existing authored Brobots logo from the desktop info surface
-    so the logo source stays centralized.
-  */
-  const brobotsLandingIdentity =
-    document.createElement(
-      "div"
-    );
-
-
-  brobotsLandingIdentity.className =
-    "brobots-tablet-landing-identity";
-
-
-  const brobotsLandingLogo =
-    brobotsDesktopInfo
-      ?.querySelector(
-        ".game-info-logo"
-      )
-      ?.cloneNode(
-        true
-      ) ||
-    null;
-
-
-  if (brobotsLandingLogo) {
-    /*
-      IMPORTANT:
-      This clone is only artwork for the tablet landing state. Remove the
-      generic .game-info-logo class so desktop/info resize rules, compact
-      states, and their width transitions cannot fight this layout.
-    */
-    brobotsLandingLogo.classList.remove(
-      "game-info-logo"
-    );
-
-
-    brobotsLandingLogo.classList.add(
-      "brobots-tablet-landing-logo"
-    );
-
-
-    brobotsLandingIdentity.appendChild(
-      brobotsLandingLogo
-    );
-  }
-
-
-  const brobotsLandingCue =
-    document.createElement(
-      "button"
-    );
-
-
-  brobotsLandingCue.type =
-    "button";
-
-  brobotsLandingCue.className =
-    "brobots-tablet-scroll-cue";
-
-  brobotsLandingCue.setAttribute(
-    "aria-label",
-    "Show Brobots game information"
-  );
-
-  brobotsLandingCue.innerHTML =
-    '<span class="brobots-tablet-scroll-cue-text">Scroll for more</span>' +
-    '<span class="brobots-tablet-scroll-cue-arrow" aria-hidden="true">⌄</span>';
-
-
-  brobotsLandingIdentity.appendChild(
-    brobotsLandingCue
-  );
-
-
-  if (brobotsInnerFrameArea) {
-    brobotsInnerFrameArea.appendChild(
-      brobotsLandingIdentity
-    );
-  }
-
-
-  /*
-    Measure the tablet landing logo's travel from its CURRENT collapsed
-    centre to the CURRENT hero viewer centre.
-
-    The old CSS used a guessed multiple of the logo height, which could leave
-    a small piece visible on some tablet/window proportions. Measuring the
-    actual two visual centres keeps the endpoint tied to the real hero rather
-    than to an arbitrary clearance value.
-  */
-  const updateBrobotsTabletLogoTarget =
-    () => {
-      if (
-        !brobotsInnerFrameArea ||
-        !brobotsLandingLogo ||
-        !brobotsTabletMode.matches
-      ) {
-        return;
-      }
-
-
-      const heroViewer =
-        brobotsInnerFrameArea.querySelector(
-          ".brobots-media-zone--hero .media-viewer"
+  const initializeGameFrameTablet =
+    (pageName) => {
+      const gameFrameArea =
+        document.querySelector(
+          `[data-game-frame="${pageName}"]`
         );
 
 
-      if (!heroViewer) {
-        return;
-      }
-
-
-      const logoRect =
-        brobotsLandingLogo.getBoundingClientRect();
-
-
-      const heroRect =
-        heroViewer.getBoundingClientRect();
+      const gamePageFrame =
+        getPageFrame(
+          pageName
+        );
 
 
       if (
-        logoRect.width <= 0 ||
-        logoRect.height <= 0 ||
-        heroRect.width <= 0 ||
-        heroRect.height <= 0
+        !gameFrameArea ||
+        !gamePageFrame
       ) {
         return;
       }
 
 
-      const logoCenterY =
-        logoRect.top +
-        logoRect.height / 2;
+      const pageLabel =
+        pageName.charAt(0).toUpperCase() +
+        pageName.slice(1);
+
+    /*
+      Tablet info host
+      ----------------
+      Keep desktop popout markup completely untouched.
+
+      The tablet surface is cloned from the existing page .game-info node,
+      so there is still only one authored content source in HTML. This avoids
+      reparenting the desktop secondary panel during breakpoint transitions
+      and keeps the proven PC popout system isolated.
+    */
+
+    const desktopInfo =
+      gamePageFrame
+        ?.querySelector(
+          ".desktop-secondary-panel .game-info"
+        ) ||
+      null;
 
 
-      const heroCenterY =
-        heroRect.top +
-        heroRect.height / 2;
+    const desktopGlassStack =
+      gamePageFrame
+        ?.querySelector(
+          ".desktop-secondary-panel .etherian-popout-layer-stack"
+        ) ||
+      null;
 
 
-      brobotsInnerFrameArea.style.setProperty(
-        "--brobots-tablet-logo-target-y",
-        `${heroCenterY - logoCenterY}px`
-      );
-    };
-
-
-  const setBrobotsTabletGeometryState =
-    (
-      infoGeometry,
-      allowOutsideTablet = false
-    ) => {
-      if (
-        !brobotsInnerFrameArea ||
-        (
-          !brobotsTabletMode.matches &&
-          !allowOutsideTablet
-        )
-      ) {
-        return;
-      }
-
-
-      /*
-        Capture the collapsed centres BEFORE adding the info-state class.
-        That gives the logo one stable destination for the whole transition.
-        On the reverse trip we keep the same value so it retraces the path.
-      */
-      if (infoGeometry) {
-        updateBrobotsTabletLogoTarget();
-      }
-
-
-      brobotsInnerFrameArea.classList.toggle(
-        "is-tablet-info-geometry",
-        infoGeometry
+    const tabletInfoHost =
+      document.createElement(
+        "section"
       );
 
 
-      brobotsTabletInfoHost.setAttribute(
-        "aria-hidden",
-        infoGeometry
-          ? "false"
-          : "true"
+    tabletInfoHost.className =
+      "game-tablet-info-host";
+
+    tabletInfoHost.setAttribute(
+      "aria-label",
+      `${pageLabel} game information`
+    );
+
+    tabletInfoHost.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+
+    if (desktopGlassStack) {
+      const tabletGlassClone =
+        desktopGlassStack.cloneNode(
+          true
+        );
+
+
+      tabletGlassClone.classList.add(
+        "game-tablet-glass-stack"
       );
-    };
 
 
-  brobotsLandingCue.addEventListener(
-    "click",
-    () => {
-      setBrobotsTabletGeometryState(
-        true
+      tabletInfoHost.appendChild(
+        tabletGlassClone
       );
     }
-  );
 
 
-  /* =======================================================
-     Brobots tablet media <-> info gesture navigation
-     =======================================================
-
-     The arrow, mouse wheel, trackpad, and touch gestures ALL call the same
-     setBrobotsTabletGeometryState() function above. There is no second
-     transition implementation.
-
-     Wheel/trackpad:
-       - accumulate intent rather than firing on one tiny delta
-       - reset accumulation when direction reverses or input pauses
-       - short lockout after a successful transition prevents momentum from
-         instantly undoing/redoing it
-
-     Touch:
-       - only vertical gestures count
-       - horizontal movement is ignored so future gallery/swipe behavior is
-         not stolen
-  */
-
-  let brobotsTabletWheelIntent =
-    0;
-
-  let brobotsTabletWheelDirection =
-    0;
-
-  let brobotsTabletWheelResetTimer =
-    null;
-
-  let brobotsTabletGestureLockedUntil =
-    0;
+    let tabletFeatureGrid =
+      null;
 
 
-  const brobotsTabletGestureCanRun =
-    () => (
-      brobotsTabletMode.matches &&
-      brobotsInnerFrameArea &&
-      brobotsFrame?.classList.contains(
-        "is-open"
-      ) &&
-      (
-        selectedPageName === "brobots" ||
-        activePageName === "brobots"
-      ) &&
-      !document.body.classList.contains(
-        "is-media-lightbox-open"
-      ) &&
-      performance.now() >=
-        brobotsTabletGestureLockedUntil
-    );
-
-
-  const triggerBrobotsTabletGesture =
-    (direction) => {
-      if (
-        !brobotsTabletGestureCanRun() ||
-        direction === 0
-      ) {
-        return false;
-      }
-
-
-      const infoIsOpen =
-        brobotsInnerFrameArea.classList.contains(
-          "is-tablet-info-geometry"
+    if (desktopInfo) {
+      const tabletInfoClone =
+        desktopInfo.cloneNode(
+          true
         );
 
 
+      tabletInfoClone.classList.add(
+        "game-info--tablet"
+      );
+
+
+      tabletInfoHost.appendChild(
+        tabletInfoClone
+      );
+
+
+      tabletFeatureGrid =
+        tabletInfoClone.querySelector(
+          ".game-info-features"
+        );
+    }
+
+
+    if (gameFrameArea) {
+      gameFrameArea.appendChild(
+        tabletInfoHost
+      );
+    }
+
+
+    /*
+      Register the tablet clone through the SAME generic crowding function and
+      observer used by the desktop popout.
+    */
+    registerGameInfoFeatureGrid(
+      tabletFeatureGrid
+    );
+
+
+    /*
+      Tablet landing identity
+      -----------------------
+      The collapsed tablet state no longer uses the thumbnail strip as its
+      primary lower-region content. Instead, show the game logo plus a
+      simple interaction cue.
+
+      Clone the existing authored game logo from the desktop info surface
+      so the logo source stays centralized.
+    */
+    const landingIdentity =
+      document.createElement(
+        "div"
+      );
+
+
+    landingIdentity.className =
+      "game-tablet-landing-identity";
+
+
+    const landingLogo =
+      desktopInfo
+        ?.querySelector(
+          ".game-info-logo"
+        )
+        ?.cloneNode(
+          true
+        ) ||
+      null;
+
+
+    if (landingLogo) {
       /*
-        Down only has meaning from media -> info.
-        Up only has meaning from info -> media.
+        IMPORTANT:
+        This clone is only artwork for the tablet landing state. Remove the
+        generic .game-info-logo class so desktop/info resize rules, compact
+        states, and their width transitions cannot fight this layout.
       */
-      if (
-        direction > 0 &&
-        !infoIsOpen
-      ) {
-        setBrobotsTabletGeometryState(
+      landingLogo.classList.remove(
+        "game-info-logo"
+      );
+
+
+      landingLogo.classList.add(
+        "game-tablet-landing-logo"
+      );
+
+
+      landingIdentity.appendChild(
+        landingLogo
+      );
+    }
+
+
+    const landingCue =
+      document.createElement(
+        "button"
+      );
+
+
+    landingCue.type =
+      "button";
+
+    landingCue.className =
+      "game-tablet-scroll-cue";
+
+    landingCue.setAttribute(
+      "aria-label",
+      `${pageLabel} game information`
+    );
+
+    landingCue.innerHTML =
+      '<span class="game-tablet-scroll-cue-text">Scroll for more</span>' +
+      '<span class="game-tablet-scroll-cue-arrow" aria-hidden="true">⌄</span>';
+
+
+    landingIdentity.appendChild(
+      landingCue
+    );
+
+
+    if (gameFrameArea) {
+      gameFrameArea.appendChild(
+        landingIdentity
+      );
+    }
+
+
+    /*
+      Measure the tablet landing logo's travel from its CURRENT collapsed
+      centre to the CURRENT hero viewer centre.
+
+      The old CSS used a guessed multiple of the logo height, which could leave
+      a small piece visible on some tablet/window proportions. Measuring the
+      actual two visual centres keeps the endpoint tied to the real hero rather
+      than to an arbitrary clearance value.
+    */
+    const updateTabletLogoTarget =
+      () => {
+        if (
+          !gameFrameArea ||
+          !landingLogo ||
+          !gameFrameTabletMode.matches
+        ) {
+          return;
+        }
+
+
+        const heroViewer =
+          gameFrameArea.querySelector(
+            ".game-media-zone--hero .media-viewer"
+          );
+
+
+        if (!heroViewer) {
+          return;
+        }
+
+
+        const logoRect =
+          landingLogo.getBoundingClientRect();
+
+
+        const heroRect =
+          heroViewer.getBoundingClientRect();
+
+
+        if (
+          logoRect.width <= 0 ||
+          logoRect.height <= 0 ||
+          heroRect.width <= 0 ||
+          heroRect.height <= 0
+        ) {
+          return;
+        }
+
+
+        const logoCenterY =
+          logoRect.top +
+          logoRect.height / 2;
+
+
+        const heroCenterY =
+          heroRect.top +
+          heroRect.height / 2;
+
+
+        gameFrameArea.style.setProperty(
+          "--brobots-tablet-logo-target-y",
+          `${heroCenterY - logoCenterY}px`
+        );
+      };
+
+
+    const setTabletGeometryState =
+      (
+        infoGeometry,
+        allowOutsideTablet = false
+      ) => {
+        if (
+          !gameFrameArea ||
+          (
+            !gameFrameTabletMode.matches &&
+            !allowOutsideTablet
+          )
+        ) {
+          return;
+        }
+
+
+        /*
+          Capture the collapsed centres BEFORE adding the info-state class.
+          That gives the logo one stable destination for the whole transition.
+          On the reverse trip we keep the same value so it retraces the path.
+        */
+        if (infoGeometry) {
+          updateTabletLogoTarget();
+        }
+
+
+        gameFrameArea.classList.toggle(
+          "is-tablet-info-geometry",
+          infoGeometry
+        );
+
+
+        tabletInfoHost.setAttribute(
+          "aria-hidden",
+          infoGeometry
+            ? "false"
+            : "true"
+        );
+      };
+
+
+    landingCue.addEventListener(
+      "click",
+      () => {
+        setTabletGeometryState(
           true
         );
       }
-
-      else if (
-        direction < 0 &&
-        infoIsOpen
-      ) {
-        setBrobotsTabletGeometryState(
-          false
-        );
-      }
-
-      else {
-        return false;
-      }
+    );
 
 
-      /*
-        720ms is the frame animation duration. Keep momentum input from
-        retriggering until just after that physical transformation finishes.
-      */
-      brobotsTabletGestureLockedUntil =
-        performance.now() +
-        780;
+    /* =======================================================
+       Brobots tablet media <-> info gesture navigation
+       =======================================================
+
+       The arrow, mouse wheel, trackpad, and touch gestures ALL call the same
+       setTabletGeometryState() function above. There is no second
+       transition implementation.
+
+       Wheel/trackpad:
+         - accumulate intent rather than firing on one tiny delta
+         - reset accumulation when direction reverses or input pauses
+         - short lockout after a successful transition prevents momentum from
+           instantly undoing/redoing it
+
+       Touch:
+         - only vertical gestures count
+         - horizontal movement is ignored so future gallery/swipe behavior is
+           not stolen
+    */
+
+    let tabletWheelIntent =
+      0;
+
+    let tabletWheelDirection =
+      0;
+
+    let tabletWheelResetTimer =
+      null;
+
+    let tabletGestureLockedUntil =
+      0;
 
 
-      brobotsTabletWheelIntent =
-        0;
-
-      brobotsTabletWheelDirection =
-        0;
-
-
-      return true;
-    };
-
-
-  const resetBrobotsTabletWheelIntent =
-    () => {
-      brobotsTabletWheelIntent =
-        0;
-
-      brobotsTabletWheelDirection =
-        0;
-
-      brobotsTabletWheelResetTimer =
-        null;
-    };
-
-
-  const handleBrobotsTabletWheel =
-    (event) => {
-      if (
-        !brobotsTabletGestureCanRun()
-      ) {
-        return;
-      }
-
-
-      /*
-        Ignore overwhelmingly horizontal trackpad gestures.
-      */
-      if (
-        Math.abs(event.deltaX) >
-        Math.abs(event.deltaY)
-      ) {
-        return;
-      }
-
-
-      if (
-        Math.abs(event.deltaY) <
-        1
-      ) {
-        return;
-      }
-
-
-      const direction =
-        Math.sign(
-          event.deltaY
-        );
-
-
-      const infoIsOpen =
-        brobotsInnerFrameArea.classList.contains(
-          "is-tablet-info-geometry"
-        );
-
-
-      const gestureCanChangeState =
+    const tabletGestureCanRun =
+      () => (
+        gameFrameTabletMode.matches &&
+        gameFrameArea &&
+        gamePageFrame?.classList.contains(
+          "is-open"
+        ) &&
         (
+          selectedPageName === pageName ||
+          activePageName === pageName
+        ) &&
+        !document.body.classList.contains(
+          "is-media-lightbox-open"
+        ) &&
+        performance.now() >=
+          tabletGestureLockedUntil
+      );
+
+
+    const triggerTabletGesture =
+      (direction) => {
+        if (
+          !tabletGestureCanRun() ||
+          direction === 0
+        ) {
+          return false;
+        }
+
+
+        const infoIsOpen =
+          gameFrameArea.classList.contains(
+            "is-tablet-info-geometry"
+          );
+
+
+        /*
+          Down only has meaning from media -> info.
+          Up only has meaning from info -> media.
+        */
+        if (
           direction > 0 &&
           !infoIsOpen
-        ) ||
-        (
-          direction < 0 &&
-          infoIsOpen
-        );
-
-
-      /*
-        Do not hijack wheel input that has nowhere useful to go.
-      */
-      if (!gestureCanChangeState) {
-        resetBrobotsTabletWheelIntent();
-        return;
-      }
-
-
-      /*
-        Once this wheel direction is meaningful to our two-state page,
-        consume it so the browser doesn't also move the document underneath.
-      */
-      event.preventDefault();
-
-
-      if (
-        direction !==
-        brobotsTabletWheelDirection
-      ) {
-        brobotsTabletWheelIntent =
-          0;
-
-        brobotsTabletWheelDirection =
-          direction;
-      }
-
-
-      /*
-        Desktop mouse wheels should feel almost like a normal page step:
-        one deliberate notch ought to be enough.
-
-        Trackpads can emit lots of tiny deltas, so those still accumulate
-        briefly instead of firing from incidental movement.
-      */
-      const absoluteDelta =
-        Math.abs(
-          event.deltaY
-        );
-
-
-      const isCoarseWheelStep =
-        event.deltaMode !== 0 ||
-        absoluteDelta >= 18;
-
-
-      if (isCoarseWheelStep) {
-        triggerBrobotsTabletGesture(
-          direction
-        );
-
-        return;
-      }
-
-
-      /*
-        High-resolution trackpad input:
-        accumulate a much smaller amount of intent than v62 required.
-      */
-      brobotsTabletWheelIntent +=
-        Math.min(
-          absoluteDelta,
-          18
-        );
-
-
-      if (
-        brobotsTabletWheelResetTimer
-      ) {
-        clearTimeout(
-          brobotsTabletWheelResetTimer
-        );
-      }
-
-
-      brobotsTabletWheelResetTimer =
-        setTimeout(
-          resetBrobotsTabletWheelIntent,
-          180
-        );
-
-
-      if (
-        brobotsTabletWheelIntent >=
-        22
-      ) {
-        triggerBrobotsTabletGesture(
-          direction
-        );
-      }
-    };
-
-
-  brobotsFrame?.addEventListener(
-    "wheel",
-    handleBrobotsTabletWheel,
-    {
-      passive: false
-    }
-  );
-
-
-  /* -----------------------
-     Touch / tablet swipe
-     ----------------------- */
-
-  let brobotsTabletTouchStartX =
-    0;
-
-  let brobotsTabletTouchStartY =
-    0;
-
-  let brobotsTabletTouchTracking =
-    false;
-
-  let brobotsTabletTouchConsumed =
-    false;
-
-
-  const clearBrobotsTabletTouch =
-    () => {
-      brobotsTabletTouchTracking =
-        false;
-
-      brobotsTabletTouchConsumed =
-        false;
-    };
-
-
-  brobotsFrame?.addEventListener(
-    "touchstart",
-    (event) => {
-      if (
-        !brobotsTabletGestureCanRun() ||
-        event.touches.length !== 1
-      ) {
-        clearBrobotsTabletTouch();
-        return;
-      }
-
-
-      const touch =
-        event.touches[0];
-
-
-      brobotsTabletTouchStartX =
-        touch.clientX;
-
-      brobotsTabletTouchStartY =
-        touch.clientY;
-
-      brobotsTabletTouchTracking =
-        true;
-
-      brobotsTabletTouchConsumed =
-        false;
-    },
-    {
-      passive: true
-    }
-  );
-
-
-  brobotsFrame?.addEventListener(
-    "touchmove",
-    (event) => {
-      if (
-        !brobotsTabletTouchTracking ||
-        brobotsTabletTouchConsumed ||
-        event.touches.length !== 1
-      ) {
-        return;
-      }
-
-
-      const touch =
-        event.touches[0];
-
-      const deltaX =
-        touch.clientX -
-        brobotsTabletTouchStartX;
-
-      const deltaY =
-        touch.clientY -
-        brobotsTabletTouchStartY;
-
-
-      /*
-        Require a clearly vertical gesture. Finger moving UP corresponds to
-        normal page-scroll intent DOWN into info; finger moving DOWN returns
-        toward media.
-      */
-      if (
-        Math.abs(deltaY) <
-        46 ||
-        Math.abs(deltaY) <
-        Math.abs(deltaX) *
-        1.2
-      ) {
-        return;
-      }
-
-
-      const direction =
-        deltaY < 0
-          ? 1
-          : -1;
-
-
-      if (
-        triggerBrobotsTabletGesture(
-          direction
-        )
-      ) {
-        brobotsTabletTouchConsumed =
-          true;
-
-        event.preventDefault();
-      }
-    },
-    {
-      passive: false
-    }
-  );
-
-
-  brobotsFrame?.addEventListener(
-    "touchend",
-    clearBrobotsTabletTouch,
-    {
-      passive: true
-    }
-  );
-
-
-  brobotsFrame?.addEventListener(
-    "touchcancel",
-    clearBrobotsTabletTouch,
-    {
-      passive: true
-    }
-  );
-
-
-  /* =======================================================
-     Brobots desktop <-> tablet content handoff
-     =======================================================
-
-     The frame itself already resizes continuously. The awkward part was
-     only the content swap at 1400px: desktop thumbnails disappeared and the
-     tablet landing identity appeared in one frame.
-
-     Keep one physical thumbnail strip and animate it toward/from the hero.
-     The travel distance is measured from the actual rendered centers after
-     the breakpoint change, so odd aspect ratios do not need a guessed CSS
-     offset.
-  */
-
-  let brobotsTabletBreakpointHandoffTimer =
-    null;
-
-  let brobotsTabletBreakpointHandoffStartTimer =
-    null;
-
-  let brobotsTabletBreakpointThumbStartTimer =
-    null;
-
-
-  const clearBrobotsTabletBreakpointHandoff =
-    () => {
-      if (!brobotsInnerFrameArea) {
-        return;
-      }
-
-
-      if (brobotsTabletBreakpointHandoffTimer) {
-        clearTimeout(
-          brobotsTabletBreakpointHandoffTimer
-        );
-
-        brobotsTabletBreakpointHandoffTimer =
-          null;
-      }
-
-
-      if (brobotsTabletBreakpointHandoffStartTimer) {
-        clearTimeout(
-          brobotsTabletBreakpointHandoffStartTimer
-        );
-
-        brobotsTabletBreakpointHandoffStartTimer =
-          null;
-      }
-
-
-      if (brobotsTabletBreakpointThumbStartTimer) {
-        clearTimeout(
-          brobotsTabletBreakpointThumbStartTimer
-        );
-
-        brobotsTabletBreakpointThumbStartTimer =
-          null;
-      }
-
-
-      brobotsInnerFrameArea.classList.remove(
-        "is-tablet-breakpoint-entering",
-        "is-tablet-breakpoint-leaving",
-        "is-tablet-breakpoint-handoff-active",
-        "is-tablet-breakpoint-thumb-active"
-      );
-    };
-
-
-  const updateBrobotsTabletBreakpointShift =
-    () => {
-      if (!brobotsInnerFrameArea) {
-        return;
-      }
-
-
-      const heroViewer =
-        brobotsInnerFrameArea.querySelector(
-          ".brobots-media-zone--hero .media-viewer"
-        );
-
-
-      const mediaStrip =
-        brobotsInnerFrameArea.querySelector(
-          ".brobots-media-zone--thumbs .media-strip"
-        );
-
-
-      if (
-        !heroViewer ||
-        !mediaStrip
-      ) {
-        return;
-      }
-
-
-      const heroRect =
-        heroViewer.getBoundingClientRect();
-
-      const stripRect =
-        mediaStrip.getBoundingClientRect();
-
-
-      if (
-        heroRect.width <= 0 ||
-        heroRect.height <= 0 ||
-        stripRect.width <= 0 ||
-        stripRect.height <= 0
-      ) {
-        return;
-      }
-
-
-      const heroCenterY =
-        heroRect.top +
-        heroRect.height / 2;
-
-      const stripCenterY =
-        stripRect.top +
-        stripRect.height / 2;
-
-
-      brobotsInnerFrameArea.style.setProperty(
-        "--brobots-breakpoint-thumb-shift-y",
-        `${heroCenterY - stripCenterY}px`
-      );
-    };
-
-
-  const playBrobotsTabletBreakpointHandoff =
-    (enteringTablet) => {
-      if (!brobotsInnerFrameArea) {
-        return;
-      }
-
-
-      clearBrobotsTabletBreakpointHandoff();
-
-
-      /*
-        Only animate a visible Brobots page. If the breakpoint changes while
-        another page is active, simply leave Brobots in the correct resting
-        state for the next time it opens.
-      */
-      if (
-        !brobotsFrame?.classList.contains(
-          "is-open"
-        )
-      ) {
-        return;
-      }
-
-
-      const directionClass =
-        enteringTablet
-          ? "is-tablet-breakpoint-entering"
-          : "is-tablet-breakpoint-leaving";
-
-
-      brobotsInnerFrameArea.classList.add(
-        directionClass
-      );
-
-
-      /*
-        Measure after the media query has switched, but before the animated
-        end state is applied. The transient class keeps both surfaces alive
-        and gives us stable geometry to measure.
-      */
-      updateBrobotsTabletBreakpointShift();
-
-
-      /* Force the start state to paint before transitioning to the end. */
-      void brobotsInnerFrameArea.offsetWidth;
-
-
-      /*
-        Delay the CONTENT swap so it follows the larger page choreography
-        instead of firing the instant the 1400px media query flips.
-
-        Desktop -> tablet:
-          wait for the desktop secondary popout to finish retracting. This
-          uses the same CSS timing token as the actual popout close, so the
-          thumbnail strip begins travelling behind the hero right as that
-          panel has been absorbed back into the frame.
-
-        Tablet -> desktop:
-          use a smaller lead-in during the main-frame expansion. The desktop
-          thumbnails therefore do not pop in immediately at the breakpoint,
-          but they are established before the secondary panel grows outward.
-      */
-      const frameStyles =
-        getComputedStyle(
-          brobotsFrame
-        );
-
-
-      const pageLayoutDuration =
-        parseCssTime(
-          frameStyles.getPropertyValue(
-            "--page-layout-transition-duration"
-          ),
-          480
-        );
-
-
-      const secondaryDelay =
-        parseCssTime(
-          frameStyles.getPropertyValue(
-            "--secondary-panel-delay"
-          ),
-          160
-        );
-
-
-      const secondaryOpenDuration =
-        parseCssTime(
-          frameStyles.getPropertyValue(
-            "--secondary-panel-duration"
-          ),
-          720
-        );
-
-
-      /*
-        Split the landing-identity timing from the thumbnail timing.
-
-        DESKTOP -> TABLET
-          - thumbnails retract upward IMMEDIATELY on resize
-          - tablet logo/cue begin fading in immediately as the desktop
-            secondary panel begins retracting
-
-        TABLET -> DESKTOP
-          - keep the current logo/cue fade timing: start when the desktop
-            secondary popout itself begins emerging
-          - hold the thumbnails until the popout INFO fade begins. Brobots'
-            info content currently starts at 78% of the secondary-panel
-            emergence animation, matching the CSS transition-delay used by
-            .desktop-secondary-panel-content.
-      */
-      const secondaryCloseDuration =
-        parseCssTime(
-          frameStyles.getPropertyValue(
-            "--secondary-panel-close-duration"
-          ),
-          460
-        );
-
-
-      const identityDelay =
-        enteringTablet
-          ? (
-              /*
-                DESKTOP -> TABLET
-
-                The Brobots frame resize does NOT begin immediately when the
-                breakpoint flips. The existing layout transition first waits
-                for the desktop secondary panel to retract, and only THEN
-                runs the 480ms frame resize.
-
-                So the tablet logo/cue must wait for BOTH phases:
-                  secondary-panel retraction
-                  + main frame resize
-
-                The thumbnail retraction remains immediate.
-              */
-              secondaryCloseDuration +
-              pageLayoutDuration
-            )
-          : (
-              pageLayoutDuration +
-              secondaryDelay
-            );
-
-
-      const thumbnailDelay =
-        enteringTablet
-          ? 0
-          : (
-              pageLayoutDuration +
-              secondaryDelay +
-              (
-                secondaryOpenDuration *
-                0.78
-              )
-            );
-
-
-      brobotsTabletBreakpointHandoffStartTimer =
-        setTimeout(
-          () => {
-            brobotsTabletBreakpointHandoffStartTimer =
-              null;
-
-
-            requestAnimationFrame(() => {
-              brobotsInnerFrameArea.classList.add(
-                "is-tablet-breakpoint-handoff-active"
-              );
-            });
-          },
-          Math.max(
-            0,
-            identityDelay
-          )
-        );
-
-
-      brobotsTabletBreakpointThumbStartTimer =
-        setTimeout(
-          () => {
-            brobotsTabletBreakpointThumbStartTimer =
-              null;
-
-
-            requestAnimationFrame(() => {
-              brobotsInnerFrameArea.classList.add(
-                "is-tablet-breakpoint-thumb-active"
-              );
-            });
-          },
-          Math.max(
-            0,
-            thumbnailDelay
-          )
-        );
-
-
-      const handoffDuration =
-        parseCssTime(
-          getComputedStyle(
-            brobotsInnerFrameArea
-          ).getPropertyValue(
-            "--brobots-breakpoint-handoff-duration"
-          ),
-          1240
-        );
-
-
-      brobotsTabletBreakpointHandoffTimer =
-        setTimeout(
-          () => {
-            clearBrobotsTabletBreakpointHandoff();
-          },
-          Math.max(
-            identityDelay,
-            thumbnailDelay
-          ) +
-          handoffDuration +
-          100
-        );
-    };
-
-
-  const resetBrobotsTabletGeometry =
-    (event = null) => {
-      if (!brobotsInnerFrameArea) {
-        return;
-      }
-
-
-      const isTabletNow =
-        event?.matches ??
-        brobotsTabletMode.matches;
-
-
-      /*
-        Animate the desktop/tablet content handoff before settling into the
-        destination's ordinary CSS state.
-      */
-      if (event) {
-        playBrobotsTabletBreakpointHandoff(
-          isTabletNow
-        );
-      }
-
-
-      /*
-        If we leave tablet while the Brobots info state is open, do NOT
-        manually strip the class. That was bypassing the exact state-change
-        path used by an upward wheel/swipe and produced the visible snap.
-
-        Instead, invoke the existing "return to media" state change itself.
-        The second argument only bypasses the tablet-mode guard because the
-        matchMedia change event fires immediately after the breakpoint has
-        crossed.
-      */
-      if (!isTabletNow) {
-        if (
-          brobotsInnerFrameArea.classList.contains(
-            "is-tablet-info-geometry"
-          )
         ) {
-          setBrobotsTabletGeometryState(
-            false,
+          setTabletGeometryState(
             true
           );
         }
 
+        else if (
+          direction < 0 &&
+          infoIsOpen
+        ) {
+          setTabletGeometryState(
+            false
+          );
+        }
 
-        resetBrobotsTabletWheelIntent();
+        else {
+          return false;
+        }
 
-        clearBrobotsTabletTouch();
 
-        brobotsTabletGestureLockedUntil =
+        /*
+          720ms is the frame animation duration. Keep momentum input from
+          retriggering until just after that physical transformation finishes.
+        */
+        tabletGestureLockedUntil =
+          performance.now() +
+          780;
+
+
+        tabletWheelIntent =
           0;
+
+        tabletWheelDirection =
+          0;
+
+
+        return true;
+      };
+
+
+    const resetTabletWheelIntent =
+      () => {
+        tabletWheelIntent =
+          0;
+
+        tabletWheelDirection =
+          0;
+
+        tabletWheelResetTimer =
+          null;
+      };
+
+
+    const handleTabletWheel =
+      (event) => {
+        if (
+          !tabletGestureCanRun()
+        ) {
+          return;
+        }
+
+
+        /*
+          Ignore overwhelmingly horizontal trackpad gestures.
+        */
+        if (
+          Math.abs(event.deltaX) >
+          Math.abs(event.deltaY)
+        ) {
+          return;
+        }
+
+
+        if (
+          Math.abs(event.deltaY) <
+          1
+        ) {
+          return;
+        }
+
+
+        const direction =
+          Math.sign(
+            event.deltaY
+          );
+
+
+        const infoIsOpen =
+          gameFrameArea.classList.contains(
+            "is-tablet-info-geometry"
+          );
+
+
+        const gestureCanChangeState =
+          (
+            direction > 0 &&
+            !infoIsOpen
+          ) ||
+          (
+            direction < 0 &&
+            infoIsOpen
+          );
+
+
+        /*
+          Do not hijack wheel input that has nowhere useful to go.
+        */
+        if (!gestureCanChangeState) {
+          resetTabletWheelIntent();
+          return;
+        }
+
+
+        /*
+          Once this wheel direction is meaningful to our two-state page,
+          consume it so the browser doesn't also move the document underneath.
+        */
+        event.preventDefault();
+
+
+        if (
+          direction !==
+          tabletWheelDirection
+        ) {
+          tabletWheelIntent =
+            0;
+
+          tabletWheelDirection =
+            direction;
+        }
+
+
+        /*
+          Desktop mouse wheels should feel almost like a normal page step:
+          one deliberate notch ought to be enough.
+
+          Trackpads can emit lots of tiny deltas, so those still accumulate
+          briefly instead of firing from incidental movement.
+        */
+        const absoluteDelta =
+          Math.abs(
+            event.deltaY
+          );
+
+
+        const isCoarseWheelStep =
+          event.deltaMode !== 0 ||
+          absoluteDelta >= 18;
+
+
+        if (isCoarseWheelStep) {
+          triggerTabletGesture(
+            direction
+          );
+
+          return;
+        }
+
+
+        /*
+          High-resolution trackpad input:
+          accumulate a much smaller amount of intent than v62 required.
+        */
+        tabletWheelIntent +=
+          Math.min(
+            absoluteDelta,
+            18
+          );
+
+
+        if (
+          tabletWheelResetTimer
+        ) {
+          clearTimeout(
+            tabletWheelResetTimer
+          );
+        }
+
+
+        tabletWheelResetTimer =
+          setTimeout(
+            resetTabletWheelIntent,
+            180
+          );
+
+
+        if (
+          tabletWheelIntent >=
+          22
+        ) {
+          triggerTabletGesture(
+            direction
+          );
+        }
+      };
+
+
+    gamePageFrame?.addEventListener(
+      "wheel",
+      handleTabletWheel,
+      {
+        passive: false
       }
+    );
+
+
+    /* -----------------------
+       Touch / tablet swipe
+       ----------------------- */
+
+    let tabletTouchStartX =
+      0;
+
+    let tabletTouchStartY =
+      0;
+
+    let tabletTouchTracking =
+      false;
+
+    let tabletTouchConsumed =
+      false;
+
+
+    const clearTabletTouch =
+      () => {
+        tabletTouchTracking =
+          false;
+
+        tabletTouchConsumed =
+          false;
+      };
+
+
+    gamePageFrame?.addEventListener(
+      "touchstart",
+      (event) => {
+        if (
+          !tabletGestureCanRun() ||
+          event.touches.length !== 1
+        ) {
+          clearTabletTouch();
+          return;
+        }
+
+
+        const touch =
+          event.touches[0];
+
+
+        tabletTouchStartX =
+          touch.clientX;
+
+        tabletTouchStartY =
+          touch.clientY;
+
+        tabletTouchTracking =
+          true;
+
+        tabletTouchConsumed =
+          false;
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    gamePageFrame?.addEventListener(
+      "touchmove",
+      (event) => {
+        if (
+          !tabletTouchTracking ||
+          tabletTouchConsumed ||
+          event.touches.length !== 1
+        ) {
+          return;
+        }
+
+
+        const touch =
+          event.touches[0];
+
+        const deltaX =
+          touch.clientX -
+          tabletTouchStartX;
+
+        const deltaY =
+          touch.clientY -
+          tabletTouchStartY;
+
+
+        /*
+          Require a clearly vertical gesture. Finger moving UP corresponds to
+          normal page-scroll intent DOWN into info; finger moving DOWN returns
+          toward media.
+        */
+        if (
+          Math.abs(deltaY) <
+          46 ||
+          Math.abs(deltaY) <
+          Math.abs(deltaX) *
+          1.2
+        ) {
+          return;
+        }
+
+
+        const direction =
+          deltaY < 0
+            ? 1
+            : -1;
+
+
+        if (
+          triggerTabletGesture(
+            direction
+          )
+        ) {
+          tabletTouchConsumed =
+            true;
+
+          event.preventDefault();
+        }
+      },
+      {
+        passive: false
+      }
+    );
+
+
+    gamePageFrame?.addEventListener(
+      "touchend",
+      clearTabletTouch,
+      {
+        passive: true
+      }
+    );
+
+
+    gamePageFrame?.addEventListener(
+      "touchcancel",
+      clearTabletTouch,
+      {
+        passive: true
+      }
+    );
+
+
+    /* =======================================================
+       Brobots desktop <-> tablet content handoff
+       =======================================================
+
+       The frame itself already resizes continuously. The awkward part was
+       only the content swap at 1400px: desktop thumbnails disappeared and the
+       tablet landing identity appeared in one frame.
+
+       Keep one physical thumbnail strip and animate it toward/from the hero.
+       The travel distance is measured from the actual rendered centers after
+       the breakpoint change, so odd aspect ratios do not need a guessed CSS
+       offset.
+    */
+
+    let breakpointHandoffTimer =
+      null;
+
+    let brobotsTabletBreakpointHandoffStartTimer =
+      null;
+
+    let breakpointThumbStartTimer =
+      null;
+
+
+    const clearTabletBreakpointHandoff =
+      () => {
+        if (!gameFrameArea) {
+          return;
+        }
+
+
+        if (breakpointHandoffTimer) {
+          clearTimeout(
+            breakpointHandoffTimer
+          );
+
+          breakpointHandoffTimer =
+            null;
+        }
+
+
+        if (brobotsTabletBreakpointHandoffStartTimer) {
+          clearTimeout(
+            brobotsTabletBreakpointHandoffStartTimer
+          );
+
+          brobotsTabletBreakpointHandoffStartTimer =
+            null;
+        }
+
+
+        if (breakpointThumbStartTimer) {
+          clearTimeout(
+            breakpointThumbStartTimer
+          );
+
+          breakpointThumbStartTimer =
+            null;
+        }
+
+
+        gameFrameArea.classList.remove(
+          "is-tablet-breakpoint-entering",
+          "is-tablet-breakpoint-leaving",
+          "is-tablet-breakpoint-handoff-active",
+          "is-tablet-breakpoint-thumb-active"
+        );
+      };
+
+
+    const updateTabletBreakpointShift =
+      () => {
+        if (!gameFrameArea) {
+          return;
+        }
+
+
+        const heroViewer =
+          gameFrameArea.querySelector(
+            ".game-media-zone--hero .media-viewer"
+          );
+
+
+        const mediaStrip =
+          gameFrameArea.querySelector(
+            ".game-media-zone--thumbs .media-strip"
+          );
+
+
+        if (
+          !heroViewer ||
+          !mediaStrip
+        ) {
+          return;
+        }
+
+
+        const heroRect =
+          heroViewer.getBoundingClientRect();
+
+        const stripRect =
+          mediaStrip.getBoundingClientRect();
+
+
+        if (
+          heroRect.width <= 0 ||
+          heroRect.height <= 0 ||
+          stripRect.width <= 0 ||
+          stripRect.height <= 0
+        ) {
+          return;
+        }
+
+
+        const heroCenterY =
+          heroRect.top +
+          heroRect.height / 2;
+
+        const stripCenterY =
+          stripRect.top +
+          stripRect.height / 2;
+
+
+        gameFrameArea.style.setProperty(
+          "--brobots-breakpoint-thumb-shift-y",
+          `${heroCenterY - stripCenterY}px`
+        );
+      };
+
+
+    const playTabletBreakpointHandoff =
+      (enteringTablet) => {
+        if (!gameFrameArea) {
+          return;
+        }
+
+
+        clearTabletBreakpointHandoff();
+
+
+        /*
+          Only animate a visible Brobots page. If the breakpoint changes while
+          another page is active, simply leave Brobots in the correct resting
+          state for the next time it opens.
+        */
+        if (
+          !gamePageFrame?.classList.contains(
+            "is-open"
+          )
+        ) {
+          return;
+        }
+
+
+        const directionClass =
+          enteringTablet
+            ? "is-tablet-breakpoint-entering"
+            : "is-tablet-breakpoint-leaving";
+
+
+        gameFrameArea.classList.add(
+          directionClass
+        );
+
+
+        /*
+          Measure after the media query has switched, but before the animated
+          end state is applied. The transient class keeps both surfaces alive
+          and gives us stable geometry to measure.
+        */
+        updateTabletBreakpointShift();
+
+
+        /* Force the start state to paint before transitioning to the end. */
+        void gameFrameArea.offsetWidth;
+
+
+        /*
+          Delay the CONTENT swap so it follows the larger page choreography
+          instead of firing the instant the 1400px media query flips.
+
+          Desktop -> tablet:
+            wait for the desktop secondary popout to finish retracting. This
+            uses the same CSS timing token as the actual popout close, so the
+            thumbnail strip begins travelling behind the hero right as that
+            panel has been absorbed back into the frame.
+
+          Tablet -> desktop:
+            use a smaller lead-in during the main-frame expansion. The desktop
+            thumbnails therefore do not pop in immediately at the breakpoint,
+            but they are established before the secondary panel grows outward.
+        */
+        const frameStyles =
+          getComputedStyle(
+            gamePageFrame
+          );
+
+
+        const pageLayoutDuration =
+          parseCssTime(
+            frameStyles.getPropertyValue(
+              "--page-layout-transition-duration"
+            ),
+            480
+          );
+
+
+        const secondaryDelay =
+          parseCssTime(
+            frameStyles.getPropertyValue(
+              "--secondary-panel-delay"
+            ),
+            160
+          );
+
+
+        const secondaryOpenDuration =
+          parseCssTime(
+            frameStyles.getPropertyValue(
+              "--secondary-panel-duration"
+            ),
+            720
+          );
+
+
+        /*
+          Split the landing-identity timing from the thumbnail timing.
+
+          DESKTOP -> TABLET
+            - thumbnails retract upward IMMEDIATELY on resize
+            - tablet logo/cue begin fading in immediately as the desktop
+              secondary panel begins retracting
+
+          TABLET -> DESKTOP
+            - keep the current logo/cue fade timing: start when the desktop
+              secondary popout itself begins emerging
+            - hold the thumbnails until the popout INFO fade begins. Brobots'
+              info content currently starts at 78% of the secondary-panel
+              emergence animation, matching the CSS transition-delay used by
+              .desktop-secondary-panel-content.
+        */
+        const secondaryCloseDuration =
+          parseCssTime(
+            frameStyles.getPropertyValue(
+              "--secondary-panel-close-duration"
+            ),
+            460
+          );
+
+
+        const identityDelay =
+          enteringTablet
+            ? (
+                /*
+                  DESKTOP -> TABLET
+
+                  The Brobots frame resize does NOT begin immediately when the
+                  breakpoint flips. The existing layout transition first waits
+                  for the desktop secondary panel to retract, and only THEN
+                  runs the 480ms frame resize.
+
+                  So the tablet logo/cue must wait for BOTH phases:
+                    secondary-panel retraction
+                    + main frame resize
+
+                  The thumbnail retraction remains immediate.
+                */
+                secondaryCloseDuration +
+                pageLayoutDuration
+              )
+            : (
+                pageLayoutDuration +
+                secondaryDelay
+              );
+
+
+        const thumbnailDelay =
+          enteringTablet
+            ? 0
+            : (
+                pageLayoutDuration +
+                secondaryDelay +
+                (
+                  secondaryOpenDuration *
+                  0.78
+                )
+              );
+
+
+        brobotsTabletBreakpointHandoffStartTimer =
+          setTimeout(
+            () => {
+              brobotsTabletBreakpointHandoffStartTimer =
+                null;
+
+
+              requestAnimationFrame(() => {
+                gameFrameArea.classList.add(
+                  "is-tablet-breakpoint-handoff-active"
+                );
+              });
+            },
+            Math.max(
+              0,
+              identityDelay
+            )
+          );
+
+
+        breakpointThumbStartTimer =
+          setTimeout(
+            () => {
+              breakpointThumbStartTimer =
+                null;
+
+
+              requestAnimationFrame(() => {
+                gameFrameArea.classList.add(
+                  "is-tablet-breakpoint-thumb-active"
+                );
+              });
+            },
+            Math.max(
+              0,
+              thumbnailDelay
+            )
+          );
+
+
+        const handoffDuration =
+          parseCssTime(
+            getComputedStyle(
+              gameFrameArea
+            ).getPropertyValue(
+              "--brobots-breakpoint-handoff-duration"
+            ),
+            1240
+          );
+
+
+        breakpointHandoffTimer =
+          setTimeout(
+            () => {
+              clearTabletBreakpointHandoff();
+            },
+            Math.max(
+              identityDelay,
+              thumbnailDelay
+            ) +
+            handoffDuration +
+            100
+          );
+      };
+
+
+    const resetTabletGeometry =
+      (event = null) => {
+        if (!gameFrameArea) {
+          return;
+        }
+
+
+        const isTabletNow =
+          event?.matches ??
+          gameFrameTabletMode.matches;
+
+
+        /*
+          Animate the desktop/tablet content handoff before settling into the
+          destination's ordinary CSS state.
+        */
+        if (event) {
+          playTabletBreakpointHandoff(
+            isTabletNow
+          );
+        }
+
+
+        /*
+          If we leave tablet while the Brobots info state is open, do NOT
+          manually strip the class. That was bypassing the exact state-change
+          path used by an upward wheel/swipe and produced the visible snap.
+
+          Instead, invoke the existing "return to media" state change itself.
+          The second argument only bypasses the tablet-mode guard because the
+          matchMedia change event fires immediately after the breakpoint has
+          crossed.
+        */
+        if (!isTabletNow) {
+          if (
+            gameFrameArea.classList.contains(
+              "is-tablet-info-geometry"
+            )
+          ) {
+            setTabletGeometryState(
+              false,
+              true
+            );
+          }
+
+
+          resetTabletWheelIntent();
+
+          clearTabletTouch();
+
+          tabletGestureLockedUntil =
+            0;
+        }
+      };
+
+
+    if (
+      typeof gameFrameTabletMode.addEventListener ===
+        "function"
+    ) {
+      gameFrameTabletMode.addEventListener(
+        "change",
+        resetTabletGeometry
+      );
+    }
+
+    else {
+      gameFrameTabletMode.addListener(
+        resetTabletGeometry
+      );
+    }
+
+
     };
 
 
-  if (
-    typeof brobotsTabletMode.addEventListener ===
-      "function"
-  ) {
-    brobotsTabletMode.addEventListener(
-      "change",
-      resetBrobotsTabletGeometry
-    );
-  }
-
-  else {
-    brobotsTabletMode.addListener(
-      resetBrobotsTabletGeometry
-    );
-  }
-
+  [
+    "brobots",
+    "etherian",
+    "halodoom"
+  ].forEach(
+    initializeGameFrameTablet
+  );
 
 
 });

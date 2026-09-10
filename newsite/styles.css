@@ -9518,6 +9518,7 @@ body.is-media-lightbox-open {
 */
 @media (max-width: 1400px) {
   #etherian-page-frame:not(.is-layout-transitioning)
+  .desktop-secondary-panel
   .etherian-popout-layer-image {
     display: none !important;
   }
@@ -12968,6 +12969,7 @@ body.is-media-lightbox-open {
 
 @media (max-width: 1400px){
 #halodoom-page-frame:not(.is-layout-transitioning)
+  .desktop-secondary-panel
   .etherian-popout-layer-image {
     display: none !important;
   }
@@ -13052,7 +13054,16 @@ body.is-media-lightbox-open {
     overflow: visible;
   }
 
-#brobots-page-frame .game-info {
+/* =========================================================
+   SHARED GAME-INFO REFERENCE IMPLEMENTATION
+   =========================================================
+   Brobots is the canonical game-info presentation. Its accumulated, proven
+   component rules below are shared by every game-frame page. Older per-game
+   Etherian/Halodoom rules may remain earlier in the file for now, but these
+   later shared rules win the cascade and define the final presentation.
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page] .game-info {
     position: relative;
 
     width: 100%;
@@ -13066,7 +13077,7 @@ body.is-media-lightbox-open {
     isolation: isolate;
   }
 
-#brobots-page-frame .game-info-background {
+.prototype-page-frame[data-game-frame-page] .game-info-background {
     position: absolute;
     inset: 2% 0 4% 14%;
 
@@ -13089,7 +13100,7 @@ body.is-media-lightbox-open {
     pointer-events: none;
   }
 
-#brobots-page-frame .game-info-background-image {
+.prototype-page-frame[data-game-frame-page] .game-info-background-image {
     width: 100%;
     height: 100%;
 
@@ -13120,7 +13131,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-layer {
+.prototype-page-frame[data-game-frame-page] .game-info-layer {
     position: absolute;
 
     z-index: 1;
@@ -13151,7 +13162,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-layer--rear {
+.prototype-page-frame[data-game-frame-page] .game-info-layer--rear {
     inset: 0.5% 1.5% 1.5% 5.5%;
 
     transform:
@@ -13160,7 +13171,7 @@ body.is-media-lightbox-open {
     opacity: 0.58;
   }
 
-#brobots-page-frame .game-info-layer--mid {
+.prototype-page-frame[data-game-frame-page] .game-info-layer--mid {
     inset: 2.5% 3.5% 3% 2%;
 
     transform:
@@ -13169,7 +13180,7 @@ body.is-media-lightbox-open {
     opacity: 0.78;
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     position: relative;
 
     z-index: 2;
@@ -13238,7 +13249,7 @@ body.is-media-lightbox-open {
       inset 18px 0 42px rgba(255, 255, 255, 0.018);
   }
 
-#brobots-page-frame .game-info-header {
+.prototype-page-frame[data-game-frame-page] .game-info-header {
     display: flex;
     flex-direction: column;
 
@@ -13250,7 +13261,7 @@ body.is-media-lightbox-open {
     min-width: 0;
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     display: block;
 
     width:
@@ -13266,7 +13277,7 @@ body.is-media-lightbox-open {
     object-position: left center;
   }
 
-#brobots-page-frame .game-info-kicker {
+.prototype-page-frame[data-game-frame-page] .game-info-kicker {
     margin: 0;
 
     color:
@@ -13284,7 +13295,7 @@ body.is-media-lightbox-open {
       0.34em;
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     max-width: 94%;
 
     margin: 0;
@@ -13298,7 +13309,7 @@ body.is-media-lightbox-open {
     line-height: 1.48;
   }
 
-#brobots-page-frame .game-info-features {
+.prototype-page-frame[data-game-frame-page] .game-info-features {
     min-height: 0;
 
     display: grid;
@@ -13312,7 +13323,7 @@ body.is-media-lightbox-open {
       clamp(8px, 0.75vw, 14px);
   }
 
-#brobots-page-frame .game-info-feature {
+.prototype-page-frame[data-game-frame-page] .game-info-feature {
     min-width: 0;
 
     display: grid;
@@ -13357,7 +13368,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-icon {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-icon {
     display: grid;
     place-items: center;
 
@@ -13394,7 +13405,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-copy {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy {
     min-width: 0;
 
     display: flex;
@@ -13403,7 +13414,7 @@ body.is-media-lightbox-open {
     gap: 3px;
   }
 
-#brobots-page-frame .game-info-feature-copy strong {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy strong {
     color:
       rgba(
         var(--page-accent-rgb),
@@ -13417,7 +13428,7 @@ body.is-media-lightbox-open {
       0.13em;
   }
 
-#brobots-page-frame .game-info-feature-copy small {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy small {
     overflow: hidden;
 
     color: rgba(232, 239, 243, 0.70);
@@ -13432,7 +13443,7 @@ body.is-media-lightbox-open {
     text-overflow: ellipsis;
   }
 
-#brobots-page-frame .game-info-facts {
+.prototype-page-frame[data-game-frame-page] .game-info-facts {
     display: grid;
 
     grid-template-columns:
@@ -13453,7 +13464,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact {
+.prototype-page-frame[data-game-frame-page] .game-info-fact {
     position: relative;
 
     min-width: 0;
@@ -13468,7 +13479,7 @@ body.is-media-lightbox-open {
       clamp(8px, 0.8vw, 14px);
   }
 
-#brobots-page-frame
+.prototype-page-frame[data-game-frame-page]
   .game-info-fact +
   .game-info-fact::before {
     content: "";
@@ -13488,7 +13499,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact span {
+.prototype-page-frame[data-game-frame-page] .game-info-fact span {
     color:
       rgba(
         var(--page-accent-rgb),
@@ -13502,7 +13513,7 @@ body.is-media-lightbox-open {
       0.18em;
   }
 
-#brobots-page-frame .game-info-fact strong {
+.prototype-page-frame[data-game-frame-page] .game-info-fact strong {
     overflow: hidden;
 
     color: rgba(244, 248, 250, 0.92);
@@ -13517,7 +13528,7 @@ body.is-media-lightbox-open {
     text-overflow: ellipsis;
   }
 
-#brobots-page-frame .game-info-actions {
+.prototype-page-frame[data-game-frame-page] .game-info-actions {
     display: grid;
 
     grid-template-columns:
@@ -13528,7 +13539,7 @@ body.is-media-lightbox-open {
       clamp(10px, 0.85vw, 16px);
   }
 
-#brobots-page-frame .game-info-action {
+.prototype-page-frame[data-game-frame-page] .game-info-action {
     min-width: 0;
 
     display: flex;
@@ -13577,7 +13588,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-action--primary {
+.prototype-page-frame[data-game-frame-page] .game-info-action--primary {
     background:
       linear-gradient(
         110deg,
@@ -13599,7 +13610,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     grid-template-rows:
       auto
       auto
@@ -13614,12 +13625,12 @@ body.is-media-lightbox-open {
       clamp(26px, 2.55vw, 44px);
   }
 
-#brobots-page-frame .game-info-header {
+.prototype-page-frame[data-game-frame-page] .game-info-header {
     gap:
       clamp(7px, 0.8vh, 12px);
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       min(
         70%,
@@ -13627,19 +13638,19 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     max-width: 91%;
 
     line-height: 1.54;
   }
 
-#brobots-page-frame .game-info-background {
+.prototype-page-frame[data-game-frame-page] .game-info-background {
     inset: 0.5% -0.5% 1.5% 9%;
 
     opacity: 0.47;
   }
 
-#brobots-page-frame .game-info-background-image {
+.prototype-page-frame[data-game-frame-page] .game-info-background-image {
     object-position: 60% 42%;
 
     filter:
@@ -13668,7 +13679,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-features {
+.prototype-page-frame[data-game-frame-page] .game-info-features {
     gap:
       clamp(6px, 0.55vw, 10px)
       clamp(14px, 1.05vw, 20px);
@@ -13692,7 +13703,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature {
+.prototype-page-frame[data-game-frame-page] .game-info-feature {
     grid-template-columns:
       clamp(30px, 2.35vw, 42px)
       minmax(0, 1fr);
@@ -13711,7 +13722,7 @@ body.is-media-lightbox-open {
     clip-path: none;
   }
 
-#brobots-page-frame .game-info-feature-icon {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-icon {
     border-color:
       rgba(
         var(--page-accent-rgb),
@@ -13728,7 +13739,7 @@ body.is-media-lightbox-open {
       clamp(16px, 1.25vw, 22px);
   }
 
-#brobots-page-frame .game-info-feature-copy strong {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy strong {
     font-size:
       clamp(8px, 0.59vw, 10.5px);
 
@@ -13736,7 +13747,7 @@ body.is-media-lightbox-open {
       0.14em;
   }
 
-#brobots-page-frame .game-info-feature-copy small {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy small {
     font-size:
       clamp(7.5px, 0.54vw, 9.5px);
 
@@ -13744,7 +13755,7 @@ body.is-media-lightbox-open {
       rgba(232, 239, 243, 0.64);
   }
 
-#brobots-page-frame .game-info-facts {
+.prototype-page-frame[data-game-frame-page] .game-info-facts {
     background:
       linear-gradient(
         90deg,
@@ -13756,7 +13767,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact {
+.prototype-page-frame[data-game-frame-page] .game-info-fact {
     padding-top:
       clamp(8px, 0.65vw, 11px);
 
@@ -13764,7 +13775,7 @@ body.is-media-lightbox-open {
       clamp(8px, 0.65vw, 11px);
   }
 
-#brobots-page-frame .game-info-action--primary {
+.prototype-page-frame[data-game-frame-page] .game-info-action--primary {
     border-color:
       rgba(
         var(--page-accent-rgb),
@@ -13785,7 +13796,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-action--secondary {
+.prototype-page-frame[data-game-frame-page] .game-info-action--secondary {
     border-color:
       rgba(
         var(--page-accent-rgb),
@@ -13796,7 +13807,7 @@ body.is-media-lightbox-open {
       rgba(238, 244, 247, 0.84);
   }
 
-#brobots-page-frame .game-info-background {
+.prototype-page-frame[data-game-frame-page] .game-info-background {
     
     inset:
       -1.2%
@@ -13835,7 +13846,7 @@ body.is-media-lightbox-open {
       inset 0 0 0 1px rgba(255,255,255,0.018);
   }
 
-#brobots-page-frame .game-info-background::after {
+.prototype-page-frame[data-game-frame-page] .game-info-background::after {
     content: "";
 
     position: absolute;
@@ -13853,7 +13864,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-background-image {
+.prototype-page-frame[data-game-frame-page] .game-info-background-image {
     width: 112%;
     height: 112%;
 
@@ -13877,7 +13888,7 @@ body.is-media-lightbox-open {
     mask-image: none;
   }
 
-#brobots-page-frame .game-info-layer--rear {
+.prototype-page-frame[data-game-frame-page] .game-info-layer--rear {
     inset:
       -1.3%
       0.4%
@@ -13899,7 +13910,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-layer--mid {
+.prototype-page-frame[data-game-frame-page] .game-info-layer--mid {
     inset:
       1.4%
       2.3%
@@ -13921,7 +13932,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info::after {
+.prototype-page-frame[data-game-frame-page] .game-info::after {
     content: "";
 
     position: absolute;
@@ -13959,7 +13970,7 @@ body.is-media-lightbox-open {
     pointer-events: none;
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     grid-template-rows:
       auto
       auto
@@ -14001,7 +14012,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       min(
         67%,
@@ -14012,14 +14023,14 @@ body.is-media-lightbox-open {
       -0.6%;
   }
 
-#brobots-page-frame .game-info-kicker {
+.prototype-page-frame[data-game-frame-page] .game-info-kicker {
     letter-spacing:
       0.31em;
 
     opacity: 0.94;
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     max-width: 89%;
 
     font-size:
@@ -14028,7 +14039,7 @@ body.is-media-lightbox-open {
     line-height: 1.52;
   }
 
-#brobots-page-frame .game-info-features {
+.prototype-page-frame[data-game-frame-page] .game-info-features {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
 
@@ -14055,7 +14066,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature {
+.prototype-page-frame[data-game-frame-page] .game-info-feature {
     position: relative;
 
     padding:
@@ -14063,7 +14074,7 @@ body.is-media-lightbox-open {
       clamp(4px, 0.3vw, 6px);
   }
 
-#brobots-page-frame .game-info-feature::after {
+.prototype-page-frame[data-game-frame-page] .game-info-feature::after {
     content: "";
 
     position: absolute;
@@ -14083,7 +14094,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-icon {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-icon {
     background:
       linear-gradient(
         135deg,
@@ -14102,15 +14113,15 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-copy strong {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy strong {
     line-height: 1.15;
   }
 
-#brobots-page-frame .game-info-feature-copy small {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy small {
     line-height: 1.22;
   }
 
-#brobots-page-frame .game-info-facts {
+.prototype-page-frame[data-game-frame-page] .game-info-facts {
     border-top-color:
       rgba(
         var(--page-accent-rgb),
@@ -14134,7 +14145,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact span {
+.prototype-page-frame[data-game-frame-page] .game-info-fact span {
     font-size:
       clamp(7.5px, 0.54vw, 9.5px);
 
@@ -14142,12 +14153,12 @@ body.is-media-lightbox-open {
       0.19em;
   }
 
-#brobots-page-frame .game-info-fact strong {
+.prototype-page-frame[data-game-frame-page] .game-info-fact strong {
     font-size:
       clamp(9.5px, 0.68vw, 12.5px);
   }
 
-#brobots-page-frame .game-info-actions {
+.prototype-page-frame[data-game-frame-page] .game-info-actions {
     grid-template-columns:
       minmax(0, 1.42fr)
       minmax(0, 0.88fr);
@@ -14156,7 +14167,7 @@ body.is-media-lightbox-open {
       clamp(11px, 0.9vw, 17px);
   }
 
-#brobots-page-frame .game-info-action {
+.prototype-page-frame[data-game-frame-page] .game-info-action {
     padding-top:
       clamp(10px, 0.72vw, 13px);
 
@@ -14164,7 +14175,7 @@ body.is-media-lightbox-open {
       clamp(10px, 0.72vw, 13px);
   }
 
-#brobots-page-frame .game-info-action--primary {
+.prototype-page-frame[data-game-frame-page] .game-info-action--primary {
     box-shadow:
       inset 0 0 0 1px
       rgba(
@@ -14178,14 +14189,14 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-background,
-  #brobots-page-frame .game-info-layer--rear,
-  #brobots-page-frame .game-info-layer--mid,
-  #brobots-page-frame .game-info::after {
+.prototype-page-frame[data-game-frame-page] .game-info-background,
+  .prototype-page-frame[data-game-frame-page] .game-info-layer--rear,
+  .prototype-page-frame[data-game-frame-page] .game-info-layer--mid,
+  .prototype-page-frame[data-game-frame-page] .game-info::after {
     display: none !important;
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     border: 0;
 
     background: transparent;
@@ -14480,7 +14491,7 @@ body.is-media-lightbox-open {
     z-index: 2;
   }
 
-#brobots-page-frame .game-info {
+.prototype-page-frame[data-game-frame-page] .game-info {
     z-index: 2;
   }
 
@@ -14649,19 +14660,19 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-features {
+.prototype-page-frame[data-game-frame-page] .game-info-features {
     transition:
       opacity 120ms ease;
   }
 
-#brobots-page-frame
+.prototype-page-frame[data-game-frame-page]
   .game-info-features.is-crowded {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     align-content: stretch;
 
     grid-template-rows:
@@ -14672,11 +14683,11 @@ body.is-media-lightbox-open {
       auto;
   }
 
-#brobots-page-frame .game-info-header {
+.prototype-page-frame[data-game-frame-page] .game-info-header {
     align-self: start;
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         250px,
@@ -14696,12 +14707,12 @@ body.is-media-lightbox-open {
     margin-left: 0;
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     width: min(100%, 76ch);
     max-width: 76ch;
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-surface {
     gap:
       clamp(8px, 0.9vh, 13px);
@@ -14713,13 +14724,13 @@ body.is-media-lightbox-open {
       clamp(22px, 1.9vw, 34px);
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-header {
     gap:
       clamp(4px, 0.5vh, 7px);
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-logo {
     width:
       clamp(
@@ -14738,7 +14749,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-kicker {
     font-size:
       clamp(8px, 0.62vw, 11px);
@@ -14746,7 +14757,7 @@ body.is-media-lightbox-open {
     letter-spacing: 0.27em;
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-blurb {
     width: min(100%, 70ch);
     max-width: 70ch;
@@ -14757,7 +14768,7 @@ body.is-media-lightbox-open {
     line-height: 1.43;
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-features {
     column-gap:
       clamp(12px, 0.9vw, 18px);
@@ -14770,7 +14781,7 @@ body.is-media-lightbox-open {
       0;
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-feature {
     grid-template-columns:
       clamp(27px, 2.15vw, 36px)
@@ -14784,13 +14795,13 @@ body.is-media-lightbox-open {
       clamp(3px, 0.26vw, 5px);
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-feature-icon {
     font-size:
       clamp(14px, 1.12vw, 20px);
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-feature-copy strong {
     font-size:
       clamp(7.5px, 0.53vw, 9.5px);
@@ -14798,13 +14809,13 @@ body.is-media-lightbox-open {
     letter-spacing: 0.12em;
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-feature-copy small {
     font-size:
       clamp(7px, 0.49vw, 8.8px);
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-fact {
     gap: 2px;
 
@@ -14813,20 +14824,20 @@ body.is-media-lightbox-open {
       clamp(6px, 0.58vw, 10px);
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-actions {
     gap:
       clamp(8px, 0.62vw, 11px);
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-action {
     padding:
       clamp(8px, 0.6vw, 10px)
       clamp(11px, 0.8vw, 14px);
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-surface {
     gap:
       clamp(6px, 0.68vh, 9px);
@@ -14838,7 +14849,7 @@ body.is-media-lightbox-open {
       clamp(18px, 1.55vw, 27px);
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-logo {
     width:
       clamp(
@@ -14857,7 +14868,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-kicker {
     font-size:
       clamp(7.5px, 0.56vw, 9.5px);
@@ -14865,7 +14876,7 @@ body.is-media-lightbox-open {
     letter-spacing: 0.23em;
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-blurb {
     width: min(100%, 64ch);
     max-width: 64ch;
@@ -14876,7 +14887,7 @@ body.is-media-lightbox-open {
     line-height: 1.38;
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-features {
     column-gap:
       clamp(9px, 0.65vw, 13px);
@@ -14886,7 +14897,7 @@ body.is-media-lightbox-open {
     padding: 3px 0;
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-feature {
     grid-template-columns:
       clamp(24px, 1.85vw, 31px)
@@ -14897,13 +14908,13 @@ body.is-media-lightbox-open {
     padding: 3px 2px;
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-feature-icon {
     font-size:
       clamp(12px, 0.92vw, 17px);
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-feature-copy strong {
     font-size:
       clamp(7px, 0.48vw, 8.5px);
@@ -14911,20 +14922,20 @@ body.is-media-lightbox-open {
     letter-spacing: 0.10em;
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-feature-copy small {
     font-size:
       clamp(6.7px, 0.45vw, 8px);
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-fact {
     padding:
       5px
       clamp(5px, 0.46vw, 8px);
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-fact span {
     font-size:
       clamp(7px, 0.48vw, 8.5px);
@@ -14932,13 +14943,13 @@ body.is-media-lightbox-open {
     letter-spacing: 0.15em;
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-fact strong {
     font-size:
       clamp(9px, 0.6vw, 11px);
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-action {
     padding:
       7px
@@ -14950,7 +14961,7 @@ body.is-media-lightbox-open {
     letter-spacing: 0.09em;
   }
 
-#brobots-page-frame
+.prototype-page-frame[data-game-frame-page]
   .game-info-features.is-crowded {
     transition:
       opacity 130ms ease;
@@ -14960,21 +14971,21 @@ body.is-media-lightbox-open {
     pointer-events: none;
   }
 
-#brobots-page-frame .game-info-surface,
-  #brobots-page-frame .game-info-header,
-  #brobots-page-frame .game-info-logo,
-  #brobots-page-frame .game-info-kicker,
-  #brobots-page-frame .game-info-blurb,
-  #brobots-page-frame .game-info-features,
-  #brobots-page-frame .game-info-feature,
-  #brobots-page-frame .game-info-feature-icon,
-  #brobots-page-frame .game-info-feature-copy strong,
-  #brobots-page-frame .game-info-feature-copy small,
-  #brobots-page-frame .game-info-fact,
-  #brobots-page-frame .game-info-fact span,
-  #brobots-page-frame .game-info-fact strong,
-  #brobots-page-frame .game-info-actions,
-  #brobots-page-frame .game-info-action {
+.prototype-page-frame[data-game-frame-page] .game-info-surface,
+  .prototype-page-frame[data-game-frame-page] .game-info-header,
+  .prototype-page-frame[data-game-frame-page] .game-info-logo,
+  .prototype-page-frame[data-game-frame-page] .game-info-kicker,
+  .prototype-page-frame[data-game-frame-page] .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page] .game-info-features,
+  .prototype-page-frame[data-game-frame-page] .game-info-feature,
+  .prototype-page-frame[data-game-frame-page] .game-info-feature-icon,
+  .prototype-page-frame[data-game-frame-page] .game-info-feature-copy strong,
+  .prototype-page-frame[data-game-frame-page] .game-info-feature-copy small,
+  .prototype-page-frame[data-game-frame-page] .game-info-fact,
+  .prototype-page-frame[data-game-frame-page] .game-info-fact span,
+  .prototype-page-frame[data-game-frame-page] .game-info-fact strong,
+  .prototype-page-frame[data-game-frame-page] .game-info-actions,
+  .prototype-page-frame[data-game-frame-page] .game-info-action {
     transition:
       width 210ms ease,
       max-width 210ms ease,
@@ -14988,7 +14999,7 @@ body.is-media-lightbox-open {
       transform 180ms ease;
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     padding:
       clamp(16px, 1.65cqw, 34px)
       clamp(17px, 1.55cqw, 32px)
@@ -14999,7 +15010,7 @@ body.is-media-lightbox-open {
       clamp(7px, 0.78cqh, 14px);
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         220px,
@@ -15017,7 +15028,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-kicker {
+.prototype-page-frame[data-game-frame-page] .game-info-kicker {
     font-size:
       clamp(8px, 0.60cqw, 11px);
 
@@ -15025,7 +15036,7 @@ body.is-media-lightbox-open {
       clamp(0.22em, 0.26em, 0.28em);
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     width:
       min(
         100%,
@@ -15045,7 +15056,7 @@ body.is-media-lightbox-open {
       clamp(1.38, 1.42, 1.46);
   }
 
-#brobots-page-frame .game-info-features {
+.prototype-page-frame[data-game-frame-page] .game-info-features {
     column-gap:
       clamp(10px, 0.85cqw, 18px);
 
@@ -15057,7 +15068,7 @@ body.is-media-lightbox-open {
       0;
   }
 
-#brobots-page-frame .game-info-feature {
+.prototype-page-frame[data-game-frame-page] .game-info-feature {
     grid-template-columns:
       clamp(25px, 2cqw, 36px)
       minmax(0, 1fr);
@@ -15070,12 +15081,12 @@ body.is-media-lightbox-open {
       clamp(2px, 0.24cqw, 5px);
   }
 
-#brobots-page-frame .game-info-feature-icon {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-icon {
     font-size:
       clamp(13px, 1.02cqw, 20px);
   }
 
-#brobots-page-frame .game-info-feature-copy strong {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy strong {
     font-size:
       clamp(7.3px, 0.50cqw, 9.5px);
 
@@ -15083,18 +15094,18 @@ body.is-media-lightbox-open {
       clamp(0.10em, 0.115em, 0.12em);
   }
 
-#brobots-page-frame .game-info-feature-copy small {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy small {
     font-size:
       clamp(6.9px, 0.46cqw, 8.8px);
   }
 
-#brobots-page-frame .game-info-fact {
+.prototype-page-frame[data-game-frame-page] .game-info-fact {
     padding:
       clamp(5px, 0.44cqw, 8px)
       clamp(5px, 0.54cqw, 10px);
   }
 
-#brobots-page-frame .game-info-action {
+.prototype-page-frame[data-game-frame-page] .game-info-action {
     padding:
       clamp(7px, 0.56cqw, 10px)
       clamp(9px, 0.74cqw, 14px);
@@ -15103,17 +15114,17 @@ body.is-media-lightbox-open {
       clamp(8px, 0.55cqw, 10px);
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-logo {
     max-width: 57%;
   }
 
-#brobots-page-frame.is-info-compact
+.prototype-page-frame[data-game-frame-page].is-info-compact
   .game-info-blurb {
     max-width: 70ch;
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-features {
     opacity: 0;
     visibility: hidden;
@@ -15123,7 +15134,7 @@ body.is-media-lightbox-open {
       translateY(-4px);
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-surface {
     grid-template-rows:
       auto
@@ -15133,7 +15144,7 @@ body.is-media-lightbox-open {
       auto;
   }
 
-#brobots-page-frame
+.prototype-page-frame[data-game-frame-page]
   .game-info-features.is-crowded {
     opacity: 0;
     visibility: hidden;
@@ -15143,9 +15154,9 @@ body.is-media-lightbox-open {
       translateY(-4px);
   }
 
-#brobots-page-frame .game-info-logo,
-  #brobots-page-frame.is-info-compact .game-info-logo,
-  #brobots-page-frame.is-info-tight .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-logo,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-logo {
     width:
       clamp(
         270px,
@@ -15163,9 +15174,9 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-kicker,
-  #brobots-page-frame.is-info-compact .game-info-kicker,
-  #brobots-page-frame.is-info-tight .game-info-kicker {
+.prototype-page-frame[data-game-frame-page] .game-info-kicker,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-kicker,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-kicker {
     font-size:
       clamp(
         9px,
@@ -15176,9 +15187,9 @@ body.is-media-lightbox-open {
     letter-spacing: 0.27em;
   }
 
-#brobots-page-frame .game-info-blurb,
-  #brobots-page-frame.is-info-compact .game-info-blurb,
-  #brobots-page-frame.is-info-tight .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-blurb {
     width:
       min(
         100%,
@@ -15201,9 +15212,9 @@ body.is-media-lightbox-open {
     line-height: 1.44;
   }
 
-#brobots-page-frame .game-info-feature,
-  #brobots-page-frame.is-info-compact .game-info-feature,
-  #brobots-page-frame.is-info-tight .game-info-feature {
+.prototype-page-frame[data-game-frame-page] .game-info-feature,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-feature,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-feature {
     grid-template-columns:
       clamp(30px, 2.05cqw, 38px)
       minmax(0, 1fr);
@@ -15216,9 +15227,9 @@ body.is-media-lightbox-open {
       clamp(3px, 0.25cqw, 6px);
   }
 
-#brobots-page-frame .game-info-feature-icon,
-  #brobots-page-frame.is-info-compact .game-info-feature-icon,
-  #brobots-page-frame.is-info-tight .game-info-feature-icon {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-icon,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-feature-icon,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-feature-icon {
     font-size:
       clamp(
         15px,
@@ -15227,9 +15238,9 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-copy strong,
-  #brobots-page-frame.is-info-compact .game-info-feature-copy strong,
-  #brobots-page-frame.is-info-tight .game-info-feature-copy strong {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy strong,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-feature-copy strong,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-feature-copy strong {
     font-size:
       clamp(
         8px,
@@ -15238,9 +15249,9 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-copy small,
-  #brobots-page-frame.is-info-compact .game-info-feature-copy small,
-  #brobots-page-frame.is-info-tight .game-info-feature-copy small {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy small,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-feature-copy small,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-feature-copy small {
     font-size:
       clamp(
         7.5px,
@@ -15249,7 +15260,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame.is-info-tight .game-info-surface {
+.prototype-page-frame[data-game-frame-page].is-info-tight .game-info-surface {
     grid-template-rows:
       auto
       auto
@@ -15258,8 +15269,8 @@ body.is-media-lightbox-open {
       auto;
   }
 
-#brobots-page-frame.is-info-tight .game-info-features,
-  #brobots-page-frame .game-info-features.is-crowded {
+.prototype-page-frame[data-game-frame-page].is-info-tight .game-info-features,
+  .prototype-page-frame[data-game-frame-page] .game-info-features.is-crowded {
     opacity: 0;
 
     
@@ -15271,17 +15282,17 @@ body.is-media-lightbox-open {
       translateY(-3px);
   }
 
-#brobots-page-frame .game-info-fact,
-  #brobots-page-frame.is-info-compact .game-info-fact,
-  #brobots-page-frame.is-info-tight .game-info-fact {
+.prototype-page-frame[data-game-frame-page] .game-info-fact,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-fact,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-fact {
     padding:
       clamp(7px, 0.46cqw, 10px)
       clamp(7px, 0.55cqw, 11px);
   }
 
-#brobots-page-frame .game-info-fact span,
-  #brobots-page-frame.is-info-compact .game-info-fact span,
-  #brobots-page-frame.is-info-tight .game-info-fact span {
+.prototype-page-frame[data-game-frame-page] .game-info-fact span,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-fact span,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-fact span {
     font-size:
       clamp(
         8px,
@@ -15290,9 +15301,9 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact strong,
-  #brobots-page-frame.is-info-compact .game-info-fact strong,
-  #brobots-page-frame.is-info-tight .game-info-fact strong {
+.prototype-page-frame[data-game-frame-page] .game-info-fact strong,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-fact strong,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-fact strong {
     font-size:
       clamp(
         10px,
@@ -15301,9 +15312,9 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-actions,
-  #brobots-page-frame.is-info-compact .game-info-actions,
-  #brobots-page-frame.is-info-tight .game-info-actions {
+.prototype-page-frame[data-game-frame-page] .game-info-actions,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-actions,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-actions {
     grid-template-columns:
       minmax(0, 1.25fr)
       minmax(0, 0.95fr);
@@ -15316,9 +15327,9 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-action,
-  #brobots-page-frame.is-info-compact .game-info-action,
-  #brobots-page-frame.is-info-tight .game-info-action {
+.prototype-page-frame[data-game-frame-page] .game-info-action,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-action,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-action {
     min-height:
       clamp(
         40px,
@@ -15351,30 +15362,30 @@ body.is-media-lightbox-open {
     letter-spacing: 0.10em;
   }
 
-#brobots-page-frame .game-info-surface,
-  #brobots-page-frame .game-info-header,
-  #brobots-page-frame .game-info-logo,
-  #brobots-page-frame .game-info-kicker,
-  #brobots-page-frame .game-info-blurb,
-  #brobots-page-frame .game-info-feature,
-  #brobots-page-frame .game-info-feature-icon,
-  #brobots-page-frame .game-info-feature-copy strong,
-  #brobots-page-frame .game-info-feature-copy small,
-  #brobots-page-frame .game-info-fact,
-  #brobots-page-frame .game-info-fact span,
-  #brobots-page-frame .game-info-fact strong,
-  #brobots-page-frame .game-info-actions,
-  #brobots-page-frame .game-info-action {
+.prototype-page-frame[data-game-frame-page] .game-info-surface,
+  .prototype-page-frame[data-game-frame-page] .game-info-header,
+  .prototype-page-frame[data-game-frame-page] .game-info-logo,
+  .prototype-page-frame[data-game-frame-page] .game-info-kicker,
+  .prototype-page-frame[data-game-frame-page] .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page] .game-info-feature,
+  .prototype-page-frame[data-game-frame-page] .game-info-feature-icon,
+  .prototype-page-frame[data-game-frame-page] .game-info-feature-copy strong,
+  .prototype-page-frame[data-game-frame-page] .game-info-feature-copy small,
+  .prototype-page-frame[data-game-frame-page] .game-info-fact,
+  .prototype-page-frame[data-game-frame-page] .game-info-fact span,
+  .prototype-page-frame[data-game-frame-page] .game-info-fact strong,
+  .prototype-page-frame[data-game-frame-page] .game-info-actions,
+  .prototype-page-frame[data-game-frame-page] .game-info-action {
     transition: none;
   }
 
-#brobots-page-frame .game-info-features {
+.prototype-page-frame[data-game-frame-page] .game-info-features {
     transition:
       opacity 190ms ease,
       transform 190ms ease;
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     align-content: start;
 
     grid-template-rows:
@@ -15392,7 +15403,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-features {
+.prototype-page-frame[data-game-frame-page] .game-info-features {
     align-content: start;
 
     min-height: 0;
@@ -15415,9 +15426,9 @@ body.is-media-lightbox-open {
       margin 220ms ease;
   }
 
-#brobots-page-frame
+.prototype-page-frame[data-game-frame-page]
   .game-info-features.is-crowded,
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .game-info-features.is-structure-hidden {
     opacity: 0;
 
@@ -15431,7 +15442,7 @@ body.is-media-lightbox-open {
     pointer-events: none;
   }
 
-#brobots-page-frame.is-info-tight
+.prototype-page-frame[data-game-frame-page].is-info-tight
   .game-info-features {
     opacity: 1;
 
@@ -15449,7 +15460,7 @@ body.is-media-lightbox-open {
     pointer-events: auto;
   }
 
-#brobots-page-frame .game-info-header {
+.prototype-page-frame[data-game-frame-page] .game-info-header {
     margin-bottom:
       clamp(
         1px,
@@ -15458,7 +15469,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     margin-bottom:
       clamp(
         2px,
@@ -15467,7 +15478,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-facts {
+.prototype-page-frame[data-game-frame-page] .game-info-facts {
     margin-top:
       clamp(
         2px,
@@ -15476,7 +15487,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-actions {
+.prototype-page-frame[data-game-frame-page] .game-info-actions {
     margin-top:
       clamp(
         1px,
@@ -15485,7 +15496,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     --feature-zone-height: 118px;
 
     display: grid;
@@ -15517,8 +15528,8 @@ body.is-media-lightbox-open {
       padding 180ms ease;
   }
 
-#brobots-page-frame.is-info-compact .game-info-surface,
-  #brobots-page-frame.is-info-tight .game-info-surface {
+.prototype-page-frame[data-game-frame-page].is-info-compact .game-info-surface,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-surface {
     grid-template-rows:
       auto
       var(--feature-zone-height)
@@ -15527,8 +15538,8 @@ body.is-media-lightbox-open {
     align-content: center;
   }
 
-#brobots-page-frame .game-info-top-zone,
-  #brobots-page-frame .game-info-bottom-zone {
+.prototype-page-frame[data-game-frame-page] .game-info-top-zone,
+  .prototype-page-frame[data-game-frame-page] .game-info-bottom-zone {
     min-width: 0;
 
     display: grid;
@@ -15536,7 +15547,7 @@ body.is-media-lightbox-open {
     align-content: start;
   }
 
-#brobots-page-frame .game-info-top-zone {
+.prototype-page-frame[data-game-frame-page] .game-info-top-zone {
     row-gap:
       clamp(
         7px,
@@ -15545,7 +15556,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-bottom-zone {
+.prototype-page-frame[data-game-frame-page] .game-info-bottom-zone {
     row-gap:
       clamp(
         7px,
@@ -15554,17 +15565,17 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-header,
-  #brobots-page-frame .game-info-blurb,
-  #brobots-page-frame .game-info-facts,
-  #brobots-page-frame .game-info-actions {
+.prototype-page-frame[data-game-frame-page] .game-info-header,
+  .prototype-page-frame[data-game-frame-page] .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page] .game-info-facts,
+  .prototype-page-frame[data-game-frame-page] .game-info-actions {
     margin-top: 0;
     margin-bottom: 0;
   }
 
-#brobots-page-frame .game-info-logo,
-  #brobots-page-frame.is-info-compact .game-info-logo,
-  #brobots-page-frame.is-info-tight .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-logo,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-logo {
     width:
       clamp(
         280px,
@@ -15582,9 +15593,9 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-blurb,
-  #brobots-page-frame.is-info-compact .game-info-blurb,
-  #brobots-page-frame.is-info-tight .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-blurb {
     width:
       min(
         100%,
@@ -15603,9 +15614,9 @@ body.is-media-lightbox-open {
     line-height: 1.44;
   }
 
-#brobots-page-frame .game-info-features,
-  #brobots-page-frame.is-info-tight .game-info-features,
-  #brobots-page-frame
+.prototype-page-frame[data-game-frame-page] .game-info-features,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-features,
+  .prototype-page-frame[data-game-frame-page]
   .game-info-features.is-crowded {
     min-height: 0;
     height: 100%;
@@ -15625,7 +15636,7 @@ body.is-media-lightbox-open {
       opacity 170ms ease;
   }
 
-#brobots-page-frame
+.prototype-page-frame[data-game-frame-page]
   .game-info-surface.is-features-collapsed
   .game-info-features {
     opacity: 0;
@@ -15633,17 +15644,17 @@ body.is-media-lightbox-open {
     pointer-events: none;
   }
 
-#brobots-page-frame .game-info-fact,
-  #brobots-page-frame.is-info-compact .game-info-fact,
-  #brobots-page-frame.is-info-tight .game-info-fact {
+.prototype-page-frame[data-game-frame-page] .game-info-fact,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-fact,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-fact {
     padding:
       clamp(7px, 0.48cqw, 10px)
       clamp(7px, 0.56cqw, 11px);
   }
 
-#brobots-page-frame .game-info-action,
-  #brobots-page-frame.is-info-compact .game-info-action,
-  #brobots-page-frame.is-info-tight .game-info-action {
+.prototype-page-frame[data-game-frame-page] .game-info-action,
+  .prototype-page-frame[data-game-frame-page].is-info-compact .game-info-action,
+  .prototype-page-frame[data-game-frame-page].is-info-tight .game-info-action {
     min-height:
       clamp(
         40px,
@@ -15667,7 +15678,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         285px,
@@ -15685,7 +15696,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-kicker {
+.prototype-page-frame[data-game-frame-page] .game-info-kicker {
     font-size:
       clamp(
         9px,
@@ -15701,7 +15712,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     width:
       min(
         100%,
@@ -15720,7 +15731,7 @@ body.is-media-lightbox-open {
     line-height: 1.46;
   }
 
-#brobots-page-frame .game-info-feature {
+.prototype-page-frame[data-game-frame-page] .game-info-feature {
     grid-template-columns:
       clamp(
         32px,
@@ -15749,7 +15760,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-icon {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-icon {
     font-size:
       clamp(
         16px,
@@ -15758,7 +15769,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-copy strong {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy strong {
     font-size:
       clamp(
         8px,
@@ -15767,7 +15778,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-copy small {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy small {
     font-size:
       clamp(
         7.5px,
@@ -15776,7 +15787,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact span {
+.prototype-page-frame[data-game-frame-page] .game-info-fact span {
     font-size:
       clamp(
         8px,
@@ -15785,7 +15796,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact strong {
+.prototype-page-frame[data-game-frame-page] .game-info-fact strong {
     font-size:
       clamp(
         10px,
@@ -15794,7 +15805,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-action {
+.prototype-page-frame[data-game-frame-page] .game-info-action {
     min-height:
       clamp(
         41px,
@@ -15818,7 +15829,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     row-gap:
       clamp(
         12px,
@@ -15849,7 +15860,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     transition:
       grid-template-rows 260ms
       cubic-bezier(0.2, 0.78, 0.24, 1),
@@ -15857,7 +15868,7 @@ body.is-media-lightbox-open {
       padding 180ms ease;
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         285px,
@@ -15875,7 +15886,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-kicker {
+.prototype-page-frame[data-game-frame-page] .game-info-kicker {
     font-size:
       clamp(
         9px,
@@ -15884,7 +15895,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     max-width: 78ch;
 
     font-size:
@@ -15897,7 +15908,7 @@ body.is-media-lightbox-open {
     line-height: 1.46;
   }
 
-#brobots-page-frame .game-info-feature {
+.prototype-page-frame[data-game-frame-page] .game-info-feature {
     grid-template-columns:
       clamp(
         32px,
@@ -15926,7 +15937,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-icon {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-icon {
     font-size:
       clamp(
         16px,
@@ -15935,7 +15946,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-copy strong {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy strong {
     font-size:
       clamp(
         8px,
@@ -15944,7 +15955,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-feature-copy small {
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy small {
     font-size:
       clamp(
         7.5px,
@@ -15953,7 +15964,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact span {
+.prototype-page-frame[data-game-frame-page] .game-info-fact span {
     font-size:
       clamp(
         8px,
@@ -15962,7 +15973,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact strong {
+.prototype-page-frame[data-game-frame-page] .game-info-fact strong {
     font-size:
       clamp(
         10px,
@@ -15971,7 +15982,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-action {
+.prototype-page-frame[data-game-frame-page] .game-info-action {
     min-height:
       clamp(
         41px,
@@ -15995,7 +16006,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     row-gap:
       clamp(
         12px,
@@ -16026,7 +16037,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-top-zone {
+.prototype-page-frame[data-game-frame-page] .game-info-top-zone {
     row-gap:
       clamp(
         7px,
@@ -16035,7 +16046,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-bottom-zone {
+.prototype-page-frame[data-game-frame-page] .game-info-bottom-zone {
     row-gap:
       clamp(
         7px,
@@ -16044,15 +16055,15 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     max-width: 68%;
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     max-width: 80ch;
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     padding-left:
       clamp(
         28px,
@@ -16068,7 +16079,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     width: 64ch;
     max-width: none;
 
@@ -16082,11 +16093,11 @@ body.is-media-lightbox-open {
     line-height: 1.46;
   }
 
-#brobots-page-frame .game-info-top-zone {
+.prototype-page-frame[data-game-frame-page] .game-info-top-zone {
     min-width: 0;
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     max-inline-size:
       min(
         64ch,
@@ -16094,7 +16105,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     width: 64ch;
 
     max-inline-size:
@@ -16113,7 +16124,7 @@ body.is-media-lightbox-open {
     line-height: 1.45;
   }
 
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
     row-gap:
       clamp(
         9px,
@@ -16145,7 +16156,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-top-zone {
+.prototype-page-frame[data-game-frame-page] .game-info-top-zone {
     row-gap:
       clamp(
         6px,
@@ -16157,7 +16168,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-bottom-zone {
+.prototype-page-frame[data-game-frame-page] .game-info-bottom-zone {
     row-gap:
       clamp(
         6px,
@@ -16169,7 +16180,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         320px,
@@ -16187,7 +16198,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-blurb {
+.prototype-page-frame[data-game-frame-page] .game-info-blurb {
     font-size:
       clamp(
         10.8px,
@@ -16196,7 +16207,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-kicker {
+.prototype-page-frame[data-game-frame-page] .game-info-kicker {
     font-size:
       clamp(
         8.5px,
@@ -16205,7 +16216,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact span {
+.prototype-page-frame[data-game-frame-page] .game-info-fact span {
     font-size:
       clamp(
         7.5px,
@@ -16214,7 +16225,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-fact strong {
+.prototype-page-frame[data-game-frame-page] .game-info-fact strong {
     font-size:
       clamp(
         9.5px,
@@ -16223,7 +16234,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         320px,
@@ -16232,7 +16243,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         390px,
@@ -16250,7 +16261,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         430px,
@@ -16261,7 +16272,7 @@ body.is-media-lightbox-open {
     max-width: 70%;
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         410px,
@@ -16279,7 +16290,7 @@ body.is-media-lightbox-open {
       );
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         470px,
@@ -16292,7 +16303,7 @@ body.is-media-lightbox-open {
     max-height: 156px;
   }
 
-#brobots-page-frame .game-info-logo {
+.prototype-page-frame[data-game-frame-page] .game-info-logo {
     width:
       clamp(
         320px,
@@ -16314,7 +16325,7 @@ body.is-media-lightbox-open {
       max-height 140ms ease-out;
   }
 
-#brobots-page-frame
+.prototype-page-frame[data-game-frame-page]
   .game-info-surface.is-features-collapsed
   .game-info-logo {
     width:
@@ -16542,16 +16553,16 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame .game-info-background,
-#brobots-page-frame .game-info-layer--rear,
-#brobots-page-frame .game-info-layer--mid,
-#brobots-page-frame .game-info::after {
+.prototype-page-frame[data-game-frame-page] .game-info-background,
+.prototype-page-frame[data-game-frame-page] .game-info-layer--rear,
+.prototype-page-frame[data-game-frame-page] .game-info-layer--mid,
+.prototype-page-frame[data-game-frame-page] .game-info::after {
   display: none !important;
 }
 
-#brobots-page-frame .desktop-secondary-panel-glass,
-#brobots-page-frame .etherian-popout-glass-layer,
-#brobots-page-frame .game-info-surface {
+.prototype-page-frame[data-game-frame-page] .desktop-secondary-panel-glass,
+.prototype-page-frame[data-game-frame-page] .etherian-popout-glass-layer,
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -16751,6 +16762,7 @@ body.is-media-lightbox-open {
 
 @media (max-width: 1400px) {
   .prototype-page-frame:not(.is-layout-transitioning)
+  .desktop-secondary-panel
   .etherian-popout-layer-image {
     display: none !important;
   }
@@ -16781,6 +16793,7 @@ body.is-media-lightbox-open {
 
 @media (max-width: 1400px) {
   #brobots-page-frame:not(.is-layout-transitioning)
+  .desktop-secondary-panel
   .brobots-popout-layer-image {
     display: none !important;
   }
@@ -16933,7 +16946,7 @@ body.is-media-lightbox-open {
    - No desktop/tablet layout promotion. Existing page behavior stays intact.
    ========================================================= */
 
-#brobots-page-frame .brobots-inner-frame-area {
+.prototype-page-frame[data-game-frame-page] .game-frame-area {
   position: relative;
 
   /*
@@ -16958,7 +16971,7 @@ body.is-media-lightbox-open {
   It is now inset inside the Brobots raster border instead of determining
   the border's outer dimensions.
 */
-#brobots-page-frame .brobots-inner-frame-area > .media-browser {
+.prototype-page-frame[data-game-frame-page] .game-frame-area > .media-browser {
   position: relative;
   z-index: 1;
 
@@ -16974,7 +16987,7 @@ body.is-media-lightbox-open {
 
 
 /* Shared border-piece behavior */
-#brobots-page-frame .brobots-inner-frame-piece {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece {
   position: absolute;
   z-index: 2;
 
@@ -17010,7 +17023,7 @@ body.is-media-lightbox-open {
 
   So hero region occupies the top 796/1149 of this shared canvas.
 */
-#brobots-page-frame .brobots-inner-frame-piece--hero-top-left {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece--hero-top-left {
   top: 0;
   left: 0;
 
@@ -17021,7 +17034,7 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame .brobots-inner-frame-piece--hero-top-right {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece--hero-top-right {
   top: 0;
   right: 0;
 
@@ -17032,7 +17045,7 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame .brobots-inner-frame-piece--hero-bottom-left {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece--hero-bottom-left {
   /*
     Native hero bottom sits at y = 796.
     Place this piece relative to the shared full frame.
@@ -17051,7 +17064,7 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame .brobots-inner-frame-piece--hero-bottom-right {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece--hero-bottom-right {
   top:
     calc(
       (796 - 185) / 1149 * 100%
@@ -17072,7 +17085,7 @@ body.is-media-lightbox-open {
   Thumbnail region begins at y = 799
   (796 hero + 3 separator).
 */
-#brobots-page-frame .brobots-inner-frame-piece--thumb-top-left {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece--thumb-top-left {
   top:
     calc(
       799 / 1149 * 100%
@@ -17087,7 +17100,7 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame .brobots-inner-frame-piece--thumb-top-right {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece--thumb-top-right {
   top:
     calc(
       799 / 1149 * 100%
@@ -17102,7 +17115,7 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame .brobots-inner-frame-piece--thumb-bottom-left {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece--thumb-bottom-left {
   bottom: 0;
   left: 0;
 
@@ -17113,7 +17126,7 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame .brobots-inner-frame-piece--thumb-bottom-right {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece--thumb-bottom-right {
   right: 0;
   bottom: 0;
 
@@ -17133,7 +17146,7 @@ body.is-media-lightbox-open {
   On desktop it occupies the available left/media side.
 */
 @media (min-width: 1401px) {
-  #brobots-page-frame .brobots-inner-frame-area {
+  .prototype-page-frame[data-game-frame-page] .game-frame-area {
     /*
       The desktop page still has its normal two-column game layout.
       This wrapper only fills the media column it already receives.
@@ -17148,7 +17161,7 @@ body.is-media-lightbox-open {
   The raster border simply scales with the full available content box.
 */
 @media (min-width: 841px) and (max-width: 1400px) {
-  #brobots-page-frame .brobots-inner-frame-area {
+  .prototype-page-frame[data-game-frame-page] .game-frame-area {
     width: 100%;
 
     /*
@@ -17165,7 +17178,7 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame .brobots-inner-frame-area > .media-browser {
+  .prototype-page-frame[data-game-frame-page] .game-frame-area > .media-browser {
     width: 72%;
   }
 }
@@ -17175,15 +17188,15 @@ body.is-media-lightbox-open {
   Mobile remains untouched for now.
 */
 @media (max-width: 840px) {
-  #brobots-page-frame .brobots-inner-frame-area {
+  .prototype-page-frame[data-game-frame-page] .game-frame-area {
     display: contents;
   }
 
-  #brobots-page-frame .brobots-inner-frame-piece {
+  .prototype-page-frame[data-game-frame-page] .game-frame-piece {
     display: none;
   }
 
-  #brobots-page-frame .brobots-inner-frame-area > .media-browser {
+  .prototype-page-frame[data-game-frame-page] .game-frame-area > .media-browser {
     width: auto;
   }
 }
@@ -17206,7 +17219,7 @@ body.is-media-lightbox-open {
    because the page became shorter.
    ========================================================= */
 
-#brobots-page-frame .brobots-inner-frame-area {
+.prototype-page-frame[data-game-frame-page] .game-frame-area {
   position: relative;
 
   width: 100%;
@@ -17256,7 +17269,7 @@ body.is-media-lightbox-open {
 */
 #brobots-page-frame
 .brobots-inner-frame-canvas
-.brobots-inner-frame-piece {
+.game-frame-piece {
   position: absolute;
 
   width: auto !important;
@@ -17273,7 +17286,7 @@ body.is-media-lightbox-open {
 
 #brobots-page-frame
 .brobots-inner-frame-canvas
-.brobots-inner-frame-piece--hero-top-left {
+.game-frame-piece--hero-top-left {
   left: 0 !important;
   right: auto !important;
   top: 0 !important;
@@ -17286,7 +17299,7 @@ body.is-media-lightbox-open {
 
 #brobots-page-frame
 .brobots-inner-frame-canvas
-.brobots-inner-frame-piece--hero-top-right {
+.game-frame-piece--hero-top-right {
   left: auto !important;
   right: 0 !important;
   top: 0 !important;
@@ -17299,7 +17312,7 @@ body.is-media-lightbox-open {
 
 #brobots-page-frame
 .brobots-inner-frame-canvas
-.brobots-inner-frame-piece--hero-bottom-left {
+.game-frame-piece--hero-bottom-left {
   left: 0 !important;
   right: auto !important;
   top: 611px !important;
@@ -17312,7 +17325,7 @@ body.is-media-lightbox-open {
 
 #brobots-page-frame
 .brobots-inner-frame-canvas
-.brobots-inner-frame-piece--hero-bottom-right {
+.game-frame-piece--hero-bottom-right {
   left: auto !important;
   right: 0 !important;
   top: 611px !important;
@@ -17327,7 +17340,7 @@ body.is-media-lightbox-open {
 
 #brobots-page-frame
 .brobots-inner-frame-canvas
-.brobots-inner-frame-piece--thumb-top-left {
+.game-frame-piece--thumb-top-left {
   left: 0 !important;
   right: auto !important;
   top: 799px !important;
@@ -17340,7 +17353,7 @@ body.is-media-lightbox-open {
 
 #brobots-page-frame
 .brobots-inner-frame-canvas
-.brobots-inner-frame-piece--thumb-top-right {
+.game-frame-piece--thumb-top-right {
   left: auto !important;
   right: 0 !important;
   top: 799px !important;
@@ -17353,7 +17366,7 @@ body.is-media-lightbox-open {
 
 #brobots-page-frame
 .brobots-inner-frame-canvas
-.brobots-inner-frame-piece--thumb-bottom-left {
+.game-frame-piece--thumb-bottom-left {
   left: 0 !important;
   right: auto !important;
   top: 946px !important;
@@ -17366,7 +17379,7 @@ body.is-media-lightbox-open {
 
 #brobots-page-frame
 .brobots-inner-frame-canvas
-.brobots-inner-frame-piece--thumb-bottom-right {
+.game-frame-piece--thumb-bottom-right {
   left: auto !important;
   right: 0 !important;
   top: 946px !important;
@@ -17381,8 +17394,8 @@ body.is-media-lightbox-open {
   The live gallery remains an independent content layer.
   We are deliberately NOT making its dimensions control the border.
 */
-#brobots-page-frame
-.brobots-inner-frame-area > .media-browser {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area > .media-browser {
   position: relative;
   z-index: 1;
 
@@ -17400,7 +17413,7 @@ body.is-media-lightbox-open {
   it; the native canvas then uniformly contains itself inside that area.
 */
 @media (min-width: 841px) and (max-width: 1400px) {
-  #brobots-page-frame .brobots-inner-frame-area {
+  .prototype-page-frame[data-game-frame-page] .game-frame-area {
     width: 100%;
     height: 100%;
 
@@ -17409,8 +17422,8 @@ body.is-media-lightbox-open {
     margin: 0;
   }
 
-  #brobots-page-frame
-  .brobots-inner-frame-area > .media-browser {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > .media-browser {
     width: 72%;
   }
 }
@@ -17445,7 +17458,7 @@ body.is-media-lightbox-open {
      intentionally creating large horizontal gaps for future spacers
    ========================================================= */
 
-#brobots-page-frame .brobots-inner-frame-area {
+.prototype-page-frame[data-game-frame-page] .game-frame-area {
   --brobots-fixed-scale: 0.5;
 
   position: relative;
@@ -17474,8 +17487,8 @@ body.is-media-lightbox-open {
    Positioning is against the real inner-frame area.
    --------------------------------------------------------- */
 
-#brobots-page-frame
-.brobots-inner-frame-area > .brobots-inner-frame-piece {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area > .game-frame-piece {
   position: absolute;
   z-index: 2;
 
@@ -17495,8 +17508,8 @@ body.is-media-lightbox-open {
 
 /* ---------------- HERO ---------------- */
 
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-top-left {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-top-left {
   left: 0 !important;
   right: auto !important;
   top: 0 !important;
@@ -17516,8 +17529,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-top-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-top-right {
   left: auto !important;
   right: 0 !important;
   top: 0 !important;
@@ -17537,8 +17550,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-bottom-left {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-bottom-left {
   left: 0 !important;
   right: auto !important;
 
@@ -17564,8 +17577,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-bottom-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-bottom-right {
   left: auto !important;
   right: 0 !important;
 
@@ -17593,8 +17606,8 @@ body.is-media-lightbox-open {
 
 /* ---------------- THUMBNAILS ---------------- */
 
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-top-left {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-top-left {
   left: 0 !important;
   right: auto !important;
 
@@ -17620,8 +17633,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-top-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-top-right {
   left: auto !important;
   right: 0 !important;
 
@@ -17647,8 +17660,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-bottom-left {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-bottom-left {
   left: 0 !important;
   right: auto !important;
 
@@ -17674,8 +17687,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-bottom-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-bottom-right {
   left: auto !important;
   right: 0 !important;
 
@@ -17704,8 +17717,8 @@ body.is-media-lightbox-open {
 /*
   Existing live gallery remains independent for this fixed-piece test.
 */
-#brobots-page-frame
-.brobots-inner-frame-area > .media-browser {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area > .media-browser {
   position: relative;
   z-index: 1;
 
@@ -17717,7 +17730,7 @@ body.is-media-lightbox-open {
 
 
 @media (min-width: 841px) and (max-width: 1400px) {
-  #brobots-page-frame .brobots-inner-frame-area {
+  .prototype-page-frame[data-game-frame-page] .game-frame-area {
     width: 100%;
     height: 100%;
 
@@ -17726,16 +17739,16 @@ body.is-media-lightbox-open {
     margin: 0;
   }
 
-  #brobots-page-frame
-  .brobots-inner-frame-area > .media-browser {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > .media-browser {
     width: 72%;
   }
 }
 
 
 @media (max-width: 840px) {
-  #brobots-page-frame
-  .brobots-inner-frame-area > .brobots-inner-frame-piece {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > .game-frame-piece {
     display: none;
   }
 }
@@ -17766,7 +17779,7 @@ body.is-media-lightbox-open {
    rather than moving the whole native composition upward.
    ========================================================= */
 
-#brobots-page-frame .brobots-inner-frame-area {
+.prototype-page-frame[data-game-frame-page] .game-frame-area {
   /*
     Original native vertical landmarks:
       hero end:    796 / 1149
@@ -17785,10 +17798,10 @@ body.is-media-lightbox-open {
 
 /* ---------------- HERO TOP: real top edge ---------------- */
 
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-top-left,
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-top-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-top-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-top-right {
   top: 0 !important;
   bottom: auto !important;
 }
@@ -17796,10 +17809,10 @@ body.is-media-lightbox-open {
 
 /* ---------------- HERO BOTTOM: pin to hero split ---------------- */
 
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-bottom-left,
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-bottom-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-bottom-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-bottom-right {
   top:
     calc(
       var(--brobots-hero-end-y)
@@ -17816,10 +17829,10 @@ body.is-media-lightbox-open {
 
 /* ---------------- THUMB TOP: pin to thumb split ---------------- */
 
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-top-left,
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-top-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-top-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-top-right {
   top:
     var(--brobots-thumb-start-y) !important;
 
@@ -17829,10 +17842,10 @@ body.is-media-lightbox-open {
 
 /* ---------------- THUMB BOTTOM: real bottom edge ---------------- */
 
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-bottom-left,
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-bottom-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-bottom-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-bottom-right {
   top: auto !important;
   bottom: 0 !important;
 }
@@ -17852,13 +17865,13 @@ body.is-media-lightbox-open {
    Only their flexible axis is stretched.
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-area > .brobots-inner-frame-piece {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area > .game-frame-piece {
   z-index: 3;
 }
 
 
-#brobots-page-frame .brobots-inner-frame-stretcher {
+.prototype-page-frame[data-game-frame-page] .game-frame-stretcher {
   position: absolute;
   z-index: 2;
 
@@ -17881,8 +17894,8 @@ body.is-media-lightbox-open {
    HERO — horizontal stretchers
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-top {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-top {
   top: 0;
 
   left:
@@ -17905,8 +17918,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-bottom {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-bottom {
   left:
     calc(
       606px *
@@ -17941,8 +17954,8 @@ body.is-media-lightbox-open {
    HERO — vertical stretchers
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-left {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-left {
   left: 0;
 
   top:
@@ -17974,8 +17987,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-right {
   right: 0;
 
   top:
@@ -18011,8 +18024,8 @@ body.is-media-lightbox-open {
    THUMBNAILS — horizontal stretchers
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-top {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-top {
   left:
     calc(
       588px *
@@ -18036,8 +18049,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-bottom {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-bottom {
   left:
     calc(
       590px *
@@ -18064,8 +18077,8 @@ body.is-media-lightbox-open {
    THUMBNAILS — vertical stretchers
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-left {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-left {
   left: 0;
 
   top:
@@ -18092,8 +18105,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-right {
   right: 0;
 
   top:
@@ -18124,8 +18137,8 @@ body.is-media-lightbox-open {
    CENTER SEPARATOR
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--separator {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--separator {
   left: 0;
   right: 0;
 
@@ -18154,11 +18167,27 @@ body.is-media-lightbox-open {
 
 /* Hide the raster frame experiment on mobile exactly as before. */
 @media (max-width: 840px) {
-  #brobots-page-frame .brobots-inner-frame-stretcher {
+  .prototype-page-frame[data-game-frame-page] .game-frame-stretcher {
     display: none;
   }
 }
 
+
+/* =========================================================
+   REUSABLE FRAME — LEGACY CASCADE BRIDGE
+   =========================================================
+
+   The v10-v15 rules below predate the final component checkpoint but still
+   participate in the CURRENT frame: measured piece dimensions, fixed-piece
+   pinning, stretcher flexible-axis geometry, repeat mode and separator fill.
+
+   Brobots was still receiving these through #brobots-page-frame. The other
+   game-frame instances were not, which is why their media aperture could be
+   correct while the raster skin itself assembled at the wrong scale.
+
+   Only selectors that target the current .game-frame-* DOM are shared here.
+   Older abandoned .brobots-inner-frame-canvas experiments remain isolated.
+   ========================================================= */
 
 /* =========================================================
    BROBOTS INNER PAGE FRAME v10 — dynamic piece dimensions
@@ -18173,18 +18202,18 @@ body.is-media-lightbox-open {
    ========================================================= */
 
 /* Fixed pieces: JS writes width/height and some anchor dimensions. */
-#brobots-page-frame
-.brobots-inner-frame-area > [data-brobots-frame-piece] {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area > [data-game-frame-piece] {
   width: var(--brobots-piece-w, auto) !important;
   height: var(--brobots-piece-h, auto) !important;
 }
 
 
 /* Hero bottom rows use measured piece height for vertical pinning. */
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-bottom-left,
-#brobots-page-frame
-.brobots-inner-frame-piece--hero-bottom-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-bottom-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--hero-bottom-right {
   top:
     calc(
       var(--brobots-hero-end-y)
@@ -18195,20 +18224,20 @@ body.is-media-lightbox-open {
 
 
 /* Thumb top rows still use the shared split anchor. */
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-top-left,
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-top-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-top-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-top-right {
   top:
     var(--brobots-thumb-start-y) !important;
 }
 
 
 /* Bottom thumb pieces stay pinned to the actual bottom edge. */
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-bottom-left,
-#brobots-page-frame
-.brobots-inner-frame-piece--thumb-bottom-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-bottom-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-piece--thumb-bottom-right {
   top: auto !important;
   bottom: 0 !important;
 }
@@ -18219,8 +18248,8 @@ body.is-media-lightbox-open {
    Their flexible axis is still defined entirely by pinned neighbors.
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-top {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-top {
   left:
     var(--brobots-hero-top-left-w);
 
@@ -18232,8 +18261,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-bottom {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-bottom {
   left:
     var(--brobots-hero-bottom-left-w);
 
@@ -18252,8 +18281,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-left {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-left {
   top:
     var(--brobots-hero-top-left-h);
 
@@ -18271,8 +18300,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-right {
   top:
     var(--brobots-hero-top-right-h);
 
@@ -18290,8 +18319,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-top {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-top {
   left:
     var(--brobots-thumb-top-left-w);
 
@@ -18306,8 +18335,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-bottom {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-bottom {
   left:
     var(--brobots-thumb-bottom-left-w);
 
@@ -18321,8 +18350,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-left {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-left {
   top:
     calc(
       var(--brobots-thumb-start-y)
@@ -18338,8 +18367,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-right {
   top:
     calc(
       var(--brobots-thumb-start-y)
@@ -18372,14 +18401,14 @@ body.is-media-lightbox-open {
 
 
 /* Horizontal stretcher samples */
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-top,
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-bottom,
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-top,
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-bottom {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-top,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-bottom,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-top,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-bottom {
   background-repeat: repeat-x !important;
   background-position: center !important;
 
@@ -18395,14 +18424,14 @@ body.is-media-lightbox-open {
 
 
 /* Vertical stretcher samples */
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-left,
-#brobots-page-frame
-.brobots-inner-frame-stretcher--hero-right,
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-left,
-#brobots-page-frame
-.brobots-inner-frame-stretcher--thumb-right {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-right,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-right {
   background-repeat: repeat-y !important;
   background-position: center !important;
 
@@ -18419,8 +18448,8 @@ body.is-media-lightbox-open {
 /*
   Separator is already a long source strip, so keep stretching it once.
 */
-#brobots-page-frame
-.brobots-inner-frame-stretcher--separator {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--separator {
   background-repeat: no-repeat !important;
   background-position: center !important;
   background-size: 100% 100% !important;
@@ -18439,8 +18468,8 @@ body.is-media-lightbox-open {
    Its height comes from the runtime-measured natural image height.
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--separator {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--separator {
   left: 0 !important;
   right: auto !important;
 
@@ -18466,8 +18495,8 @@ body.is-media-lightbox-open {
    full-width stretch-separator.webp strip.
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--separator {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--separator {
   left: 0 !important;
   right: auto !important;
 
@@ -18509,8 +18538,8 @@ body.is-media-lightbox-open {
    internal details keep their original X positions.
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--separator {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--separator {
   left: 0 !important;
   right: auto !important;
 
@@ -18551,8 +18580,8 @@ body.is-media-lightbox-open {
    raster to fill that box.
    ========================================================= */
 
-#brobots-page-frame
-.brobots-inner-frame-stretcher--separator {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--separator {
   left: 0 !important;
   right: 0 !important;
 
@@ -18582,6 +18611,15 @@ body.is-media-lightbox-open {
 
 /* =========================================================
    BROBOTS — FINAL DESKTOP/TABLET MEDIA FRAME
+/*
+  MULTI-INSTANCE CONTRACT
+  -----------------------
+  Everything from this checkpoint onward belongs to the reusable raster-frame
+  / tablet presentation component. Page-specific content and theme rules may
+  still live elsewhere, but frame geometry/layout must never be scoped to one
+  project id here.
+*/
+
    Stable checkpoint before tablet integration
    =========================================================
 
@@ -18602,7 +18640,7 @@ body.is-media-lightbox-open {
    Frame area + layer ownership
    --------------------------------------------------------- */
 
-#brobots-page-frame .brobots-inner-frame-area {
+.prototype-page-frame[data-game-frame-page] .game-frame-area {
   position: relative;
 
   width: 100%;
@@ -18617,8 +18655,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-area > .media-browser {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area > .media-browser {
   position: absolute;
 
   z-index: 1;
@@ -18651,8 +18689,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame .brobots-inner-frame-piece,
-#brobots-page-frame .brobots-inner-frame-stretcher {
+.prototype-page-frame[data-game-frame-page] .game-frame-piece,
+.prototype-page-frame[data-game-frame-page] .game-frame-stretcher {
   z-index: 3;
 }
 
@@ -18661,7 +18699,7 @@ body.is-media-lightbox-open {
    Media zones
    --------------------------------------------------------- */
 
-#brobots-page-frame .brobots-media-zone {
+.prototype-page-frame[data-game-frame-page] .game-media-zone {
   position: absolute;
 
   display: grid;
@@ -18679,7 +18717,7 @@ body.is-media-lightbox-open {
 /*
   Hero aperture = exact space between the four hero stretchers.
 */
-#brobots-page-frame .brobots-media-zone--hero {
+.prototype-page-frame[data-game-frame-page] .game-media-zone--hero {
   left:
     var(
       --brobots-hero-left-rail-w,
@@ -18718,7 +18756,7 @@ body.is-media-lightbox-open {
 /*
   Thumbnail aperture = exact space between the four thumbnail stretchers.
 */
-#brobots-page-frame .brobots-media-zone--thumbs {
+.prototype-page-frame[data-game-frame-page] .game-media-zone--thumbs {
   left:
     var(
       --brobots-thumb-left-rail-w,
@@ -18812,8 +18850,8 @@ body.is-media-lightbox-open {
    Hero viewer
    --------------------------------------------------------- */
 
-#brobots-page-frame
-.brobots-media-zone--hero
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--hero
 .media-viewer {
   width: 100cqw !important;
   height: 100cqh !important;
@@ -18870,8 +18908,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--hero
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--hero
 .media-viewer-stage {
   position: absolute;
 
@@ -18883,11 +18921,11 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--hero
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--hero
 .media-viewer-image,
-#brobots-page-frame
-.brobots-media-zone--hero
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--hero
 .media-viewer-video {
   position: absolute;
 
@@ -18915,8 +18953,8 @@ body.is-media-lightbox-open {
 /*
   YouTube equivalent of object-fit: cover.
 */
-#brobots-page-frame
-.brobots-media-zone--hero
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--hero
 .media-viewer-youtube {
   position: absolute;
 
@@ -18947,18 +18985,18 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--hero
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--hero
 .media-youtube-local-fallback,
-#brobots-page-frame
-.brobots-media-zone--hero
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--hero
 .media-youtube-local-fallback-image {
   border-radius: inherit;
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--hero
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--hero
 .media-youtube-local-fallback-image {
   object-fit: cover;
   object-position: center center;
@@ -18972,8 +19010,8 @@ body.is-media-lightbox-open {
 /*
   Full aperture becomes the thumbnail composition canvas.
 */
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-strip {
   position: absolute;
 
@@ -18997,8 +19035,8 @@ body.is-media-lightbox-open {
 /*
   Arrows are fixed relative to the live aperture / side rails.
 */
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-arrow {
   position: absolute;
 
@@ -19034,27 +19072,27 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-arrow--previous {
   left:
     var(--brobots-thumb-left-arrow-offset);
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-arrow--next {
   right:
     var(--brobots-thumb-right-arrow-offset);
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-arrow:hover,
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-arrow:focus-visible {
   transform:
     translateY(-50%)
@@ -19065,8 +19103,8 @@ body.is-media-lightbox-open {
 /*
   Exactly three visible cards live continuously between the anchored arrows.
 */
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-thumbnails {
   position: absolute;
 
@@ -19121,8 +19159,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-thumbnail {
   width: 100%;
 
@@ -19160,11 +19198,11 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-thumbnail-image,
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-thumbnail-local-video {
   width: 100%;
   height: 100%;
@@ -19176,8 +19214,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-media-zone--thumbs
+.prototype-page-frame[data-game-frame-page]
+.game-media-zone--thumbs
 .media-thumbnail-overlay {
   border-radius: inherit;
 }
@@ -19190,7 +19228,7 @@ body.is-media-lightbox-open {
 /*
   Keep the SVG shell alive as geometry / animation infrastructure.
 */
-#brobots-page-frame .prototype-page-frame-shell {
+.prototype-page-frame[data-game-frame-page] .prototype-page-frame-shell {
   opacity: 0;
 }
 
@@ -19198,7 +19236,7 @@ body.is-media-lightbox-open {
 /*
   The visible raster frame reclaims almost all of the old SVG-border space.
 */
-#brobots-page-frame .prototype-page-frame-content {
+.prototype-page-frame[data-game-frame-page] .prototype-page-frame-content {
   top:
     clamp(
       6px,
@@ -19229,8 +19267,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame .game-page--brobots,
-#brobots-page-frame .brobots-inner-frame-area {
+.prototype-page-frame[data-game-frame-page] .game-page--brobots,
+.prototype-page-frame[data-game-frame-page] .game-frame-area {
   width: 100%;
   height: 100%;
 }
@@ -19241,7 +19279,7 @@ body.is-media-lightbox-open {
    --------------------------------------------------------- */
 
 @media (min-width: 1401px) {
-  #brobots-page-frame .desktop-secondary-panel {
+  .prototype-page-frame[data-game-frame-page] .desktop-secondary-panel {
     top: 7.75%;
     bottom: 7.75%;
   }
@@ -19252,7 +19290,7 @@ body.is-media-lightbox-open {
   This MUST remain outside the desktop query: when PC -> tablet crosses the
   breakpoint, the outgoing popout is still alive for its reverse morph.
 */
-#brobots-page-frame.is-layout-transitioning
+.prototype-page-frame[data-game-frame-page].is-layout-transitioning
 .desktop-secondary-panel {
   top: 7.75% !important;
   bottom: 7.75% !important;
@@ -19269,12 +19307,12 @@ body.is-media-lightbox-open {
     Mobile currently uses the generic gallery rather than the 17-piece
     raster frame.
   */
-  #brobots-page-frame .prototype-page-frame-shell {
+  .prototype-page-frame[data-game-frame-page] .prototype-page-frame-shell {
     opacity: 1;
   }
 
 
-  #brobots-page-frame .prototype-page-frame-content {
+  .prototype-page-frame[data-game-frame-page] .prototype-page-frame-content {
     top:
       var(--page-content-top, 48px);
 
@@ -19289,8 +19327,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area > .media-browser {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > .media-browser {
     position: static;
 
     width: auto !important;
@@ -19307,7 +19345,7 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame .brobots-media-zone {
+  .prototype-page-frame[data-game-frame-page] .game-media-zone {
     position: static;
 
     display: contents;
@@ -19316,7 +19354,7 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame .media-viewer {
+  .prototype-page-frame[data-game-frame-page] .media-viewer {
     width:
       min(
         var(--media-composition-width),
@@ -19337,8 +19375,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-media-zone--hero
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
   .media-viewer-stage {
     position: absolute;
 
@@ -19349,11 +19387,11 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-media-zone--hero
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
   .media-viewer-image,
-  #brobots-page-frame
-  .brobots-media-zone--hero
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
   .media-viewer-video {
     position: static;
 
@@ -19366,8 +19404,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-media-zone--hero
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
   .media-viewer-youtube {
     position: static;
 
@@ -19378,7 +19416,7 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame .media-strip {
+  .prototype-page-frame[data-game-frame-page] .media-strip {
     width:
       var(--media-composition-width)
       !important;
@@ -19404,13 +19442,13 @@ body.is-media-lightbox-open {
     morph. The media browser is allowed to follow its normal mobile rules
     immediately instead of being rebuilt as the old tablet composition.
   */
-  #brobots-page-frame.is-mobile-collapse-hold
+  .prototype-page-frame[data-game-frame-page].is-mobile-collapse-hold
   .prototype-page-frame-shell {
     opacity: 0 !important;
   }
 
 
-  #brobots-page-frame.is-mobile-collapse-hold
+  .prototype-page-frame[data-game-frame-page].is-mobile-collapse-hold
   .prototype-page-frame-content {
     top:
       clamp(
@@ -19473,7 +19511,7 @@ body.is-media-lightbox-open {
 
 @media (min-width: 841px) and (max-width: 1400px) {
 
-  #brobots-page-frame .brobots-inner-frame-area {
+  .prototype-page-frame[data-game-frame-page] .game-frame-area {
     --brobots-tablet-info-split-ratio:
       0.30;
 
@@ -19607,8 +19645,8 @@ body.is-media-lightbox-open {
   /*
     The actual raster pieces consume the SAME progress.
   */
-  #brobots-page-frame
-  .brobots-inner-frame-area > [data-brobots-frame-piece] {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > [data-game-frame-piece] {
     --brobots-piece-live-w:
       calc(
         var(--brobots-piece-base-w)
@@ -19637,8 +19675,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area > [data-brobots-frame-stretcher] {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > [data-game-frame-stretcher] {
     --brobots-stretcher-live-w:
       calc(
         var(--brobots-stretcher-base-w)
@@ -19672,14 +19710,14 @@ body.is-media-lightbox-open {
       horizontal stretchers fill between current left/right anchors
       vertical stretchers fill between current top/bottom anchors
   */
-  #brobots-page-frame
-  .brobots-inner-frame-stretcher--hero-top,
-  #brobots-page-frame
-  .brobots-inner-frame-stretcher--hero-bottom,
-  #brobots-page-frame
-  .brobots-inner-frame-stretcher--thumb-top,
-  #brobots-page-frame
-  .brobots-inner-frame-stretcher--thumb-bottom {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-stretcher--hero-top,
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-stretcher--hero-bottom,
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-stretcher--thumb-top,
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-stretcher--thumb-bottom {
     width: auto !important;
   }
 
@@ -19693,16 +19731,16 @@ body.is-media-lightbox-open {
     them zero-height (they have no bottom anchor/content), which is why the
     hero left/right rails disappeared in v52.
   */
-  #brobots-page-frame
-  .brobots-inner-frame-stretcher--thumb-left,
-  #brobots-page-frame
-  .brobots-inner-frame-stretcher--thumb-right {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-stretcher--thumb-left,
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-stretcher--thumb-right {
     height: auto !important;
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-stretcher--hero-left {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-stretcher--hero-left {
     height:
       calc(
         var(--brobots-hero-end-y)
@@ -19714,8 +19752,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-stretcher--hero-right {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-stretcher--hero-right {
     height:
       calc(
         var(--brobots-hero-end-y)
@@ -19727,8 +19765,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry {
     --brobots-tablet-frame-progress: 1;
   }
 
@@ -19768,8 +19806,8 @@ body.is-media-lightbox-open {
 
     clamp() keeps the value valid through the full transition.
   */
-  #brobots-page-frame
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--thumbs
   .media-strip {
     opacity:
       clamp(
@@ -19814,9 +19852,9 @@ body.is-media-lightbox-open {
     Once the frame reaches its info state, the hidden thumbnail UI should
     not remain interactive underneath the future info surface.
   */
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-media-zone--thumbs
   .media-strip {
     pointer-events: none;
   }
@@ -19853,28 +19891,28 @@ body.is-media-lightbox-open {
 
 @media (min-width: 841px) and (max-width: 1400px) {
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry
-  .brobots-media-zone--thumbs,
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-media-zone--thumbs,
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-media-zone--thumbs
   .media-strip,
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-media-zone--thumbs
   .media-thumbnails,
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-media-zone--thumbs
   .media-thumbnail,
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-media-zone--thumbs
   .media-arrow {
     pointer-events: none !important;
   }
@@ -19885,20 +19923,20 @@ body.is-media-lightbox-open {
    BROBOTS TABLET INFO — STEP 3: INFO SURFACE HANDOFF
    =========================================================
 
-   The tablet info host lives INSIDE .brobots-inner-frame-area, so it can
+   The tablet info host lives INSIDE .game-frame-area, so it can
    use the exact same continuously-derived geometry as the raster frame.
 
    No desktop panel is moved or restyled.
    ========================================================= */
 
-#brobots-page-frame .brobots-tablet-info-host {
+.prototype-page-frame[data-game-frame-page] .game-tablet-info-host {
   display: none;
 }
 
 
 @media (min-width: 841px) and (max-width: 1400px) {
 
-  #brobots-page-frame .brobots-tablet-info-host {
+  .prototype-page-frame[data-game-frame-page] .game-tablet-info-host {
     position: absolute;
 
     /*
@@ -19993,9 +20031,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry
-  .brobots-tablet-info-host {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-tablet-info-host {
     pointer-events: auto;
   }
 
@@ -20005,8 +20043,8 @@ body.is-media-lightbox-open {
     extra glass/decorative shell responsibilities. The Brobots raster frame
     is now the physical container.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .game-info {
     position: absolute;
     inset: 0;
@@ -20028,11 +20066,11 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .game-info-background,
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .game-info-layer {
     /*
       Keep the existing decorative background treatment available, but
@@ -20042,8 +20080,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .game-info-surface {
     width: 100%;
     height: 100%;
@@ -20060,8 +20098,8 @@ body.is-media-lightbox-open {
     whether the highlights fit. This is only a tablet-specific sizing nudge,
     not a second info layout.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .game-info-logo {
     max-height:
       clamp(
@@ -20078,7 +20116,7 @@ body.is-media-lightbox-open {
 /* Outside tablet mode the cloned surface does not participate at all. */
 @media (max-width: 840px),
        (min-width: 1401px) {
-  #brobots-page-frame .brobots-tablet-info-host {
+  .prototype-page-frame[data-game-frame-page] .game-tablet-info-host {
     display: none !important;
   }
 }
@@ -20098,8 +20136,8 @@ body.is-media-lightbox-open {
     These selectors only adapt the PRESENTATION of that same collapsed
     state to the tablet cavity; no separate culling decision is invented.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .game-info-surface.is-features-collapsed
   .game-info-features {
     opacity: 0;
@@ -20111,8 +20149,8 @@ body.is-media-lightbox-open {
     Once the shared function collapses the middle feature zone, let the
     remaining top/bottom zones redistribute naturally through the cavity.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .game-info-surface.is-features-collapsed {
     grid-template-rows:
       auto
@@ -20132,9 +20170,9 @@ body.is-media-lightbox-open {
      Reuse the SAME four-layer glass stack as the PC popout.
      ------------------------------------------------------- */
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack {
     position: absolute;
     inset:
       clamp(8px, 1.1cqh, 14px)
@@ -20178,9 +20216,9 @@ body.is-media-lightbox-open {
     Inside the tablet host the stack is controlled entirely by tablet frame
     progress instead.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer {
     display: block;
 
@@ -20199,9 +20237,9 @@ body.is-media-lightbox-open {
     the same asymmetric layered language while avoiding a literal copy of
     the narrow desktop wedge.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--1 {
     inset:
       1.5%
@@ -20213,9 +20251,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--2 {
     inset:
       6%
@@ -20227,9 +20265,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--3 {
     inset:
       11%
@@ -20241,9 +20279,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--4 {
     left: 2%;
     right: 17%;
@@ -20258,8 +20296,8 @@ body.is-media-lightbox-open {
     Keep the atmospheric Brobots background image in layer 1, but make it
     more restrained here because the tablet cavity is much larger.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .brobots-popout-layer-image {
     opacity: 0.22;
 
@@ -20276,8 +20314,8 @@ body.is-media-lightbox-open {
   /*
     Content remains above the glass stack.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .game-info {
     z-index: 2;
   }
@@ -20298,11 +20336,11 @@ body.is-media-lightbox-open {
 
     Re-enable the cloned image specifically inside the tablet host.
   */
-  #brobots-page-frame:not(.is-layout-transitioning)
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]:not(.is-layout-transitioning)
+  .game-tablet-info-host
   .etherian-popout-layer-image,
-  #brobots-page-frame:not(.is-layout-transitioning)
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]:not(.is-layout-transitioning)
+  .game-tablet-info-host
   .brobots-popout-layer-image {
     display: block !important;
 
@@ -20375,9 +20413,9 @@ body.is-media-lightbox-open {
     The fills remain translucent; opacity:1 just stops stacking an extra
     whole-element transparency on top of them.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer {
     opacity: 1 !important;
 
@@ -20419,9 +20457,9 @@ body.is-media-lightbox-open {
     Give each sheet a slightly different radius so the layered stack feels
     intentional instead of like four identical rectangles.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--1 {
     border-radius:
       clamp(
@@ -20432,9 +20470,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--2 {
     border-radius:
       clamp(
@@ -20445,9 +20483,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--3 {
     border-radius:
       clamp(
@@ -20458,9 +20496,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--4 {
     border-radius:
       clamp(
@@ -20475,9 +20513,9 @@ body.is-media-lightbox-open {
     Slightly stronger pane fills for this larger tablet cavity.
     These intentionally preserve the existing Brobots glass language.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--1 {
     background:
       linear-gradient(
@@ -20492,9 +20530,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--2 {
     background:
       linear-gradient(
@@ -20505,9 +20543,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--3 {
     background:
       linear-gradient(
@@ -20521,9 +20559,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer--4 {
     background:
       linear-gradient(
@@ -20557,12 +20595,12 @@ body.is-media-lightbox-open {
 
 @media (min-width: 841px) and (max-width: 1400px) {
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack {
     /*
       Do not independently animate opacity on a backdrop-filter container.
-      The parent .brobots-tablet-info-host already performs the reveal.
+      The parent .game-tablet-info-host already performs the reveal.
     */
     opacity: 1 !important;
 
@@ -20582,9 +20620,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer {
     /*
       These are the actual filtered surfaces. Their visual state should
@@ -20609,11 +20647,11 @@ body.is-media-lightbox-open {
     The screenshot is likewise held at its final visual treatment from the
     moment the host begins appearing. Only the host itself fades.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .etherian-popout-layer-image,
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .brobots-popout-layer-image {
     transition: none !important;
 
@@ -20649,9 +20687,9 @@ body.is-media-lightbox-open {
 
 @media (min-width: 841px) and (max-width: 1400px) {
 
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
   .etherian-popout-glass-layer {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -20673,14 +20711,14 @@ body.is-media-lightbox-open {
     useful as a test, but can themselves encourage Chrome to promote/rebuild
     layers while resizing.
   */
-  #brobots-page-frame
-  .brobots-tablet-info-host
-  .brobots-tablet-glass-stack,
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack,
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .etherian-popout-layer-image,
-  #brobots-page-frame
-  .brobots-tablet-info-host
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
   .brobots-popout-layer-image {
     transform: none !important;
     backface-visibility: visible !important;
@@ -20694,7 +20732,7 @@ body.is-media-lightbox-open {
    Logo + "Scroll for more" replaces thumbnail rail
    ========================================================= */
 
-#brobots-page-frame .brobots-tablet-landing-identity {
+.prototype-page-frame[data-game-frame-page] .game-tablet-landing-identity {
   display: none;
 }
 
@@ -20705,8 +20743,8 @@ body.is-media-lightbox-open {
     The thumbnail area remains part of the physical frame geometry, but its
     CONTENT is no longer shown in the normal tablet landing state.
   */
-  #brobots-page-frame
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--thumbs
   .media-strip {
     opacity: 0 !important;
     pointer-events: none !important;
@@ -20719,8 +20757,8 @@ body.is-media-lightbox-open {
     Identity block occupies the lower frame aperture in the collapsed
     tablet state.
   */
-  #brobots-page-frame
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-identity {
     position: absolute;
 
     left:
@@ -20807,9 +20845,9 @@ body.is-media-lightbox-open {
     Once info mode is active, the landing identity is visually gone and
     should no longer intercept input.
   */
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-tablet-landing-identity {
     pointer-events: none;
   }
 
@@ -20818,8 +20856,8 @@ body.is-media-lightbox-open {
     Reuse the authored Brobots logo. Keep it bold enough to immediately
     identify the page even when the current hero screenshot is ambiguous.
   */
-  #brobots-page-frame
-  .brobots-tablet-landing-logo {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-logo {
     /*
       Keep the larger visual weight from v65, but size it against the
       ACTUAL lower landing aperture rather than the full Brobots frame.
@@ -20860,8 +20898,8 @@ body.is-media-lightbox-open {
     The lower identity area is a hard visual aperture: nothing in the
     landing treatment should spill across the Brobots raster border.
   */
-  #brobots-page-frame
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-identity {
     overflow: hidden;
   }
 
@@ -20870,8 +20908,8 @@ body.is-media-lightbox-open {
     Simple, readable interaction cue.
     No heavy card around it: the logo is the identity, this is just the hint.
   */
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue {
     display: inline-flex;
     flex-direction: column;
 
@@ -20917,8 +20955,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue-text {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue-text {
     font-size:
       clamp(
         11px,
@@ -20939,8 +20977,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue-arrow {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue-arrow {
     display: block;
 
     color:
@@ -20959,17 +20997,17 @@ body.is-media-lightbox-open {
     line-height: 0.8;
 
     animation:
-      brobots-tablet-scroll-cue-bob
+      game-tablet-scroll-cue-bob
       1.65s
       ease-in-out
       infinite;
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue:hover,
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue:focus-visible {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue:hover,
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue:focus-visible {
     color:
       rgba(
         255,
@@ -20980,8 +21018,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue:focus-visible {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue:focus-visible {
     outline:
       2px solid
       rgba(
@@ -20996,7 +21034,7 @@ body.is-media-lightbox-open {
 }
 
 
-@keyframes brobots-tablet-scroll-cue-bob {
+@keyframes game-tablet-scroll-cue-bob {
   0%,
   100% {
     transform:
@@ -21011,8 +21049,8 @@ body.is-media-lightbox-open {
 
 
 @media (prefers-reduced-motion: reduce) {
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue-arrow {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue-arrow {
     animation: none;
   }
 }
@@ -21035,8 +21073,8 @@ body.is-media-lightbox-open {
 
 @media (min-width: 841px) and (max-width: 1400px) {
 
-  #brobots-page-frame
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-identity {
     container-type: size;
     container-name: brobots-tablet-landing;
 
@@ -21066,13 +21104,13 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-landing-logo {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-logo {
     /*
       Width is primarily driven by the landing aperture, while max-height
       gives the cue guaranteed proportional breathing room.
 
-      Because cqw/cqh now resolve against .brobots-tablet-landing-identity,
+      Because cqw/cqh now resolve against .game-tablet-landing-identity,
       this stays centered and scales continuously with the actual panel.
     */
     width:
@@ -21097,8 +21135,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue {
     /*
       Cue sizing now follows the SAME lower aperture as the logo.
       Remove fixed clamp minimums that made it look detached at short sizes.
@@ -21124,8 +21162,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue-text {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue-text {
     font-size:
       min(
         5.2cqh,
@@ -21140,8 +21178,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue-arrow {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue-arrow {
     font-size:
       min(
         9cqh,
@@ -21171,8 +21209,8 @@ body.is-media-lightbox-open {
 
 @media (min-width: 841px) and (max-width: 1400px) {
 
-  #brobots-page-frame
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-identity {
     /*
       One plain centered column. No nested responsive reservation math.
     */
@@ -21205,8 +21243,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-landing-logo {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-logo {
     /*
       Large like the good v65 proportion, but bounded by BOTH dimensions of
       the actual lower aperture.
@@ -21238,8 +21276,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue {
     /*
       Keep the cue visually attached to the logo, but preserve readability
       instead of shrinking it toward illegibility on short windows.
@@ -21267,8 +21305,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue-text {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue-text {
     font-size:
       clamp(
         11px,
@@ -21284,8 +21322,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue-arrow {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue-arrow {
     font-size:
       clamp(
         18px,
@@ -21317,8 +21355,8 @@ body.is-media-lightbox-open {
 
 @media (min-width: 841px) and (max-width: 1400px) {
 
-  #brobots-page-frame
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-identity {
     /*
       Do NOT fade the whole group. The logo and cue now have separate exits.
     */
@@ -21330,8 +21368,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-tablet-landing-logo {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-logo {
     /*
       Crucial: this cap depends on the viewport, not on the live lower
       aperture height. Opening the info region therefore cannot make the
@@ -21412,8 +21450,8 @@ body.is-media-lightbox-open {
   /*
     Keep the cue where it is; only fade it away.
   */
-  #brobots-page-frame
-  .brobots-tablet-scroll-cue {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue {
     opacity:
       clamp(
         0,
@@ -21439,9 +21477,9 @@ body.is-media-lightbox-open {
     Once the info state has been selected, none of the old landing controls
     should remain interactive while visually leaving.
   */
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-info-geometry
-  .brobots-tablet-scroll-cue {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-tablet-scroll-cue {
     pointer-events: none;
   }
 }
@@ -21461,8 +21499,8 @@ body.is-media-lightbox-open {
    ========================================================= */
 
 @media (max-width: 840px) {
-  #brobots-page-frame.is-mobile-collapse-hold
-  .brobots-inner-frame-area > .media-browser {
+  .prototype-page-frame[data-game-frame-page].is-mobile-collapse-hold
+  .game-frame-area > .media-browser {
     display: none !important;
   }
 }
@@ -21494,8 +21532,8 @@ body.is-media-lightbox-open {
 
 @media (min-width: 841px) and (max-width: 1400px) {
 
-  #brobots-page-frame
-  .brobots-media-zone--hero
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
   .media-hero-navigation {
     position: absolute;
     z-index: 2;
@@ -21512,7 +21550,7 @@ body.is-media-lightbox-open {
      Invisible side hit areas + proximity glow
      ------------------------------------------------------- */
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow {
     position: absolute;
 
@@ -21560,7 +21598,7 @@ body.is-media-lightbox-open {
     It uses the page accent variable, so Brobots is gold now and future game
     pages can inherit their own theme without a new color rule.
   */
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow::before {
     content: "";
 
@@ -21576,13 +21614,13 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow--previous {
     left: 0;
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow--previous::before {
     background:
       linear-gradient(
@@ -21596,13 +21634,13 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow--next {
     right: 0;
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow--next::before {
     background:
       linear-gradient(
@@ -21616,28 +21654,28 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow:hover::before,
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow:focus-visible::before {
     opacity: 1;
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow:focus-visible {
     outline: none;
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow:disabled {
     cursor: default;
     pointer-events: none;
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-arrow:disabled::before {
     opacity: 0;
   }
@@ -21647,7 +21685,7 @@ body.is-media-lightbox-open {
      Minimal pagination dots
      ------------------------------------------------------- */
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-dots {
     position: absolute;
 
@@ -21715,10 +21753,10 @@ body.is-media-lightbox-open {
     enters the hero. focus-within preserves keyboard access once a dot is
     focused.
   */
-  #brobots-page-frame
-  .brobots-media-zone--hero:hover
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero:hover
   .media-hero-dots,
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-navigation:has(:focus-visible)
   .media-hero-dots {
     opacity: 1;
@@ -21726,7 +21764,7 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-dot {
     width:
       clamp(
@@ -21774,9 +21812,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-dot:hover,
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-dot:focus-visible {
     border-color:
       rgba(
@@ -21795,7 +21833,7 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-dot:focus-visible {
     outline:
       1px solid
@@ -21808,7 +21846,7 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
+  .prototype-page-frame[data-game-frame-page]
   .media-hero-dot.is-selected {
     opacity: 1;
 
@@ -21847,8 +21885,8 @@ body.is-media-lightbox-open {
    and navigation overlay are not faded with the image/video.
 */
 @media (min-width: 841px) and (max-width: 1400px) {
-  #brobots-page-frame
-  .brobots-media-zone--hero
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
   .media-viewer-stage.is-ready {
     opacity: 0.8;
 
@@ -21857,8 +21895,8 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-media-zone--hero:hover
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero:hover
   .media-viewer-stage.is-ready {
     opacity: 1;
   }
@@ -21922,7 +21960,7 @@ body.is-media-lightbox-open {
    for unusual aspect ratios instead of relying on a guessed pixel offset.
    ========================================================= */
 
-#brobots-page-frame .brobots-inner-frame-area {
+.prototype-page-frame[data-game-frame-page] .game-frame-area {
   --brobots-breakpoint-thumb-shift-y: -180px;
   --brobots-breakpoint-handoff-duration: 1240ms;
 }
@@ -21933,9 +21971,9 @@ body.is-media-lightbox-open {
    ------------------------- */
 
 @media (min-width: 841px) and (max-width: 1400px) {
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-entering
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-entering
+  .game-media-zone--thumbs
   .media-strip {
     opacity: 1 !important;
 
@@ -21949,18 +21987,18 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-entering
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-entering
+  .game-tablet-landing-identity {
     opacity: 0 !important;
     transition: none !important;
     pointer-events: none !important;
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-entering.is-tablet-breakpoint-thumb-active
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-entering.is-tablet-breakpoint-thumb-active
+  .game-media-zone--thumbs
   .media-strip {
     opacity: 0 !important;
 
@@ -21978,9 +22016,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-entering.is-tablet-breakpoint-handoff-active
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-entering.is-tablet-breakpoint-handoff-active
+  .game-tablet-landing-identity {
     opacity: 1 !important;
 
     transition:
@@ -21999,9 +22037,9 @@ body.is-media-lightbox-open {
     Normally it is display:none outside tablet mode, so this transient class
     supplies the same lower-aperture placement while the handoff runs.
   */
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-landing-identity {
     position: absolute;
 
     left:
@@ -22067,9 +22105,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-landing-logo {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-landing-logo {
     display: block;
 
     width:
@@ -22097,9 +22135,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-scroll-cue {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-scroll-cue {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -22149,9 +22187,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-scroll-cue-text {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-scroll-cue-text {
     font-size:
       var(
         --brobots-breakpoint-cue-text-size,
@@ -22167,9 +22205,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-scroll-cue-arrow {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-scroll-cue-arrow {
     display: block;
 
     color:
@@ -22185,9 +22223,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-media-zone--thumbs
   .media-strip {
     opacity: 0 !important;
 
@@ -22203,9 +22241,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving.is-tablet-breakpoint-handoff-active
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving.is-tablet-breakpoint-handoff-active
+  .game-tablet-landing-identity {
     opacity: 0 !important;
 
     transition:
@@ -22213,9 +22251,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving.is-tablet-breakpoint-thumb-active
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving.is-tablet-breakpoint-thumb-active
+  .game-media-zone--thumbs
   .media-strip {
     opacity: 1 !important;
 
@@ -22233,23 +22271,23 @@ body.is-media-lightbox-open {
 
 
 @media (prefers-reduced-motion: reduce) {
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-entering
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-entering
+  .game-media-zone--thumbs
   .media-strip,
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-entering
-  .brobots-tablet-landing-identity,
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-entering
+  .game-tablet-landing-identity,
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-media-zone--thumbs
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-media-zone--thumbs
   .media-strip,
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-landing-identity {
     transition-duration: 1ms !important;
   }
 }
@@ -22263,21 +22301,21 @@ body.is-media-lightbox-open {
   upward into the hero aperture. Keep that moving strip BEHIND the hero
   media instead of allowing its later DOM position to paint on top.
 */
-#brobots-page-frame
-.brobots-inner-frame-area.is-tablet-breakpoint-entering
-.brobots-media-zone--hero,
-#brobots-page-frame
-.brobots-inner-frame-area.is-tablet-breakpoint-leaving
-.brobots-media-zone--hero {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area.is-tablet-breakpoint-entering
+.game-media-zone--hero,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area.is-tablet-breakpoint-leaving
+.game-media-zone--hero {
   z-index: 2;
 }
 
-#brobots-page-frame
-.brobots-inner-frame-area.is-tablet-breakpoint-entering
-.brobots-media-zone--thumbs,
-#brobots-page-frame
-.brobots-inner-frame-area.is-tablet-breakpoint-leaving
-.brobots-media-zone--thumbs {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area.is-tablet-breakpoint-entering
+.game-media-zone--thumbs,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area.is-tablet-breakpoint-leaving
+.game-media-zone--thumbs {
   z-index: 1;
 }
 
@@ -22288,8 +22326,8 @@ body.is-media-lightbox-open {
   viewer/frame itself, so raster chrome and controls remain full strength.
 */
 @media (min-width: 1401px) {
-  #brobots-page-frame
-  .brobots-media-zone--hero
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
   .media-viewer-stage.is-ready {
     opacity: 0.8;
 
@@ -22297,8 +22335,8 @@ body.is-media-lightbox-open {
       opacity 220ms ease;
   }
 
-  #brobots-page-frame
-  .brobots-media-zone--hero:hover
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero:hover
   .media-viewer-stage.is-ready {
     opacity: 1;
   }
@@ -22321,9 +22359,9 @@ body.is-media-lightbox-open {
 
 @media (min-width: 1401px) {
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-landing-identity {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-landing-identity {
     container-type: size;
     container-name: brobots-tablet-landing;
 
@@ -22354,9 +22392,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-landing-logo {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-landing-logo {
     display: block;
 
     width:
@@ -22391,9 +22429,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-scroll-cue {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-scroll-cue {
     gap:
       clamp(
         2px,
@@ -22415,9 +22453,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-scroll-cue-text {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-scroll-cue-text {
     font-size:
       clamp(
         11px,
@@ -22432,9 +22470,9 @@ body.is-media-lightbox-open {
   }
 
 
-  #brobots-page-frame
-  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
-  .brobots-tablet-scroll-cue-arrow {
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-breakpoint-leaving
+  .game-tablet-scroll-cue-arrow {
     font-size:
       clamp(
         18px,
@@ -22474,7 +22512,7 @@ body.is-media-lightbox-open {
    can animate cleanly back to 0 after crossing into desktop.
    ========================================================= */
 
-#brobots-page-frame .brobots-inner-frame-area {
+.prototype-page-frame[data-game-frame-page] .game-frame-area {
   --brobots-tablet-info-split-ratio:
     0.30;
 
@@ -22600,8 +22638,8 @@ body.is-media-lightbox-open {
   prevents this state from being entered on desktop; this simply lets a state
   that ALREADY EXISTS survive the breakpoint long enough to animate out.
 */
-#brobots-page-frame
-.brobots-inner-frame-area.is-tablet-info-geometry {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area.is-tablet-info-geometry {
   --brobots-tablet-frame-progress: 1;
 }
 
@@ -22611,8 +22649,8 @@ body.is-media-lightbox-open {
   JS-authored aliases. Keep their interpolation available outside the tablet
   media query for the same exit-only reason.
 */
-#brobots-page-frame
-.brobots-inner-frame-area > [data-brobots-frame-piece] {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area > [data-game-frame-piece] {
   --brobots-piece-live-w:
     calc(
       var(--brobots-piece-base-w)
@@ -22641,8 +22679,8 @@ body.is-media-lightbox-open {
 }
 
 
-#brobots-page-frame
-.brobots-inner-frame-area > [data-brobots-frame-stretcher] {
+.prototype-page-frame[data-game-frame-page]
+.game-frame-area > [data-game-frame-stretcher] {
   --brobots-stretcher-live-w:
     calc(
       var(--brobots-stretcher-base-w)
@@ -22668,4 +22706,286 @@ body.is-media-lightbox-open {
       *
       var(--brobots-tablet-frame-progress)
     );
+}
+
+
+/* =========================================================
+   SHARED TABLET GLASS — BROBOTS INFO FORMATTING PRESERVED
+   =========================================================
+
+   The information layout above now comes from the real Brobots rules.
+   This is only the glass/decorative layer that was confirmed working in
+   the previous pass.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack {
+    position: absolute !important;
+    inset: 0 !important;
+
+    z-index: 1 !important;
+
+    display: block !important;
+    overflow: hidden !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+
+    pointer-events: none !important;
+
+    transform: none !important;
+    transition: none !important;
+    clip-path: none !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer {
+    display: block !important;
+    position: absolute !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+
+    overflow: hidden !important;
+
+    border:
+      1px solid
+      rgba(255,255,255,0.055) !important;
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255,255,255,0.035),
+      0 8px 28px
+      rgba(0,0,0,0.10) !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    transform: none !important;
+    transition: none !important;
+    will-change: auto !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--1 {
+    inset: 1.5% 1.8% 4.5% 0 !important;
+
+    border-radius:
+      clamp(24px, 3.1cqw, 40px) !important;
+
+    background:
+      linear-gradient(
+        112deg,
+        rgba(255,255,255,0.075),
+        rgba(var(--page-accent-rgb),0.105) 52%,
+        rgba(22,32,40,0.18)
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--2 {
+    inset: 6% 6.5% 8% 1.5% !important;
+
+    border-radius:
+      clamp(20px, 2.7cqw, 36px) !important;
+
+    background:
+      linear-gradient(
+        105deg,
+        rgba(80,105,120,0.20),
+        rgba(255,255,255,0.055)
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--3 {
+    inset: 11% 12.5% 13% 3% !important;
+
+    border-radius:
+      clamp(18px, 2.35cqw, 32px) !important;
+
+    background:
+      linear-gradient(
+        115deg,
+        rgba(var(--page-accent-rgb),0.09),
+        rgba(90,105,120,0.18)
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--4 {
+    left: 2% !important;
+    right: 17% !important;
+    top: 52% !important;
+    bottom: 1% !important;
+
+    border-radius:
+      clamp(16px, 2.1cqw, 28px) !important;
+
+    background:
+      linear-gradient(
+        108deg,
+        rgba(255,255,255,0.065),
+        rgba(var(--page-accent-rgb),0.12)
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]:not(.is-layout-transitioning)
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-layer-image {
+    display: block !important;
+
+    position: absolute !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    z-index: 0 !important;
+
+    object-fit: cover !important;
+    object-position: center !important;
+
+    opacity: 0.58 !important;
+
+    filter:
+      saturate(0.92)
+      contrast(0.96)
+      brightness(0.82)
+      !important;
+
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,0.96) 30%,
+        rgba(0,0,0,0.72) 48%,
+        rgba(0,0,0,0.30) 66%,
+        rgba(0,0,0,0) 84%
+      ) !important;
+
+    mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,0.96) 30%,
+        rgba(0,0,0,0.72) 48%,
+        rgba(0,0,0,0.30) 66%,
+        rgba(0,0,0,0) 84%
+      ) !important;
+
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
+
+    -webkit-mask-size: 100% 100% !important;
+    mask-size: 100% 100% !important;
+  }
+
+}
+
+
+/* =========================================================
+   SHARED TABLET GLASS — TOP-RIGHT MASKED SCREENSHOT
+   =========================================================
+
+   Each game's authored desktop glass stack already contains its own image.
+   The tablet controller clones that stack, so the image source stays entirely
+   page-driven. The responsive "hide popout image" rules above are now scoped
+   to .desktop-secondary-panel only, allowing the tablet clone to participate.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--1 {
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-layer-image {
+    display: block;
+
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    max-width: none;
+    max-height: none;
+
+    z-index: 0;
+
+    object-fit: cover;
+    object-position: right top;
+
+    opacity: 0.58;
+
+    filter:
+      saturate(0.92)
+      contrast(0.96)
+      brightness(0.82);
+
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,0.96) 30%,
+        rgba(0,0,0,0.72) 48%,
+        rgba(0,0,0,0.30) 66%,
+        rgba(0,0,0,0) 84%
+      );
+
+    mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,0.96) 30%,
+        rgba(0,0,0,0.72) 48%,
+        rgba(0,0,0,0.30) 66%,
+        rgba(0,0,0,0) 84%
+      );
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+
+    pointer-events: none;
+  }
+
 }
