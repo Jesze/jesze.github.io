@@ -19387,15 +19387,22 @@ body.is-media-lightbox-open {
 
 
 /* ---------------------------------------------------------
-   Outgoing tablet/desktop -> mobile handoff hold
+   Outgoing tablet/desktop -> mobile handoff hold — simplified
    --------------------------------------------------------- */
 
 @media (max-width: 840px) {
 
   /*
-    The real page stays visible briefly while it crossfades into the fake
-    hamburger-collapse shape. Freeze its pre-mobile internal composition so
-    mobile CSS cannot pop/reflow before visual ownership transfers.
+    The old hold block reconstructed the entire desktop/tablet media browser
+    (hero + thumbnail rail) for a few frames while ownership transferred to
+    the mobile collapse animation.
+
+    That media presentation is no longer part of the tablet landing design,
+    so preserving it here only caused obsolete UI to flash before fading.
+
+    Keep ONLY the outer frame/content geometry hold required by the page
+    morph. The media browser is allowed to follow its normal mobile rules
+    immediately instead of being rebuilt as the old tablet composition.
   */
   #brobots-page-frame.is-mobile-collapse-hold
   .prototype-page-frame-shell {
@@ -19433,92 +19440,484 @@ body.is-media-lightbox-open {
         12px
       ) !important;
   }
+}
 
 
-  #brobots-page-frame.is-mobile-collapse-hold
-  .brobots-inner-frame-area > .media-browser {
-    position: absolute !important;
+/* =========================================================
+   BROBOTS TABLET INFO — CLEAN STEP 1 / VIRTUAL RESIZE
+   =========================================================
 
-    inset: 0 !important;
+   IMPORTANT:
+   Desktop is intentionally untouched by this entire block.
 
-    width: 100% !important;
-    height: 100% !important;
+   Normal frame sizing already works perfectly when the browser is resized:
+     scale = min(frame width / native width, frame height / native height)
 
-    display: block !important;
+   Tablet-info simply feeds that SAME idea a deliberate virtual height:
+     scale = min(
+       frame width / native full-frame width,
+       30% frame height / native HERO height
+     )
 
-    margin: 0 !important;
-    padding: 0 !important;
+   One 0->1 progress value blends from the proven normal resize result to
+   that virtual-resize result. Every fixed piece, every stretcher thickness,
+   every stretcher anchor and the separator use that SAME progress.
+   ========================================================= */
 
-    overflow: visible !important;
-
-    pointer-events: none !important;
-  }
-
-
-  #brobots-page-frame.is-mobile-collapse-hold
-  .brobots-media-zone {
-    position: absolute !important;
-
-    display: grid !important;
-    place-items: center !important;
-
-    container-type: size !important;
-
-    min-width: 0;
-    min-height: 0;
-  }
+@property --brobots-tablet-frame-progress {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
 
 
-  #brobots-page-frame.is-mobile-collapse-hold
-  .brobots-media-zone--hero {
-    left:
-      var(
-        --brobots-hero-left-rail-w,
-        0px
-      ) !important;
+@media (min-width: 841px) and (max-width: 1400px) {
 
-    right:
-      var(
-        --brobots-hero-right-rail-w,
-        0px
-      ) !important;
+  #brobots-page-frame .brobots-inner-frame-area {
+    --brobots-tablet-info-split-ratio:
+      0.30;
 
-    top:
-      var(
-        --brobots-hero-top-bar-h,
-        0px
-      ) !important;
-
-    bottom:
+    --brobots-tablet-info-hero-end-y:
       calc(
-        100%
-        -
-        var(--brobots-hero-end-y)
-        +
+        100cqh
+        *
         var(
-          --brobots-hero-bottom-bar-h,
-          0px
+          --brobots-tablet-info-split-ratio
         )
-      ) !important;
+      );
 
+    --brobots-tablet-info-thumb-start-y:
+      calc(
+        var(--brobots-tablet-info-hero-end-y)
+        +
+        max(
+          var(
+            --brobots-separator-h-info,
+            0px
+          ),
+          2px
+        )
+      );
+
+    --brobots-tablet-frame-progress:
+      0;
+
+    transition:
+      --brobots-tablet-frame-progress
+        720ms
+        cubic-bezier(0.18, 0.78, 0.22, 1);
+
+
+    /*
+      Split position follows the same master progress as raster scale.
+    */
+    --brobots-hero-end-live-y:
+      calc(
+        var(--brobots-hero-end-base-y)
+        +
+        (
+          var(--brobots-tablet-info-hero-end-y)
+          -
+          var(--brobots-hero-end-base-y)
+        )
+        *
+        var(--brobots-tablet-frame-progress)
+      );
+
+    --brobots-thumb-start-live-y:
+      calc(
+        var(--brobots-thumb-start-base-y)
+        +
+        (
+          var(--brobots-tablet-info-thumb-start-y)
+          -
+          var(--brobots-thumb-start-base-y)
+        )
+        *
+        var(--brobots-tablet-frame-progress)
+      );
+
+
+    /* Fixed-piece anchor dimensions. */
+    --brobots-hero-top-left-w-live:
+      calc(var(--brobots-hero-top-left-w-base) + (var(--brobots-hero-top-left-w-info) - var(--brobots-hero-top-left-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-hero-top-left-h-live:
+      calc(var(--brobots-hero-top-left-h-base) + (var(--brobots-hero-top-left-h-info) - var(--brobots-hero-top-left-h-base)) * var(--brobots-tablet-frame-progress));
+
+    --brobots-hero-top-right-w-live:
+      calc(var(--brobots-hero-top-right-w-base) + (var(--brobots-hero-top-right-w-info) - var(--brobots-hero-top-right-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-hero-top-right-h-live:
+      calc(var(--brobots-hero-top-right-h-base) + (var(--brobots-hero-top-right-h-info) - var(--brobots-hero-top-right-h-base)) * var(--brobots-tablet-frame-progress));
+
+    --brobots-hero-bottom-left-w-live:
+      calc(var(--brobots-hero-bottom-left-w-base) + (var(--brobots-hero-bottom-left-w-info) - var(--brobots-hero-bottom-left-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-hero-bottom-left-h-live:
+      calc(var(--brobots-hero-bottom-left-h-base) + (var(--brobots-hero-bottom-left-h-info) - var(--brobots-hero-bottom-left-h-base)) * var(--brobots-tablet-frame-progress));
+
+    --brobots-hero-bottom-right-w-live:
+      calc(var(--brobots-hero-bottom-right-w-base) + (var(--brobots-hero-bottom-right-w-info) - var(--brobots-hero-bottom-right-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-hero-bottom-right-h-live:
+      calc(var(--brobots-hero-bottom-right-h-base) + (var(--brobots-hero-bottom-right-h-info) - var(--brobots-hero-bottom-right-h-base)) * var(--brobots-tablet-frame-progress));
+
+    --brobots-thumb-top-left-w-live:
+      calc(var(--brobots-thumb-top-left-w-base) + (var(--brobots-thumb-top-left-w-info) - var(--brobots-thumb-top-left-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-thumb-top-left-h-live:
+      calc(var(--brobots-thumb-top-left-h-base) + (var(--brobots-thumb-top-left-h-info) - var(--brobots-thumb-top-left-h-base)) * var(--brobots-tablet-frame-progress));
+
+    --brobots-thumb-top-right-w-live:
+      calc(var(--brobots-thumb-top-right-w-base) + (var(--brobots-thumb-top-right-w-info) - var(--brobots-thumb-top-right-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-thumb-top-right-h-live:
+      calc(var(--brobots-thumb-top-right-h-base) + (var(--brobots-thumb-top-right-h-info) - var(--brobots-thumb-top-right-h-base)) * var(--brobots-tablet-frame-progress));
+
+    --brobots-thumb-bottom-left-w-live:
+      calc(var(--brobots-thumb-bottom-left-w-base) + (var(--brobots-thumb-bottom-left-w-info) - var(--brobots-thumb-bottom-left-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-thumb-bottom-left-h-live:
+      calc(var(--brobots-thumb-bottom-left-h-base) + (var(--brobots-thumb-bottom-left-h-info) - var(--brobots-thumb-bottom-left-h-base)) * var(--brobots-tablet-frame-progress));
+
+    --brobots-thumb-bottom-right-w-live:
+      calc(var(--brobots-thumb-bottom-right-w-base) + (var(--brobots-thumb-bottom-right-w-info) - var(--brobots-thumb-bottom-right-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-thumb-bottom-right-h-live:
+      calc(var(--brobots-thumb-bottom-right-h-base) + (var(--brobots-thumb-bottom-right-h-info) - var(--brobots-thumb-bottom-right-h-base)) * var(--brobots-tablet-frame-progress));
+
+
+    /* Aperture / frame thicknesses. */
+    --brobots-hero-left-rail-w-live:
+      calc(var(--brobots-hero-left-rail-w-base) + (var(--brobots-hero-left-rail-w-info) - var(--brobots-hero-left-rail-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-hero-right-rail-w-live:
+      calc(var(--brobots-hero-right-rail-w-base) + (var(--brobots-hero-right-rail-w-info) - var(--brobots-hero-right-rail-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-hero-top-bar-h-live:
+      calc(var(--brobots-hero-top-bar-h-base) + (var(--brobots-hero-top-bar-h-info) - var(--brobots-hero-top-bar-h-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-hero-bottom-bar-h-live:
+      calc(var(--brobots-hero-bottom-bar-h-base) + (var(--brobots-hero-bottom-bar-h-info) - var(--brobots-hero-bottom-bar-h-base)) * var(--brobots-tablet-frame-progress));
+
+    --brobots-thumb-left-rail-w-live:
+      calc(var(--brobots-thumb-left-rail-w-base) + (var(--brobots-thumb-left-rail-w-info) - var(--brobots-thumb-left-rail-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-thumb-right-rail-w-live:
+      calc(var(--brobots-thumb-right-rail-w-base) + (var(--brobots-thumb-right-rail-w-info) - var(--brobots-thumb-right-rail-w-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-thumb-top-bar-h-live:
+      calc(var(--brobots-thumb-top-bar-h-base) + (var(--brobots-thumb-top-bar-h-info) - var(--brobots-thumb-top-bar-h-base)) * var(--brobots-tablet-frame-progress));
+    --brobots-thumb-bottom-bar-h-live:
+      calc(var(--brobots-thumb-bottom-bar-h-base) + (var(--brobots-thumb-bottom-bar-h-info) - var(--brobots-thumb-bottom-bar-h-base)) * var(--brobots-tablet-frame-progress));
+
+    --brobots-separator-h-live:
+      calc(var(--brobots-separator-h-base) + (var(--brobots-separator-h-info) - var(--brobots-separator-h-base)) * var(--brobots-tablet-frame-progress));
+  }
+
+
+  /*
+    The actual raster pieces consume the SAME progress.
+  */
+  #brobots-page-frame
+  .brobots-inner-frame-area > [data-brobots-frame-piece] {
+    --brobots-piece-live-w:
+      calc(
+        var(--brobots-piece-base-w)
+        +
+        (
+          var(--brobots-piece-info-w)
+          -
+          var(--brobots-piece-base-w)
+        )
+        *
+        var(--brobots-tablet-frame-progress)
+      );
+
+    --brobots-piece-live-h:
+      calc(
+        var(--brobots-piece-base-h)
+        +
+        (
+          var(--brobots-piece-info-h)
+          -
+          var(--brobots-piece-base-h)
+        )
+        *
+        var(--brobots-tablet-frame-progress)
+      );
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area > [data-brobots-frame-stretcher] {
+    --brobots-stretcher-live-w:
+      calc(
+        var(--brobots-stretcher-base-w)
+        +
+        (
+          var(--brobots-stretcher-info-w)
+          -
+          var(--brobots-stretcher-base-w)
+        )
+        *
+        var(--brobots-tablet-frame-progress)
+      );
+
+    --brobots-stretcher-live-h:
+      calc(
+        var(--brobots-stretcher-base-h)
+        +
+        (
+          var(--brobots-stretcher-info-h)
+          -
+          var(--brobots-stretcher-base-h)
+        )
+        *
+        var(--brobots-tablet-frame-progress)
+      );
+  }
+
+
+  /*
+    Flexible axes remain the SAME proven v46 formulas:
+      horizontal stretchers fill between current left/right anchors
+      vertical stretchers fill between current top/bottom anchors
+  */
+  #brobots-page-frame
+  .brobots-inner-frame-stretcher--hero-top,
+  #brobots-page-frame
+  .brobots-inner-frame-stretcher--hero-bottom,
+  #brobots-page-frame
+  .brobots-inner-frame-stretcher--thumb-top,
+  #brobots-page-frame
+  .brobots-inner-frame-stretcher--thumb-bottom {
     width: auto !important;
+  }
+
+
+  /*
+    Thumb side stretchers are pinned by BOTH top and bottom, so auto height
+    correctly fills that gap.
+
+    Hero side stretchers are different: their proven v46 geometry uses
+    top + an explicit calculated height. Forcing those to height:auto makes
+    them zero-height (they have no bottom anchor/content), which is why the
+    hero left/right rails disappeared in v52.
+  */
+  #brobots-page-frame
+  .brobots-inner-frame-stretcher--thumb-left,
+  #brobots-page-frame
+  .brobots-inner-frame-stretcher--thumb-right {
     height: auto !important;
   }
 
 
-  #brobots-page-frame.is-mobile-collapse-hold
-  .brobots-media-zone--thumbs {
+  #brobots-page-frame
+  .brobots-inner-frame-stretcher--hero-left {
+    height:
+      calc(
+        var(--brobots-hero-end-y)
+        -
+        var(--brobots-hero-bottom-left-h)
+        -
+        var(--brobots-hero-top-left-h)
+      ) !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-stretcher--hero-right {
+    height:
+      calc(
+        var(--brobots-hero-end-y)
+        -
+        var(--brobots-hero-bottom-right-h)
+        -
+        var(--brobots-hero-top-right-h)
+      ) !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry {
+    --brobots-tablet-frame-progress: 1;
+  }
+
+
+
+
+}
+
+
+@media (max-width: 840px),
+       (min-width: 1401px) {
+}
+
+
+/* =========================================================
+   BROBOTS TABLET INFO — STEP 2a: MEDIA FADE HANDOFF
+   =========================================================
+
+   Geometry remains exactly as established in v53.
+
+   The lower thumbnail UI now fades/scales away from the SAME master
+   tablet-frame progress that drives the physical frame transformation.
+
+   This keeps the visual handoff synchronized without adding a second JS
+   animation timeline.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  /*
+    Use the existing master 0 -> 1 frame progress as the media handoff
+    source of truth.
+
+    Fade the thumbnails a little faster than the frame itself:
+      progress 0.00 -> fully visible
+      progress 0.62 -> effectively gone
+
+    clamp() keeps the value valid through the full transition.
+  */
+  #brobots-page-frame
+  .brobots-media-zone--thumbs
+  .media-strip {
+    opacity:
+      clamp(
+        0,
+        calc(
+          1
+          -
+          (
+            var(--brobots-tablet-frame-progress)
+            /
+            0.62
+          )
+        ),
+        1
+      );
+
+    transform:
+      scale(
+        calc(
+          1
+          -
+          (
+            var(--brobots-tablet-frame-progress)
+            *
+            0.035
+          )
+        )
+      );
+
+    transform-origin:
+      50% 50%;
+
+    /*
+      The values above already interpolate continuously because the shared
+      progress variable is animated. Do not add another transition here.
+    */
+    transition: none !important;
+  }
+
+
+  /*
+    Once the frame reaches its info state, the hidden thumbnail UI should
+    not remain interactive underneath the future info surface.
+  */
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry
+  .brobots-media-zone--thumbs
+  .media-strip {
+    pointer-events: none;
+  }
+
+
+  /*
+    The temporary geometry-test arrow remains available for now so we can
+    still click back to the media state while building this feature.
+
+    It fades down substantially during the transition instead of vanishing
+    completely. When wheel/touch navigation is added, this can become the
+    final one-way attention arrow and disappear fully.
+  */
+
+
+  /*
+    Preserve the existing up/down direction flip while keeping the new
+    parent-level fade/scale independent.
+  */
+}
+
+
+/* =========================================================
+   BROBOTS TABLET INFO — STEP 2b: disable hidden media input
+   =========================================================
+
+   The site-wide open-page rules explicitly restore pointer-events:auto on
+   thumbnails/arrows, so disabling only .media-strip was not sufficient:
+   its descendants could still become hit targets.
+
+   When tablet info geometry is active, disable the complete lower media
+   interaction tree explicitly.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry
+  .brobots-media-zone--thumbs,
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry
+  .brobots-media-zone--thumbs
+  .media-strip,
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry
+  .brobots-media-zone--thumbs
+  .media-thumbnails,
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry
+  .brobots-media-zone--thumbs
+  .media-thumbnail,
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry
+  .brobots-media-zone--thumbs
+  .media-arrow {
+    pointer-events: none !important;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET INFO — STEP 3: INFO SURFACE HANDOFF
+   =========================================================
+
+   The tablet info host lives INSIDE .brobots-inner-frame-area, so it can
+   use the exact same continuously-derived geometry as the raster frame.
+
+   No desktop panel is moved or restyled.
+   ========================================================= */
+
+#brobots-page-frame .brobots-tablet-info-host {
+  display: none;
+}
+
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  #brobots-page-frame .brobots-tablet-info-host {
+    position: absolute;
+
+    /*
+      Occupy the exact lower INNER aperture:
+        left/right  = current thumbnail side-rail thickness
+        top         = current thumbnail start + top bar thickness
+        bottom      = current bottom bar thickness
+    */
     left:
       var(
         --brobots-thumb-left-rail-w,
         0px
-      ) !important;
+      );
 
     right:
       var(
         --brobots-thumb-right-rail-w,
         0px
-      ) !important;
+      );
 
     top:
       calc(
@@ -19528,84 +19927,2745 @@ body.is-media-lightbox-open {
           --brobots-thumb-top-bar-h,
           0px
         )
-      ) !important;
+      );
 
     bottom:
       var(
         --brobots-thumb-bottom-bar-h,
         0px
-      ) !important;
+      );
 
-    width: auto !important;
-    height: auto !important;
-  }
+    z-index: 2;
 
+    display: block;
 
-  #brobots-page-frame.is-mobile-collapse-hold
-  .brobots-media-zone--hero
-  .media-viewer {
-    width: 100cqw !important;
-    height: 100cqh !important;
+    min-width: 0;
+    min-height: 0;
 
-    max-width: none !important;
-    max-height: none !important;
+    overflow: hidden;
 
-    aspect-ratio: auto !important;
+    /*
+      Begin revealing after the thumbnail UI is mostly gone.
+      progress ~= .52 -> starts
+      progress = 1    -> fully visible
+    */
+    opacity:
+      clamp(
+        0,
+        calc(
+          (
+            var(--brobots-tablet-frame-progress)
+            -
+            0.52
+          )
+          /
+          0.48
+        ),
+        1
+      );
 
     transform:
-      scale(1.04) !important;
+      translateY(
+        calc(
+          14px
+          *
+          (
+            1
+            -
+            clamp(
+              0,
+              calc(
+                (
+                  var(--brobots-tablet-frame-progress)
+                  -
+                  0.52
+                )
+                /
+                0.48
+              ),
+              1
+            )
+          )
+        )
+      );
 
-    transform-origin:
-      50% 50% !important;
+    pointer-events: none;
   }
 
 
-  #brobots-page-frame.is-mobile-collapse-hold
-  .brobots-media-zone--hero
-  .media-viewer-stage {
-    position: absolute !important;
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry
+  .brobots-tablet-info-host {
+    pointer-events: auto;
+  }
 
-    inset: 0 !important;
 
+  /*
+    Reuse the existing game-info component, but remove the desktop popout's
+    extra glass/decorative shell responsibilities. The Brobots raster frame
+    is now the physical container.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .game-info {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    padding:
+      clamp(
+        16px,
+        2.2cqw,
+        30px
+      );
+
+    overflow: hidden;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .game-info-background,
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .game-info-layer {
+    /*
+      Keep the existing decorative background treatment available, but
+      don't let it create a second physical border.
+    */
+    border: 0;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .game-info-surface {
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+  }
+
+
+  /*
+    Let the existing vertical feature-culling system continue to decide
+    whether the highlights fit. This is only a tablet-specific sizing nudge,
+    not a second info layout.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .game-info-logo {
+    max-height:
+      clamp(
+        54px,
+        8.5cqh,
+        104px
+      );
+  }
+
+
+}
+
+
+/* Outside tablet mode the cloned surface does not participate at all. */
+@media (max-width: 840px),
+       (min-width: 1401px) {
+  #brobots-page-frame .brobots-tablet-info-host {
+    display: none !important;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET INFO — STEP 3b
+   Shared crowding logic + layered glass motif
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  /*
+    The tablet clone now runs through the exact same
+    updateGameInfoFeatureCrowding() function as the desktop popout.
+
+    These selectors only adapt the PRESENTATION of that same collapsed
+    state to the tablet cavity; no separate culling decision is invented.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .game-info-surface.is-features-collapsed
+  .game-info-features {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+
+  /*
+    Once the shared function collapses the middle feature zone, let the
+    remaining top/bottom zones redistribute naturally through the cavity.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .game-info-surface.is-features-collapsed {
+    grid-template-rows:
+      auto
+      0px
+      auto;
+
+    row-gap:
+      clamp(
+        10px,
+        1.45cqh,
+        20px
+      );
+  }
+
+
+  /* -------------------------------------------------------
+     Reuse the SAME four-layer glass stack as the PC popout.
+     ------------------------------------------------------- */
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack {
+    position: absolute;
+    inset:
+      clamp(8px, 1.1cqh, 14px)
+      clamp(8px, 1.0cqw, 16px);
+
+    z-index: 1;
+
+    display: block;
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+    /*
+      The host itself already fades in from frame progress. Give the glass a
+      slightly later/softer arrival so the content reads first.
+    */
+    opacity:
+      clamp(
+        0,
+        calc(
+          (
+            var(--brobots-tablet-frame-progress)
+            -
+            0.60
+          )
+          /
+          0.40
+        ),
+        1
+      );
+
+    clip-path: none;
+
+    transition: none !important;
+  }
+
+
+  /*
+    Override the desktop-only "secondary open" opacity contract.
+    Inside the tablet host the stack is controlled entirely by tablet frame
+    progress instead.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer {
+    display: block;
+
+    backdrop-filter:
+      blur(3px)
+      saturate(110%);
+
+    -webkit-backdrop-filter:
+      blur(3px)
+      saturate(110%);
+  }
+
+
+  /*
+    Adapt the existing motif to the broader/lower tablet cavity. These keep
+    the same asymmetric layered language while avoiding a literal copy of
+    the narrow desktop wedge.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--1 {
+    inset:
+      1.5%
+      1.8%
+      4.5%
+      0;
+
+    opacity: 0.56;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--2 {
+    inset:
+      6%
+      6.5%
+      8%
+      1.5%;
+
+    opacity: 0.48;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--3 {
+    inset:
+      11%
+      12.5%
+      13%
+      3%;
+
+    opacity: 0.44;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--4 {
+    left: 2%;
+    right: 17%;
+    top: 52%;
+    bottom: 1%;
+
+    opacity: 0.52;
+  }
+
+
+  /*
+    Keep the atmospheric Brobots background image in layer 1, but make it
+    more restrained here because the tablet cavity is much larger.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-popout-layer-image {
+    opacity: 0.22;
+
+    object-position:
+      right top;
+
+    filter:
+      saturate(0.88)
+      contrast(0.94)
+      brightness(0.82);
+  }
+
+
+  /*
+    Content remains above the glass stack.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .game-info {
+    z-index: 2;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET INFO — STEP 3c
+   Stronger glass + visible screenshot + rounded panes
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  /*
+    The generic responsive rule hides decorative popout images below
+    1400px. That is correct for the OLD desktop->tablet handoff, but the
+    new tablet info host intentionally reuses that artwork.
+
+    Re-enable the cloned image specifically inside the tablet host.
+  */
+  #brobots-page-frame:not(.is-layout-transitioning)
+  .brobots-tablet-info-host
+  .etherian-popout-layer-image,
+  #brobots-page-frame:not(.is-layout-transitioning)
+  .brobots-tablet-info-host
+  .brobots-popout-layer-image {
     display: block !important;
-  }
 
-
-  #brobots-page-frame.is-mobile-collapse-hold
-  .brobots-media-zone--hero
-  .media-viewer-image,
-  #brobots-page-frame.is-mobile-collapse-hold
-  .brobots-media-zone--hero
-  .media-viewer-video {
     position: absolute !important;
 
-    left: 50% !important;
-    top: 50% !important;
+    top: 0 !important;
+    right: 0 !important;
 
     width: 100% !important;
     height: 100% !important;
 
     max-width: none !important;
     max-height: none !important;
-
-    transform:
-      translate(-50%, -50%) !important;
 
     object-fit: cover !important;
-    object-position: 50% 50% !important;
+    object-position: center !important;
+
+    z-index: 0 !important;
+
+    /*
+      Match the stronger desktop treatment much more closely.
+    */
+    opacity: 0.58 !important;
+
+    filter:
+      saturate(0.92)
+      contrast(0.96)
+      brightness(0.82)
+      !important;
+
+    /*
+      Match the desktop popout behavior again:
+      only the TOP-RIGHT corner of the screenshot should remain visible,
+      feathering smoothly into the surrounding glass.
+    */
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,0.96) 30%,
+        rgba(0,0,0,0.72) 48%,
+        rgba(0,0,0,0.30) 66%,
+        rgba(0,0,0,0) 84%
+      ) !important;
+
+    mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0,0,0,1) 0%,
+        rgba(0,0,0,0.96) 30%,
+        rgba(0,0,0,0.72) 48%,
+        rgba(0,0,0,0.30) 66%,
+        rgba(0,0,0,0) 84%
+      ) !important;
+
+    -webkit-mask-size: 100% 100% !important;
+    mask-size: 100% 100% !important;
+
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
+
+    pointer-events: none !important;
   }
 
 
-  #brobots-page-frame.is-mobile-collapse-hold
+  /*
+    Make the tablet glass much closer in strength to the PC popout.
+    The fills remain translucent; opacity:1 just stops stacking an extra
+    whole-element transparency on top of them.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer {
+    opacity: 1 !important;
+
+    /*
+      Tablet version uses softened Y2K glass cards rather than the sharper
+      desktop wedge cuts.
+    */
+    border-radius:
+      clamp(
+        18px,
+        2.5cqw,
+        34px
+      ) !important;
+
+    clip-path: none !important;
+
+    overflow: hidden;
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(255,255,255,0.055),
+
+      0 8px 28px
+      rgba(0,0,0,0.10);
+
+    backdrop-filter:
+      blur(5px)
+      saturate(116%)
+      !important;
+
+    -webkit-backdrop-filter:
+      blur(5px)
+      saturate(116%)
+      !important;
+  }
+
+
+  /*
+    Give each sheet a slightly different radius so the layered stack feels
+    intentional instead of like four identical rectangles.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--1 {
+    border-radius:
+      clamp(
+        24px,
+        3.1cqw,
+        40px
+      ) !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--2 {
+    border-radius:
+      clamp(
+        20px,
+        2.7cqw,
+        36px
+      ) !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--3 {
+    border-radius:
+      clamp(
+        18px,
+        2.35cqw,
+        32px
+      ) !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--4 {
+    border-radius:
+      clamp(
+        16px,
+        2.1cqw,
+        28px
+      ) !important;
+  }
+
+
+  /*
+    Slightly stronger pane fills for this larger tablet cavity.
+    These intentionally preserve the existing Brobots glass language.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--1 {
+    background:
+      linear-gradient(
+        112deg,
+        rgba(255,255,255,0.075),
+        rgba(
+          var(--page-accent-rgb),
+          0.105
+        ) 52%,
+        rgba(22,32,40,0.18)
+      ) !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--2 {
+    background:
+      linear-gradient(
+        105deg,
+        rgba(80,105,120,0.20),
+        rgba(255,255,255,0.055)
+      ) !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--3 {
+    background:
+      linear-gradient(
+        115deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.09
+        ),
+        rgba(90,105,120,0.18)
+      ) !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer--4 {
+    background:
+      linear-gradient(
+        108deg,
+        rgba(255,255,255,0.065),
+        rgba(
+          var(--page-accent-rgb),
+          0.12
+        )
+      ) !important;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET INFO — STEP 3d
+   Stabilize glass compositing through the fade
+   =========================================================
+
+   The glass stack was being faded independently INSIDE the already-fading
+   tablet info host. With backdrop-filter on its child panes, Chrome can
+   composite that nested translucent layer differently while opacity is
+   animating, then rebuild it when the animation reaches 1. That produces
+   the visible "blur changes when it settles" pop.
+
+   Keep the physical glass stack at its final opacity for the ENTIRE
+   transition. The existing host fade is already sufficient to reveal it.
+   This means the glass has one visual treatment from first visible frame
+   through the settled state.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack {
+    /*
+      Do not independently animate opacity on a backdrop-filter container.
+      The parent .brobots-tablet-info-host already performs the reveal.
+    */
+    opacity: 1 !important;
+
+    transition: none !important;
+
+    /*
+      Keep Chrome on one compositing path during and after the host fade.
+    */
+    transform:
+      translateZ(0);
+
+    backface-visibility:
+      hidden;
+
+    will-change:
+      transform;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer {
+    /*
+      These are the actual filtered surfaces. Their visual state should
+      never change merely because the parent fade has completed.
+    */
+    opacity: 1 !important;
+
+    transition: none !important;
+
+    transform:
+      translateZ(0);
+
+    backface-visibility:
+      hidden;
+
+    will-change:
+      backdrop-filter;
+  }
+
+
+  /*
+    The screenshot is likewise held at its final visual treatment from the
+    moment the host begins appearing. Only the host itself fades.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .etherian-popout-layer-image,
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-popout-layer-image {
+    transition: none !important;
+
+    transform:
+      translateZ(0);
+
+    backface-visibility:
+      hidden;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET INFO — STEP 3e
+   Stable glass: remove real backdrop blur
+   =========================================================
+
+   New diagnosis from manual resize:
+   this is NOT the fade timing. The visual shift also happens when the
+   browser manually resizes the panel, which points to Chrome re-rasterizing
+   backdrop-filter as the pane dimensions change.
+
+   The desktop Brobots info treatment already avoids real backdrop blur.
+   Match that architecture here too: keep the layered translucent panes,
+   screenshot, gradients, highlights and borders, but remove
+   backdrop-filter entirely from the tablet stack.
+
+   This should make the glass appearance deterministic during:
+   - arrow transition
+   - manual resize
+   - settled state
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack
+  .etherian-popout-glass-layer {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    /*
+      Keep the pane treatment itself unchanged and stable.
+    */
+    opacity: 1 !important;
+    transition: none !important;
+
+    transform: none !important;
+    backface-visibility: visible !important;
+    will-change: auto !important;
+  }
+
+
+  /*
+    Also remove compositor-forcing hints from the stack/image. They were
+    useful as a test, but can themselves encourage Chrome to promote/rebuild
+    layers while resizing.
+  */
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-tablet-glass-stack,
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .etherian-popout-layer-image,
+  #brobots-page-frame
+  .brobots-tablet-info-host
+  .brobots-popout-layer-image {
+    transform: none !important;
+    backface-visibility: visible !important;
+    will-change: auto !important;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET LANDING — STEP 1
+   Logo + "Scroll for more" replaces thumbnail rail
+   ========================================================= */
+
+#brobots-page-frame .brobots-tablet-landing-identity {
+  display: none;
+}
+
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  /*
+    The thumbnail area remains part of the physical frame geometry, but its
+    CONTENT is no longer shown in the normal tablet landing state.
+  */
+  #brobots-page-frame
   .brobots-media-zone--thumbs
   .media-strip {
-    position: absolute !important;
-
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    display: block !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
+
+
+
+
+  /*
+    Identity block occupies the lower frame aperture in the collapsed
+    tablet state.
+  */
+  #brobots-page-frame
+  .brobots-tablet-landing-identity {
+    position: absolute;
+
+    left:
+      var(
+        --brobots-thumb-left-rail-w,
+        0px
+      );
+
+    right:
+      var(
+        --brobots-thumb-right-rail-w,
+        0px
+      );
+
+    top:
+      calc(
+        var(--brobots-thumb-start-y)
+        +
+        var(
+          --brobots-thumb-top-bar-h,
+          0px
+        )
+      );
+
+    bottom:
+      var(
+        --brobots-thumb-bottom-bar-h,
+        0px
+      );
+
+    z-index: 4;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap:
+      clamp(
+        10px,
+        1.8cqh,
+        20px
+      );
+
+    padding:
+      clamp(
+        12px,
+        1.8cqw,
+        24px
+      );
+
+    text-align: center;
+
+    opacity:
+      clamp(
+        0,
+        calc(
+          1
+          -
+          (
+            var(--brobots-tablet-frame-progress)
+            /
+            0.50
+          )
+        ),
+        1
+      );
+
+    transform:
+      translateY(
+        calc(
+          -8px
+          *
+          var(--brobots-tablet-frame-progress)
+        )
+      );
+
+    pointer-events: auto;
+  }
+
+
+  /*
+    Once info mode is active, the landing identity is visually gone and
+    should no longer intercept input.
+  */
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry
+  .brobots-tablet-landing-identity {
+    pointer-events: none;
+  }
+
+
+  /*
+    Reuse the authored Brobots logo. Keep it bold enough to immediately
+    identify the page even when the current hero screenshot is ambiguous.
+  */
+  #brobots-page-frame
+  .brobots-tablet-landing-logo {
+    /*
+      Keep the larger visual weight from v65, but size it against the
+      ACTUAL lower landing aperture rather than the full Brobots frame.
+
+      Reserve enough vertical room for the "Scroll for more" cue, then let
+      the logo consume the rest without ever crossing the aperture edges.
+    */
+    width:
+      min(
+        76cqw,
+        560px
+      );
+
+    max-width: 88%;
+
+    height: auto;
+
+    max-height:
+      calc(
+        100%
+        -
+        clamp(
+          64px,
+          8cqh,
+          92px
+        )
+      );
+
+    object-fit: contain;
+
+    margin: 0;
+
+    flex: 0 1 auto;
+  }
+
+
+  /*
+    The lower identity area is a hard visual aperture: nothing in the
+    landing treatment should spill across the Brobots raster border.
+  */
+  #brobots-page-frame
+  .brobots-tablet-landing-identity {
+    overflow: hidden;
+  }
+
+
+  /*
+    Simple, readable interaction cue.
+    No heavy card around it: the logo is the identity, this is just the hint.
+  */
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue {
+    display: inline-flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap:
+      clamp(
+        2px,
+        0.45cqh,
+        5px
+      );
+
+    padding:
+      clamp(
+        4px,
+        0.6cqh,
+        7px
+      )
+      clamp(
+        10px,
+        1.4cqw,
+        16px
+      );
+
+    border: 0;
+    background: transparent;
+
+    color:
+      rgba(
+        240,
+        240,
+        240,
+        0.82
+      );
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    font: inherit;
+    text-align: center;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue-text {
+    font-size:
+      clamp(
+        11px,
+        1.25cqw,
+        15px
+      );
+
+    font-weight: 600;
+
+    letter-spacing:
+      0.11em;
+
+    text-transform: uppercase;
+
+    text-shadow:
+      0 1px 8px
+      rgba(0,0,0,0.55);
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue-arrow {
+    display: block;
+
+    color:
+      rgba(
+        var(--page-accent-rgb),
+        0.96
+      );
+
+    font-size:
+      clamp(
+        20px,
+        2.8cqh,
+        30px
+      );
+
+    line-height: 0.8;
+
+    animation:
+      brobots-tablet-scroll-cue-bob
+      1.65s
+      ease-in-out
+      infinite;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue:hover,
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue:focus-visible {
+    color:
+      rgba(
+        255,
+        255,
+        255,
+        1
+      );
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue:focus-visible {
+    outline:
+      2px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.82
+      );
+
+    outline-offset: 4px;
+
+    border-radius: 10px;
+  }
+}
+
+
+@keyframes brobots-tablet-scroll-cue-bob {
+  0%,
+  100% {
+    transform:
+      translateY(0);
+  }
+
+  50% {
+    transform:
+      translateY(5px);
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue-arrow {
+    animation: none;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET LANDING — STEP 1c
+   Scale the entire identity composition as one unit
+   =========================================================
+
+   v66 bounded the logo, but reserved a fixed-ish amount of vertical space
+   for the cue. On a short tablet frame that reservation consumed nearly the
+   whole lower aperture, so the logo collapsed while the cue stayed roughly
+   the same size.
+
+   Make the lower aperture its OWN size container instead. Logo, text, arrow,
+   and spacing now all derive from the same available width/height, so the
+   complete landing composition scales together during manual resize.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  #brobots-page-frame
+  .brobots-tablet-landing-identity {
+    container-type: size;
+    container-name: brobots-tablet-landing;
+
+    /*
+      Keep the whole composition truly centered in the live lower aperture.
+      No child reserves a fixed pixel block anymore.
+    */
+    justify-content: center;
+
+    gap:
+      min(
+        3.8cqh,
+        18px
+      );
+
+    padding:
+      min(
+        4.5cqh,
+        22px
+      )
+      min(
+        3.2cqw,
+        26px
+      );
+
+    overflow: hidden;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-landing-logo {
+    /*
+      Width is primarily driven by the landing aperture, while max-height
+      gives the cue guaranteed proportional breathing room.
+
+      Because cqw/cqh now resolve against .brobots-tablet-landing-identity,
+      this stays centered and scales continuously with the actual panel.
+    */
+    width:
+      min(
+        84cqw,
+        620px
+      );
+
+    max-width: 84cqw;
+
+    height: auto;
+
+    max-height:
+      55cqh;
+
+    object-fit: contain;
+
+    flex:
+      0 1 auto;
+
+    margin: 0;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue {
+    /*
+      Cue sizing now follows the SAME lower aperture as the logo.
+      Remove fixed clamp minimums that made it look detached at short sizes.
+    */
+    gap:
+      min(
+        1.2cqh,
+        5px
+      );
+
+    padding:
+      min(
+        1.4cqh,
+        7px
+      )
+      min(
+        2.6cqw,
+        16px
+      );
+
+    flex:
+      0 0 auto;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue-text {
+    font-size:
+      min(
+        5.2cqh,
+        15px
+      );
+
+    letter-spacing:
+      min(
+        0.11em,
+        0.9cqh
+      );
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue-arrow {
+    font-size:
+      min(
+        9cqh,
+        30px
+      );
+
+    line-height:
+      0.78;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET LANDING — STEP 1d
+   Clean isolated landing composition
+   =========================================================
+
+   The landing logo was cloned from .game-info-logo and still carried that
+   class. Brobots has several generic/info compact sizing rules and even a
+   width transition on .game-info-logo, so the landing logo was being driven
+   by TWO systems. That explains both the off-centering and the "pop" after
+   resize stopped.
+
+   v68 removes that class in JS and gives the landing panel one simple,
+   self-contained layout.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  #brobots-page-frame
+  .brobots-tablet-landing-identity {
+    /*
+      One plain centered column. No nested responsive reservation math.
+    */
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap:
+      clamp(
+        8px,
+        2.0cqh,
+        18px
+      );
+
+    padding:
+      clamp(
+        10px,
+        2.2cqh,
+        20px
+      )
+      clamp(
+        16px,
+        2.6cqw,
+        28px
+      );
+
+    text-align: center;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-landing-logo {
+    /*
+      Large like the good v65 proportion, but bounded by BOTH dimensions of
+      the actual lower aperture.
+
+      Since this element no longer has .game-info-logo, no desktop/info
+      width clamp or resize transition can override this.
+    */
+    display: block;
+
+    width:
+      min(
+        78%,
+        560px
+      );
+
+    height: auto;
+
+    max-width: 78%;
+
+    max-height: 58%;
+
+    object-fit: contain;
+
+    flex: 0 1 auto;
+
+    margin: 0;
+
+    transition: none !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue {
+    /*
+      Keep the cue visually attached to the logo, but preserve readability
+      instead of shrinking it toward illegibility on short windows.
+    */
+    flex: 0 0 auto;
+
+    gap:
+      clamp(
+        2px,
+        0.55cqh,
+        5px
+      );
+
+    padding:
+      clamp(
+        3px,
+        0.6cqh,
+        6px
+      )
+      clamp(
+        8px,
+        1.2cqw,
+        14px
+      );
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue-text {
+    font-size:
+      clamp(
+        11px,
+        min(
+          1.35cqw,
+          4.6cqh
+        ),
+        15px
+      );
+
+    letter-spacing:
+      0.11em;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue-arrow {
+    font-size:
+      clamp(
+        18px,
+        min(
+          2.4cqw,
+          8cqh
+        ),
+        28px
+      );
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET LANDING — STEP 1e
+   Logo exits upward; cue fades independently
+   =========================================================
+
+   Keep the landing logo's SIZE independent of the expanding lower aperture.
+   Previously max-height was a percentage of that live aperture, so the logo
+   visibly grew as the info region expanded before fading.
+
+   The logo now keeps a viewport-relative cap during the state transition,
+   then physically travels upward and is clipped by the lower aperture.
+   This reads like the page content is being pulled upward by the scroll.
+
+   The "Scroll for more" cue remains in place and simply fades out.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  #brobots-page-frame
+  .brobots-tablet-landing-identity {
+    /*
+      Do NOT fade the whole group. The logo and cue now have separate exits.
+    */
+    opacity: 1 !important;
+
+    transform: none !important;
+
+    overflow: hidden;
+  }
+
+
+  #brobots-page-frame
+  .brobots-tablet-landing-logo {
+    /*
+      Crucial: this cap depends on the viewport, not on the live lower
+      aperture height. Opening the info region therefore cannot make the
+      logo suddenly grow.
+    */
+    width:
+      min(
+        78%,
+        560px
+      );
+
+    max-width: 78%;
+
+    height: auto;
+
+    max-height:
+      clamp(
+        76px,
+        10vh,
+        126px
+      );
+
+    flex: 0 0 auto;
+
+    /*
+      JS measures the logo's collapsed centre against the hero viewer's
+      centre immediately before entering info mode and stores that exact
+      vertical delta here. The shared 0 -> 1 tablet progress then carries
+      the logo to the hero centre instead of relying on a guessed multiple
+      of the logo's own height.
+
+      This deliberately remains a transform-only motion: the landing layout
+      itself does not move, so the cue can keep fading independently.
+    */
+    transform:
+      translateY(
+        calc(
+          var(
+            --brobots-tablet-logo-target-y,
+            -320px
+          )
+          *
+          var(--brobots-tablet-frame-progress)
+        )
+      );
+
+    /*
+      The physical travel should normally tuck the logo fully behind the
+      hero frame. Fade it as a safety net as well so unusual tablet/window
+      proportions can never leave a visible sliver behind.
+
+      Keep the first part of the motion readable, then finish the fade before
+      the info surface is fully established.
+    */
+    opacity:
+      clamp(
+        0,
+        calc(
+          1
+          -
+          (
+            var(--brobots-tablet-frame-progress)
+            /
+            0.72
+          )
+        ),
+        1
+      ) !important;
+
+    transition: none !important;
+
+    will-change:
+      transform,
+      opacity;
+  }
+
+
+  /*
+    Keep the cue where it is; only fade it away.
+  */
+  #brobots-page-frame
+  .brobots-tablet-scroll-cue {
+    opacity:
+      clamp(
+        0,
+        calc(
+          1
+          -
+          (
+            var(--brobots-tablet-frame-progress)
+            /
+            0.42
+          )
+        ),
+        1
+      );
+
+    transform: none !important;
+
+    transition: none !important;
+  }
+
+
+  /*
+    Once the info state has been selected, none of the old landing controls
+    should remain interactive while visually leaving.
+  */
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-info-geometry
+  .brobots-tablet-scroll-cue {
+    pointer-events: none;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS MOBILE COLLAPSE — FINAL MEDIA OWNERSHIP CLEANUP
+   =========================================================
+
+   During .is-mobile-collapse-hold the outgoing real page only exists long
+   enough to hand visual ownership to the fake hamburger-collapse morph.
+
+   The media browser is not useful during that interval and was the source
+   of the final hero-image flash. Remove it from layout/rendering entirely
+   for those few frames rather than preserving or merely fading obsolete
+   media UI.
+   ========================================================= */
+
+@media (max-width: 840px) {
+  #brobots-page-frame.is-mobile-collapse-hold
+  .brobots-inner-frame-area > .media-browser {
+    display: none !important;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET HERO — MEDIA NAVIGATION
+   =========================================================
+
+   The authored thumbnail buttons remain the one media-item data source and
+   continue to drive desktop. JS creates this lightweight overlay from those
+   same items, and the existing renderItem() controller drives both systems.
+
+   On tablet, navigation is deliberately recessive:
+   - the side hit areas are invisible at rest
+   - approaching either side reveals a soft page-accent glow rather than a
+     permanent arrow button
+   - pagination dots float directly over the media with no backing pill
+
+   Only Brobots tablet shows this overlay for now. Keeping the controls out of
+   the raster frame markup means they can later be generalized for Etherian /
+   Halodoom without duplicating the media list in HTML.
+   ========================================================= */
+
+.media-hero-navigation {
+  display: none;
+}
+
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  #brobots-page-frame
+  .brobots-media-zone--hero
+  .media-hero-navigation {
+    position: absolute;
+    z-index: 2;
+
+    inset: 0;
+
+    display: block;
+
+    pointer-events: none;
+  }
+
+
+  /* -------------------------------------------------------
+     Invisible side hit areas + proximity glow
+     ------------------------------------------------------- */
+
+  #brobots-page-frame
+  .media-hero-arrow {
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+
+    /*
+      A generous transparent hit area makes the control respond as the cursor
+      approaches the side of the hero instead of requiring a tiny target.
+    */
+    width:
+      clamp(
+        92px,
+        20%,
+        210px
+      );
+
+    height: auto;
+
+    display: block;
+
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+
+    /* Hide the authored ‹ / › glyph without changing the JS/HTML control. */
+    color: transparent;
+    font-size: 0;
+    line-height: 0;
+
+    cursor: pointer;
+
+    opacity: 1;
+
+    transform: none;
+
+    pointer-events: auto;
+  }
+
+
+  /*
+    The visible feedback is a soft accent wash that blooms in from the edge.
+    It uses the page accent variable, so Brobots is gold now and future game
+    pages can inherit their own theme without a new color rule.
+  */
+  #brobots-page-frame
+  .media-hero-arrow::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+      opacity 220ms ease;
+  }
+
+
+  #brobots-page-frame
+  .media-hero-arrow--previous {
+    left: 0;
+  }
+
+
+  #brobots-page-frame
+  .media-hero-arrow--previous::before {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(var(--page-accent-rgb), 0.30) 0%,
+        rgba(var(--page-accent-rgb), 0.16) 30%,
+        rgba(var(--page-accent-rgb), 0.07) 58%,
+        rgba(var(--page-accent-rgb), 0.025) 78%,
+        rgba(var(--page-accent-rgb), 0) 100%
+      );
+  }
+
+
+  #brobots-page-frame
+  .media-hero-arrow--next {
+    right: 0;
+  }
+
+
+  #brobots-page-frame
+  .media-hero-arrow--next::before {
+    background:
+      linear-gradient(
+        270deg,
+        rgba(var(--page-accent-rgb), 0.30) 0%,
+        rgba(var(--page-accent-rgb), 0.16) 30%,
+        rgba(var(--page-accent-rgb), 0.07) 58%,
+        rgba(var(--page-accent-rgb), 0.025) 78%,
+        rgba(var(--page-accent-rgb), 0) 100%
+      );
+  }
+
+
+  #brobots-page-frame
+  .media-hero-arrow:hover::before,
+  #brobots-page-frame
+  .media-hero-arrow:focus-visible::before {
+    opacity: 1;
+  }
+
+
+  #brobots-page-frame
+  .media-hero-arrow:focus-visible {
+    outline: none;
+  }
+
+
+  #brobots-page-frame
+  .media-hero-arrow:disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+
+
+  #brobots-page-frame
+  .media-hero-arrow:disabled::before {
+    opacity: 0;
+  }
+
+
+  /* -------------------------------------------------------
+     Minimal pagination dots
+     ------------------------------------------------------- */
+
+  #brobots-page-frame
+  .media-hero-dots {
+    position: absolute;
+
+    left: 50%;
+    bottom:
+      clamp(
+        9px,
+        3.2cqh,
+        16px
+      );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap:
+      clamp(
+        6px,
+        0.85cqw,
+        10px
+      );
+
+    /*
+      Keep a very restrained border/backplate around the dots for contrast,
+      but hide the whole pagination treatment until the hero is engaged.
+    */
+    padding:
+      5px
+      8px;
+
+    /*
+      Restore the original v74 capsule-border visibility while keeping the
+      newer lighter backplate + hover-only reveal behavior.
+    */
+    border:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      );
+
+    border-radius: 999px;
+
+    background:
+      rgba(10, 13, 16, 0.22);
+
+    box-shadow:
+      0 2px 8px
+      rgba(0, 0, 0, 0.16);
+
+    opacity: 0;
+
+    transition:
+      opacity 180ms ease;
+
+    transform:
+      translateX(-50%);
+
+    pointer-events: none;
+  }
+
+
+  /*
+    Pagination stays completely out of the artwork until the user actually
+    enters the hero. focus-within preserves keyboard access once a dot is
+    focused.
+  */
+  #brobots-page-frame
+  .brobots-media-zone--hero:hover
+  .media-hero-dots,
+  #brobots-page-frame
+  .media-hero-navigation:has(:focus-visible)
+  .media-hero-dots {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+
+  #brobots-page-frame
+  .media-hero-dot {
+    width:
+      clamp(
+        8px,
+        min(1.15cqw, 4.8cqh),
+        11px
+      );
+
+    height:
+      clamp(
+        8px,
+        min(1.15cqw, 4.8cqh),
+        11px
+      );
+
+    flex: 0 0 auto;
+
+    margin: 0;
+    padding: 0;
+
+    border:
+      1px solid
+      rgba(255, 255, 255, 0.44);
+
+    border-radius: 50%;
+
+    background:
+      rgba(240, 244, 247, 0.28);
+
+    box-shadow:
+      0 1px 4px
+      rgba(0, 0, 0, 0.32);
+
+    cursor: pointer;
+
+    opacity: 1;
+
+    transform: scale(1);
+
+    transition:
+      transform 150ms ease,
+      border-color 150ms ease,
+      background-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+
+  #brobots-page-frame
+  .media-hero-dot:hover,
+  #brobots-page-frame
+  .media-hero-dot:focus-visible {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.88
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.54
+      );
+
+    transform:
+      scale(1.18);
+  }
+
+
+  #brobots-page-frame
+  .media-hero-dot:focus-visible {
+    outline:
+      1px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.68
+      );
+
+    outline-offset: 3px;
+  }
+
+
+  #brobots-page-frame
+  .media-hero-dot.is-selected {
+    opacity: 1;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        1
+      );
+
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.96
+      );
+
+    box-shadow:
+      0 0 7px
+      rgba(
+        var(--page-accent-rgb),
+        0.48
+      );
+
+    transform:
+      scale(1.22);
+  }
+}
+
+
+/* =========================================================
+   Brobots tablet hero — resting media opacity
+   =========================================================
+
+   Keep the hero artwork slightly recessed at rest, then bring it to full
+   strength when the pointer enters the hero zone. This intentionally lives on
+   the READY media stage rather than .media-viewer itself so the frame/border
+   and navigation overlay are not faded with the image/video.
+*/
+@media (min-width: 841px) and (max-width: 1400px) {
+  #brobots-page-frame
+  .brobots-media-zone--hero
+  .media-viewer-stage.is-ready {
+    opacity: 0.8;
+
+    transition:
+      opacity 220ms ease;
+  }
+
+
+  #brobots-page-frame
+  .brobots-media-zone--hero:hover
+  .media-viewer-stage.is-ready {
+    opacity: 1;
+  }
+}
+
+
+/* =========================================================
+   CLOSED PAGE FRAMES — HARD INTERACTION GATE
+   =========================================================
+
+   A hidden .prototype-page-frame previously relied on pointer-events:none
+   only on the frame/content ancestors. Several descendants explicitly set
+   pointer-events:auto (media viewers, arrows, local YouTube fallback links,
+   desktop info content, etc.), which allows those invisible descendants to
+   become hit targets even while their page frame is visually closed.
+
+   This is the single source-of-truth gate: if the real page does not own
+   .is-open, NOTHING inside its content surface may receive pointer input.
+   Once .is-open is added, the existing open-page rules regain control.
+   ========================================================= */
+
+.prototype-page-frame:not(.is-open)
+.prototype-page-frame-content,
+.prototype-page-frame:not(.is-open)
+.prototype-page-frame-content * {
+  pointer-events: none !important;
+}
+
+
+/*
+  Desktop secondary panels sit outside .prototype-page-frame-content, so give
+  their complete hidden subtree the same protection. This also prevents an
+  opacity-zero CTA/content layer from ever becoming an invisible hit target.
+*/
+.prototype-page-frame:not(.is-open)
+.desktop-secondary-panel,
+.prototype-page-frame:not(.is-open)
+.desktop-secondary-panel * {
+  pointer-events: none !important;
+}
+
+
+/* =========================================================
+   BROBOTS DESKTOP <-> TABLET CONTENT HANDOFF
+   =========================================================
+
+   Crossing 1400px used to swap the desktop thumbnail rail and tablet
+   landing identity in a single frame. Keep the physical Brobots frame on
+   its existing responsive geometry, but animate the CONTENT handoff:
+
+     desktop -> tablet
+       thumbnails travel upward toward the hero and fade out
+       landing logo / scroll cue fade in
+
+     tablet -> desktop
+       landing logo / scroll cue fade out
+       thumbnails travel back down from the hero and fade in
+
+   JS measures the actual hero-center -> thumbnail-center distance and
+   writes --brobots-breakpoint-thumb-shift-y. That keeps the motion correct
+   for unusual aspect ratios instead of relying on a guessed pixel offset.
+   ========================================================= */
+
+#brobots-page-frame .brobots-inner-frame-area {
+  --brobots-breakpoint-thumb-shift-y: -180px;
+  --brobots-breakpoint-handoff-duration: 1240ms;
+}
+
+
+/* -------------------------
+   Desktop -> tablet
+   ------------------------- */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-entering
+  .brobots-media-zone--thumbs
+  .media-strip {
+    opacity: 1 !important;
+
+    transform:
+      translateY(0)
+      scale(1) !important;
+
+    transition: none !important;
+
+    pointer-events: none !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-entering
+  .brobots-tablet-landing-identity {
+    opacity: 0 !important;
+    transition: none !important;
+    pointer-events: none !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-entering.is-tablet-breakpoint-thumb-active
+  .brobots-media-zone--thumbs
+  .media-strip {
+    opacity: 0 !important;
+
+    transform:
+      translateY(
+        var(--brobots-breakpoint-thumb-shift-y)
+      )
+      scale(0.975) !important;
+
+    transition:
+      opacity 840ms ease,
+      transform
+        var(--brobots-breakpoint-handoff-duration)
+        cubic-bezier(0.18, 0.78, 0.22, 1) !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-entering.is-tablet-breakpoint-handoff-active
+  .brobots-tablet-landing-identity {
+    opacity: 1 !important;
+
+    transition:
+      opacity 430ms ease 120ms !important;
+  }
+}
+
+
+/* -------------------------
+   Tablet -> desktop
+   ------------------------- */
+
+@media (min-width: 1401px) {
+  /*
+    Keep the outgoing tablet identity alive just long enough to fade away.
+    Normally it is display:none outside tablet mode, so this transient class
+    supplies the same lower-aperture placement while the handoff runs.
+  */
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-landing-identity {
+    position: absolute;
+
+    left:
+      var(--brobots-thumb-left-rail-w, 0px);
+
+    right:
+      var(--brobots-thumb-right-rail-w, 0px);
+
+    top:
+      calc(
+        var(--brobots-thumb-start-y)
+        +
+        var(--brobots-thumb-top-bar-h, 0px)
+      );
+
+    bottom:
+      var(--brobots-thumb-bottom-bar-h, 0px);
+
+    z-index: 4;
+
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap:
+      var(
+        --brobots-breakpoint-landing-gap,
+        12px
+      );
+
+    padding-top:
+      var(
+        --brobots-breakpoint-landing-padding-top,
+        12px
+      );
+
+    padding-right:
+      var(
+        --brobots-breakpoint-landing-padding-right,
+        20px
+      );
+
+    padding-bottom:
+      var(
+        --brobots-breakpoint-landing-padding-bottom,
+        12px
+      );
+
+    padding-left:
+      var(
+        --brobots-breakpoint-landing-padding-left,
+        20px
+      );
+
+    overflow: hidden;
+
+    text-align: center;
+
+    opacity: 1 !important;
+    transition: none !important;
+    pointer-events: none !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-landing-logo {
+    display: block;
+
+    width:
+      var(
+        --brobots-breakpoint-landing-logo-width,
+        min(78%, 560px)
+      );
+
+    height:
+      var(
+        --brobots-breakpoint-landing-logo-height,
+        auto
+      );
+
+    max-width: none;
+    max-height: none;
+
+    object-fit: contain;
+
+    flex: 0 1 auto;
+
+    margin: 0;
+
+    transition: none !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-scroll-cue {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap:
+      var(
+        --brobots-breakpoint-cue-gap,
+        3px
+      );
+
+    padding-top:
+      var(
+        --brobots-breakpoint-cue-padding-top,
+        4px
+      );
+
+    padding-right:
+      var(
+        --brobots-breakpoint-cue-padding-right,
+        10px
+      );
+
+    padding-bottom:
+      var(
+        --brobots-breakpoint-cue-padding-bottom,
+        4px
+      );
+
+    padding-left:
+      var(
+        --brobots-breakpoint-cue-padding-left,
+        10px
+      );
+
+    border: 0;
+    background: transparent;
+
+    color: rgba(240, 240, 240, 0.82);
+
+    font: inherit;
+    text-align: center;
+
+    flex: 0 0 auto;
+
+    pointer-events: none !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-scroll-cue-text {
+    font-size:
+      var(
+        --brobots-breakpoint-cue-text-size,
+        13px
+      );
+
+    font-weight: 600;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+
+    text-shadow:
+      0 1px 8px rgba(0, 0, 0, 0.55);
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-scroll-cue-arrow {
+    display: block;
+
+    color:
+      rgba(var(--page-accent-rgb), 0.96);
+
+    font-size:
+      var(
+        --brobots-breakpoint-cue-arrow-size,
+        22px
+      );
+
+    line-height: 0.78;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-media-zone--thumbs
+  .media-strip {
+    opacity: 0 !important;
+
+    transform:
+      translateY(
+        var(--brobots-breakpoint-thumb-shift-y)
+      )
+      scale(0.975) !important;
+
+    transition: none !important;
+
+    pointer-events: none !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving.is-tablet-breakpoint-handoff-active
+  .brobots-tablet-landing-identity {
+    opacity: 0 !important;
+
+    transition:
+      opacity 360ms ease !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving.is-tablet-breakpoint-thumb-active
+  .brobots-media-zone--thumbs
+  .media-strip {
+    opacity: 1 !important;
+
+    transform:
+      translateY(0)
+      scale(1) !important;
+
+    transition:
+      opacity 880ms ease 90ms,
+      transform
+        var(--brobots-breakpoint-handoff-duration)
+        cubic-bezier(0.18, 0.78, 0.22, 1) !important;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-entering
+  .brobots-media-zone--thumbs
+  .media-strip,
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-entering
+  .brobots-tablet-landing-identity,
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-media-zone--thumbs
+  .media-strip,
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-landing-identity {
+    transition-duration: 1ms !important;
+  }
+}
+
+/* =========================================================
+   BROBOTS — breakpoint handoff layering + desktop hero hover
+   ========================================================= */
+
+/*
+  During the desktop <-> tablet content handoff the thumbnail strip travels
+  upward into the hero aperture. Keep that moving strip BEHIND the hero
+  media instead of allowing its later DOM position to paint on top.
+*/
+#brobots-page-frame
+.brobots-inner-frame-area.is-tablet-breakpoint-entering
+.brobots-media-zone--hero,
+#brobots-page-frame
+.brobots-inner-frame-area.is-tablet-breakpoint-leaving
+.brobots-media-zone--hero {
+  z-index: 2;
+}
+
+#brobots-page-frame
+.brobots-inner-frame-area.is-tablet-breakpoint-entering
+.brobots-media-zone--thumbs,
+#brobots-page-frame
+.brobots-inner-frame-area.is-tablet-breakpoint-leaving
+.brobots-media-zone--thumbs {
+  z-index: 1;
+}
+
+
+/*
+  Use the same 80% -> 100% hero treatment on full desktop that tablet
+  already uses. The opacity belongs to the ready media stage, not the
+  viewer/frame itself, so raster chrome and controls remain full strength.
+*/
+@media (min-width: 1401px) {
+  #brobots-page-frame
+  .brobots-media-zone--hero
+  .media-viewer-stage.is-ready {
+    opacity: 0.8;
+
+    transition:
+      opacity 220ms ease;
+  }
+
+  #brobots-page-frame
+  .brobots-media-zone--hero:hover
+  .media-viewer-stage.is-ready {
+    opacity: 1;
+  }
+}
+
+
+/* =========================================================
+   BROBOTS — tablet -> desktop handoff uses native tablet sizing
+   =========================================================
+
+   The landing identity already has a working responsive sizing system in
+   tablet mode. The previous handoff experiments overrode that system with
+   frozen pixel dimensions / JS transform scaling once the viewport crossed
+   1400px, which is what caused the visible size jump.
+
+   During the transient tablet -> desktop handoff, simply keep the identity
+   as its own size container and continue using the SAME sizing formulas as
+   the real tablet layout. No snapshot dimensions and no JS scale are needed.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-landing-identity {
+    container-type: size;
+    container-name: brobots-tablet-landing;
+
+    gap:
+      clamp(
+        8px,
+        2cqh,
+        18px
+      );
+
+    padding:
+      clamp(
+        10px,
+        2.2cqh,
+        20px
+      )
+      clamp(
+        16px,
+        2.6cqw,
+        28px
+      );
+
+    /*
+      Do not allow the old breakpoint-handoff scale experiment to affect
+      this element. Its children now resize naturally from this aperture.
+    */
+    transform: none !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-landing-logo {
+    display: block;
+
+    width:
+      min(
+        78%,
+        560px
+      );
+
+    max-width: 78%;
+
+    height: auto;
+
+    /*
+      This is the same effective cap used by the normal tablet landing logo.
+      It prevents the logo growing during the tablet info animation while
+      still allowing width to follow the shrinking handoff aperture.
+    */
+    max-height:
+      clamp(
+        76px,
+        10vh,
+        126px
+      );
+
+    object-fit: contain;
+
+    flex: 0 0 auto;
+
+    margin: 0;
+
+    transition: none !important;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-scroll-cue {
+    gap:
+      clamp(
+        2px,
+        0.55cqh,
+        5px
+      );
+
+    padding:
+      clamp(
+        3px,
+        0.6cqh,
+        6px
+      )
+      clamp(
+        8px,
+        1.2cqw,
+        14px
+      );
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-scroll-cue-text {
+    font-size:
+      clamp(
+        11px,
+        min(
+          1.35cqw,
+          4.6cqh
+        ),
+        15px
+      );
+
+    letter-spacing: 0.11em;
+  }
+
+
+  #brobots-page-frame
+  .brobots-inner-frame-area.is-tablet-breakpoint-leaving
+  .brobots-tablet-scroll-cue-arrow {
+    font-size:
+      clamp(
+        18px,
+        min(
+          2.4cqw,
+          8cqh
+        ),
+        28px
+      );
+  }
+}
+
+
+/* =========================================================
+   BROBOTS TABLET INFO — GLOBAL PROGRESS SUBSTRATE
+   =========================================================
+
+   IMPORTANT FIX:
+   The scroll-up event WAS already being called correctly.
+
+   The snap happened because the animation machinery itself lived entirely
+   inside @media (841px..1400px). The instant the viewport crossed 1400px,
+   CSS discarded:
+     - the --brobots-tablet-frame-progress transition
+     - every *-live interpolation formula
+
+   At that moment all JS-authored frame variables fell through their existing
+   fallbacks straight to *-base, so there was literally nothing left for
+   setBrobotsTabletGeometryState(false) to animate.
+
+   These formulas are safe globally:
+     progress = 0  -> exact existing base/desktop geometry
+     progress = 1  -> tablet info geometry
+
+   JS still only ENTERS the info state in tablet mode. The only reason this
+   substrate remains available outside tablet is so an existing info state
+   can animate cleanly back to 0 after crossing into desktop.
+   ========================================================= */
+
+#brobots-page-frame .brobots-inner-frame-area {
+  --brobots-tablet-info-split-ratio:
+    0.30;
+
+  --brobots-tablet-info-hero-end-y:
+    calc(
+      100cqh
+      *
+      var(--brobots-tablet-info-split-ratio)
+    );
+
+  --brobots-tablet-info-thumb-start-y:
+    calc(
+      var(--brobots-tablet-info-hero-end-y)
+      +
+      max(
+        var(--brobots-separator-h-info, 0px),
+        2px
+      )
+    );
+
+  /*
+    Outside an active info state this remains exactly zero, so all of the
+    live formulas below resolve to the normal/base desktop geometry.
+  */
+  --brobots-tablet-frame-progress: 0;
+
+  transition:
+    --brobots-tablet-frame-progress
+      720ms
+      cubic-bezier(0.18, 0.78, 0.22, 1);
+
+  --brobots-hero-end-live-y:
+    calc(
+      var(--brobots-hero-end-base-y)
+      +
+      (
+        var(--brobots-tablet-info-hero-end-y)
+        -
+        var(--brobots-hero-end-base-y)
+      )
+      *
+      var(--brobots-tablet-frame-progress)
+    );
+
+  --brobots-thumb-start-live-y:
+    calc(
+      var(--brobots-thumb-start-base-y)
+      +
+      (
+        var(--brobots-tablet-info-thumb-start-y)
+        -
+        var(--brobots-thumb-start-base-y)
+      )
+      *
+      var(--brobots-tablet-frame-progress)
+    );
+
+  --brobots-hero-top-left-w-live:
+    calc(var(--brobots-hero-top-left-w-base) + (var(--brobots-hero-top-left-w-info) - var(--brobots-hero-top-left-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-hero-top-left-h-live:
+    calc(var(--brobots-hero-top-left-h-base) + (var(--brobots-hero-top-left-h-info) - var(--brobots-hero-top-left-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-hero-top-right-w-live:
+    calc(var(--brobots-hero-top-right-w-base) + (var(--brobots-hero-top-right-w-info) - var(--brobots-hero-top-right-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-hero-top-right-h-live:
+    calc(var(--brobots-hero-top-right-h-base) + (var(--brobots-hero-top-right-h-info) - var(--brobots-hero-top-right-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-hero-bottom-left-w-live:
+    calc(var(--brobots-hero-bottom-left-w-base) + (var(--brobots-hero-bottom-left-w-info) - var(--brobots-hero-bottom-left-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-hero-bottom-left-h-live:
+    calc(var(--brobots-hero-bottom-left-h-base) + (var(--brobots-hero-bottom-left-h-info) - var(--brobots-hero-bottom-left-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-hero-bottom-right-w-live:
+    calc(var(--brobots-hero-bottom-right-w-base) + (var(--brobots-hero-bottom-right-w-info) - var(--brobots-hero-bottom-right-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-hero-bottom-right-h-live:
+    calc(var(--brobots-hero-bottom-right-h-base) + (var(--brobots-hero-bottom-right-h-info) - var(--brobots-hero-bottom-right-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-thumb-top-left-w-live:
+    calc(var(--brobots-thumb-top-left-w-base) + (var(--brobots-thumb-top-left-w-info) - var(--brobots-thumb-top-left-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-thumb-top-left-h-live:
+    calc(var(--brobots-thumb-top-left-h-base) + (var(--brobots-thumb-top-left-h-info) - var(--brobots-thumb-top-left-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-thumb-top-right-w-live:
+    calc(var(--brobots-thumb-top-right-w-base) + (var(--brobots-thumb-top-right-w-info) - var(--brobots-thumb-top-right-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-thumb-top-right-h-live:
+    calc(var(--brobots-thumb-top-right-h-base) + (var(--brobots-thumb-top-right-h-info) - var(--brobots-thumb-top-right-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-thumb-bottom-left-w-live:
+    calc(var(--brobots-thumb-bottom-left-w-base) + (var(--brobots-thumb-bottom-left-w-info) - var(--brobots-thumb-bottom-left-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-thumb-bottom-left-h-live:
+    calc(var(--brobots-thumb-bottom-left-h-base) + (var(--brobots-thumb-bottom-left-h-info) - var(--brobots-thumb-bottom-left-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-thumb-bottom-right-w-live:
+    calc(var(--brobots-thumb-bottom-right-w-base) + (var(--brobots-thumb-bottom-right-w-info) - var(--brobots-thumb-bottom-right-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-thumb-bottom-right-h-live:
+    calc(var(--brobots-thumb-bottom-right-h-base) + (var(--brobots-thumb-bottom-right-h-info) - var(--brobots-thumb-bottom-right-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-hero-left-rail-w-live:
+    calc(var(--brobots-hero-left-rail-w-base) + (var(--brobots-hero-left-rail-w-info) - var(--brobots-hero-left-rail-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-hero-right-rail-w-live:
+    calc(var(--brobots-hero-right-rail-w-base) + (var(--brobots-hero-right-rail-w-info) - var(--brobots-hero-right-rail-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-hero-top-bar-h-live:
+    calc(var(--brobots-hero-top-bar-h-base) + (var(--brobots-hero-top-bar-h-info) - var(--brobots-hero-top-bar-h-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-hero-bottom-bar-h-live:
+    calc(var(--brobots-hero-bottom-bar-h-base) + (var(--brobots-hero-bottom-bar-h-info) - var(--brobots-hero-bottom-bar-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-thumb-left-rail-w-live:
+    calc(var(--brobots-thumb-left-rail-w-base) + (var(--brobots-thumb-left-rail-w-info) - var(--brobots-thumb-left-rail-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-thumb-right-rail-w-live:
+    calc(var(--brobots-thumb-right-rail-w-base) + (var(--brobots-thumb-right-rail-w-info) - var(--brobots-thumb-right-rail-w-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-thumb-top-bar-h-live:
+    calc(var(--brobots-thumb-top-bar-h-base) + (var(--brobots-thumb-top-bar-h-info) - var(--brobots-thumb-top-bar-h-base)) * var(--brobots-tablet-frame-progress));
+  --brobots-thumb-bottom-bar-h-live:
+    calc(var(--brobots-thumb-bottom-bar-h-base) + (var(--brobots-thumb-bottom-bar-h-info) - var(--brobots-thumb-bottom-bar-h-base)) * var(--brobots-tablet-frame-progress));
+
+  --brobots-separator-h-live:
+    calc(var(--brobots-separator-h-base) + (var(--brobots-separator-h-info) - var(--brobots-separator-h-base)) * var(--brobots-tablet-frame-progress));
+}
+
+
+/*
+  Keep the existing state switch global as well. The JS tablet guard still
+  prevents this state from being entered on desktop; this simply lets a state
+  that ALREADY EXISTS survive the breakpoint long enough to animate out.
+*/
+#brobots-page-frame
+.brobots-inner-frame-area.is-tablet-info-geometry {
+  --brobots-tablet-frame-progress: 1;
+}
+
+
+/*
+  The raster pieces already consume these --*-live values through the
+  JS-authored aliases. Keep their interpolation available outside the tablet
+  media query for the same exit-only reason.
+*/
+#brobots-page-frame
+.brobots-inner-frame-area > [data-brobots-frame-piece] {
+  --brobots-piece-live-w:
+    calc(
+      var(--brobots-piece-base-w)
+      +
+      (
+        var(--brobots-piece-info-w)
+        -
+        var(--brobots-piece-base-w)
+      )
+      *
+      var(--brobots-tablet-frame-progress)
+    );
+
+  --brobots-piece-live-h:
+    calc(
+      var(--brobots-piece-base-h)
+      +
+      (
+        var(--brobots-piece-info-h)
+        -
+        var(--brobots-piece-base-h)
+      )
+      *
+      var(--brobots-tablet-frame-progress)
+    );
+}
+
+
+#brobots-page-frame
+.brobots-inner-frame-area > [data-brobots-frame-stretcher] {
+  --brobots-stretcher-live-w:
+    calc(
+      var(--brobots-stretcher-base-w)
+      +
+      (
+        var(--brobots-stretcher-info-w)
+        -
+        var(--brobots-stretcher-base-w)
+      )
+      *
+      var(--brobots-tablet-frame-progress)
+    );
+
+  --brobots-stretcher-live-h:
+    calc(
+      var(--brobots-stretcher-base-h)
+      +
+      (
+        var(--brobots-stretcher-info-h)
+        -
+        var(--brobots-stretcher-base-h)
+      )
+      *
+      var(--brobots-tablet-frame-progress)
+    );
 }

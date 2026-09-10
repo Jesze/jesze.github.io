@@ -13953,11 +13953,150 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
+    /*
+      Tablet hero navigation
+      ----------------------
+      Brobots no longer uses its thumbnail strip as the tablet interaction
+      surface. Keep the existing authored thumbnail items as the SINGLE media
+      data source, but create a lightweight hero-overlay controller from them.
+
+      This is deliberately generated here instead of adding duplicate media
+      markup to HTML. The same renderItem() function below therefore remains
+      the only thing that actually changes the selected media.
+    */
+    const heroZone =
+      browser.querySelector(
+        ".brobots-media-zone--hero"
+      );
+
+
+    let heroNavigation = null;
+    let heroPreviousButton = null;
+    let heroNextButton = null;
+    let heroDots = [];
+
+
+    if (heroZone) {
+      heroNavigation =
+        document.createElement(
+          "div"
+        );
+
+      heroNavigation.className =
+        "media-hero-navigation";
+
+      heroNavigation.setAttribute(
+        "aria-label",
+        "Brobots media navigation"
+      );
+
+
+      heroPreviousButton =
+        document.createElement(
+          "button"
+        );
+
+      heroPreviousButton.type =
+        "button";
+
+      heroPreviousButton.className =
+        "media-hero-arrow media-hero-arrow--previous";
+
+      heroPreviousButton.setAttribute(
+        "aria-label",
+        "Previous media"
+      );
+
+      heroPreviousButton.innerHTML =
+        '<span aria-hidden="true">‹</span>';
+
+
+      heroNextButton =
+        document.createElement(
+          "button"
+        );
+
+      heroNextButton.type =
+        "button";
+
+      heroNextButton.className =
+        "media-hero-arrow media-hero-arrow--next";
+
+      heroNextButton.setAttribute(
+        "aria-label",
+        "Next media"
+      );
+
+      heroNextButton.innerHTML =
+        '<span aria-hidden="true">›</span>';
+
+
+      const dotRail =
+        document.createElement(
+          "div"
+        );
+
+      dotRail.className =
+        "media-hero-dots";
+
+      dotRail.setAttribute(
+        "aria-label",
+        "Choose media"
+      );
+
+
+      heroDots =
+        items.map(
+          (item, index) => {
+            const dot =
+              document.createElement(
+                "button"
+              );
+
+
+            dot.type =
+              "button";
+
+            dot.className =
+              "media-hero-dot";
+
+            dot.setAttribute(
+              "aria-label",
+              `Show ${
+                item.dataset.mediaTitle ||
+                `media ${index + 1}`
+              }`
+            );
+
+            dotRail.appendChild(
+              dot
+            );
+
+            return dot;
+          }
+        );
+
+
+      heroNavigation.append(
+        heroPreviousButton,
+        heroNextButton,
+        dotRail
+      );
+
+
+      heroZone.appendChild(
+        heroNavigation
+      );
+    }
+
+
     if (
       !stage ||
       !thumbnails ||
       items.length === 0
     ) {
+      heroNavigation?.remove();
+
       return;
     }
 
@@ -13975,17 +14114,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const updateArrowState = () => {
+      const atStart =
+        activeIndex <= 0;
+
+      const atEnd =
+        activeIndex >=
+        items.length - 1;
+
+
       if (previousButton) {
         previousButton.disabled =
-          activeIndex <= 0;
+          atStart;
       }
 
 
       if (nextButton) {
         nextButton.disabled =
-          activeIndex >=
-          items.length - 1;
+          atEnd;
       }
+
+
+      if (heroPreviousButton) {
+        heroPreviousButton.disabled =
+          atStart;
+      }
+
+
+      if (heroNextButton) {
+        heroNextButton.disabled =
+          atEnd;
+      }
+
+
+      heroDots.forEach(
+        (dot, index) => {
+          const selected =
+            index ===
+            activeIndex;
+
+
+          dot.classList.toggle(
+            "is-selected",
+            selected
+          );
+
+
+          if (selected) {
+            dot.setAttribute(
+              "aria-current",
+              "true"
+            );
+          }
+
+          else {
+            dot.removeAttribute(
+              "aria-current"
+            );
+          }
+        }
+      );
     };
 
 
@@ -14364,6 +14551,40 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
+    heroPreviousButton?.addEventListener(
+      "click",
+      () => {
+        renderItem(
+          activeIndex - 1
+        );
+      }
+    );
+
+
+    heroNextButton?.addEventListener(
+      "click",
+      () => {
+        renderItem(
+          activeIndex + 1
+        );
+      }
+    );
+
+
+    heroDots.forEach(
+      (dot, index) => {
+        dot.addEventListener(
+          "click",
+          () => {
+            renderItem(
+              index
+            );
+          }
+        );
+      }
+    );
+
+
     browser.addEventListener(
       "keydown",
       (event) => {
@@ -14682,11 +14903,114 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
+  /*
+    One shared observer + registration path for EVERY info surface.
+
+    This is intentionally reusable by desktop popouts and dynamically
+    created tablet surfaces. Future culling stages can therefore be added
+    inside updateGameInfoFeatureCrowding() once and automatically apply to
+    both presentations.
+  */
+  let gameInfoFeatureObserver =
+    null;
+
+
+  if (
+    typeof ResizeObserver ===
+    "function"
+  ) {
+    gameInfoFeatureObserver =
+      new ResizeObserver(
+        (entries) => {
+          const gridsToUpdate =
+            new Set();
+
+
+          entries.forEach(
+            (entry) => {
+              const grid =
+                entry.target.matches(
+                  ".game-info-features"
+                )
+                  ? entry.target
+                  : entry.target.querySelector(
+                      ".game-info-features"
+                    );
+
+
+              if (grid) {
+                gridsToUpdate.add(
+                  grid
+                );
+              }
+            }
+          );
+
+
+          requestAnimationFrame(
+            () => {
+              gridsToUpdate.forEach(
+                updateGameInfoFeatureCrowding
+              );
+            }
+          );
+        }
+      );
+  }
+
+
+  const registerGameInfoFeatureGrid = (
+    featureGrid
+  ) => {
+    if (!featureGrid) {
+      return;
+    }
+
+
+    /*
+      IMPORTANT: same function call for desktop + tablet.
+    */
+    updateGameInfoFeatureCrowding(
+      featureGrid
+    );
+
+
+    if (!gameInfoFeatureObserver) {
+      return;
+    }
+
+
+    gameInfoFeatureObserver.observe(
+      featureGrid
+    );
+
+
+    const surface =
+      featureGrid.closest(
+        ".game-info-surface"
+      );
+
+
+    if (surface) {
+      gameInfoFeatureObserver.observe(
+        surface
+      );
+    }
+  };
+
+
   const updateAllGameInfoFeatureCrowding = () => {
-    gameInfoFeatureGrids.forEach(
+    document.querySelectorAll(
+      ".game-info-features"
+    ).forEach(
       updateGameInfoFeatureCrowding
     );
   };
+
+
+  gameInfoFeatureGrids.forEach(
+    registerGameInfoFeatureGrid
+  );
 
 
   if (
@@ -14695,72 +15019,6 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(
       updateAllGameInfoFeatureCrowding
     );
-
-
-    if (
-      typeof ResizeObserver ===
-      "function"
-    ) {
-      const gameInfoFeatureObserver =
-        new ResizeObserver(
-          (entries) => {
-            const gridsToUpdate =
-              new Set();
-
-
-            entries.forEach(
-              (entry) => {
-                const grid =
-                  entry.target.matches(
-                    ".game-info-features"
-                  )
-                    ? entry.target
-                    : entry.target.querySelector(
-                        ".game-info-features"
-                      );
-
-
-                if (grid) {
-                  gridsToUpdate.add(
-                    grid
-                  );
-                }
-              }
-            );
-
-
-            requestAnimationFrame(
-              () => {
-                gridsToUpdate.forEach(
-                  updateGameInfoFeatureCrowding
-                );
-              }
-            );
-          }
-        );
-
-
-      gameInfoFeatureGrids.forEach(
-        (featureGrid) => {
-          gameInfoFeatureObserver.observe(
-            featureGrid
-          );
-
-
-          const surface =
-            featureGrid.closest(
-              ".game-info-surface"
-            );
-
-
-          if (surface) {
-            gameInfoFeatureObserver.observe(
-              surface
-            );
-          }
-        }
-      );
-    }
   }
 
 
@@ -15383,21 +15641,85 @@ document.addEventListener("DOMContentLoaded", () => {
 
       fixed.forEach(
         (record) => {
+          const baseWidth =
+            responsiveLength(
+              record.width
+            );
+
+          const baseHeight =
+            responsiveLength(
+              record.height
+            );
+
+
+          /*
+            Tablet-info uses the SAME fitting rule as normal resize, but
+            against a virtual frame whose usable height is the intended
+            small hero region rather than the full page height.
+
+            scale = min(
+              current frame width / native full-frame width,
+              tablet hero target height / native hero height
+            )
+          */
+          const infoWidth =
+            `min(` +
+            `calc(100cqw * ${record.width / derived.nativeWidth}), ` +
+            `calc(var(--brobots-tablet-info-hero-end-y) * ${record.width / derived.nativeHeroHeight})` +
+            `)`;
+
+
+          const infoHeight =
+            `min(` +
+            `calc(100cqw * ${record.height / derived.nativeWidth}), ` +
+            `calc(var(--brobots-tablet-info-hero-end-y) * ${record.height / derived.nativeHeroHeight})` +
+            `)`;
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-piece-base-w",
+              baseWidth
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-piece-base-h",
+              baseHeight
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-piece-info-w",
+              infoWidth
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-piece-info-h",
+              infoHeight
+            );
+
+
+          /*
+            Desktop and ordinary tablet still resolve straight to the proven
+            v46 base geometry. Tablet CSS only supplies the optional LIVE
+            values while its controlled frame transition is active.
+          */
           record.element.style
             .setProperty(
               "--brobots-piece-w",
-              responsiveLength(
-                record.width
-              )
+              "var(--brobots-piece-live-w, var(--brobots-piece-base-w))"
             );
 
 
           record.element.style
             .setProperty(
               "--brobots-piece-h",
-              responsiveLength(
-                record.height
-              )
+              "var(--brobots-piece-live-h, var(--brobots-piece-base-h))"
             );
         }
       );
@@ -15417,21 +15739,70 @@ document.addEventListener("DOMContentLoaded", () => {
           }
 
 
+          const baseWidth =
+            responsiveLength(
+              record.width
+            );
+
+          const baseHeight =
+            responsiveLength(
+              record.height
+            );
+
+
+          const infoWidth =
+            `min(` +
+            `calc(100cqw * ${record.width / derived.nativeWidth}), ` +
+            `calc(var(--brobots-tablet-info-hero-end-y) * ${record.width / derived.nativeHeroHeight})` +
+            `)`;
+
+
+          const infoHeight =
+            `min(` +
+            `calc(100cqw * ${record.height / derived.nativeWidth}), ` +
+            `calc(var(--brobots-tablet-info-hero-end-y) * ${record.height / derived.nativeHeroHeight})` +
+            `)`;
+
+
+          brobotsInnerFrameArea.style
+            .setProperty(
+              `--${prefix}-w-base`,
+              baseWidth
+            );
+
+
+          brobotsInnerFrameArea.style
+            .setProperty(
+              `--${prefix}-h-base`,
+              baseHeight
+            );
+
+
+          brobotsInnerFrameArea.style
+            .setProperty(
+              `--${prefix}-w-info`,
+              infoWidth
+            );
+
+
+          brobotsInnerFrameArea.style
+            .setProperty(
+              `--${prefix}-h-info`,
+              infoHeight
+            );
+
+
           brobotsInnerFrameArea.style
             .setProperty(
               `--${prefix}-w`,
-              responsiveLength(
-                record.width
-              )
+              `var(--${prefix}-w-live, var(--${prefix}-w-base))`
             );
 
 
           brobotsInnerFrameArea.style
             .setProperty(
               `--${prefix}-h`,
-              responsiveLength(
-                record.height
-              )
+              `var(--${prefix}-h-live, var(--${prefix}-h-base))`
             );
         };
 
@@ -15502,17 +15873,59 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
+          const infoWidth =
+            `min(` +
+            `calc(100cqw * ${record.width / derived.nativeWidth}), ` +
+            `calc(var(--brobots-tablet-info-hero-end-y) * ${record.width / derived.nativeHeroHeight})` +
+            `)`;
+
+
+          const infoHeight =
+            `min(` +
+            `calc(100cqw * ${record.height / derived.nativeWidth}), ` +
+            `calc(var(--brobots-tablet-info-hero-end-y) * ${record.height / derived.nativeHeroHeight})` +
+            `)`;
+
+
           record.element.style
             .setProperty(
-              "--brobots-stretcher-w",
+              "--brobots-stretcher-base-w",
               width
             );
 
 
           record.element.style
             .setProperty(
-              "--brobots-stretcher-h",
+              "--brobots-stretcher-base-h",
               height
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-stretcher-info-w",
+              infoWidth
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-stretcher-info-h",
+              infoHeight
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-stretcher-w",
+              "var(--brobots-stretcher-live-w, var(--brobots-stretcher-base-w))"
+            );
+
+
+          record.element.style
+            .setProperty(
+              "--brobots-stretcher-h",
+              "var(--brobots-stretcher-live-h, var(--brobots-stretcher-base-h))"
             );
 
 
@@ -15544,7 +15957,10 @@ document.addEventListener("DOMContentLoaded", () => {
               "--brobots-thumb-top-bar-h",
 
             "thumb-stretch-bottom":
-              "--brobots-thumb-bottom-bar-h"
+              "--brobots-thumb-bottom-bar-h",
+
+            "separator":
+              "--brobots-separator-h"
           };
 
 
@@ -15553,17 +15969,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
           if (exposedName) {
+            const useWidth =
+              key.endsWith(
+                "left"
+              ) ||
+              key.endsWith(
+                "right"
+              );
+
+
+            brobotsInnerFrameArea.style
+              .setProperty(
+                `${exposedName}-base`,
+                useWidth
+                  ? width
+                  : height
+              );
+
+
+            brobotsInnerFrameArea.style
+              .setProperty(
+                `${exposedName}-info`,
+                useWidth
+                  ? infoWidth
+                  : infoHeight
+              );
+
+
             brobotsInnerFrameArea.style
               .setProperty(
                 exposedName,
-                key.endsWith(
-                  "left"
-                ) ||
-                key.endsWith(
-                  "right"
-                )
-                  ? width
-                  : height
+                `var(${exposedName}-live, var(${exposedName}-base))`
               );
           }
         }
@@ -15580,15 +16016,29 @@ document.addEventListener("DOMContentLoaded", () => {
       */
       brobotsInnerFrameArea.style
         .setProperty(
-          "--brobots-hero-end-y",
+          "--brobots-hero-end-base-y",
           `calc(100cqh * ${derived.heroEndRatio})`
         );
 
 
       brobotsInnerFrameArea.style
         .setProperty(
-          "--brobots-thumb-start-y",
+          "--brobots-thumb-start-base-y",
           `calc(100cqh * ${derived.thumbStartRatio})`
+        );
+
+
+      brobotsInnerFrameArea.style
+        .setProperty(
+          "--brobots-hero-end-y",
+          "var(--brobots-hero-end-live-y, var(--brobots-hero-end-base-y))"
+        );
+
+
+      brobotsInnerFrameArea.style
+        .setProperty(
+          "--brobots-thumb-start-y",
+          "var(--brobots-thumb-start-live-y, var(--brobots-thumb-start-base-y))"
         );
     };
 
@@ -15605,5 +16055,1186 @@ document.addEventListener("DOMContentLoaded", () => {
         applyBrobotsMeasuredFrameDimensions();
       });
   }
+
+  /* =======================================================
+     Brobots tablet info geometry — clean STEP 1 test
+     ======================================================= */
+
+  const brobotsTabletMode =
+    window.matchMedia(
+      "(min-width: 841px) and (max-width: 1400px)"
+    );
+
+
+  /*
+    Tablet info host
+    ----------------
+    Keep desktop popout markup completely untouched.
+
+    The tablet surface is cloned from the existing Brobots .game-info node,
+    so there is still only one authored content source in HTML. This avoids
+    reparenting the desktop secondary panel during breakpoint transitions
+    and keeps the proven PC popout system isolated.
+  */
+  const brobotsFrame =
+    getPageFrame(
+      "brobots"
+    );
+
+
+  const brobotsDesktopInfo =
+    brobotsFrame
+      ?.querySelector(
+        ".desktop-secondary-panel .game-info"
+      ) ||
+    null;
+
+
+  const brobotsDesktopGlassStack =
+    brobotsFrame
+      ?.querySelector(
+        ".desktop-secondary-panel .etherian-popout-layer-stack"
+      ) ||
+    null;
+
+
+  const brobotsTabletInfoHost =
+    document.createElement(
+      "section"
+    );
+
+
+  brobotsTabletInfoHost.className =
+    "brobots-tablet-info-host";
+
+  brobotsTabletInfoHost.setAttribute(
+    "aria-label",
+    "Brobots game information"
+  );
+
+  brobotsTabletInfoHost.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+
+  if (brobotsDesktopGlassStack) {
+    const tabletGlassClone =
+      brobotsDesktopGlassStack.cloneNode(
+        true
+      );
+
+
+    tabletGlassClone.classList.add(
+      "brobots-tablet-glass-stack"
+    );
+
+
+    brobotsTabletInfoHost.appendChild(
+      tabletGlassClone
+    );
+  }
+
+
+  let brobotsTabletFeatureGrid =
+    null;
+
+
+  if (brobotsDesktopInfo) {
+    const tabletInfoClone =
+      brobotsDesktopInfo.cloneNode(
+        true
+      );
+
+
+    tabletInfoClone.classList.add(
+      "game-info--tablet"
+    );
+
+
+    brobotsTabletInfoHost.appendChild(
+      tabletInfoClone
+    );
+
+
+    brobotsTabletFeatureGrid =
+      tabletInfoClone.querySelector(
+        ".game-info-features"
+      );
+  }
+
+
+  if (brobotsInnerFrameArea) {
+    brobotsInnerFrameArea.appendChild(
+      brobotsTabletInfoHost
+    );
+  }
+
+
+  /*
+    Register the tablet clone through the SAME generic crowding function and
+    observer used by the desktop popout.
+  */
+  registerGameInfoFeatureGrid(
+    brobotsTabletFeatureGrid
+  );
+
+
+  /*
+    Tablet landing identity
+    -----------------------
+    The collapsed tablet state no longer uses the thumbnail strip as its
+    primary lower-region content. Instead, show the Brobots logo plus a
+    simple interaction cue.
+
+    Clone the existing authored Brobots logo from the desktop info surface
+    so the logo source stays centralized.
+  */
+  const brobotsLandingIdentity =
+    document.createElement(
+      "div"
+    );
+
+
+  brobotsLandingIdentity.className =
+    "brobots-tablet-landing-identity";
+
+
+  const brobotsLandingLogo =
+    brobotsDesktopInfo
+      ?.querySelector(
+        ".game-info-logo"
+      )
+      ?.cloneNode(
+        true
+      ) ||
+    null;
+
+
+  if (brobotsLandingLogo) {
+    /*
+      IMPORTANT:
+      This clone is only artwork for the tablet landing state. Remove the
+      generic .game-info-logo class so desktop/info resize rules, compact
+      states, and their width transitions cannot fight this layout.
+    */
+    brobotsLandingLogo.classList.remove(
+      "game-info-logo"
+    );
+
+
+    brobotsLandingLogo.classList.add(
+      "brobots-tablet-landing-logo"
+    );
+
+
+    brobotsLandingIdentity.appendChild(
+      brobotsLandingLogo
+    );
+  }
+
+
+  const brobotsLandingCue =
+    document.createElement(
+      "button"
+    );
+
+
+  brobotsLandingCue.type =
+    "button";
+
+  brobotsLandingCue.className =
+    "brobots-tablet-scroll-cue";
+
+  brobotsLandingCue.setAttribute(
+    "aria-label",
+    "Show Brobots game information"
+  );
+
+  brobotsLandingCue.innerHTML =
+    '<span class="brobots-tablet-scroll-cue-text">Scroll for more</span>' +
+    '<span class="brobots-tablet-scroll-cue-arrow" aria-hidden="true">⌄</span>';
+
+
+  brobotsLandingIdentity.appendChild(
+    brobotsLandingCue
+  );
+
+
+  if (brobotsInnerFrameArea) {
+    brobotsInnerFrameArea.appendChild(
+      brobotsLandingIdentity
+    );
+  }
+
+
+  /*
+    Measure the tablet landing logo's travel from its CURRENT collapsed
+    centre to the CURRENT hero viewer centre.
+
+    The old CSS used a guessed multiple of the logo height, which could leave
+    a small piece visible on some tablet/window proportions. Measuring the
+    actual two visual centres keeps the endpoint tied to the real hero rather
+    than to an arbitrary clearance value.
+  */
+  const updateBrobotsTabletLogoTarget =
+    () => {
+      if (
+        !brobotsInnerFrameArea ||
+        !brobotsLandingLogo ||
+        !brobotsTabletMode.matches
+      ) {
+        return;
+      }
+
+
+      const heroViewer =
+        brobotsInnerFrameArea.querySelector(
+          ".brobots-media-zone--hero .media-viewer"
+        );
+
+
+      if (!heroViewer) {
+        return;
+      }
+
+
+      const logoRect =
+        brobotsLandingLogo.getBoundingClientRect();
+
+
+      const heroRect =
+        heroViewer.getBoundingClientRect();
+
+
+      if (
+        logoRect.width <= 0 ||
+        logoRect.height <= 0 ||
+        heroRect.width <= 0 ||
+        heroRect.height <= 0
+      ) {
+        return;
+      }
+
+
+      const logoCenterY =
+        logoRect.top +
+        logoRect.height / 2;
+
+
+      const heroCenterY =
+        heroRect.top +
+        heroRect.height / 2;
+
+
+      brobotsInnerFrameArea.style.setProperty(
+        "--brobots-tablet-logo-target-y",
+        `${heroCenterY - logoCenterY}px`
+      );
+    };
+
+
+  const setBrobotsTabletGeometryState =
+    (
+      infoGeometry,
+      allowOutsideTablet = false
+    ) => {
+      if (
+        !brobotsInnerFrameArea ||
+        (
+          !brobotsTabletMode.matches &&
+          !allowOutsideTablet
+        )
+      ) {
+        return;
+      }
+
+
+      /*
+        Capture the collapsed centres BEFORE adding the info-state class.
+        That gives the logo one stable destination for the whole transition.
+        On the reverse trip we keep the same value so it retraces the path.
+      */
+      if (infoGeometry) {
+        updateBrobotsTabletLogoTarget();
+      }
+
+
+      brobotsInnerFrameArea.classList.toggle(
+        "is-tablet-info-geometry",
+        infoGeometry
+      );
+
+
+      brobotsTabletInfoHost.setAttribute(
+        "aria-hidden",
+        infoGeometry
+          ? "false"
+          : "true"
+      );
+    };
+
+
+  brobotsLandingCue.addEventListener(
+    "click",
+    () => {
+      setBrobotsTabletGeometryState(
+        true
+      );
+    }
+  );
+
+
+  /* =======================================================
+     Brobots tablet media <-> info gesture navigation
+     =======================================================
+
+     The arrow, mouse wheel, trackpad, and touch gestures ALL call the same
+     setBrobotsTabletGeometryState() function above. There is no second
+     transition implementation.
+
+     Wheel/trackpad:
+       - accumulate intent rather than firing on one tiny delta
+       - reset accumulation when direction reverses or input pauses
+       - short lockout after a successful transition prevents momentum from
+         instantly undoing/redoing it
+
+     Touch:
+       - only vertical gestures count
+       - horizontal movement is ignored so future gallery/swipe behavior is
+         not stolen
+  */
+
+  let brobotsTabletWheelIntent =
+    0;
+
+  let brobotsTabletWheelDirection =
+    0;
+
+  let brobotsTabletWheelResetTimer =
+    null;
+
+  let brobotsTabletGestureLockedUntil =
+    0;
+
+
+  const brobotsTabletGestureCanRun =
+    () => (
+      brobotsTabletMode.matches &&
+      brobotsInnerFrameArea &&
+      brobotsFrame?.classList.contains(
+        "is-open"
+      ) &&
+      (
+        selectedPageName === "brobots" ||
+        activePageName === "brobots"
+      ) &&
+      !document.body.classList.contains(
+        "is-media-lightbox-open"
+      ) &&
+      performance.now() >=
+        brobotsTabletGestureLockedUntil
+    );
+
+
+  const triggerBrobotsTabletGesture =
+    (direction) => {
+      if (
+        !brobotsTabletGestureCanRun() ||
+        direction === 0
+      ) {
+        return false;
+      }
+
+
+      const infoIsOpen =
+        brobotsInnerFrameArea.classList.contains(
+          "is-tablet-info-geometry"
+        );
+
+
+      /*
+        Down only has meaning from media -> info.
+        Up only has meaning from info -> media.
+      */
+      if (
+        direction > 0 &&
+        !infoIsOpen
+      ) {
+        setBrobotsTabletGeometryState(
+          true
+        );
+      }
+
+      else if (
+        direction < 0 &&
+        infoIsOpen
+      ) {
+        setBrobotsTabletGeometryState(
+          false
+        );
+      }
+
+      else {
+        return false;
+      }
+
+
+      /*
+        720ms is the frame animation duration. Keep momentum input from
+        retriggering until just after that physical transformation finishes.
+      */
+      brobotsTabletGestureLockedUntil =
+        performance.now() +
+        780;
+
+
+      brobotsTabletWheelIntent =
+        0;
+
+      brobotsTabletWheelDirection =
+        0;
+
+
+      return true;
+    };
+
+
+  const resetBrobotsTabletWheelIntent =
+    () => {
+      brobotsTabletWheelIntent =
+        0;
+
+      brobotsTabletWheelDirection =
+        0;
+
+      brobotsTabletWheelResetTimer =
+        null;
+    };
+
+
+  const handleBrobotsTabletWheel =
+    (event) => {
+      if (
+        !brobotsTabletGestureCanRun()
+      ) {
+        return;
+      }
+
+
+      /*
+        Ignore overwhelmingly horizontal trackpad gestures.
+      */
+      if (
+        Math.abs(event.deltaX) >
+        Math.abs(event.deltaY)
+      ) {
+        return;
+      }
+
+
+      if (
+        Math.abs(event.deltaY) <
+        1
+      ) {
+        return;
+      }
+
+
+      const direction =
+        Math.sign(
+          event.deltaY
+        );
+
+
+      const infoIsOpen =
+        brobotsInnerFrameArea.classList.contains(
+          "is-tablet-info-geometry"
+        );
+
+
+      const gestureCanChangeState =
+        (
+          direction > 0 &&
+          !infoIsOpen
+        ) ||
+        (
+          direction < 0 &&
+          infoIsOpen
+        );
+
+
+      /*
+        Do not hijack wheel input that has nowhere useful to go.
+      */
+      if (!gestureCanChangeState) {
+        resetBrobotsTabletWheelIntent();
+        return;
+      }
+
+
+      /*
+        Once this wheel direction is meaningful to our two-state page,
+        consume it so the browser doesn't also move the document underneath.
+      */
+      event.preventDefault();
+
+
+      if (
+        direction !==
+        brobotsTabletWheelDirection
+      ) {
+        brobotsTabletWheelIntent =
+          0;
+
+        brobotsTabletWheelDirection =
+          direction;
+      }
+
+
+      /*
+        Desktop mouse wheels should feel almost like a normal page step:
+        one deliberate notch ought to be enough.
+
+        Trackpads can emit lots of tiny deltas, so those still accumulate
+        briefly instead of firing from incidental movement.
+      */
+      const absoluteDelta =
+        Math.abs(
+          event.deltaY
+        );
+
+
+      const isCoarseWheelStep =
+        event.deltaMode !== 0 ||
+        absoluteDelta >= 18;
+
+
+      if (isCoarseWheelStep) {
+        triggerBrobotsTabletGesture(
+          direction
+        );
+
+        return;
+      }
+
+
+      /*
+        High-resolution trackpad input:
+        accumulate a much smaller amount of intent than v62 required.
+      */
+      brobotsTabletWheelIntent +=
+        Math.min(
+          absoluteDelta,
+          18
+        );
+
+
+      if (
+        brobotsTabletWheelResetTimer
+      ) {
+        clearTimeout(
+          brobotsTabletWheelResetTimer
+        );
+      }
+
+
+      brobotsTabletWheelResetTimer =
+        setTimeout(
+          resetBrobotsTabletWheelIntent,
+          180
+        );
+
+
+      if (
+        brobotsTabletWheelIntent >=
+        22
+      ) {
+        triggerBrobotsTabletGesture(
+          direction
+        );
+      }
+    };
+
+
+  brobotsFrame?.addEventListener(
+    "wheel",
+    handleBrobotsTabletWheel,
+    {
+      passive: false
+    }
+  );
+
+
+  /* -----------------------
+     Touch / tablet swipe
+     ----------------------- */
+
+  let brobotsTabletTouchStartX =
+    0;
+
+  let brobotsTabletTouchStartY =
+    0;
+
+  let brobotsTabletTouchTracking =
+    false;
+
+  let brobotsTabletTouchConsumed =
+    false;
+
+
+  const clearBrobotsTabletTouch =
+    () => {
+      brobotsTabletTouchTracking =
+        false;
+
+      brobotsTabletTouchConsumed =
+        false;
+    };
+
+
+  brobotsFrame?.addEventListener(
+    "touchstart",
+    (event) => {
+      if (
+        !brobotsTabletGestureCanRun() ||
+        event.touches.length !== 1
+      ) {
+        clearBrobotsTabletTouch();
+        return;
+      }
+
+
+      const touch =
+        event.touches[0];
+
+
+      brobotsTabletTouchStartX =
+        touch.clientX;
+
+      brobotsTabletTouchStartY =
+        touch.clientY;
+
+      brobotsTabletTouchTracking =
+        true;
+
+      brobotsTabletTouchConsumed =
+        false;
+    },
+    {
+      passive: true
+    }
+  );
+
+
+  brobotsFrame?.addEventListener(
+    "touchmove",
+    (event) => {
+      if (
+        !brobotsTabletTouchTracking ||
+        brobotsTabletTouchConsumed ||
+        event.touches.length !== 1
+      ) {
+        return;
+      }
+
+
+      const touch =
+        event.touches[0];
+
+      const deltaX =
+        touch.clientX -
+        brobotsTabletTouchStartX;
+
+      const deltaY =
+        touch.clientY -
+        brobotsTabletTouchStartY;
+
+
+      /*
+        Require a clearly vertical gesture. Finger moving UP corresponds to
+        normal page-scroll intent DOWN into info; finger moving DOWN returns
+        toward media.
+      */
+      if (
+        Math.abs(deltaY) <
+        46 ||
+        Math.abs(deltaY) <
+        Math.abs(deltaX) *
+        1.2
+      ) {
+        return;
+      }
+
+
+      const direction =
+        deltaY < 0
+          ? 1
+          : -1;
+
+
+      if (
+        triggerBrobotsTabletGesture(
+          direction
+        )
+      ) {
+        brobotsTabletTouchConsumed =
+          true;
+
+        event.preventDefault();
+      }
+    },
+    {
+      passive: false
+    }
+  );
+
+
+  brobotsFrame?.addEventListener(
+    "touchend",
+    clearBrobotsTabletTouch,
+    {
+      passive: true
+    }
+  );
+
+
+  brobotsFrame?.addEventListener(
+    "touchcancel",
+    clearBrobotsTabletTouch,
+    {
+      passive: true
+    }
+  );
+
+
+  /* =======================================================
+     Brobots desktop <-> tablet content handoff
+     =======================================================
+
+     The frame itself already resizes continuously. The awkward part was
+     only the content swap at 1400px: desktop thumbnails disappeared and the
+     tablet landing identity appeared in one frame.
+
+     Keep one physical thumbnail strip and animate it toward/from the hero.
+     The travel distance is measured from the actual rendered centers after
+     the breakpoint change, so odd aspect ratios do not need a guessed CSS
+     offset.
+  */
+
+  let brobotsTabletBreakpointHandoffTimer =
+    null;
+
+  let brobotsTabletBreakpointHandoffStartTimer =
+    null;
+
+  let brobotsTabletBreakpointThumbStartTimer =
+    null;
+
+
+  const clearBrobotsTabletBreakpointHandoff =
+    () => {
+      if (!brobotsInnerFrameArea) {
+        return;
+      }
+
+
+      if (brobotsTabletBreakpointHandoffTimer) {
+        clearTimeout(
+          brobotsTabletBreakpointHandoffTimer
+        );
+
+        brobotsTabletBreakpointHandoffTimer =
+          null;
+      }
+
+
+      if (brobotsTabletBreakpointHandoffStartTimer) {
+        clearTimeout(
+          brobotsTabletBreakpointHandoffStartTimer
+        );
+
+        brobotsTabletBreakpointHandoffStartTimer =
+          null;
+      }
+
+
+      if (brobotsTabletBreakpointThumbStartTimer) {
+        clearTimeout(
+          brobotsTabletBreakpointThumbStartTimer
+        );
+
+        brobotsTabletBreakpointThumbStartTimer =
+          null;
+      }
+
+
+      brobotsInnerFrameArea.classList.remove(
+        "is-tablet-breakpoint-entering",
+        "is-tablet-breakpoint-leaving",
+        "is-tablet-breakpoint-handoff-active",
+        "is-tablet-breakpoint-thumb-active"
+      );
+    };
+
+
+  const updateBrobotsTabletBreakpointShift =
+    () => {
+      if (!brobotsInnerFrameArea) {
+        return;
+      }
+
+
+      const heroViewer =
+        brobotsInnerFrameArea.querySelector(
+          ".brobots-media-zone--hero .media-viewer"
+        );
+
+
+      const mediaStrip =
+        brobotsInnerFrameArea.querySelector(
+          ".brobots-media-zone--thumbs .media-strip"
+        );
+
+
+      if (
+        !heroViewer ||
+        !mediaStrip
+      ) {
+        return;
+      }
+
+
+      const heroRect =
+        heroViewer.getBoundingClientRect();
+
+      const stripRect =
+        mediaStrip.getBoundingClientRect();
+
+
+      if (
+        heroRect.width <= 0 ||
+        heroRect.height <= 0 ||
+        stripRect.width <= 0 ||
+        stripRect.height <= 0
+      ) {
+        return;
+      }
+
+
+      const heroCenterY =
+        heroRect.top +
+        heroRect.height / 2;
+
+      const stripCenterY =
+        stripRect.top +
+        stripRect.height / 2;
+
+
+      brobotsInnerFrameArea.style.setProperty(
+        "--brobots-breakpoint-thumb-shift-y",
+        `${heroCenterY - stripCenterY}px`
+      );
+    };
+
+
+  const playBrobotsTabletBreakpointHandoff =
+    (enteringTablet) => {
+      if (!brobotsInnerFrameArea) {
+        return;
+      }
+
+
+      clearBrobotsTabletBreakpointHandoff();
+
+
+      /*
+        Only animate a visible Brobots page. If the breakpoint changes while
+        another page is active, simply leave Brobots in the correct resting
+        state for the next time it opens.
+      */
+      if (
+        !brobotsFrame?.classList.contains(
+          "is-open"
+        )
+      ) {
+        return;
+      }
+
+
+      const directionClass =
+        enteringTablet
+          ? "is-tablet-breakpoint-entering"
+          : "is-tablet-breakpoint-leaving";
+
+
+      brobotsInnerFrameArea.classList.add(
+        directionClass
+      );
+
+
+      /*
+        Measure after the media query has switched, but before the animated
+        end state is applied. The transient class keeps both surfaces alive
+        and gives us stable geometry to measure.
+      */
+      updateBrobotsTabletBreakpointShift();
+
+
+      /* Force the start state to paint before transitioning to the end. */
+      void brobotsInnerFrameArea.offsetWidth;
+
+
+      /*
+        Delay the CONTENT swap so it follows the larger page choreography
+        instead of firing the instant the 1400px media query flips.
+
+        Desktop -> tablet:
+          wait for the desktop secondary popout to finish retracting. This
+          uses the same CSS timing token as the actual popout close, so the
+          thumbnail strip begins travelling behind the hero right as that
+          panel has been absorbed back into the frame.
+
+        Tablet -> desktop:
+          use a smaller lead-in during the main-frame expansion. The desktop
+          thumbnails therefore do not pop in immediately at the breakpoint,
+          but they are established before the secondary panel grows outward.
+      */
+      const frameStyles =
+        getComputedStyle(
+          brobotsFrame
+        );
+
+
+      const pageLayoutDuration =
+        parseCssTime(
+          frameStyles.getPropertyValue(
+            "--page-layout-transition-duration"
+          ),
+          480
+        );
+
+
+      const secondaryDelay =
+        parseCssTime(
+          frameStyles.getPropertyValue(
+            "--secondary-panel-delay"
+          ),
+          160
+        );
+
+
+      const secondaryOpenDuration =
+        parseCssTime(
+          frameStyles.getPropertyValue(
+            "--secondary-panel-duration"
+          ),
+          720
+        );
+
+
+      /*
+        Split the landing-identity timing from the thumbnail timing.
+
+        DESKTOP -> TABLET
+          - thumbnails retract upward IMMEDIATELY on resize
+          - tablet logo/cue begin fading in immediately as the desktop
+            secondary panel begins retracting
+
+        TABLET -> DESKTOP
+          - keep the current logo/cue fade timing: start when the desktop
+            secondary popout itself begins emerging
+          - hold the thumbnails until the popout INFO fade begins. Brobots'
+            info content currently starts at 78% of the secondary-panel
+            emergence animation, matching the CSS transition-delay used by
+            .desktop-secondary-panel-content.
+      */
+      const secondaryCloseDuration =
+        parseCssTime(
+          frameStyles.getPropertyValue(
+            "--secondary-panel-close-duration"
+          ),
+          460
+        );
+
+
+      const identityDelay =
+        enteringTablet
+          ? (
+              /*
+                DESKTOP -> TABLET
+
+                The Brobots frame resize does NOT begin immediately when the
+                breakpoint flips. The existing layout transition first waits
+                for the desktop secondary panel to retract, and only THEN
+                runs the 480ms frame resize.
+
+                So the tablet logo/cue must wait for BOTH phases:
+                  secondary-panel retraction
+                  + main frame resize
+
+                The thumbnail retraction remains immediate.
+              */
+              secondaryCloseDuration +
+              pageLayoutDuration
+            )
+          : (
+              pageLayoutDuration +
+              secondaryDelay
+            );
+
+
+      const thumbnailDelay =
+        enteringTablet
+          ? 0
+          : (
+              pageLayoutDuration +
+              secondaryDelay +
+              (
+                secondaryOpenDuration *
+                0.78
+              )
+            );
+
+
+      brobotsTabletBreakpointHandoffStartTimer =
+        setTimeout(
+          () => {
+            brobotsTabletBreakpointHandoffStartTimer =
+              null;
+
+
+            requestAnimationFrame(() => {
+              brobotsInnerFrameArea.classList.add(
+                "is-tablet-breakpoint-handoff-active"
+              );
+            });
+          },
+          Math.max(
+            0,
+            identityDelay
+          )
+        );
+
+
+      brobotsTabletBreakpointThumbStartTimer =
+        setTimeout(
+          () => {
+            brobotsTabletBreakpointThumbStartTimer =
+              null;
+
+
+            requestAnimationFrame(() => {
+              brobotsInnerFrameArea.classList.add(
+                "is-tablet-breakpoint-thumb-active"
+              );
+            });
+          },
+          Math.max(
+            0,
+            thumbnailDelay
+          )
+        );
+
+
+      const handoffDuration =
+        parseCssTime(
+          getComputedStyle(
+            brobotsInnerFrameArea
+          ).getPropertyValue(
+            "--brobots-breakpoint-handoff-duration"
+          ),
+          1240
+        );
+
+
+      brobotsTabletBreakpointHandoffTimer =
+        setTimeout(
+          () => {
+            clearBrobotsTabletBreakpointHandoff();
+          },
+          Math.max(
+            identityDelay,
+            thumbnailDelay
+          ) +
+          handoffDuration +
+          100
+        );
+    };
+
+
+  const resetBrobotsTabletGeometry =
+    (event = null) => {
+      if (!brobotsInnerFrameArea) {
+        return;
+      }
+
+
+      const isTabletNow =
+        event?.matches ??
+        brobotsTabletMode.matches;
+
+
+      /*
+        Animate the desktop/tablet content handoff before settling into the
+        destination's ordinary CSS state.
+      */
+      if (event) {
+        playBrobotsTabletBreakpointHandoff(
+          isTabletNow
+        );
+      }
+
+
+      /*
+        If we leave tablet while the Brobots info state is open, do NOT
+        manually strip the class. That was bypassing the exact state-change
+        path used by an upward wheel/swipe and produced the visible snap.
+
+        Instead, invoke the existing "return to media" state change itself.
+        The second argument only bypasses the tablet-mode guard because the
+        matchMedia change event fires immediately after the breakpoint has
+        crossed.
+      */
+      if (!isTabletNow) {
+        if (
+          brobotsInnerFrameArea.classList.contains(
+            "is-tablet-info-geometry"
+          )
+        ) {
+          setBrobotsTabletGeometryState(
+            false,
+            true
+          );
+        }
+
+
+        resetBrobotsTabletWheelIntent();
+
+        clearBrobotsTabletTouch();
+
+        brobotsTabletGestureLockedUntil =
+          0;
+      }
+    };
+
+
+  if (
+    typeof brobotsTabletMode.addEventListener ===
+      "function"
+  ) {
+    brobotsTabletMode.addEventListener(
+      "change",
+      resetBrobotsTabletGeometry
+    );
+  }
+
+  else {
+    brobotsTabletMode.addListener(
+      resetBrobotsTabletGeometry
+    );
+  }
+
+
 
 });
