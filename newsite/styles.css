@@ -23753,3 +23753,80 @@ body.is-media-lightbox-open {
   }
 }
 
+
+
+/* =========================================================
+   MOBILE PROTOTYPE — KEEP TABLET VERTICAL FRAME COMPOSITION
+   =========================================================
+
+   v121 gave mobile its own top/bottom rectangle. That changed the frame's
+   vertical center exactly at 840px, which is the visible downward "pop"
+   during tablet -> mobile resizing.
+
+   Mobile can still use tighter horizontal side padding, but the vertical
+   rectangle should remain continuous across the breakpoint.
+   ========================================================= */
+
+@media (max-width: 840px) {
+  .prototype-page-frame[data-game-frame-page] {
+    /*
+      Match the shared tablet/desktop vertical composition.
+      These override the exploratory v121 mobile values.
+    */
+    --page-frame-shift-y: -18px;
+
+    top:
+      calc(
+        clamp(82px, calc(64px + 3.9vw), 120px)
+        +
+        (clamp(6px, 0.7vw, 10px) * 2)
+        +
+        20px
+        +
+        var(--page-frame-shift-y)
+      );
+
+    bottom:
+      calc(
+        clamp(18px, 2vw, 30px)
+        -
+        var(--page-frame-shift-y)
+      );
+
+    /*
+      Keep the narrower mobile horizontal margins from v121.
+    */
+    --page-frame-side-padding:
+      clamp(
+        10px,
+        3vw,
+        18px
+      );
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE PROTOTYPE — CONTINUOUS HORIZONTAL FRAME WIDTH
+   =========================================================
+
+   The tablet frame reaches 840px with 28px side padding.
+   v121/v122 switched immediately to an 18px mobile maximum, so crossing
+   the breakpoint added ~20px of total frame width in one frame.
+
+   Start mobile at the exact same 28px inset, then let it decrease smoothly
+   with the viewport instead of stepping at 840px.
+   ========================================================= */
+
+@media (max-width: 840px) {
+  .prototype-page-frame[data-game-frame-page] {
+    --page-frame-side-padding:
+      clamp(
+        10px,
+        3.333333vw,
+        28px
+      );
+  }
+}
+

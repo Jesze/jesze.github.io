@@ -9262,6 +9262,195 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
 
+
+  /*
+    Touch equivalent for the non-game pages.
+
+    Game pages deliberately keep their own richer media/info gesture state
+    machine. About / Contact only need direct sequential navigation:
+      finger up   -> next page
+      finger down -> previous page
+
+    Claim a clearly vertical gesture early so mobile browser overscroll /
+    pull-to-refresh never steals it, but keep the larger movement threshold
+    before actually switching pages.
+  */
+  [
+    "about",
+    "contact"
+  ].forEach((pageName) => {
+    const frame =
+      getPageFrame(
+        pageName
+      );
+
+
+    if (!frame) {
+      return;
+    }
+
+
+    let touchStartX =
+      0;
+
+    let touchStartY =
+      0;
+
+    let touchTracking =
+      false;
+
+    let touchConsumed =
+      false;
+
+
+    const clearTouch =
+      () => {
+        touchTracking =
+          false;
+
+        touchConsumed =
+          false;
+      };
+
+
+    frame.addEventListener(
+      "touchstart",
+      (event) => {
+        if (
+          !gameFrameTabletMode.matches ||
+          activePageName !== pageName ||
+          !frame.classList.contains(
+            "is-open"
+          ) ||
+          pageFrameIsAnimating ||
+          document.body.classList.contains(
+            "is-media-lightbox-open"
+          ) ||
+          event.touches.length !== 1
+        ) {
+          clearTouch();
+
+          return;
+        }
+
+
+        const touch =
+          event.touches[0];
+
+
+        touchStartX =
+          touch.clientX;
+
+        touchStartY =
+          touch.clientY;
+
+        touchTracking =
+          true;
+
+        touchConsumed =
+          false;
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    frame.addEventListener(
+      "touchmove",
+      (event) => {
+        if (
+          !touchTracking ||
+          touchConsumed ||
+          event.touches.length !== 1
+        ) {
+          return;
+        }
+
+
+        const touch =
+          event.touches[0];
+
+        const deltaX =
+          touch.clientX -
+          touchStartX;
+
+        const deltaY =
+          touch.clientY -
+          touchStartY;
+
+
+        const verticalIntentIsClear =
+          Math.abs(deltaY) >= 8 &&
+          Math.abs(deltaY) >
+            Math.abs(deltaX) * 1.1;
+
+
+        if (verticalIntentIsClear) {
+          event.preventDefault();
+        }
+
+
+        if (
+          Math.abs(deltaY) < 46 ||
+          !verticalIntentIsClear
+        ) {
+          return;
+        }
+
+
+        /*
+          Finger moving UP means forward/down through the site.
+          Finger moving DOWN means backward/up through the site.
+        */
+        const direction =
+          deltaY < 0
+            ? 1
+            : -1;
+
+
+        const switched =
+          direction > 0
+            ? requestNextPage(
+                pageName
+              )
+            : requestPreviousPage(
+                pageName
+              );
+
+
+        if (switched) {
+          touchConsumed =
+            true;
+
+          event.preventDefault();
+        }
+      },
+      {
+        passive: false
+      }
+    );
+
+
+    frame.addEventListener(
+      "touchend",
+      clearTouch,
+      {
+        passive: true
+      }
+    );
+
+
+    frame.addEventListener(
+      "touchcancel",
+      clearTouch,
+      {
+        passive: true
+      }
+    );
+  });
+
+
   /* =======================================================
      Initial state
      ======================================================= */
@@ -12630,6 +12819,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   const getCurrentPageNavButton = () => {
+    /*
+      Mobile's visible navigation anchor is the hamburger, not the hidden
+      tablet/desktop page button. Use the live hamburger geometry for the
+      lightbox button morph so opening and closing visually belong to the
+      control the user can actually see.
+    */
+    if (
+      !iconButtonMode.matches &&
+      menuToggle
+    ) {
+      return menuToggle;
+    }
+
+
     const name =
       selectedPageName ||
       activePageName;
@@ -12654,6 +12857,11 @@ document.addEventListener("DOMContentLoaded", () => {
     button
   ) => {
     if (!button) {
+      return "";
+    }
+
+
+    if (button === menuToggle) {
       return "";
     }
 
@@ -17881,16 +18089,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         /*
-          Require a clearly vertical gesture. Finger moving UP corresponds to
-          normal page-scroll intent DOWN into info; finger moving DOWN returns
-          toward media.
+          Claim vertical movement as soon as its intent is clear.
+
+          Waiting until the full 46px navigation threshold before calling
+          preventDefault() gives mobile browsers enough time to begin native
+          page overscroll / pull-to-refresh. Once this touch is clearly more
+          vertical than horizontal, the game-page gesture controller owns it.
+
+          We still keep the larger 46px threshold for actually changing
+          state, so accidental small finger motion does not trigger navigation.
+        */
+        const verticalIntentIsClear =
+          Math.abs(deltaY) >= 8 &&
+          Math.abs(deltaY) >
+            Math.abs(deltaX) * 1.1;
+
+
+        if (verticalIntentIsClear) {
+          event.preventDefault();
+        }
+
+
+        /*
+          Require a deliberate vertical distance before firing the site's
+          media/info/page navigation.
         */
         if (
-          Math.abs(deltaY) <
-          46 ||
-          Math.abs(deltaY) <
-          Math.abs(deltaX) *
-          1.2
+          Math.abs(deltaY) < 46 ||
+          !verticalIntentIsClear
         ) {
           return;
         }
