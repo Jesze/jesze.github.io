@@ -25361,3 +25361,35 @@ body.is-media-lightbox-open {
   }
 }
 
+
+
+/* =========================================================
+   MOBILE HERO — RESTORE INTERACTION AFTER MEDIA WIPE
+   =========================================================
+   The completed wipe wrapper intentionally remains in place to avoid the
+   1px end-of-transition snap. However, the base wrapper has
+   pointer-events:none so it cannot interfere DURING the wipe.
+
+   Once the wipe is complete, that same wrapper is now the permanent visible
+   hero. Re-enable pointer events so its image can receive double-click /
+   double-tap and open the lightbox normally.
+
+   Outgoing transition snapshots remain non-interactive.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-complete:not(.is-wipe-outgoing) {
+    pointer-events: auto !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-complete:not(.is-wipe-outgoing)
+  > .media-viewer-image {
+    pointer-events: auto !important;
+    touch-action: manipulation;
+  }
+}
+

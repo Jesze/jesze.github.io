@@ -735,6 +735,40 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
+  /*
+    Establish Safari-safe media state before the first play() call.
+  */
+  backgroundVideoBuffers.forEach(
+    (video) => {
+      video.defaultMuted = true;
+      video.muted = true;
+      video.autoplay = true;
+      video.loop = true;
+      video.playsInline = true;
+
+      video.setAttribute(
+        "muted",
+        ""
+      );
+
+      video.setAttribute(
+        "autoplay",
+        ""
+      );
+
+      video.setAttribute(
+        "playsinline",
+        ""
+      );
+
+      video.setAttribute(
+        "webkit-playsinline",
+        ""
+      );
+    }
+  );
+
+
   let activeBackgroundVideo =
     backgroundVideoBuffers.find(
       (video) =>
@@ -787,9 +821,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    /*
+      iOS Safari is stricter than desktop browsers about the exact muted /
+      inline state that exists BEFORE play() is requested. Keep both the
+      properties and HTML attributes synchronized.
+
+      defaultMuted is particularly important here: it tells WebKit this media
+      is intrinsically muted rather than something JS muted only after load.
+    */
+    video.defaultMuted = true;
     video.muted = true;
+    video.autoplay = true;
     video.loop = true;
     video.playsInline = true;
+
+    video.setAttribute(
+      "muted",
+      ""
+    );
+
+    video.setAttribute(
+      "autoplay",
+      ""
+    );
+
+    video.setAttribute(
+      "playsinline",
+      ""
+    );
+
+    video.setAttribute(
+      "webkit-playsinline",
+      ""
+    );
 
 
     const playPromise =
@@ -798,16 +862,98 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (
       playPromise &&
-      typeof playPromise.catch ===
+      typeof playPromise.then ===
         "function"
     ) {
-      playPromise.catch(() => {
-        video.classList.add(
-          "is-autoplay-blocked"
-        );
-      });
+      playPromise
+        .then(() => {
+          video.classList.remove(
+            "is-autoplay-blocked"
+          );
+        })
+        .catch(() => {
+          video.classList.add(
+            "is-autoplay-blocked"
+          );
+        });
     }
   };
+
+
+  /*
+    Safari can still reject the very first autoplay attempt in circumstances
+    such as Low Power Mode, returning from the app switcher, or a fresh tab.
+
+    The background itself intentionally has pointer-events:none, so its native
+    play overlay can never be our fallback. Instead, any normal user gesture
+    anywhere on the site becomes a harmless opportunity to retry the currently
+    active muted background video.
+  */
+  const retryActiveBackgroundVideo =
+    () => {
+      if (
+        !activeBackgroundVideo ||
+        (
+          !activeBackgroundVideo.paused &&
+          !activeBackgroundVideo.classList.contains(
+            "is-autoplay-blocked"
+          )
+        )
+      ) {
+        return;
+      }
+
+
+      safelyPlayBackgroundVideo(
+        activeBackgroundVideo
+      );
+    };
+
+
+  document.addEventListener(
+    "touchstart",
+    retryActiveBackgroundVideo,
+    {
+      capture: true,
+      passive: true
+    }
+  );
+
+
+  document.addEventListener(
+    "pointerdown",
+    retryActiveBackgroundVideo,
+    {
+      capture: true,
+      passive: true
+    }
+  );
+
+
+  /*
+    iOS can suspend decorative video when Safari is backgrounded. Retry when
+    the page becomes visible again rather than leaving the frozen play state.
+  */
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (
+        document.visibilityState ===
+        "visible"
+      ) {
+        retryActiveBackgroundVideo();
+      }
+    }
+  );
+
+
+  window.addEventListener(
+    "pageshow",
+    retryActiveBackgroundVideo,
+    {
+      passive: true
+    }
+  );
 
 
   const requestBackgroundVideo = (
