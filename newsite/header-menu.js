@@ -745,6 +745,7 @@ document.addEventListener("DOMContentLoaded", () => {
       video.autoplay = true;
       video.loop = true;
       video.playsInline = true;
+      video.preload = "auto";
 
       video.setAttribute(
         "muted",
@@ -834,6 +835,7 @@ document.addEventListener("DOMContentLoaded", () => {
     video.autoplay = true;
     video.loop = true;
     video.playsInline = true;
+    video.preload = "auto";
 
     video.setAttribute(
       "muted",
@@ -889,6 +891,70 @@ document.addEventListener("DOMContentLoaded", () => {
     anywhere on the site becomes a harmless opportunity to retry the currently
     active muted background video.
   */
+  const armBackgroundVideoAutoplayWhenReady =
+    (
+      video,
+      expectedSrc = null
+    ) => {
+      if (!video) {
+        return;
+      }
+
+
+      const tryReadyPlay =
+        () => {
+          if (
+            expectedSrc &&
+            video.dataset.backgroundSrc !==
+              expectedSrc
+          ) {
+            return;
+          }
+
+
+          safelyPlayBackgroundVideo(
+            video
+          );
+        };
+
+
+      /*
+        Safari can reject play() while the newly-assigned resource is still
+        between HAVE_NOTHING / metadata. Re-issue the same muted inline play
+        request at the first useful media milestones.
+
+        These are one-shot listeners for THIS source assignment, so changing
+        pages later gets a fresh set tied to the new expected source.
+      */
+      [
+        "loadedmetadata",
+        "loadeddata",
+        "canplay"
+      ].forEach(
+        (eventName) => {
+          video.addEventListener(
+            eventName,
+            tryReadyPlay,
+            {
+              once: true
+            }
+          );
+        }
+      );
+
+
+      /*
+        Also retry on the next paint. iOS Safari sometimes accepts play()
+        immediately after the source/load mutation but not in the same task.
+      */
+      requestAnimationFrame(
+        () => {
+          tryReadyPlay();
+        }
+      );
+    };
+
+
   const retryActiveBackgroundVideo =
     () => {
       if (
@@ -1043,6 +1109,13 @@ document.addEventListener("DOMContentLoaded", () => {
     incomingVideo.src =
       nextSrc;
 
+
+    armBackgroundVideoAutoplayWhenReady(
+      incomingVideo,
+      nextSrc
+    );
+
+
     incomingVideo.load();
 
 
@@ -1142,6 +1215,27 @@ document.addEventListener("DOMContentLoaded", () => {
         "src"
       ) ||
       defaultBackgroundVideoSrc;
+
+
+    /*
+      Important for iPhone Safari:
+      establish muted + inline + autoplay state FIRST (done above), then make
+      the resource start/restart loading under that policy state.
+
+      This is the part that avoids relying on the first user tap as the thing
+      that finally makes playback legal.
+    */
+    armBackgroundVideoAutoplayWhenReady(
+      activeBackgroundVideo,
+      activeBackgroundVideo.dataset.backgroundSrc
+    );
+
+
+    if (
+      activeBackgroundVideo.readyState === 0
+    ) {
+      activeBackgroundVideo.load();
+    }
 
 
     safelyPlayBackgroundVideo(
