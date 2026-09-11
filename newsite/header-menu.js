@@ -15130,29 +15130,51 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =======================================================
-     Brobots inner-frame native canvas scaling
+     Reusable game-frame raster skin scaling
      ======================================================= */
 
-  const brobotsInnerFrameArea =
-    document.querySelector(
-      '[data-game-frame="brobots"]'
+  const gameFrameAreas =
+    Array.from(
+      document.querySelectorAll(
+        "[data-game-frame]"
+      )
     );
 
 
-  /* =======================================================
-     Brobots frame — dynamic raster dimensions
-     ======================================================= */
+  const gameFrameDimensionStates =
+    new WeakMap();
 
-  const brobotsFrameDimensionState = {
-    fixed:
-      new Map(),
 
-    stretchers:
-      new Map(),
+  const getGameFrameDimensionState =
+    (frameArea) => {
+      let state =
+        gameFrameDimensionStates.get(
+          frameArea
+        );
 
-    derived:
-      null
-  };
+
+      if (!state) {
+        state = {
+          fixed:
+            new Map(),
+
+          stretchers:
+            new Map(),
+
+          derived:
+            null
+        };
+
+
+        gameFrameDimensionStates.set(
+          frameArea,
+          state
+        );
+      }
+
+
+      return state;
+    };
 
 
   const getCssBackgroundUrl = (
@@ -15230,16 +15252,26 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
-  const measureBrobotsFrameAssets =
-    async () => {
-      if (!brobotsInnerFrameArea) {
+  const measureGameFrameAssets =
+    async (frameArea) => {
+      if (!frameArea) {
         return;
       }
 
 
+      const state =
+        getGameFrameDimensionState(
+          frameArea
+        );
+
+
+      state.fixed.clear();
+      state.stretchers.clear();
+
+
       const fixedElements =
         Array.from(
-          brobotsInnerFrameArea
+          frameArea
             .querySelectorAll(
               "[data-game-frame-piece]"
             )
@@ -15295,24 +15327,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        brobotsFrameDimensionState
-          .fixed
-          .set(
-            element.dataset
-              .gameFramePiece,
+        state.fixed.set(
+          element.dataset
+            .gameFramePiece,
 
-            {
-              element,
-              width,
-              height
-            }
-          );
+          {
+            element,
+            width,
+            height
+          }
+        );
       }
 
 
       const stretcherElements =
         Array.from(
-          brobotsInnerFrameArea
+          frameArea
             .querySelectorAll(
               "[data-game-frame-stretcher]"
             )
@@ -15331,28 +15361,36 @@ document.addEventListener("DOMContentLoaded", () => {
           );
 
 
-        brobotsFrameDimensionState
-          .stretchers
-          .set(
-            element.dataset
-              .gameFrameStretcher,
+        state.stretchers.set(
+          element.dataset
+            .gameFrameStretcher,
 
-            {
-              element,
-              ...dimensions
-            }
-          );
+          {
+            element,
+            ...dimensions
+          }
+        );
       }
     };
 
 
-  const deriveBrobotsFrameGeometry =
-    () => {
+  const deriveGameFrameGeometry =
+    (frameArea) => {
+      if (!frameArea) {
+        return null;
+      }
+
+
+      const state =
+        getGameFrameDimensionState(
+          frameArea
+        );
+
       const fixed =
-        brobotsFrameDimensionState.fixed;
+        state.fixed;
 
       const stretchers =
-        brobotsFrameDimensionState.stretchers;
+        state.stretchers;
 
 
       const f =
@@ -15371,18 +15409,6 @@ document.addEventListener("DOMContentLoaded", () => {
           };
 
 
-      /*
-        Reconstruct the UNSTRETCHED source frame directly from the 17 files.
-
-        Horizontal rows:
-          fixed-left + horizontal-stretcher + fixed-right
-
-        Vertical columns:
-          fixed-top + vertical-stretcher + fixed-bottom
-
-        If the cut set is authored consistently, the corresponding
-        measurements on both sides/rows are identical.
-      */
       const widths = {
         heroTop:
           f("hero-top-left").width +
@@ -15402,10 +15428,7 @@ document.addEventListener("DOMContentLoaded", () => {
         thumbBottom:
           f("thumb-bottom-left").width +
           s("thumb-stretch-bottom").width +
-          f("thumb-bottom-right").width,
-
-        separator:
-          s("separator").width
+          f("thumb-bottom-right").width
       };
 
 
@@ -15471,11 +15494,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
 
-      /*
-        Well-authored skins should make these values identical.
-        Use the rounded average as a harmless fallback while also warning
-        about any discrepancy so bad cuts are easy to spot.
-      */
       const average =
         (values) =>
           values.reduce(
@@ -15511,12 +15529,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       const nativeSeparatorHeight =
-        s("separator").height;
+        0;
 
 
       const nativeHeight =
         nativeHeroHeight +
-        nativeSeparatorHeight +
         nativeThumbHeight;
 
 
@@ -15553,7 +15570,7 @@ document.addEventListener("DOMContentLoaded", () => {
             0.01
           ) {
             console.warn(
-              `[Brobots frame] ${label} source dimensions do not agree:`,
+              `[${frameArea.dataset.gameFrame} frame] ${label} source dimensions do not agree:`,
               entries
             );
           }
@@ -15590,10 +15607,7 @@ document.addEventListener("DOMContentLoaded", () => {
           nativeHeight,
 
         thumbStartRatio:
-          (
-            nativeHeroHeight +
-            nativeSeparatorHeight
-          ) /
+          nativeHeroHeight /
           nativeHeight,
 
         widths,
@@ -15602,7 +15616,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
 
-      brobotsFrameDimensionState.derived =
+      state.derived =
         derived;
 
 
@@ -15610,17 +15624,20 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-
-  const applyBrobotsMeasuredFrameDimensions =
-    () => {
-      if (!brobotsInnerFrameArea) {
+  const applyGameFrameMeasuredDimensions =
+    (frameArea) => {
+      if (!frameArea) {
         return;
       }
 
 
+      const state =
+        getGameFrameDimensionState(
+          frameArea
+        );
+
       const derived =
-        brobotsFrameDimensionState
-          .derived;
+        state.derived;
 
 
       if (
@@ -15632,33 +15649,26 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
 
-      /*
-        One uniform art scale, expressed entirely in CSS:
-
-          min(
-            container width  / native width,
-            container height / native height
-          )
-
-        Rather than storing the scale itself, each required dimension is
-        emitted as the equivalent min(cqw, cqh) expression. This keeps the
-        raster frame synchronized with the container in the browser's own
-        layout pass and removes resize-frame latency.
-      */
       const responsiveLength =
-        (nativePixels) =>
-          `min(` +
-          `calc(100cqw * ${nativePixels / derived.nativeWidth}), ` +
-          `calc(100cqh * ${nativePixels / derived.nativeHeight})` +
-          `)`;
+        (sourcePixels) => {
+          return (
+            `min(` +
+            `calc(100cqw * ${sourcePixels / derived.nativeWidth}), ` +
+            `calc(100cqh * ${sourcePixels / derived.nativeHeight})` +
+            `)`
+          );
+        };
 
 
-      const fixed =
-        brobotsFrameDimensionState
-          .fixed;
+      /*
+        Preserve the original fixed-piece sizing substrate exactly.
 
-
-      fixed.forEach(
+        The component CSS still consumes these shared per-piece variables.
+        v91 accidentally dropped this pass while parameterizing the frame
+        controller, which left the fixed raster pieces without the same
+        responsive scale basis as the stretchers.
+      */
+      state.fixed.forEach(
         (record) => {
           const baseWidth =
             responsiveLength(
@@ -15671,22 +15681,11 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-          /*
-            Tablet-info uses the SAME fitting rule as normal resize, but
-            against a virtual frame whose usable height is the intended
-            small hero region rather than the full page height.
-
-            scale = min(
-              current frame width / native full-frame width,
-              tablet hero target height / native hero height
-            )
-          */
           const infoWidth =
             `min(` +
             `calc(100cqw * ${record.width / derived.nativeWidth}), ` +
             `calc(var(--brobots-tablet-info-hero-end-y) * ${record.width / derived.nativeHeroHeight})` +
             `)`;
-
 
           const infoHeight =
             `min(` +
@@ -15701,13 +15700,11 @@ document.addEventListener("DOMContentLoaded", () => {
               baseWidth
             );
 
-
           record.element.style
             .setProperty(
               "--brobots-piece-base-h",
               baseHeight
             );
-
 
           record.element.style
             .setProperty(
@@ -15715,25 +15712,17 @@ document.addEventListener("DOMContentLoaded", () => {
               infoWidth
             );
 
-
           record.element.style
             .setProperty(
               "--brobots-piece-info-h",
               infoHeight
             );
 
-
-          /*
-            Desktop and ordinary tablet still resolve straight to the proven
-            v46 base geometry. Tablet CSS only supplies the optional LIVE
-            values while its controlled frame transition is active.
-          */
           record.element.style
             .setProperty(
               "--brobots-piece-w",
               "var(--brobots-piece-live-w, var(--brobots-piece-base-w))"
             );
-
 
           record.element.style
             .setProperty(
@@ -15750,7 +15739,9 @@ document.addEventListener("DOMContentLoaded", () => {
           prefix
         ) => {
           const record =
-            fixed.get(key);
+            state.fixed.get(
+              key
+            );
 
 
           if (!record) {
@@ -15768,13 +15759,11 @@ document.addEventListener("DOMContentLoaded", () => {
               record.height
             );
 
-
           const infoWidth =
             `min(` +
             `calc(100cqw * ${record.width / derived.nativeWidth}), ` +
             `calc(var(--brobots-tablet-info-hero-end-y) * ${record.width / derived.nativeHeroHeight})` +
             `)`;
-
 
           const infoHeight =
             `min(` +
@@ -15783,42 +15772,42 @@ document.addEventListener("DOMContentLoaded", () => {
             `)`;
 
 
-          brobotsInnerFrameArea.style
+          frameArea.style
             .setProperty(
               `--${prefix}-w-base`,
               baseWidth
             );
 
 
-          brobotsInnerFrameArea.style
+          frameArea.style
             .setProperty(
               `--${prefix}-h-base`,
               baseHeight
             );
 
 
-          brobotsInnerFrameArea.style
+          frameArea.style
             .setProperty(
               `--${prefix}-w-info`,
               infoWidth
             );
 
 
-          brobotsInnerFrameArea.style
+          frameArea.style
             .setProperty(
               `--${prefix}-h-info`,
               infoHeight
             );
 
 
-          brobotsInnerFrameArea.style
+          frameArea.style
             .setProperty(
               `--${prefix}-w`,
               `var(--${prefix}-w-live, var(--${prefix}-w-base))`
             );
 
 
-          brobotsInnerFrameArea.style
+          frameArea.style
             .setProperty(
               `--${prefix}-h`,
               `var(--${prefix}-h-live, var(--${prefix}-h-base))`
@@ -15831,42 +15820,35 @@ document.addEventListener("DOMContentLoaded", () => {
         "brobots-hero-top-left"
       );
 
-
       exposeFixed(
         "hero-top-right",
         "brobots-hero-top-right"
       );
-
 
       exposeFixed(
         "hero-bottom-left",
         "brobots-hero-bottom-left"
       );
 
-
       exposeFixed(
         "hero-bottom-right",
         "brobots-hero-bottom-right"
       );
-
 
       exposeFixed(
         "thumb-top-left",
         "brobots-thumb-top-left"
       );
 
-
       exposeFixed(
         "thumb-top-right",
         "brobots-thumb-top-right"
       );
 
-
       exposeFixed(
         "thumb-bottom-left",
         "brobots-thumb-bottom-left"
       );
-
 
       exposeFixed(
         "thumb-bottom-right",
@@ -15874,12 +15856,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-      const stretchers =
-        brobotsFrameDimensionState
-          .stretchers;
-
-
-      stretchers.forEach(
+      state.stretchers.forEach(
         (record, key) => {
           const width =
             responsiveLength(
@@ -15891,13 +15868,11 @@ document.addEventListener("DOMContentLoaded", () => {
               record.height
             );
 
-
           const infoWidth =
             `min(` +
             `calc(100cqw * ${record.width / derived.nativeWidth}), ` +
             `calc(var(--brobots-tablet-info-hero-end-y) * ${record.width / derived.nativeHeroHeight})` +
             `)`;
-
 
           const infoHeight =
             `min(` +
@@ -15912,13 +15887,11 @@ document.addEventListener("DOMContentLoaded", () => {
               width
             );
 
-
           record.element.style
             .setProperty(
               "--brobots-stretcher-base-h",
               height
             );
-
 
           record.element.style
             .setProperty(
@@ -15926,20 +15899,17 @@ document.addEventListener("DOMContentLoaded", () => {
               infoWidth
             );
 
-
           record.element.style
             .setProperty(
               "--brobots-stretcher-info-h",
               infoHeight
             );
 
-
           record.element.style
             .setProperty(
               "--brobots-stretcher-w",
               "var(--brobots-stretcher-live-w, var(--brobots-stretcher-base-w))"
             );
-
 
           record.element.style
             .setProperty(
@@ -15948,11 +15918,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-          /*
-            Expose the aperture-defining stretcher thicknesses on the frame
-            container itself. The media zones can then follow the frame
-            continuously in CSS without re-measuring rendered rectangles.
-          */
           const exposedNames = {
             "hero-stretch-left":
               "--brobots-hero-left-rail-w",
@@ -15976,10 +15941,7 @@ document.addEventListener("DOMContentLoaded", () => {
               "--brobots-thumb-top-bar-h",
 
             "thumb-stretch-bottom":
-              "--brobots-thumb-bottom-bar-h",
-
-            "separator":
-              "--brobots-separator-h"
+              "--brobots-thumb-bottom-bar-h"
           };
 
 
@@ -15997,7 +15959,7 @@ document.addEventListener("DOMContentLoaded", () => {
               );
 
 
-            brobotsInnerFrameArea.style
+            frameArea.style
               .setProperty(
                 `${exposedName}-base`,
                 useWidth
@@ -16005,8 +15967,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   : height
               );
 
-
-            brobotsInnerFrameArea.style
+            frameArea.style
               .setProperty(
                 `${exposedName}-info`,
                 useWidth
@@ -16014,8 +15975,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   : infoHeight
               );
 
-
-            brobotsInnerFrameArea.style
+            frameArea.style
               .setProperty(
                 exposedName,
                 `var(${exposedName}-live, var(${exposedName}-base))`
@@ -16025,36 +15985,29 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-      /*
-        These anchors intentionally use the FULL current frame height,
-        exactly like the previous JS calculation:
-          rect.height * derived ratio
-
-        They are not uniform-art-scaled dimensions; they divide the flexible
-        page cavity into hero / separator / thumbnail regions.
-      */
-      brobotsInnerFrameArea.style
+      frameArea.style
         .setProperty(
           "--brobots-hero-end-base-y",
           `calc(100cqh * ${derived.heroEndRatio})`
         );
 
-
-      brobotsInnerFrameArea.style
+      /*
+        16-piece frame: there is no center separator. The thumbnail region
+        begins exactly where the hero region ends.
+      */
+      frameArea.style
         .setProperty(
           "--brobots-thumb-start-base-y",
-          `calc(100cqh * ${derived.thumbStartRatio})`
+          "var(--brobots-hero-end-base-y)"
         );
 
-
-      brobotsInnerFrameArea.style
+      frameArea.style
         .setProperty(
           "--brobots-hero-end-y",
           "var(--brobots-hero-end-live-y, var(--brobots-hero-end-base-y))"
         );
 
-
-      brobotsInnerFrameArea.style
+      frameArea.style
         .setProperty(
           "--brobots-thumb-start-y",
           "var(--brobots-thumb-start-live-y, var(--brobots-thumb-start-base-y))"
@@ -16062,116 +16015,26 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-  if (brobotsInnerFrameArea) {
-    measureBrobotsFrameAssets()
-      .then(() => {
-        deriveBrobotsFrameGeometry();
+  if (gameFrameAreas.length > 0) {
+    Promise.all(
+      gameFrameAreas.map(
+        async (frameArea) => {
+          await measureGameFrameAssets(
+            frameArea
+          );
 
-        /*
-          Write the asset-derived responsive formulas ONCE. From here the
-          raster frame itself requires no resize-time JS.
-        */
-        applyBrobotsMeasuredFrameDimensions();
+          deriveGameFrameGeometry(
+            frameArea
+          );
 
-        /*
-          All current game-frame instances use the same raster skin. Measure
-          that skin once, then mirror only its generated custom properties to
-          each instance. The formulas still resolve against each instance's
-          own cqw/cqh, so every page scales independently.
-        */
-        const sourceAreaStyle =
-          brobotsInnerFrameArea.style;
-
-
-        document.querySelectorAll(
-          '[data-game-frame]'
-        ).forEach((targetArea) => {
-          if (targetArea === brobotsInnerFrameArea) {
-            return;
-          }
-
-
-          for (
-            let index = 0;
-            index < sourceAreaStyle.length;
-            index += 1
-          ) {
-            const property =
-              sourceAreaStyle[index];
-
-
-            if (
-              property?.startsWith(
-                "--brobots-"
-              )
-            ) {
-              targetArea.style.setProperty(
-                property,
-                sourceAreaStyle.getPropertyValue(
-                  property
-                )
-              );
-            }
-          }
-
-
-          brobotsInnerFrameArea
-            .querySelectorAll(
-              '[data-game-frame-piece], [data-game-frame-stretcher]'
-            )
-            .forEach((sourcePiece) => {
-              const key =
-                sourcePiece.dataset.gameFramePiece ||
-                sourcePiece.dataset.gameFrameStretcher;
-
-              const attribute =
-                sourcePiece.dataset.gameFramePiece
-                  ? 'data-game-frame-piece'
-                  : 'data-game-frame-stretcher';
-
-              const targetPiece =
-                targetArea.querySelector(
-                  `[${attribute}="${key}"]`
-                );
-
-
-              if (!targetPiece) {
-                return;
-              }
-
-
-              const sourceStyle =
-                sourcePiece.style;
-
-
-              for (
-                let styleIndex = 0;
-                styleIndex < sourceStyle.length;
-                styleIndex += 1
-              ) {
-                const property =
-                  sourceStyle[styleIndex];
-
-
-                if (
-                  property?.startsWith(
-                    "--brobots-"
-                  ) &&
-                  property !==
-                    "--brobots-stretcher-image"
-                ) {
-                  targetPiece.style.setProperty(
-                    property,
-                    sourceStyle.getPropertyValue(
-                      property
-                    )
-                  );
-                }
-              }
-            });
-        });
-      });
+          applyGameFrameMeasuredDimensions(
+            frameArea
+          );
+        }
+      )
+    );
   }
+
 
   /* =======================================================
      Reusable game-frame tablet controller

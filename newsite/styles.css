@@ -20336,76 +20336,7 @@ body.is-media-lightbox-open {
 
     Re-enable the cloned image specifically inside the tablet host.
   */
-  .prototype-page-frame[data-game-frame-page]:not(.is-layout-transitioning)
-  .game-tablet-info-host
-  .etherian-popout-layer-image,
-  .prototype-page-frame[data-game-frame-page]:not(.is-layout-transitioning)
-  .game-tablet-info-host
-  .brobots-popout-layer-image {
-    display: block !important;
 
-    position: absolute !important;
-
-    top: 0 !important;
-    right: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    object-fit: cover !important;
-    object-position: center !important;
-
-    z-index: 0 !important;
-
-    /*
-      Match the stronger desktop treatment much more closely.
-    */
-    opacity: 0.58 !important;
-
-    filter:
-      saturate(0.92)
-      contrast(0.96)
-      brightness(0.82)
-      !important;
-
-    /*
-      Match the desktop popout behavior again:
-      only the TOP-RIGHT corner of the screenshot should remain visible,
-      feathering smoothly into the surrounding glass.
-    */
-    -webkit-mask-image:
-      radial-gradient(
-        ellipse 78% 72%
-        at 100% 0%,
-        rgba(0,0,0,1) 0%,
-        rgba(0,0,0,0.96) 30%,
-        rgba(0,0,0,0.72) 48%,
-        rgba(0,0,0,0.30) 66%,
-        rgba(0,0,0,0) 84%
-      ) !important;
-
-    mask-image:
-      radial-gradient(
-        ellipse 78% 72%
-        at 100% 0%,
-        rgba(0,0,0,1) 0%,
-        rgba(0,0,0,0.96) 30%,
-        rgba(0,0,0,0.72) 48%,
-        rgba(0,0,0,0.30) 66%,
-        rgba(0,0,0,0) 84%
-      ) !important;
-
-    -webkit-mask-size: 100% 100% !important;
-    mask-size: 100% 100% !important;
-
-    -webkit-mask-repeat: no-repeat !important;
-    mask-repeat: no-repeat !important;
-
-    pointer-events: none !important;
-  }
 
 
   /*
@@ -22849,63 +22780,6 @@ body.is-media-lightbox-open {
   }
 
 
-  .prototype-page-frame[data-game-frame-page]:not(.is-layout-transitioning)
-  .game-tablet-info-host
-  .game-tablet-glass-stack
-  .etherian-popout-layer-image {
-    display: block !important;
-
-    position: absolute !important;
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    z-index: 0 !important;
-
-    object-fit: cover !important;
-    object-position: center !important;
-
-    opacity: 0.58 !important;
-
-    filter:
-      saturate(0.92)
-      contrast(0.96)
-      brightness(0.82)
-      !important;
-
-    -webkit-mask-image:
-      radial-gradient(
-        ellipse 78% 72%
-        at 100% 0%,
-        rgba(0,0,0,1) 0%,
-        rgba(0,0,0,0.96) 30%,
-        rgba(0,0,0,0.72) 48%,
-        rgba(0,0,0,0.30) 66%,
-        rgba(0,0,0,0) 84%
-      ) !important;
-
-    mask-image:
-      radial-gradient(
-        ellipse 78% 72%
-        at 100% 0%,
-        rgba(0,0,0,1) 0%,
-        rgba(0,0,0,0.96) 30%,
-        rgba(0,0,0,0.72) 48%,
-        rgba(0,0,0,0.30) 66%,
-        rgba(0,0,0,0) 84%
-      ) !important;
-
-    -webkit-mask-repeat: no-repeat !important;
-    mask-repeat: no-repeat !important;
-
-    -webkit-mask-size: 100% 100% !important;
-    mask-size: 100% 100% !important;
-  }
-
 }
 
 
@@ -22989,3 +22863,602 @@ body.is-media-lightbox-open {
   }
 
 }
+
+
+/* =========================================================
+   SHARED TABLET GLASS SCREENSHOT — DESKTOP RULE, VERBATIM
+   =========================================================
+
+   This is intentionally NOT a tablet reinterpretation.
+
+   The desktop popout's working screenshot geometry is:
+     position:absolute;
+     top:0;
+     right:0;
+     height:100%;
+     width:auto;
+     object-fit:contain;
+     object-position:top right;
+
+   The exact same geometry and radial mask are applied to the image cloned
+   into the tablet glass stack. No inset:0, no width:100%, no alternate crop.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]:not(.is-layout-transitioning)
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-layer-image {
+    position: absolute !important;
+
+    top: 0 !important;
+    right: 0 !important;
+    left: auto !important;
+    bottom: auto !important;
+
+    height: 100% !important;
+    width: auto !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    display: block !important;
+
+    object-fit: contain !important;
+    object-position: top right !important;
+
+    z-index: 0 !important;
+
+    opacity: 0.58 !important;
+
+    filter:
+      saturate(0.92)
+      contrast(0.96)
+      brightness(0.88)
+      !important;
+
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      ) !important;
+
+    mask-image:
+      radial-gradient(
+        ellipse 78% 72%
+        at 100% 0%,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.96) 30%,
+        rgba(0, 0, 0, 0.72) 48%,
+        rgba(0, 0, 0, 0.30) 66%,
+        rgba(0, 0, 0, 0) 84%
+      ) !important;
+
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
+
+    -webkit-mask-size: 100% 100% !important;
+    mask-size: 100% 100% !important;
+
+    pointer-events: none !important;
+
+    transform: none !important;
+  }
+
+}
+
+
+
+/* =========================================================
+   TABLET GLASS STACK — DESKTOP-STYLE CHAMFERED CORNERS
+   =========================================================
+
+   Replace the tablet's rounded pane corners with the same angular chamfer
+   language used by the desktop popout glass.
+
+   Unlike the desktop panes, the tablet version should chamfer ALL FOUR
+   corners. The angle stays tied to the existing button/popout shear so the
+   visual language remains consistent across the site.
+   ========================================================= */
+
+@media (min-width: 841px) and (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack {
+    --tablet-glass-angle:
+      calc(
+        var(--button-shear-angle) * -1
+      );
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer {
+    border-radius: 0 !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer::before,
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer::after {
+    border-radius: 0 !important;
+    clip-path: inherit;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--1 {
+    --tablet-pane-cut-rise:
+      clamp(24px, 2.45cqw, 38px);
+
+    --tablet-pane-cut-run:
+      calc(
+        var(--tablet-pane-cut-rise)
+        *
+        tan(
+          var(--tablet-glass-angle)
+        )
+      );
+
+    clip-path:
+      polygon(
+        var(--tablet-pane-cut-run) 0,
+        calc(100% - var(--tablet-pane-cut-run)) 0,
+        100% var(--tablet-pane-cut-rise),
+        100% calc(100% - var(--tablet-pane-cut-rise)),
+        calc(100% - var(--tablet-pane-cut-run)) 100%,
+        var(--tablet-pane-cut-run) 100%,
+        0 calc(100% - var(--tablet-pane-cut-rise)),
+        0 var(--tablet-pane-cut-rise)
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--2 {
+    --tablet-pane-cut-rise:
+      clamp(20px, 2.05cqw, 32px);
+
+    --tablet-pane-cut-run:
+      calc(
+        var(--tablet-pane-cut-rise)
+        *
+        tan(
+          var(--tablet-glass-angle)
+        )
+      );
+
+    clip-path:
+      polygon(
+        var(--tablet-pane-cut-run) 0,
+        calc(100% - var(--tablet-pane-cut-run)) 0,
+        100% var(--tablet-pane-cut-rise),
+        100% calc(100% - var(--tablet-pane-cut-rise)),
+        calc(100% - var(--tablet-pane-cut-run)) 100%,
+        var(--tablet-pane-cut-run) 100%,
+        0 calc(100% - var(--tablet-pane-cut-rise)),
+        0 var(--tablet-pane-cut-rise)
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--3 {
+    --tablet-pane-cut-rise:
+      clamp(17px, 1.75cqw, 28px);
+
+    --tablet-pane-cut-run:
+      calc(
+        var(--tablet-pane-cut-rise)
+        *
+        tan(
+          var(--tablet-glass-angle)
+        )
+      );
+
+    clip-path:
+      polygon(
+        var(--tablet-pane-cut-run) 0,
+        calc(100% - var(--tablet-pane-cut-run)) 0,
+        100% var(--tablet-pane-cut-rise),
+        100% calc(100% - var(--tablet-pane-cut-rise)),
+        calc(100% - var(--tablet-pane-cut-run)) 100%,
+        var(--tablet-pane-cut-run) 100%,
+        0 calc(100% - var(--tablet-pane-cut-rise)),
+        0 var(--tablet-pane-cut-rise)
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--4 {
+    --tablet-pane-cut-rise:
+      clamp(15px, 1.55cqw, 24px);
+
+    --tablet-pane-cut-run:
+      calc(
+        var(--tablet-pane-cut-rise)
+        *
+        tan(
+          var(--tablet-glass-angle)
+        )
+      );
+
+    clip-path:
+      polygon(
+        var(--tablet-pane-cut-run) 0,
+        calc(100% - var(--tablet-pane-cut-run)) 0,
+        100% var(--tablet-pane-cut-rise),
+        100% calc(100% - var(--tablet-pane-cut-rise)),
+        calc(100% - var(--tablet-pane-cut-run)) 100%,
+        var(--tablet-pane-cut-run) 100%,
+        0 calc(100% - var(--tablet-pane-cut-rise)),
+        0 var(--tablet-pane-cut-rise)
+      ) !important;
+  }
+
+}
+
+
+
+/* =========================================================
+   GAME FRAME — STRETCH FLEXIBLE BARS INSTEAD OF TILING
+   =========================================================
+
+   The original Brobots skin used tiny spacer samples and repeated them
+   along the flexible axis. Etherian's spacer artwork is much larger and is
+   authored as a continuous section, so repeating it is visibly incorrect.
+
+   Keep the measured cross-axis thickness from JS, but stretch each source
+   once across the flexible axis:
+     horizontal bars -> width 100%, measured height
+     vertical bars   -> measured width, height 100%
+
+   Separator already uses one continuous stretched source.
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-top,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-bottom,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-top,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-bottom {
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+
+  background-size:
+    100%
+    var(--brobots-stretcher-h)
+    !important;
+}
+
+
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-right,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-right {
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+
+  background-size:
+    var(--brobots-stretcher-w)
+    100%
+    !important;
+}
+
+
+
+/* =========================================================
+   GAME FRAME — THUMBNAIL RAILS TILE ON THEIR LONG AXIS
+   =========================================================
+
+   Hero rails remain stretched once, but the thumbnail section becomes very
+   tall in tablet info mode. Stretching the side artwork across that entire
+   cavity visibly smears the stone texture, so the thumbnail rails return to
+   repeating on their flexible axis.
+
+   Cross-axis thickness is still taken from the measured source artwork.
+   ========================================================= */
+
+/* Horizontal thumbnail rails: repeat left-to-right. */
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-top,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-bottom {
+  background-repeat: repeat-x !important;
+  background-position: center !important;
+
+  background-size:
+    var(--brobots-stretcher-w)
+    var(--brobots-stretcher-h)
+    !important;
+}
+
+
+/* Vertical thumbnail rails: repeat top-to-bottom. */
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-right {
+  background-repeat: repeat-y !important;
+  background-position: center !important;
+
+  background-size:
+    var(--brobots-stretcher-w)
+    var(--brobots-stretcher-h)
+    !important;
+}
+
+
+
+/* =========================================================
+   GAME FRAME — CONSISTENT TEXEL DENSITY / TILE ALL RAILS
+   =========================================================
+
+   Final policy for the current raster skins:
+   every flexible rail repeats on its long axis rather than stretching.
+
+   This preserves the authored texel density and keeps the stone/material
+   scale consistent between fixed corner pieces and flexible rails.
+
+   Horizontal rails -> repeat-x
+   Vertical rails   -> repeat-y
+   Separator        -> repeat-x
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-top,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-bottom,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-top,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-bottom,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--separator {
+  background-repeat: repeat-x !important;
+  background-position: center !important;
+
+  background-size:
+    var(--brobots-stretcher-w)
+    var(--brobots-stretcher-h)
+    !important;
+}
+
+
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-right,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-right {
+  background-repeat: repeat-y !important;
+  background-position: center !important;
+
+  background-size:
+    var(--brobots-stretcher-w)
+    var(--brobots-stretcher-h)
+    !important;
+}
+
+
+
+/* =========================================================
+   GAME FRAME — CANONICAL CENTER SEPARATOR
+   =========================================================
+
+   The separator is NOT the same kind of stretcher as the four rails.
+
+   Its source artwork is authored as a full-width strip spanning the entire
+   frame. Older Brobots CSS has several historical separator implementations
+   (including a hard-coded 1164px version), while v111 accidentally grouped
+   the separator into the new repeat-x rail policy.
+
+   That combination makes its phase / width disagree with the fixed frame
+   pieces on every skin.
+
+   Final rule:
+     - span the exact gap between hero + thumbnail regions
+     - use the whole separator image once
+     - scale it to the separator box
+     - never tile it
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--separator {
+  left: 0 !important;
+  right: 0 !important;
+
+  width: auto !important;
+
+  top:
+    var(--brobots-hero-end-y) !important;
+
+  bottom:
+    calc(
+      100%
+      -
+      var(--brobots-thumb-start-y)
+    ) !important;
+
+  height: auto !important;
+
+  background-image:
+    var(--brobots-stretcher-image) !important;
+
+  background-repeat:
+    no-repeat !important;
+
+  background-position:
+    center center !important;
+
+  background-size:
+    100% 100% !important;
+
+  z-index: 4 !important;
+}
+
+
+
+/* =========================================================
+   GAME FRAME — HYBRID RAIL POLICY
+   =========================================================
+
+   Back out of the three-slice experiment and use a pragmatic hybrid:
+
+   STRETCH
+   - hero-top
+   - hero-left
+   - hero-right
+
+   TILE
+   - hero-bottom
+   - thumb-top
+   - thumb-bottom
+   - thumb-left
+   - thumb-right
+
+   KEEP SPECIAL
+   - separator remains the canonical full-width separator from v112
+
+   This matches the visible problem areas in Etherian while keeping the
+   simpler authored/tiled behavior everywhere else.
+   ========================================================= */
+
+/* If any old three-slice spans exist during live reload, hide them. */
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher
+.game-frame-slice {
+  display: none !important;
+}
+
+/* ---------------------------
+   Stretch the hero top rail
+   --------------------------- */
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-top {
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size:
+    100%
+    var(--brobots-stretcher-h)
+    !important;
+}
+
+/* --------------------------------------
+   Stretch the hero left / right sidebars
+   -------------------------------------- */
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-right {
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size:
+    var(--brobots-stretcher-w)
+    100%
+    !important;
+}
+
+/* -----------------------
+   Tile the hero bottom bar
+   ----------------------- */
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--hero-bottom {
+  background-repeat: repeat-x !important;
+  background-position: center !important;
+  background-size:
+    var(--brobots-stretcher-w)
+    var(--brobots-stretcher-h)
+    !important;
+}
+
+/* -----------------------------------------
+   Tile the thumbnail top / bottom / sidebars
+   ----------------------------------------- */
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-top,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-bottom {
+  background-repeat: repeat-x !important;
+  background-position: center !important;
+  background-size:
+    var(--brobots-stretcher-w)
+    var(--brobots-stretcher-h)
+    !important;
+}
+
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-left,
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--thumb-right {
+  background-repeat: repeat-y !important;
+  background-position: center !important;
+  background-size:
+    var(--brobots-stretcher-w)
+    var(--brobots-stretcher-h)
+    !important;
+}
+
+
+
+/* =========================================================
+   GAME FRAME — 16-PIECE MODE (NO CENTER SEPARATOR)
+   =========================================================
+
+   The separator asset has been removed from every game frame. Hero and
+   thumbnail regions now meet directly.
+
+   Keep the old historical separator rules inert; there is no separator
+   element in the DOM anymore. These variables collapse any remaining
+   separator-era spacing assumptions to zero.
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page] .game-frame-area {
+  --brobots-separator-h-base: 0px;
+  --brobots-separator-h-info: 0px;
+  --brobots-separator-h-live: 0px;
+
+  --brobots-tablet-info-thumb-start-y:
+    var(--brobots-tablet-info-hero-end-y);
+}
+
+/*
+  Defensive only: if an old cached/live-reload DOM still contains a separator,
+  it contributes nothing.
+*/
+.prototype-page-frame[data-game-frame-page]
+.game-frame-stretcher--separator {
+  display: none !important;
+}
+
