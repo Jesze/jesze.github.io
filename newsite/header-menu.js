@@ -9275,6 +9275,158 @@ document.addEventListener("DOMContentLoaded", () => {
     pull-to-refresh never steals it, but keep the larger movement threshold
     before actually switching pages.
   */
+
+  /*
+    Mobile open-page swipe ownership
+    --------------------------------
+    While any real page is open, vertical touch movement belongs to the site,
+    not the browser. This prevents native document scrolling, rubber-banding,
+    pull-to-refresh, etc. from appearing between our gesture states.
+
+    About is the one deliberate exception:
+      - pulling DOWN on About is left native, so the browser can still perform
+        its normal top-of-page refresh gesture if the user wants it.
+      - upward movement on About is still owned by the site so About -> Brobots
+        remains reliable.
+
+    This is a capture-phase guard only. It calls preventDefault() but does NOT
+    stop propagation, so the existing game/non-game gesture controllers still
+    receive the same touchmove and perform the actual navigation.
+  */
+  let mobilePageSwipeLockStartX =
+    0;
+
+  let mobilePageSwipeLockStartY =
+    0;
+
+  let mobilePageSwipeLockTracking =
+    false;
+
+
+  const clearMobilePageSwipeLock =
+    () => {
+      mobilePageSwipeLockTracking =
+        false;
+    };
+
+
+  document.addEventListener(
+    "touchstart",
+    (event) => {
+      if (
+        !gameFrameTabletMode.matches ||
+        !activePageName ||
+        !getPageFrame(
+          activePageName
+        )?.classList.contains(
+          "is-open"
+        ) ||
+        document.body.classList.contains(
+          "is-media-lightbox-open"
+        ) ||
+        event.touches.length !== 1
+      ) {
+        clearMobilePageSwipeLock();
+
+        return;
+      }
+
+
+      const touch =
+        event.touches[0];
+
+
+      mobilePageSwipeLockStartX =
+        touch.clientX;
+
+      mobilePageSwipeLockStartY =
+        touch.clientY;
+
+      mobilePageSwipeLockTracking =
+        true;
+    },
+    {
+      passive: true,
+      capture: true
+    }
+  );
+
+
+  document.addEventListener(
+    "touchmove",
+    (event) => {
+      if (
+        !mobilePageSwipeLockTracking ||
+        event.touches.length !== 1
+      ) {
+        return;
+      }
+
+
+      const touch =
+        event.touches[0];
+
+      const deltaX =
+        touch.clientX -
+        mobilePageSwipeLockStartX;
+
+      const deltaY =
+        touch.clientY -
+        mobilePageSwipeLockStartY;
+
+
+      const verticalIntentIsClear =
+        Math.abs(deltaY) >= 6 &&
+        Math.abs(deltaY) >
+          Math.abs(deltaX) * 1.05;
+
+
+      if (!verticalIntentIsClear) {
+        return;
+      }
+
+
+      /*
+        About + finger moving DOWN:
+        deliberately leave native overscroll / refresh available.
+      */
+      if (
+        activePageName === "about" &&
+        deltaY > 0
+      ) {
+        return;
+      }
+
+
+      event.preventDefault();
+    },
+    {
+      passive: false,
+      capture: true
+    }
+  );
+
+
+  document.addEventListener(
+    "touchend",
+    clearMobilePageSwipeLock,
+    {
+      passive: true,
+      capture: true
+    }
+  );
+
+
+  document.addEventListener(
+    "touchcancel",
+    clearMobilePageSwipeLock,
+    {
+      passive: true,
+      capture: true
+    }
+  );
+
+
   [
     "about",
     "contact"
@@ -15501,6 +15653,199 @@ document.addEventListener("DOMContentLoaded", () => {
             );
           }
         );
+      }
+    );
+
+
+    /*
+      Mobile horizontal swipe navigation
+      ----------------------------------
+      While a game page is open on phone, horizontal swipes belong to the
+      media browser:
+
+        finger LEFT  -> next hero media
+        finger RIGHT -> previous hero media
+
+      We claim a clearly-horizontal gesture early so browser history/edge
+      navigation never steals it, but retain a larger threshold before
+      actually changing media.
+
+      Vertical gestures are left alone here so the existing media/info/page
+      state machine can own them.
+    */
+    const owningGamePageForSwipe =
+      browser.closest(
+        ".prototype-page-frame"
+      );
+
+
+    let mediaSwipeStartX =
+      0;
+
+    let mediaSwipeStartY =
+      0;
+
+    let mediaSwipeTracking =
+      false;
+
+    let mediaSwipeConsumed =
+      false;
+
+
+    const clearMediaSwipe =
+      () => {
+        mediaSwipeTracking =
+          false;
+
+        mediaSwipeConsumed =
+          false;
+      };
+
+
+    owningGamePageForSwipe?.addEventListener(
+      "touchstart",
+      (event) => {
+        if (
+          iconButtonMode.matches ||
+          !owningGamePageForSwipe.classList.contains(
+            "is-open"
+          ) ||
+          document.body.classList.contains(
+            "is-media-lightbox-open"
+          ) ||
+          event.touches.length !== 1
+        ) {
+          clearMediaSwipe();
+
+          return;
+        }
+
+
+        const touch =
+          event.touches[0];
+
+
+        mediaSwipeStartX =
+          touch.clientX;
+
+        mediaSwipeStartY =
+          touch.clientY;
+
+        mediaSwipeTracking =
+          true;
+
+        mediaSwipeConsumed =
+          false;
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    owningGamePageForSwipe?.addEventListener(
+      "touchmove",
+      (event) => {
+        if (
+          !mediaSwipeTracking ||
+          mediaSwipeConsumed ||
+          event.touches.length !== 1
+        ) {
+          return;
+        }
+
+
+        const touch =
+          event.touches[0];
+
+        const deltaX =
+          touch.clientX -
+          mediaSwipeStartX;
+
+        const deltaY =
+          touch.clientY -
+          mediaSwipeStartY;
+
+
+        const horizontalIntentIsClear =
+          Math.abs(deltaX) >= 8 &&
+          Math.abs(deltaX) >
+            Math.abs(deltaY) * 1.1;
+
+
+        if (!horizontalIntentIsClear) {
+          return;
+        }
+
+
+        /*
+          Own the gesture immediately once it is clearly horizontal.
+          This is especially important near iOS/Android screen edges where
+          the browser may otherwise begin back/forward history navigation.
+        */
+        event.preventDefault();
+
+
+        if (
+          Math.abs(deltaX) < 46
+        ) {
+          return;
+        }
+
+
+        /*
+          Finger moving LEFT = advance.
+          Finger moving RIGHT = go back.
+        */
+        const targetIndex =
+          deltaX < 0
+            ? activeIndex + 1
+            : activeIndex - 1;
+
+
+        /*
+          Keep the existing non-wrapping media semantics used by the arrow
+          buttons. A swipe at either end simply does nothing.
+        */
+        if (
+          targetIndex < 0 ||
+          targetIndex >= items.length
+        ) {
+          mediaSwipeConsumed =
+            true;
+
+          return;
+        }
+
+
+        renderItem(
+          targetIndex
+        );
+
+
+        mediaSwipeConsumed =
+          true;
+      },
+      {
+        passive: false
+      }
+    );
+
+
+    owningGamePageForSwipe?.addEventListener(
+      "touchend",
+      clearMediaSwipe,
+      {
+        passive: true
+      }
+    );
+
+
+    owningGamePageForSwipe?.addEventListener(
+      "touchcancel",
+      clearMediaSwipe,
+      {
+        passive: true
       }
     );
 
