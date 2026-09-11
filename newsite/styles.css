@@ -25316,3 +25316,68 @@ body.is-media-lightbox-open {
   }
 }
 
+
+
+/* =========================================================
+   MOBILE SAFARI — FIXED FRAME PIECES AS CSS BACKGROUNDS
+   =========================================================
+   Safari-only paint workaround for intermittent low-resolution rendering of
+   the eight fixed raster corners.
+
+   The original <img> stays in place (hidden visually) so JS can continue to
+   read naturalWidth/naturalHeight and derive the exact same frame geometry.
+   A sibling div paints the same source as a CSS background instead.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  html.is-mobile-safari-frame-renderer
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area
+  > img[data-game-frame-piece] {
+    visibility: hidden !important;
+  }
+
+
+  html.is-mobile-safari-frame-renderer
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area
+  > .game-frame-piece--safari-background {
+    width:
+      var(
+        --brobots-piece-w,
+        auto
+      ) !important;
+
+    height:
+      var(
+        --brobots-piece-h,
+        auto
+      ) !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+
+    pointer-events: none !important;
+    user-select: none !important;
+
+    background-repeat: no-repeat !important;
+    background-position: 0 0 !important;
+    background-size: 100% 100% !important;
+
+    /*
+      Keep this renderer simple and non-composited. Its purpose is specifically
+      to avoid Safari's occasional low-resolution <img> raster cache.
+    */
+    transform: none !important;
+    will-change: auto !important;
+    filter: none !important;
+    contain: none !important;
+
+    -webkit-backface-visibility: visible !important;
+    backface-visibility: visible !important;
+  }
+}
+

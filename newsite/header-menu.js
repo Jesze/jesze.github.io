@@ -17230,84 +17230,86 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =======================================================
-     Mobile fixed frame-piece device-pixel snapping
+     Mobile Safari fixed-piece background renderer
      =======================================================
 
-     Some mobile Chromium devices appear to rasterize a few of the small
-     fixed WebP corner pieces at an intermediate fractional size.
+     Safari on iPhone is intermittently presenting a few of the small fixed
+     frame <img> elements as low-resolution rasters even though the same
+     sources are sharp in Chromium.
 
-     Keep this intentionally conservative:
-       - fixed corner pieces only
-       - width / height only
-       - NO position snapping, transforms, or stretcher changes
+     Keep the real <img> elements in the DOM for natural-size measurement and
+     shared frame geometry, but on MOBILE SAFARI only paint a sibling <div>
+     using the same source as a CSS background.
 
-     Width/height are rounded to the nearest physical device pixel, then
-     written through the existing --brobots-piece-live-w/h substrate.
-
-     The overrides are cleared before responsive / tablet geometry changes
-     and re-applied only after layout has settled, so they do not freeze the
-     720ms media <-> info transition.
+     This changes painting only:
+       - same frame classes
+       - same responsive custom properties
+       - same anchors / dimensions
+       - stretchers untouched
+       - original <img> remains the geometry source
      ======================================================= */
 
-  const mobileFramePixelSnapMode =
-    window.matchMedia(
-      "(max-width: 840px)"
-    );
+  const isMobileSafariFrameRenderer =
+    (() => {
+      const ua =
+        navigator.userAgent || "";
+
+      const vendor =
+        navigator.vendor || "";
 
 
-  let mobileFramePixelSnapTimer =
-    null;
+      const appleWebKit =
+        /AppleWebKit/i.test(
+          ua
+        );
+
+      const safariToken =
+        /Safari/i.test(
+          ua
+        );
+
+      const alternateIosBrowser =
+        /CriOS|FxiOS|EdgiOS|OPiOS/i.test(
+          ua
+        );
+
+      const mobileAppleDevice =
+        /iPhone|iPad|iPod/i.test(
+          ua
+        );
 
 
-  const clearMobileFramePiecePixelSnap =
-    (
-      frameArea = null
-    ) => {
-      const targets =
-        frameArea
-          ? [frameArea]
-          : gameFrameAreas;
-
-
-      targets.forEach(
-        (area) => {
-          area
-            ?.querySelectorAll(
-              "img[data-game-frame-piece]"
-            )
-            .forEach(
-              (piece) => {
-                piece.style.removeProperty(
-                  "--brobots-piece-live-w"
-                );
-
-                piece.style.removeProperty(
-                  "--brobots-piece-live-h"
-                );
-              }
-            );
-        }
+      return (
+        appleWebKit &&
+        safariToken &&
+        !alternateIosBrowser &&
+        (
+          mobileAppleDevice ||
+          /Apple/i.test(
+            vendor
+          )
+        )
       );
-    };
+    })();
 
 
-  const snapMobileFramePiecePixels =
+  if (isMobileSafariFrameRenderer) {
+    document.documentElement.classList.add(
+      "is-mobile-safari-frame-renderer"
+    );
+  }
+
+
+  const ensureMobileSafariFrameBackgrounds =
     (
       frameArea
     ) => {
       if (
-        !mobileFramePixelSnapMode.matches ||
+        !isMobileSafariFrameRenderer ||
         !frameArea
       ) {
         return;
       }
-
-
-      const dpr =
-        Math.max(
-          1,
-          window.devicePixelRatio || 1
-        );
 
 
       frameArea
@@ -17315,92 +17317,89 @@ document.addEventListener("DOMContentLoaded", () => {
           "img[data-game-frame-piece]"
         )
         .forEach(
-          (piece) => {
-            /*
-              Read the unsnapped responsive result first.
-            */
-            piece.style.removeProperty(
-              "--brobots-piece-live-w"
-            );
-
-            piece.style.removeProperty(
-              "--brobots-piece-live-h"
-            );
-
-
-            const rect =
-              piece.getBoundingClientRect();
-
-
+          (image) => {
             if (
-              rect.width <= 0 ||
-              rect.height <= 0
+              image.nextElementSibling
+                ?.classList.contains(
+                  "game-frame-piece--safari-background"
+                )
             ) {
               return;
             }
 
 
-            const snappedWidth =
-              Math.round(
-                rect.width * dpr
-              ) /
-              dpr;
-
-            const snappedHeight =
-              Math.round(
-                rect.height * dpr
-              ) /
-              dpr;
+            const backgroundPiece =
+              document.createElement(
+                "div"
+              );
 
 
-            piece.style.setProperty(
-              "--brobots-piece-live-w",
-              `${snappedWidth}px`
-            );
-
-            piece.style.setProperty(
-              "--brobots-piece-live-h",
-              `${snappedHeight}px`
-            );
-          }
-        );
-    };
-
-
-  const scheduleMobileFramePiecePixelSnap =
-    (
-      frameArea = null,
-      delay = 0
-    ) => {
-      window.clearTimeout(
-        mobileFramePixelSnapTimer
-      );
-
-
-      mobileFramePixelSnapTimer =
-        window.setTimeout(
-          () => {
-            requestAnimationFrame(
-              () => {
-                requestAnimationFrame(
-                  () => {
-                    if (frameArea) {
-                      snapMobileFramePiecePixels(
-                        frameArea
-                      );
-                    }
-
-                    else {
-                      gameFrameAreas.forEach(
-                        snapMobileFramePiecePixels
-                      );
-                    }
-                  }
+            /*
+              Reuse all existing semantic positioning classes, but deliberately
+              DO NOT copy data-game-frame-piece. The original <img> must remain
+              the sole asset measured by the frame controller.
+            */
+            image.classList.forEach(
+              (className) => {
+                backgroundPiece.classList.add(
+                  className
                 );
               }
             );
-          },
-          delay
+
+
+            backgroundPiece.classList.add(
+              "game-frame-piece--safari-background"
+            );
+
+
+            backgroundPiece.setAttribute(
+              "aria-hidden",
+              "true"
+            );
+
+
+            /*
+              Per-piece sizing variables live inline on the measured <img>.
+              Copy only those existing inline declarations so the background
+              renderer consumes exactly the same responsive geometry.
+            */
+            for (
+              const propertyName
+              of image.style
+            ) {
+              if (
+                propertyName.startsWith(
+                  "--brobots-piece-"
+                )
+              ) {
+                backgroundPiece.style.setProperty(
+                  propertyName,
+                  image.style.getPropertyValue(
+                    propertyName
+                  )
+                );
+              }
+            }
+
+
+            const source =
+              image.currentSrc ||
+              image.src;
+
+
+            backgroundPiece.style.backgroundImage =
+              `url("${source.replace(
+                /"/g,
+                '\\"'
+              )}")`;
+
+
+            image.insertAdjacentElement(
+              "afterend",
+              backgroundPiece
+            );
+          }
         );
     };
 
@@ -18236,42 +18235,13 @@ document.addEventListener("DOMContentLoaded", () => {
           );
 
 
-          scheduleMobileFramePiecePixelSnap(
+          ensureMobileSafariFrameBackgrounds(
             frameArea
           );
         }
       )
     );
   }
-
-
-  const refreshMobileFramePiecePixelSnap =
-    () => {
-      clearMobileFramePiecePixelSnap();
-
-      scheduleMobileFramePiecePixelSnap(
-        null,
-        80
-      );
-    };
-
-
-  window.addEventListener(
-    "resize",
-    refreshMobileFramePiecePixelSnap,
-    {
-      passive: true
-    }
-  );
-
-
-  window.addEventListener(
-    "orientationchange",
-    refreshMobileFramePiecePixelSnap,
-    {
-      passive: true
-    }
-  );
 
 
   /* =======================================================
@@ -18605,20 +18575,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        clearMobileFramePiecePixelSnap(
-          gameFrameArea
-        );
-
-
         gameFrameArea.classList.toggle(
           "is-tablet-info-geometry",
           infoGeometry
-        );
-
-
-        scheduleMobileFramePiecePixelSnap(
-          gameFrameArea,
-          760
         );
 
 
