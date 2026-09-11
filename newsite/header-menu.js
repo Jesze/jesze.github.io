@@ -12499,15 +12499,130 @@ document.addEventListener("DOMContentLoaded", () => {
         "async";
 
 
+      /*
+        Desktop/tablet keep the established single-click lightbox behavior.
+        Mobile reserves a single tap for touch interaction and requires a
+        deliberate double tap instead.
+      */
       image.addEventListener(
         "click",
         () => {
+          if (!iconButtonMode.matches) {
+            return;
+          }
+
+
           openMediaLightbox(
             item.dataset.mediaSrc,
             item.dataset.mediaTitle ||
             "Game screenshot",
             image
           );
+        }
+      );
+
+
+      let mobileTapStartX =
+        0;
+
+      let mobileTapStartY =
+        0;
+
+      let mobileLastTapAt =
+        0;
+
+
+      image.addEventListener(
+        "touchstart",
+        (event) => {
+          if (
+            iconButtonMode.matches ||
+            event.touches.length !== 1
+          ) {
+            return;
+          }
+
+
+          const touch =
+            event.touches[0];
+
+
+          mobileTapStartX =
+            touch.clientX;
+
+          mobileTapStartY =
+            touch.clientY;
+        },
+        {
+          passive: true
+        }
+      );
+
+
+      image.addEventListener(
+        "touchend",
+        (event) => {
+          if (
+            iconButtonMode.matches ||
+            event.changedTouches.length !== 1
+          ) {
+            return;
+          }
+
+
+          const touch =
+            event.changedTouches[0];
+
+          const moved =
+            Math.hypot(
+              touch.clientX -
+                mobileTapStartX,
+              touch.clientY -
+                mobileTapStartY
+            );
+
+
+          /*
+            Ignore a swipe that happened to end on the image.
+          */
+          if (moved > 14) {
+            mobileLastTapAt =
+              0;
+
+            return;
+          }
+
+
+          const now =
+            performance.now();
+
+
+          if (
+            mobileLastTapAt > 0 &&
+            now - mobileLastTapAt <= 320
+          ) {
+            mobileLastTapAt =
+              0;
+
+            event.preventDefault();
+
+
+            openMediaLightbox(
+              item.dataset.mediaSrc,
+              item.dataset.mediaTitle ||
+              "Game screenshot",
+              image
+            );
+
+            return;
+          }
+
+
+          mobileLastTapAt =
+            now;
+        },
+        {
+          passive: false
         }
       );
 
@@ -15427,7 +15542,8 @@ document.addEventListener("DOMContentLoaded", () => {
       index,
       {
         focusThumbnail = false,
-        scrollBehavior = "smooth"
+        scrollBehavior = "smooth",
+        transitionDirection = 0
       } = {}
     ) => {
       const clampedIndex =
@@ -15437,6 +15553,20 @@ document.addEventListener("DOMContentLoaded", () => {
             items.length - 1,
             index
           )
+        );
+
+
+      const previousIndex =
+        activeIndex;
+
+      const resolvedTransitionDirection =
+        transitionDirection ||
+        (
+          clampedIndex > previousIndex
+            ? 1
+            : clampedIndex < previousIndex
+              ? -1
+              : 0
         );
 
 
@@ -15476,8 +15606,44 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
+      const mobileImageWipe =
+        !iconButtonMode.matches &&
+        resolvedTransitionDirection !== 0 &&
+        mediaElement instanceof HTMLImageElement &&
+        stage.querySelector(
+          ".media-viewer-image"
+        ) instanceof HTMLImageElement;
+
+
+      let outgoingMedia =
+        null;
+
+
+      if (mobileImageWipe) {
+        outgoingMedia =
+          stage.querySelector(
+            ".media-viewer-image"
+          )?.cloneNode(
+            true
+          ) ||
+          null;
+
+
+        outgoingMedia?.classList.add(
+          "media-viewer-image--outgoing"
+        );
+      }
+
+      else {
+        stage.classList.remove(
+          "is-ready"
+        );
+      }
+
+
       stage.classList.remove(
-        "is-ready"
+        "is-mobile-wipe-forward",
+        "is-mobile-wipe-backward"
       );
 
 
@@ -15498,9 +15664,32 @@ document.addEventListener("DOMContentLoaded", () => {
       stage.replaceChildren();
 
 
+      if (outgoingMedia) {
+        stage.appendChild(
+          outgoingMedia
+        );
+      }
+
+
       if (mediaElement) {
+        if (mobileImageWipe) {
+          mediaElement.classList.add(
+            "media-viewer-image--incoming"
+          );
+        }
+
+
         stage.appendChild(
           mediaElement
+        );
+      }
+
+
+      if (mobileImageWipe) {
+        stage.classList.add(
+          resolvedTransitionDirection > 0
+            ? "is-mobile-wipe-forward"
+            : "is-mobile-wipe-backward"
         );
       }
 
@@ -15524,6 +15713,40 @@ document.addEventListener("DOMContentLoaded", () => {
             stage.classList.add(
               "is-ready"
             );
+
+
+            if (mobileImageWipe) {
+              const incoming =
+                stage.querySelector(
+                  ".media-viewer-image--incoming"
+                );
+
+
+              incoming?.addEventListener(
+                "animationend",
+                () => {
+                  stage
+                    .querySelector(
+                      ".media-viewer-image--outgoing"
+                    )
+                    ?.remove();
+
+
+                  incoming.classList.remove(
+                    "media-viewer-image--incoming"
+                  );
+
+
+                  stage.classList.remove(
+                    "is-mobile-wipe-forward",
+                    "is-mobile-wipe-backward"
+                  );
+                },
+                {
+                  once: true
+                }
+              );
+            }
           });
         };
 
@@ -15819,7 +16042,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         renderItem(
-          targetIndex
+          targetIndex,
+          {
+            transitionDirection:
+              deltaX < 0
+                ? 1
+                : -1
+          }
         );
 
 

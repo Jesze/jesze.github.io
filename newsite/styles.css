@@ -23830,3 +23830,174 @@ body.is-media-lightbox-open {
   }
 }
 
+
+
+/* =========================================================
+   MOBILE — KEEP VERTICAL SWIPES INSIDE THE SITE
+   =========================================================
+
+   The game pages use deliberate swipe gestures rather than native document
+   scrolling. Prevent the browser's root overscroll / pull-to-refresh gesture
+   from competing with those interactions.
+
+   JS also claims a clearly-vertical touchmove immediately, before the larger
+   navigation threshold is reached. This CSS is the browser-level first line
+   of defense; the JS handler is the fallback/interaction-level lock.
+   ========================================================= */
+
+@media (max-width: 840px) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  .prototype-page-frame[data-game-frame-page].is-open {
+    overscroll-behavior: none;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE MEDIA UX
+   =========================================================
+   - Hide tablet hover arrows + pagination dots on phones.
+   - Hero media is changed by horizontal swipe instead.
+   - Image-to-image changes use a directional soft-edge gradient wipe.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-hero-navigation {
+    display: none !important;
+  }
+
+
+  /*
+    Keep both outgoing and incoming screenshots stacked during a mobile wipe.
+  */
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-stage
+  .media-viewer-image--outgoing,
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-stage
+  .media-viewer-image--incoming {
+    position: absolute !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    transform: none !important;
+
+    object-fit: cover !important;
+    object-position: 50% 50% !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-image--outgoing {
+    z-index: 1;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-image--incoming {
+    z-index: 2;
+
+    /*
+      A feathered mask creates the "gradient wipe" rather than a hard clip.
+      The whole mask is translated across the image in the swipe direction.
+    */
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.10) 8%,
+        #000 22%,
+        #000 100%
+      );
+
+    mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.10) 8%,
+        #000 22%,
+        #000 100%
+      );
+
+    -webkit-mask-size:
+      160% 100%;
+
+    mask-size:
+      160% 100%;
+
+    -webkit-mask-repeat:
+      no-repeat;
+
+    mask-repeat:
+      no-repeat;
+
+    will-change:
+      -webkit-mask-position,
+      mask-position,
+      opacity;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-stage.is-mobile-wipe-forward
+  .media-viewer-image--incoming {
+    animation:
+      mobile-media-wipe-forward
+      360ms
+      cubic-bezier(0.22, 0.72, 0.24, 1)
+      both;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-stage.is-mobile-wipe-backward
+  .media-viewer-image--incoming {
+    transform: scaleX(-1) !important;
+
+    animation:
+      mobile-media-wipe-backward
+      360ms
+      cubic-bezier(0.22, 0.72, 0.24, 1)
+      both;
+  }
+
+
+  @keyframes mobile-media-wipe-forward {
+    from {
+      -webkit-mask-position: 155% 0;
+      mask-position: 155% 0;
+      opacity: 0.92;
+    }
+
+    to {
+      -webkit-mask-position: -55% 0;
+      mask-position: -55% 0;
+      opacity: 1;
+    }
+  }
+
+
+  @keyframes mobile-media-wipe-backward {
+    from {
+      -webkit-mask-position: 155% 0;
+      mask-position: 155% 0;
+      opacity: 0.92;
+    }
+
+    to {
+      -webkit-mask-position: -55% 0;
+      mask-position: -55% 0;
+      opacity: 1;
+    }
+  }
+}
+
