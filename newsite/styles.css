@@ -25319,14 +25319,13 @@ body.is-media-lightbox-open {
 
 
 /* =========================================================
-   MOBILE SAFARI — FIXED FRAME PIECES AS CSS BACKGROUNDS
+   MOBILE SAFARI — FIXED PIECES PAINTED ON THEIR OWN <img>
    =========================================================
-   Safari-only paint workaround for intermittent low-resolution rendering of
-   the eight fixed raster corners.
+   This preserves the original element's complete frame geometry and scaling.
+   Only Safari's paint path changes.
 
-   The original <img> stays in place (hidden visually) so JS can continue to
-   read naturalWidth/naturalHeight and derive the exact same frame geometry.
-   A sibling div paints the same source as a CSS background instead.
+   The WebP is painted as the element background; the normal replaced-image
+   pixels are moved well outside the visible content box.
    ========================================================= */
 
 @media (max-width: 840px) {
@@ -25335,49 +25334,30 @@ body.is-media-lightbox-open {
   .prototype-page-frame[data-game-frame-page]
   .game-frame-area
   > img[data-game-frame-piece] {
-    visibility: hidden !important;
-  }
-
-
-  html.is-mobile-safari-frame-renderer
-  .prototype-page-frame[data-game-frame-page]
-  .game-frame-area
-  > .game-frame-piece--safari-background {
-    width:
+    background-image:
       var(
-        --brobots-piece-w,
-        auto
+        --safari-frame-piece-background
       ) !important;
 
-    height:
-      var(
-        --brobots-piece-h,
-        auto
-      ) !important;
+    background-repeat:
+      no-repeat !important;
 
-    max-width: none !important;
-    max-height: none !important;
+    background-position:
+      center !important;
 
-    margin: 0 !important;
-
-    pointer-events: none !important;
-    user-select: none !important;
-
-    background-repeat: no-repeat !important;
-    background-position: 0 0 !important;
-    background-size: 100% 100% !important;
+    background-size:
+      100% 100% !important;
 
     /*
-      Keep this renderer simple and non-composited. Its purpose is specifically
-      to avoid Safari's occasional low-resolution <img> raster cache.
+      Preserve the <img> itself as the sizing/positioning object so all of the
+      existing responsive frame interpolation continues to apply unchanged.
+      Only its replaced pixels are moved out of view.
     */
-    transform: none !important;
-    will-change: auto !important;
-    filter: none !important;
-    contain: none !important;
+    object-fit:
+      none !important;
 
-    -webkit-backface-visibility: visible !important;
-    backface-visibility: visible !important;
+    object-position:
+      100000px 100000px !important;
   }
 }
 

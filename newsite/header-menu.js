@@ -17230,23 +17230,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =======================================================
-     Mobile Safari fixed-piece background renderer
+     Mobile Safari fixed-piece self-background renderer
      =======================================================
 
-     Safari on iPhone is intermittently presenting a few of the small fixed
-     frame <img> elements as low-resolution rasters even though the same
-     sources are sharp in Chromium.
+     Safari was sharper when the fixed frame artwork was painted as a CSS
+     background, but creating sibling elements broke the shared frame scaling.
 
-     Keep the real <img> elements in the DOM for natural-size measurement and
-     shared frame geometry, but on MOBILE SAFARI only paint a sibling <div>
-     using the same source as a CSS background.
+     This version keeps each ORIGINAL <img> as the geometry element. Safari
+     simply paints the same source as that element's own background, while
+     moving the replaced-image pixels outside the visible content box.
 
-     This changes painting only:
-       - same frame classes
-       - same responsive custom properties
-       - same anchors / dimensions
-       - stretchers untouched
-       - original <img> remains the geometry source
+     Result:
+       - exact same element
+       - exact same width / height interpolation
+       - exact same positioning / transforms / transitions
+       - naturalWidth / naturalHeight remain available to JS
+       - only the paint path changes on mobile Safari
      ======================================================= */
 
   const isMobileSafariFrameRenderer =
@@ -17254,40 +17253,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const ua =
         navigator.userAgent || "";
 
-      const vendor =
-        navigator.vendor || "";
-
-
-      const appleWebKit =
-        /AppleWebKit/i.test(
-          ua
-        );
-
-      const safariToken =
-        /Safari/i.test(
-          ua
-        );
-
-      const alternateIosBrowser =
-        /CriOS|FxiOS|EdgiOS|OPiOS/i.test(
-          ua
-        );
-
-      const mobileAppleDevice =
-        /iPhone|iPad|iPod/i.test(
-          ua
-        );
-
 
       return (
-        appleWebKit &&
-        safariToken &&
-        !alternateIosBrowser &&
-        (
-          mobileAppleDevice ||
-          /Apple/i.test(
-            vendor
-          )
+        /AppleWebKit/i.test(
+          ua
+        ) &&
+        /Safari/i.test(
+          ua
+        ) &&
+        /iPhone|iPad|iPod/i.test(
+          ua
+        ) &&
+        !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(
+          ua
         )
       );
     })();
@@ -17300,7 +17278,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  const ensureMobileSafariFrameBackgrounds =
+  const applyMobileSafariFrameSelfBackgrounds =
     (
       frameArea
     ) => {
@@ -17318,86 +17296,22 @@ document.addEventListener("DOMContentLoaded", () => {
         )
         .forEach(
           (image) => {
-            if (
-              image.nextElementSibling
-                ?.classList.contains(
-                  "game-frame-piece--safari-background"
-                )
-            ) {
-              return;
-            }
-
-
-            const backgroundPiece =
-              document.createElement(
-                "div"
-              );
-
-
-            /*
-              Reuse all existing semantic positioning classes, but deliberately
-              DO NOT copy data-game-frame-piece. The original <img> must remain
-              the sole asset measured by the frame controller.
-            */
-            image.classList.forEach(
-              (className) => {
-                backgroundPiece.classList.add(
-                  className
-                );
-              }
-            );
-
-
-            backgroundPiece.classList.add(
-              "game-frame-piece--safari-background"
-            );
-
-
-            backgroundPiece.setAttribute(
-              "aria-hidden",
-              "true"
-            );
-
-
-            /*
-              Per-piece sizing variables live inline on the measured <img>.
-              Copy only those existing inline declarations so the background
-              renderer consumes exactly the same responsive geometry.
-            */
-            for (
-              const propertyName
-              of image.style
-            ) {
-              if (
-                propertyName.startsWith(
-                  "--brobots-piece-"
-                )
-              ) {
-                backgroundPiece.style.setProperty(
-                  propertyName,
-                  image.style.getPropertyValue(
-                    propertyName
-                  )
-                );
-              }
-            }
-
-
             const source =
               image.currentSrc ||
               image.src;
 
 
-            backgroundPiece.style.backgroundImage =
+            if (!source) {
+              return;
+            }
+
+
+            image.style.setProperty(
+              "--safari-frame-piece-background",
               `url("${source.replace(
                 /"/g,
                 '\\"'
-              )}")`;
-
-
-            image.insertAdjacentElement(
-              "afterend",
-              backgroundPiece
+              )}")`
             );
           }
         );
@@ -18235,7 +18149,7 @@ document.addEventListener("DOMContentLoaded", () => {
           );
 
 
-          ensureMobileSafariFrameBackgrounds(
+          applyMobileSafariFrameSelfBackgrounds(
             frameArea
           );
         }
