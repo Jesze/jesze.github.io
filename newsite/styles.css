@@ -24001,3 +24001,126 @@ body.is-media-lightbox-open {
   }
 }
 
+
+
+/* =========================================================
+   MOBILE MEDIA WIPE — LOAD-SAFE DIRECTION FIX
+   =========================================================
+
+   v125 had two problems:
+   1. the wipe animation could run before the incoming screenshot loaded;
+   2. the reverse direction used scaleX(-1), which literally mirrored the
+      screenshot.
+
+   Keep both images normally oriented and use opposite gradient masks instead.
+   JS now starts these animations only after the incoming image is ready.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-stage
+  .media-viewer-image--incoming {
+    transform: none !important;
+    opacity: 1;
+  }
+
+
+  /* NEXT: reveal B from right -> left. */
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-stage.is-mobile-wipe-forward
+  .media-viewer-image--incoming {
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        #000 0%,
+        #000 68%,
+        rgba(0, 0, 0, 0.72) 78%,
+        rgba(0, 0, 0, 0.18) 92%,
+        transparent 100%
+      ) !important;
+
+    mask-image:
+      linear-gradient(
+        90deg,
+        #000 0%,
+        #000 68%,
+        rgba(0, 0, 0, 0.72) 78%,
+        rgba(0, 0, 0, 0.18) 92%,
+        transparent 100%
+      ) !important;
+
+    -webkit-mask-size: 220% 100% !important;
+    mask-size: 220% 100% !important;
+
+    animation:
+      mobile-media-reveal-from-right
+      360ms
+      cubic-bezier(0.22, 0.72, 0.24, 1)
+      both !important;
+  }
+
+
+  /* PREVIOUS: reveal B from left -> right. */
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-stage.is-mobile-wipe-backward
+  .media-viewer-image--incoming {
+    transform: none !important;
+
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.18) 8%,
+        rgba(0, 0, 0, 0.72) 22%,
+        #000 32%,
+        #000 100%
+      ) !important;
+
+    mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.18) 8%,
+        rgba(0, 0, 0, 0.72) 22%,
+        #000 32%,
+        #000 100%
+      ) !important;
+
+    -webkit-mask-size: 220% 100% !important;
+    mask-size: 220% 100% !important;
+
+    animation:
+      mobile-media-reveal-from-left
+      360ms
+      cubic-bezier(0.22, 0.72, 0.24, 1)
+      both !important;
+  }
+
+
+  @keyframes mobile-media-reveal-from-right {
+    from {
+      -webkit-mask-position: -120% 0;
+      mask-position: -120% 0;
+    }
+
+    to {
+      -webkit-mask-position: 100% 0;
+      mask-position: 100% 0;
+    }
+  }
+
+
+  @keyframes mobile-media-reveal-from-left {
+    from {
+      -webkit-mask-position: 120% 0;
+      mask-position: 120% 0;
+    }
+
+    to {
+      -webkit-mask-position: -100% 0;
+      mask-position: -100% 0;
+    }
+  }
+}
+

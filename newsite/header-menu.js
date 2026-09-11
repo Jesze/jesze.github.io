@@ -15685,13 +15685,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
 
-      if (mobileImageWipe) {
-        stage.classList.add(
-          resolvedTransitionDirection > 0
-            ? "is-mobile-wipe-forward"
-            : "is-mobile-wipe-backward"
-        );
-      }
+      /*
+        Important: do NOT start the wipe yet.
+
+        On a phone the incoming screenshot may still be decoding/loading.
+        Starting the animation here means the wipe can finish while the new
+        image is still blank, leaving only the old image visible and then
+        snapping to the new one afterward.
+
+        The wipe now begins inside revealImage(), only after the incoming
+        screenshot is actually ready to paint.
+      */
 
 
       if (
@@ -15722,30 +15726,48 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
 
-              incoming?.addEventListener(
-                "animationend",
-                () => {
-                  stage
-                    .querySelector(
-                      ".media-viewer-image--outgoing"
-                    )
-                    ?.remove();
+              if (incoming) {
+                incoming.addEventListener(
+                  "animationend",
+                  () => {
+                    stage
+                      .querySelector(
+                        ".media-viewer-image--outgoing"
+                      )
+                      ?.remove();
 
 
-                  incoming.classList.remove(
-                    "media-viewer-image--incoming"
-                  );
+                    incoming.classList.remove(
+                      "media-viewer-image--incoming"
+                    );
 
 
-                  stage.classList.remove(
-                    "is-mobile-wipe-forward",
-                    "is-mobile-wipe-backward"
-                  );
-                },
-                {
-                  once: true
-                }
-              );
+                    stage.classList.remove(
+                      "is-mobile-wipe-forward",
+                      "is-mobile-wipe-backward"
+                    );
+                  },
+                  {
+                    once: true
+                  }
+                );
+
+
+                /*
+                  Force one painted frame with A + fully-loaded B stacked
+                  before adding the animation class. This guarantees that the
+                  wipe animates B itself rather than animating an empty image
+                  slot and snapping afterward.
+                */
+                incoming.getBoundingClientRect();
+
+
+                stage.classList.add(
+                  resolvedTransitionDirection > 0
+                    ? "is-mobile-wipe-forward"
+                    : "is-mobile-wipe-backward"
+                );
+              }
             }
           });
         };
