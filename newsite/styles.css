@@ -5631,7 +5631,7 @@ body.is-media-lightbox-open {
         110deg,
         rgba(
           var(--page-accent-rgb),
-          0.30
+          0.10
         ),
         rgba(
           var(--page-accent-rgb),
@@ -10097,7 +10097,7 @@ body.is-media-lightbox-open {
         110deg,
         rgba(
           var(--page-accent-rgb),
-          0.30
+          0.10
         ),
         rgba(
           var(--page-accent-rgb),
@@ -13594,7 +13594,7 @@ body.is-media-lightbox-open {
         110deg,
         rgba(
           var(--page-accent-rgb),
-          0.30
+          0.10
         ),
         rgba(
           var(--page-accent-rgb),
@@ -24270,6 +24270,1031 @@ body.is-media-lightbox-open {
       -webkit-mask-position: -100% 0;
       mask-position: -100% 0;
     }
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE MEDIA WIPE — WIDTH REVEAL LAYER (FINAL OVERRIDE)
+   =========================================================
+
+   Previous mask-position versions were ambiguous: B could already be visible,
+   then the moving mask exposed A again underneath.
+
+   This renderer is geometrically simple:
+     A stays static underneath.
+     B sits full-size inside an overflow-hidden wrapper.
+     The wrapper grows from 0% -> 100% width.
+     A soft mask on the wrapper feathers ONLY the moving reveal edge.
+
+   Neither image translates, mirrors, fades, or animates.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+
+    width: 0;
+
+    overflow: hidden;
+
+    z-index: 2;
+
+    pointer-events: none;
+
+    will-change: width;
+
+    animation: none !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer > .media-viewer-image {
+    position: absolute !important;
+
+    top: 0 !important;
+    bottom: 0 !important;
+
+    width:
+      var(
+        --mobile-media-stage-width,
+        100cqw
+      ) !important;
+
+    height: 100% !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    object-fit: cover !important;
+    object-position: 50% 50% !important;
+
+    transform: none !important;
+
+    opacity: 1 !important;
+
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+
+    animation: none !important;
+  }
+
+
+  /*
+    NEXT / finger swipes left:
+    B grows inward from the RIGHT edge.
+    Its left reveal edge is softly feathered.
+  */
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-forward {
+    right: 0;
+    left: auto;
+
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0,
+        rgba(0, 0, 0, 0.18) 12px,
+        rgba(0, 0, 0, 0.72) 30px,
+        #000 52px,
+        #000 100%
+      ) !important;
+
+    mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0,
+        rgba(0, 0, 0, 0.18) 12px,
+        rgba(0, 0, 0, 0.72) 30px,
+        #000 52px,
+        #000 100%
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-forward
+  > .media-viewer-image {
+    right: 0 !important;
+    left: auto !important;
+  }
+
+
+  /*
+    PREVIOUS / finger swipes right:
+    B grows inward from the LEFT edge.
+    Its right reveal edge is softly feathered.
+  */
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-backward {
+    left: 0;
+    right: auto;
+
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        #000 0,
+        #000 calc(100% - 52px),
+        rgba(0, 0, 0, 0.72) calc(100% - 30px),
+        rgba(0, 0, 0, 0.18) calc(100% - 12px),
+        transparent 100%
+      ) !important;
+
+    mask-image:
+      linear-gradient(
+        90deg,
+        #000 0,
+        #000 calc(100% - 52px),
+        rgba(0, 0, 0, 0.72) calc(100% - 30px),
+        rgba(0, 0, 0, 0.18) calc(100% - 12px),
+        transparent 100%
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-backward
+  > .media-viewer-image {
+    left: 0 !important;
+    right: auto !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-running {
+    animation:
+      mobile-media-layer-reveal
+      380ms
+      cubic-bezier(0.22, 0.72, 0.24, 1)
+      both !important;
+  }
+
+
+  @keyframes mobile-media-layer-reveal {
+    from {
+      width: 0;
+    }
+
+    to {
+      width: 100%;
+    }
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE MEDIA WIPE — STABLE COMPLETION STATE
+   =========================================================
+
+   Keep the incoming image inside its reveal wrapper after the wipe finishes.
+   This avoids the tiny end-of-animation position jump caused by reparenting
+   the image back into the normal media stage.
+
+   Once complete, the wrapper simply becomes a normal full-size unmasked
+   layer until the next media render replaces the stage.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-complete {
+    width: 100% !important;
+
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+
+    animation: none !important;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE MEDIA WIPE — PRESERVE OUTGOING WRAPPER GEOMETRY
+   =========================================================
+
+   After the first successful wipe, the visible screenshot intentionally lives
+   inside .mobile-media-wipe-layer. On the next swipe, keep a clone of that
+   entire layer as the outgoing A rather than extracting/reparenting the image.
+   This keeps A in the exact same positioning context at swipe start.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-outgoing {
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+
+    z-index: 1 !important;
+
+    overflow: hidden !important;
+
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+
+    animation: none !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-outgoing
+  > .media-viewer-image {
+    left: 0 !important;
+    right: auto !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    transform: none !important;
+
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+
+    animation: none !important;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE MEDIA WIPE — ZERO-GEOMETRY-CHANGE OUTGOING SNAPSHOT
+   =========================================================
+
+   The start-of-swipe pop came from "normalizing" the outgoing clone:
+   the visible completed layer could be right-anchored, then the outgoing
+   override forced its child to left:0. That is a real geometry change.
+
+   The outgoing snapshot must preserve the exact completed layer geometry.
+   Only stacking / interactivity are changed here.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-outgoing {
+    z-index: 1 !important;
+
+    pointer-events: none !important;
+
+    animation: none !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .mobile-media-wipe-layer.is-wipe-outgoing
+  > .media-viewer-image {
+    animation: none !important;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE — DIRECTIONAL PAGE-COLOR SWIPE FEEDBACK
+   =========================================================
+   A soft horizontal light band travels with vertical swipe direction.
+
+   Same-page media/info transitions:
+     current page accent -> current page accent
+
+   Page-to-page transitions:
+     current accent -> incoming page accent
+
+   The layer sits just beneath the real page frames so it reads as background
+   illumination rather than another foreground UI element.
+   ========================================================= */
+
+.mobile-swipe-feedback {
+  display: none;
+}
+
+
+@media (max-width: 840px) {
+  .mobile-swipe-feedback {
+    display: block;
+
+    position: fixed;
+
+    left: 0;
+    right: 0;
+
+    height:
+      clamp(
+        440px,
+        88vw,
+        720px
+      );
+
+    z-index: 19;
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transform:
+      translate3d(
+        0,
+        0,
+        0
+      );
+
+    will-change:
+      transform,
+      opacity;
+
+    filter:
+      blur(10px);
+
+    mix-blend-mode:
+      screen;
+  }
+
+
+  /*
+    Finger moving UP / navigating forward:
+    the light enters from the bottom and travels toward the top.
+  */
+  .mobile-swipe-feedback.is-swipe-up {
+    top: 100%;
+
+    background:
+      linear-gradient(
+        to top,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0
+        )
+        0%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0.10
+        )
+        18%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0.31
+        )
+        42%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0.41
+        )
+        58%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0.10
+        )
+        82%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0
+        )
+        100%
+      );
+  }
+
+
+  .mobile-swipe-feedback.is-swipe-up.is-running {
+    animation:
+      mobile-swipe-light-up
+      1280ms
+      cubic-bezier(0.16, 0.76, 0.20, 1)
+      both;
+  }
+
+
+  /*
+    Finger moving DOWN / navigating backward:
+    reverse both travel and the color ordering.
+  */
+  .mobile-swipe-feedback.is-swipe-down {
+    bottom: 100%;
+
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0
+        )
+        0%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0.10
+        )
+        18%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0.31
+        )
+        42%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0.41
+        )
+        58%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0.10
+        )
+        82%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0
+        )
+        100%
+      );
+  }
+
+
+  .mobile-swipe-feedback.is-swipe-down.is-running {
+    animation:
+      mobile-swipe-light-down
+      1280ms
+      cubic-bezier(0.16, 0.76, 0.20, 1)
+      both;
+  }
+
+
+  @keyframes mobile-swipe-light-up {
+    0% {
+      opacity: 0;
+      transform:
+        translate3d(
+          0,
+          0,
+          0
+        );
+    }
+
+    14% {
+      opacity: 0.92;
+    }
+
+    78% {
+      opacity: 0.78;
+    }
+
+    100% {
+      opacity: 0;
+      transform:
+        translate3d(
+          0,
+          calc(-100vh - 180px),
+          0
+        );
+    }
+  }
+
+
+  @keyframes mobile-swipe-light-down {
+    0% {
+      opacity: 0;
+      transform:
+        translate3d(
+          0,
+          0,
+          0
+        );
+    }
+
+    14% {
+      opacity: 0.92;
+    }
+
+    78% {
+      opacity: 0.78;
+    }
+
+    100% {
+      opacity: 0;
+      transform:
+        translate3d(
+          0,
+          calc(100vh + 180px),
+          0
+        );
+    }
+  }
+
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-swipe-feedback.is-running {
+      animation-duration: 1ms !important;
+    }
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE SWIPE FEEDBACK — CLIP TO BACKGROUND VIDEO OPENING
+   =========================================================
+   The swipe glow now lives inside a dedicated clipping layer that matches
+   the background video's exact inset + inner corner radius. It can no longer
+   wash across the opaque border/bezel around the video.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .site-background
+  .mobile-swipe-feedback-clip {
+    position: absolute;
+
+    top:
+      var(--background-video-frame-width);
+
+    right:
+      var(--background-video-frame-width);
+
+    bottom:
+      var(--background-video-frame-width);
+
+    left:
+      var(--background-video-frame-width);
+
+    overflow: hidden;
+
+    border-radius:
+      clamp(10px, 0.9vw, 16px);
+
+    pointer-events: none;
+
+    z-index: 1;
+  }
+
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback {
+    /*
+      The clip wrapper is now the containing block, so the light sweep is
+      positioned relative to the VIDEO opening instead of the whole viewport.
+    */
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    z-index: 1;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE SWIPE FEEDBACK — TRUE VIDEO-APERTURE TRAVEL
+   =========================================================
+   Clarification:
+   - the dark color bezel is the OUTER boundary
+   - the raster viewport-frame graphics sit above this effect naturally
+   - the light should travel across the full VIDEO aperture, including any
+     portions later covered by those raster frame graphics
+
+   Animate through the clip's own height rather than 100vh. This keeps the
+   1280ms timing perceptually consistent after moving the effect into the
+   video aperture.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-up {
+    top: 100%;
+    bottom: auto;
+  }
+
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-up.is-running {
+    animation:
+      mobile-swipe-light-up-in-aperture
+      2560ms
+      cubic-bezier(0.16, 0.76, 0.20, 1)
+      both;
+  }
+
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-down {
+    top: auto;
+    bottom: 100%;
+  }
+
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-down.is-running {
+    animation:
+      mobile-swipe-light-down-in-aperture
+      2560ms
+      cubic-bezier(0.16, 0.76, 0.20, 1)
+      both;
+  }
+
+
+  @keyframes mobile-swipe-light-up-in-aperture {
+    0% {
+      opacity: 0;
+      top: 100%;
+      transform: none;
+    }
+
+    14% {
+      opacity: 0.92;
+    }
+
+    78% {
+      opacity: 0.78;
+    }
+
+    100% {
+      opacity: 0;
+      top: -360px;
+      transform: none;
+    }
+  }
+
+
+  @keyframes mobile-swipe-light-down-in-aperture {
+    0% {
+      opacity: 0;
+      bottom: 100%;
+      transform: none;
+    }
+
+    14% {
+      opacity: 0.92;
+    }
+
+    78% {
+      opacity: 0.78;
+    }
+
+    100% {
+      opacity: 0;
+      bottom: -360px;
+      transform: none;
+    }
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE — HORIZONTAL PAGE-COLOR SWIPE FEEDBACK
+   =========================================================
+   Same visual language as the vertical sweep, but for hero media swipes.
+
+   Swipe left  -> light enters from right and travels left.
+   Swipe right -> light enters from left and travels right.
+
+   Horizontal feedback always uses the currently-open page accent color.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-left,
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-right {
+    top: 0;
+    bottom: 0;
+
+    width:
+      clamp(
+        440px,
+        88vw,
+        720px
+      );
+
+    height: auto;
+
+    filter:
+      blur(18px);
+  }
+
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-left {
+    left: 100%;
+    right: auto;
+
+    background:
+      linear-gradient(
+        to left,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0
+        )
+        0%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0.10
+        )
+        18%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0.31
+        )
+        42%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0.41
+        )
+        58%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0.11
+        )
+        82%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0
+        )
+        100%
+      );
+  }
+
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-left.is-running {
+    animation:
+      mobile-swipe-light-left-in-aperture
+      2560ms
+      cubic-bezier(0.16, 0.76, 0.20, 1)
+      both;
+  }
+
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-right {
+    left: auto;
+    right: 100%;
+
+    background:
+      linear-gradient(
+        to right,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0
+        )
+        0%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0.10
+        )
+        18%,
+        rgba(
+          var(--mobile-swipe-from-rgb),
+          0.31
+        )
+        42%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0.41
+        )
+        58%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0.11
+        )
+        82%,
+        rgba(
+          var(--mobile-swipe-to-rgb),
+          0
+        )
+        100%
+      );
+  }
+
+
+  .site-background
+  .mobile-swipe-feedback-clip
+  .mobile-swipe-feedback.is-swipe-right.is-running {
+    animation:
+      mobile-swipe-light-right-in-aperture
+      2560ms
+      cubic-bezier(0.16, 0.76, 0.20, 1)
+      both;
+  }
+
+
+  @keyframes mobile-swipe-light-left-in-aperture {
+    0% {
+      opacity: 0;
+      left: 100%;
+      transform: none;
+    }
+
+    14% {
+      opacity: 0.92;
+    }
+
+    78% {
+      opacity: 0.78;
+    }
+
+    100% {
+      opacity: 0;
+      left: -720px;
+      transform: none;
+    }
+  }
+
+
+  @keyframes mobile-swipe-light-right-in-aperture {
+    0% {
+      opacity: 0;
+      right: 100%;
+      transform: none;
+    }
+
+    14% {
+      opacity: 0.92;
+    }
+
+    78% {
+      opacity: 0.78;
+    }
+
+    100% {
+      opacity: 0;
+      right: -720px;
+      transform: none;
+    }
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE FRAME RASTER QUALITY — KEEP ALL 16 PIECES SHARP
+   =========================================================
+   Some mobile Chromium devices can cache small raster assets at an
+   intermediate/composited resolution while the responsive frame settles.
+
+   Keep every fixed corner piece and stretcher on the normal image raster
+   path, and explicitly opt them out of transform / will-change hints that
+   can encourage a stale low-resolution composited copy.
+
+   Note: fixed <img> pieces already receive explicit live width + height from
+   the shared measured frame geometry, so the safer part of the "explicit
+   dimensions" fix is already present and does not need a second sizing system.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > [data-game-frame-piece],
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > [data-game-frame-stretcher] {
+    image-rendering: auto !important;
+
+    transform: none !important;
+    translate: none !important;
+    scale: none !important;
+    rotate: none !important;
+
+    will-change: auto !important;
+
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+
+    filter: none !important;
+
+    /*
+      Avoid giving Chromium an extra paint-containment boundary for these
+      tiny raster assets. Let the browser rerasterize them at their final
+      on-screen dimensions.
+    */
+    contain: none !important;
+  }
+
+
+  /*
+    Fixed corner pieces are real <img> elements. Reassert both dimensions
+    from the already-existing measured geometry so mobile Chromium has an
+    explicit final raster target in both axes.
+  */
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > img[data-game-frame-piece] {
+    width:
+      var(
+        --brobots-piece-w,
+        auto
+      )
+      !important;
+
+    height:
+      var(
+        --brobots-piece-h,
+        auto
+      )
+      !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    object-fit: fill;
+
+    /*
+      Keep the browser's decoder/rasterizer in its normal high-quality mode.
+    */
+    image-rendering: auto !important;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE LANDSCAPE — PORTRAIT-ONLY GUARD
+   =========================================================
+   Browsers do not reliably allow an ordinary webpage to force portrait
+   orientation. Instead, block interaction in phone-landscape and ask the
+   user to rotate back to portrait.
+
+   The coarse-pointer + short-height checks keep this aimed at phones rather
+   than ordinary desktop windows.
+   ========================================================= */
+
+@media
+  (orientation: landscape)
+  and (pointer: coarse)
+  and (max-height: 600px) {
+
+  html,
+  body {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+  }
+
+
+  body > * {
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+
+
+  body::before {
+    content:
+      "Please rotate your device to portrait";
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 2147483647;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 32px;
+
+    box-sizing: border-box;
+
+    background:
+      rgba(
+        10,
+        10,
+        10,
+        0.94
+      );
+
+    color: #f0f0f0;
+
+    font:
+      600
+      clamp(18px, 4vw, 28px)
+      / 1.25
+      system-ui,
+      sans-serif;
+
+    text-align: center;
+
+    letter-spacing: 0.01em;
+
+    pointer-events: auto;
   }
 }
 

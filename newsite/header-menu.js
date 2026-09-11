@@ -8834,6 +8834,311 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
+  /* =======================================================
+     Mobile directional color-swipe feedback
+     ======================================================= */
+
+  let mobileSwipeFeedbackLayer =
+    null;
+
+  let mobileSwipeFeedbackRunId =
+    0;
+
+
+  const ensureMobileSwipeFeedbackLayer =
+    () => {
+      if (mobileSwipeFeedbackLayer) {
+        return mobileSwipeFeedbackLayer;
+      }
+
+
+      const background =
+        document.querySelector(
+          ".site-background"
+        );
+
+
+      let clip =
+        background?.querySelector(
+          ".mobile-swipe-feedback-clip"
+        );
+
+
+      if (
+        background &&
+        !clip
+      ) {
+        clip =
+          document.createElement(
+            "div"
+          );
+
+
+        clip.className =
+          "mobile-swipe-feedback-clip";
+
+        clip.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+
+        background.appendChild(
+          clip
+        );
+      }
+
+
+      const layer =
+        document.createElement(
+          "div"
+        );
+
+
+      layer.className =
+        "mobile-swipe-feedback";
+
+      layer.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+
+      /*
+        Keep the light sweep inside the exact same inner opening as the
+        background video. If the background wrapper is unavailable for any
+        reason, fall back to <body> so the feedback still functions.
+      */
+      (
+        clip ||
+        document.body
+      ).appendChild(
+        layer
+      );
+
+
+      mobileSwipeFeedbackLayer =
+        layer;
+
+
+      return layer;
+    };
+
+
+  const getPageAccentRgbTriplet =
+    (pageName) => {
+      const frame =
+        getPageFrame(
+          pageName
+        );
+
+
+      if (frame) {
+        const value =
+          getComputedStyle(
+            frame
+          )
+            .getPropertyValue(
+              "--page-accent-rgb"
+            )
+            .trim();
+
+
+        if (value) {
+          return value;
+        }
+      }
+
+
+      /*
+        Fallback directly to the master variables in :root.
+      */
+      const rootStyle =
+        getComputedStyle(
+          document.documentElement
+        );
+
+
+      const fallbackName =
+        `--accent-${pageName}-rgb`;
+
+
+      return (
+        rootStyle
+          .getPropertyValue(
+            fallbackName
+          )
+          .trim()
+        ||
+        "255, 114, 2"
+      );
+    };
+
+
+  const playMobileVerticalSwipeFeedback =
+    (
+      direction,
+      fromPageName,
+      toPageName = fromPageName
+    ) => {
+      if (
+        iconButtonMode.matches ||
+        direction === 0 ||
+        !fromPageName
+      ) {
+        return;
+      }
+
+
+      const layer =
+        ensureMobileSwipeFeedbackLayer();
+
+
+      const runId =
+        ++mobileSwipeFeedbackRunId;
+
+
+      const fromRgb =
+        getPageAccentRgbTriplet(
+          fromPageName
+        );
+
+      const toRgb =
+        getPageAccentRgbTriplet(
+          toPageName ||
+          fromPageName
+        );
+
+
+      layer.style.setProperty(
+        "--mobile-swipe-from-rgb",
+        fromRgb
+      );
+
+
+      layer.style.setProperty(
+        "--mobile-swipe-to-rgb",
+        toRgb
+      );
+
+
+      layer.classList.remove(
+        "is-swipe-up",
+        "is-swipe-down",
+        "is-swipe-left",
+        "is-swipe-right",
+        "is-running"
+      );
+
+
+      /*
+        Flush the reset state so repeated swipes can replay immediately.
+      */
+      layer.getBoundingClientRect();
+
+
+      layer.classList.add(
+        direction > 0
+          ? "is-swipe-up"
+          : "is-swipe-down"
+      );
+
+
+      requestAnimationFrame(
+        () => {
+          if (
+            runId !==
+            mobileSwipeFeedbackRunId
+          ) {
+            return;
+          }
+
+
+          layer.classList.add(
+            "is-running"
+          );
+        }
+      );
+    };
+
+  const playMobileHorizontalSwipeFeedback =
+    (
+      direction,
+      pageName
+    ) => {
+      if (
+        iconButtonMode.matches ||
+        direction === 0 ||
+        !pageName
+      ) {
+        return;
+      }
+
+
+      const layer =
+        ensureMobileSwipeFeedbackLayer();
+
+
+      const runId =
+        ++mobileSwipeFeedbackRunId;
+
+
+      const rgb =
+        getPageAccentRgbTriplet(
+          pageName
+        );
+
+
+      layer.style.setProperty(
+        "--mobile-swipe-from-rgb",
+        rgb
+      );
+
+
+      layer.style.setProperty(
+        "--mobile-swipe-to-rgb",
+        rgb
+      );
+
+
+      layer.classList.remove(
+        "is-swipe-up",
+        "is-swipe-down",
+        "is-swipe-left",
+        "is-swipe-right",
+        "is-running"
+      );
+
+
+      layer.getBoundingClientRect();
+
+
+      layer.classList.add(
+        direction > 0
+          ? "is-swipe-left"
+          : "is-swipe-right"
+      );
+
+
+      requestAnimationFrame(
+        () => {
+          if (
+            runId !==
+            mobileSwipeFeedbackRunId
+          ) {
+            return;
+          }
+
+
+          layer.classList.add(
+            "is-running"
+          );
+        }
+      );
+    };
+
+
+
   /*
     Desktop:
       one deliberate downward wheel/trackpad gesture = next page.
@@ -9559,6 +9864,25 @@ document.addEventListener("DOMContentLoaded", () => {
           deltaY < 0
             ? 1
             : -1;
+
+
+        const destinationPageName =
+          direction > 0
+            ? getNextPageName(
+                pageName
+              )
+            : getPreviousPageName(
+                pageName
+              );
+
+
+        if (destinationPageName) {
+          playMobileVerticalSwipeFeedback(
+            direction,
+            pageName,
+            destinationPageName
+          );
+        }
 
 
         const switched =
@@ -15620,27 +15944,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       if (mobileImageWipe) {
-        outgoingMedia =
+        /*
+          If the currently-visible image is already living inside a completed
+          wipe wrapper, preserve that WHOLE rendered layer as A.
+
+          v112 cloned only the nested <img> and moved that clone directly into
+          the stage. That changed its positioning context at the exact moment
+          a new swipe began, which caused the new start-of-swipe pop.
+        */
+        const currentCompletedLayer =
           stage.querySelector(
-            ".media-viewer-image"
-          )?.cloneNode(
-            true
-          ) ||
-          null;
+            ".mobile-media-wipe-layer.is-wipe-complete"
+          );
 
 
-        if (outgoingMedia) {
+        if (currentCompletedLayer) {
+          outgoingMedia =
+            currentCompletedLayer.cloneNode(
+              true
+            );
+
+
+          /*
+            Preserve the completed layer's exact directional anchoring.
+
+            The previous pass stripped is-wipe-complete / directional state
+            and then normalized the clone with new CSS. That changed a
+            right-anchored completed image into a left-anchored outgoing one
+            at the instant the next swipe began — the visible "pop".
+
+            Keep the rendered layer exactly as it is and only tag it as the
+            outgoing snapshot.
+          */
           outgoingMedia.classList.remove(
-            "media-viewer-image--incoming",
-            "is-wipe-forward",
-            "is-wipe-backward",
             "is-wipe-running"
           );
 
 
           outgoingMedia.classList.add(
-            "media-viewer-image--outgoing"
+            "is-wipe-outgoing"
           );
+        }
+
+        else {
+          outgoingMedia =
+            stage.querySelector(
+              ".media-viewer-image"
+            )?.cloneNode(
+              true
+            ) ||
+            null;
+
+
+          if (outgoingMedia) {
+            outgoingMedia.classList.remove(
+              "media-viewer-image--incoming",
+              "is-wipe-forward",
+              "is-wipe-backward",
+              "is-wipe-running"
+            );
+
+
+            outgoingMedia.classList.add(
+              "media-viewer-image--outgoing"
+            );
+          }
         }
       }
 
@@ -15681,20 +16049,47 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
 
+      let incomingWipeWrapper =
+        null;
+
+
       if (mediaElement) {
         if (mobileImageWipe) {
-          mediaElement.classList.add(
-            "media-viewer-image--incoming",
-            resolvedTransitionDirection > 0
-              ? "is-wipe-forward"
-              : "is-wipe-backward"
+          incomingWipeWrapper =
+            document.createElement(
+              "div"
+            );
+
+
+          incomingWipeWrapper.className =
+            "mobile-media-wipe-layer " +
+            (
+              resolvedTransitionDirection > 0
+                ? "is-wipe-forward"
+                : "is-wipe-backward"
+            );
+
+
+          /*
+            Keep B at the full hero dimensions inside a width-animated,
+            overflow-hidden wrapper. This avoids the mask-position ambiguity
+            that made the previous versions reveal A again over B.
+          */
+          incomingWipeWrapper.appendChild(
+            mediaElement
+          );
+
+
+          stage.appendChild(
+            incomingWipeWrapper
           );
         }
 
-
-        stage.appendChild(
-          mediaElement
-        );
+        else {
+          stage.appendChild(
+            mediaElement
+          );
+        }
       }
 
 
@@ -15732,53 +16127,58 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            if (mobileImageWipe) {
-              const incoming =
-                stage.querySelector(
-                  ".media-viewer-image--incoming"
-                );
+            if (
+              mobileImageWipe &&
+              incomingWipeWrapper
+            ) {
+              incomingWipeWrapper.addEventListener(
+                "animationend",
+                () => {
+                  stage
+                    .querySelector(
+                      ".is-wipe-outgoing, .media-viewer-image--outgoing"
+                    )
+                    ?.remove();
 
 
-              if (incoming) {
-                incoming.addEventListener(
-                  "animationend",
-                  () => {
-                    stage
-                      .querySelector(
-                        ".media-viewer-image--outgoing"
-                      )
-                      ?.remove();
+                  /*
+                    Do NOT unwrap B at the end of the wipe.
+
+                    The wrapped image uses a slightly different positioning
+                    context than the normal stage image. Moving B out of that
+                    wrapper after the animation caused the tiny 1-2px snap the
+                    user could see at completion.
+
+                    Instead, keep the fully-revealed wrapper in place as the
+                    stable final state. The next render replaces the whole
+                    stage anyway, so there is no cleanup penalty.
+                  */
+                  incomingWipeWrapper.classList.add(
+                    "is-wipe-complete"
+                  );
+                },
+                {
+                  once: true
+                }
+              );
 
 
-                    incoming.classList.remove(
-                      "media-viewer-image--incoming",
-                      "is-wipe-forward",
-                      "is-wipe-backward",
-                      "is-wipe-running"
-                    );
-                  },
-                  {
-                    once: true
-                  }
-                );
+              /*
+                Paint the zero-width reveal layer first. The next frame expands
+                that layer over static A. Only the wrapper animates; neither
+                screenshot moves or changes opacity.
+              */
+              incomingWipeWrapper
+                .getBoundingClientRect();
 
 
-                /*
-                  B already entered the DOM in its fully hidden directional
-                  mask state. Force that state to paint, then animate B itself
-                  across A. No stage-level wipe class is involved anymore.
-                */
-                incoming.getBoundingClientRect();
-
-
-                requestAnimationFrame(
-                  () => {
-                    incoming.classList.add(
-                      "is-wipe-running"
-                    );
-                  }
-                );
-              }
+              requestAnimationFrame(
+                () => {
+                  incomingWipeWrapper.classList.add(
+                    "is-wipe-running"
+                  );
+                }
+              );
             }
           });
         };
@@ -16072,6 +16472,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
           return;
         }
+
+
+        const swipePageName =
+          owningGamePageForSwipe?.dataset.page ||
+          activePageName;
+
+
+        playMobileHorizontalSwipeFeedback(
+          deltaX < 0
+            ? 1
+            : -1,
+          swipePageName
+        );
 
 
         renderItem(
@@ -18280,6 +18693,13 @@ document.addEventListener("DOMContentLoaded", () => {
           cancelTabletPreviousGestureArm();
 
 
+          playMobileVerticalSwipeFeedback(
+            1,
+            pageName,
+            pageName
+          );
+
+
           setTabletGeometryState(
             true
           );
@@ -18302,6 +18722,20 @@ document.addEventListener("DOMContentLoaded", () => {
           infoIsOpen &&
           tabletNextGestureArmed
         ) {
+          const nextPageName =
+            getNextPageName(
+              pageName
+            );
+
+
+          playMobileVerticalSwipeFeedback(
+            1,
+            pageName,
+            nextPageName ||
+            pageName
+          );
+
+
           const switched =
             requestNextPage(
               pageName
@@ -18329,6 +18763,13 @@ document.addEventListener("DOMContentLoaded", () => {
           cancelTabletNextGestureArm();
 
 
+          playMobileVerticalSwipeFeedback(
+            -1,
+            pageName,
+            pageName
+          );
+
+
           setTabletGeometryState(
             false
           );
@@ -18352,6 +18793,20 @@ document.addEventListener("DOMContentLoaded", () => {
           !infoIsOpen &&
           tabletPreviousGestureArmed
         ) {
+          const previousPageName =
+            getPreviousPageName(
+              pageName
+            );
+
+
+          playMobileVerticalSwipeFeedback(
+            -1,
+            pageName,
+            previousPageName ||
+            pageName
+          );
+
+
           const switched =
             requestPreviousPage(
               pageName
