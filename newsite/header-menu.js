@@ -8623,6 +8623,529 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
+
+  /* =======================================================
+     Sequential wheel / trackpad page navigation
+     ======================================================= */
+
+  const getNextPageName =
+    (name) => {
+      const index =
+        pageNames.indexOf(
+          name
+        );
+
+
+      if (
+        index < 0 ||
+        index >=
+          pageNames.length - 1
+      ) {
+        return null;
+      }
+
+
+      return pageNames[
+        index + 1
+      ];
+    };
+
+
+  const requestNextPage =
+    (name) => {
+      const nextPageName =
+        getNextPageName(
+          name
+        );
+
+
+      if (!nextPageName) {
+        return false;
+      }
+
+
+      /*
+        Reuse the exact same page-switch path as clicking another header
+        button. Gesture code only decides WHEN to request the switch.
+      */
+      requestPage(
+        nextPageName
+      );
+
+
+      return true;
+    };
+
+
+  const getPreviousPageName =
+    (name) => {
+      const index =
+        pageNames.indexOf(
+          name
+        );
+
+
+      if (index <= 0) {
+        return null;
+      }
+
+
+      return pageNames[
+        index - 1
+      ];
+    };
+
+
+  const requestPreviousPage =
+    (name) => {
+      const previousPageName =
+        getPreviousPageName(
+          name
+        );
+
+
+      if (!previousPageName) {
+        return false;
+      }
+
+
+      requestPage(
+        previousPageName
+      );
+
+
+      return true;
+    };
+
+
+  /*
+    Desktop:
+      one deliberate downward wheel/trackpad gesture = next page.
+
+    A fired gesture stays latched until BOTH:
+      - wheel input has gone quiet
+      - the page-switch animation has finished
+
+    This prevents inertial trackpad momentum from skipping multiple pages.
+  */
+  let desktopPageWheelIntent =
+    0;
+
+  let desktopPageWheelDirection =
+    0;
+
+  let desktopPageWheelResetTimer =
+    null;
+
+  let desktopPageWheelLatched =
+    false;
+
+
+  const resetDesktopPageWheelIntent =
+    () => {
+      desktopPageWheelIntent =
+        0;
+
+      desktopPageWheelDirection =
+        0;
+
+      desktopPageWheelResetTimer =
+        null;
+    };
+
+
+  const tryReleaseDesktopPageWheelLatch =
+    () => {
+      if (!desktopPageWheelLatched) {
+        return;
+      }
+
+
+      if (pageFrameIsAnimating) {
+        desktopPageWheelResetTimer =
+          setTimeout(
+            tryReleaseDesktopPageWheelLatch,
+            90
+          );
+
+        return;
+      }
+
+
+      desktopPageWheelLatched =
+        false;
+
+      resetDesktopPageWheelIntent();
+    };
+
+
+  const scheduleDesktopPageWheelReset =
+    () => {
+      if (desktopPageWheelResetTimer) {
+        clearTimeout(
+          desktopPageWheelResetTimer
+        );
+      }
+
+
+      desktopPageWheelResetTimer =
+        setTimeout(
+          () => {
+            if (desktopPageWheelLatched) {
+              tryReleaseDesktopPageWheelLatch();
+            }
+
+            else {
+              resetDesktopPageWheelIntent();
+            }
+          },
+          220
+        );
+    };
+
+
+  const handleDesktopPageWheel =
+    (event) => {
+      /*
+        Tablet has its own two-stage media -> info -> next-page controller.
+      */
+      if (
+        !fullTextDesktopMode.matches ||
+        !activePageName ||
+        !getPageFrame(
+          activePageName
+        )?.classList.contains(
+          "is-open"
+        ) ||
+        document.body.classList.contains(
+          "is-media-lightbox-open"
+        )
+      ) {
+        return;
+      }
+
+
+      if (
+        Math.abs(event.deltaX) >
+        Math.abs(event.deltaY) ||
+        Math.abs(event.deltaY) < 1
+      ) {
+        return;
+      }
+
+
+      const direction =
+        Math.sign(
+          event.deltaY
+        );
+
+
+      const destinationPageName =
+        direction > 0
+          ? getNextPageName(
+              activePageName
+            )
+          : getPreviousPageName(
+              activePageName
+            );
+
+
+      if (!destinationPageName) {
+        resetDesktopPageWheelIntent();
+        return;
+      }
+
+
+      /*
+        Once this gesture has fired, continue consuming its momentum until
+        the gesture has gone quiet and the page switch is fully settled.
+      */
+      if (desktopPageWheelLatched) {
+        event.preventDefault();
+
+        scheduleDesktopPageWheelReset();
+
+        return;
+      }
+
+
+      event.preventDefault();
+
+
+      if (
+        direction !==
+        desktopPageWheelDirection
+      ) {
+        desktopPageWheelIntent =
+          0;
+
+        desktopPageWheelDirection =
+          direction;
+      }
+
+
+      const absoluteDelta =
+        Math.abs(
+          event.deltaY
+        );
+
+
+      const isCoarseWheelStep =
+        event.deltaMode !== 0 ||
+        absoluteDelta >= 24;
+
+
+      if (isCoarseWheelStep) {
+        desktopPageWheelLatched =
+          (
+            direction > 0
+              ? requestNextPage(
+                  activePageName
+                )
+              : requestPreviousPage(
+                  activePageName
+                )
+          );
+
+
+        scheduleDesktopPageWheelReset();
+
+        return;
+      }
+
+
+      desktopPageWheelIntent +=
+        Math.min(
+          absoluteDelta,
+          20
+        );
+
+
+      scheduleDesktopPageWheelReset();
+
+
+      if (
+        desktopPageWheelIntent >=
+        34
+      ) {
+        desktopPageWheelLatched =
+          (
+            direction > 0
+              ? requestNextPage(
+                  activePageName
+                )
+              : requestPreviousPage(
+                  activePageName
+                )
+          );
+      }
+    };
+
+
+  document.addEventListener(
+    "wheel",
+    handleDesktopPageWheel,
+    {
+      passive: false
+    }
+  );
+
+
+
+  /*
+    Tablet non-game pages
+    ---------------------
+    The game pages have their own two-stage tablet controller, but About does
+    not. Give non-game pages the same deliberate downward sequential
+    navigation used on desktop so About -> Brobots works naturally.
+
+    Game pages are explicitly excluded here to avoid competing with their
+    media/info gesture state machine.
+  */
+  let tabletPageWheelIntent =
+    0;
+
+  let tabletPageWheelLatched =
+    false;
+
+  let tabletPageWheelResetTimer =
+    null;
+
+
+  const resetTabletPageWheel =
+    () => {
+      tabletPageWheelIntent =
+        0;
+
+      tabletPageWheelLatched =
+        false;
+
+      tabletPageWheelResetTimer =
+        null;
+    };
+
+
+  const scheduleTabletPageWheelReset =
+    () => {
+      if (
+        tabletPageWheelResetTimer
+      ) {
+        clearTimeout(
+          tabletPageWheelResetTimer
+        );
+      }
+
+
+      tabletPageWheelResetTimer =
+        setTimeout(
+          () => {
+            if (pageFrameIsAnimating) {
+              scheduleTabletPageWheelReset();
+              return;
+            }
+
+
+            resetTabletPageWheel();
+          },
+          220
+        );
+    };
+
+
+  const handleTabletNonGameWheel =
+    (event) => {
+      if (
+        !gameFrameTabletMode.matches ||
+        !activePageName ||
+        [
+          "brobots",
+          "etherian",
+          "halodoom"
+        ].includes(
+          activePageName
+        ) ||
+        !getPageFrame(
+          activePageName
+        )?.classList.contains(
+          "is-open"
+        ) ||
+        document.body.classList.contains(
+          "is-media-lightbox-open"
+        )
+      ) {
+        return;
+      }
+
+
+      if (
+        Math.abs(event.deltaX) >
+        Math.abs(event.deltaY) ||
+        Math.abs(event.deltaY) < 1
+      ) {
+        return;
+      }
+
+
+      const direction =
+        Math.sign(
+          event.deltaY
+        );
+
+
+      const destinationPageName =
+        direction > 0
+          ? getNextPageName(
+              activePageName
+            )
+          : getPreviousPageName(
+              activePageName
+            );
+
+
+      if (!destinationPageName) {
+        tabletPageWheelIntent =
+          0;
+
+        return;
+      }
+
+
+      event.preventDefault();
+
+
+      if (tabletPageWheelLatched) {
+        scheduleTabletPageWheelReset();
+        return;
+      }
+
+
+      const absoluteDelta =
+        Math.abs(
+          event.deltaY
+        );
+
+
+      const isCoarseWheelStep =
+        event.deltaMode !== 0 ||
+        absoluteDelta >= 24;
+
+
+      if (isCoarseWheelStep) {
+        tabletPageWheelLatched =
+          (
+            direction > 0
+              ? requestNextPage(
+                  activePageName
+                )
+              : requestPreviousPage(
+                  activePageName
+                )
+          );
+
+
+        scheduleTabletPageWheelReset();
+
+        return;
+      }
+
+
+      tabletPageWheelIntent +=
+        Math.min(
+          absoluteDelta,
+          20
+        );
+
+
+      scheduleTabletPageWheelReset();
+
+
+      if (
+        tabletPageWheelIntent >=
+        34
+      ) {
+        tabletPageWheelLatched =
+          (
+            direction > 0
+              ? requestNextPage(
+                  activePageName
+                )
+              : requestPreviousPage(
+                  activePageName
+                )
+          );
+      }
+    };
+
+
+  document.addEventListener(
+    "wheel",
+    handleTabletNonGameWheel,
+    {
+      passive: false
+    }
+  );
+
+
   /* =======================================================
      Initial state
      ======================================================= */
@@ -16418,6 +16941,300 @@ document.addEventListener("DOMContentLoaded", () => {
     let tabletGestureLockedUntil =
       0;
 
+    /*
+      Tablet navigation is deliberately staged in both directions:
+
+        DOWN:
+          collapsed media -> info -> NEW gesture -> next page
+
+        UP:
+          info -> collapsed media -> NEW gesture -> previous page
+
+      The navigation arm is never enabled merely because the visual
+      transition finished. Trackpad inertia from the state-change gesture
+      must go quiet first.
+    */
+    let tabletNextGestureArmed =
+      false;
+
+    let tabletNextGestureArmPending =
+      false;
+
+    let tabletNextGestureArmTimer =
+      null;
+
+    let tabletPreviousGestureArmed =
+      false;
+
+    let tabletPreviousGestureArmPending =
+      false;
+
+    let tabletPreviousGestureArmTimer =
+      null;
+
+
+    const cancelTabletPreviousGestureArm =
+      () => {
+        tabletPreviousGestureArmed =
+          false;
+
+        tabletPreviousGestureArmPending =
+          false;
+
+
+        if (
+          tabletPreviousGestureArmTimer
+        ) {
+          clearTimeout(
+            tabletPreviousGestureArmTimer
+          );
+
+          tabletPreviousGestureArmTimer =
+            null;
+        }
+      };
+
+
+    const cancelTabletNextGestureArm =
+      () => {
+        tabletNextGestureArmed =
+          false;
+
+        tabletNextGestureArmPending =
+          false;
+
+
+        if (
+          tabletNextGestureArmTimer
+        ) {
+          clearTimeout(
+            tabletNextGestureArmTimer
+          );
+
+          tabletNextGestureArmTimer =
+            null;
+        }
+      };
+
+
+    const scheduleTabletNextGestureArm =
+      () => {
+        tabletNextGestureArmed =
+          false;
+
+        tabletNextGestureArmPending =
+          true;
+
+
+        if (
+          tabletNextGestureArmTimer
+        ) {
+          clearTimeout(
+            tabletNextGestureArmTimer
+          );
+        }
+
+
+        tabletNextGestureArmTimer =
+          setTimeout(
+            () => {
+              const remainingLock =
+                tabletGestureLockedUntil -
+                performance.now();
+
+
+              if (
+                remainingLock > 0 ||
+                pageFrameIsAnimating
+              ) {
+                tabletNextGestureArmTimer =
+                  setTimeout(
+                    scheduleTabletNextGestureArm,
+                    remainingLock > 0
+                      ? remainingLock + 24
+                      : 90
+                  );
+
+                return;
+              }
+
+
+              /*
+                The page may have retained its tablet-info geometry while it
+                was closed. Only arm once this specific page is actually open
+                again and is the selected/active page.
+              */
+              if (
+                !gamePageFrame?.classList.contains(
+                  "is-open"
+                ) ||
+                (
+                  selectedPageName !== pageName &&
+                  activePageName !== pageName
+                )
+              ) {
+                tabletNextGestureArmPending =
+                  false;
+
+                tabletNextGestureArmTimer =
+                  null;
+
+                return;
+              }
+
+
+              tabletNextGestureArmPending =
+                false;
+
+              tabletNextGestureArmed =
+                true;
+
+              tabletNextGestureArmTimer =
+                null;
+            },
+            190
+          );
+      };
+
+
+    const scheduleTabletPreviousGestureArm =
+      () => {
+        tabletPreviousGestureArmed =
+          false;
+
+        tabletPreviousGestureArmPending =
+          true;
+
+
+        if (
+          tabletPreviousGestureArmTimer
+        ) {
+          clearTimeout(
+            tabletPreviousGestureArmTimer
+          );
+        }
+
+
+        tabletPreviousGestureArmTimer =
+          setTimeout(
+            () => {
+              const remainingLock =
+                tabletGestureLockedUntil -
+                performance.now();
+
+
+              if (
+                remainingLock > 0 ||
+                pageFrameIsAnimating
+              ) {
+                tabletPreviousGestureArmTimer =
+                  setTimeout(
+                    scheduleTabletPreviousGestureArm,
+                    remainingLock > 0
+                      ? remainingLock + 24
+                      : 90
+                  );
+
+                return;
+              }
+
+
+              if (
+                !gamePageFrame?.classList.contains(
+                  "is-open"
+                ) ||
+                (
+                  selectedPageName !== pageName &&
+                  activePageName !== pageName
+                )
+              ) {
+                tabletPreviousGestureArmPending =
+                  false;
+
+                tabletPreviousGestureArmTimer =
+                  null;
+
+                return;
+              }
+
+
+              tabletPreviousGestureArmPending =
+                false;
+
+              tabletPreviousGestureArmed =
+                true;
+
+              tabletPreviousGestureArmTimer =
+                null;
+            },
+            190
+          );
+      };
+
+
+    /*
+      A tablet page intentionally keeps its info/media geometry when another
+      game is opened. If an info-state page is later reopened, its old
+      next-gesture arm may have been consumed by the previous page switch.
+
+      Re-arm it whenever this page becomes open while already in info mode.
+      This restores the expected:
+        reopened info page + fresh down-scroll -> next page
+    */
+    const tabletPageOpenObserver =
+      new MutationObserver(
+        () => {
+          if (
+            !gameFrameTabletMode.matches
+          ) {
+            return;
+          }
+
+
+          const pageIsOpen =
+            gamePageFrame.classList.contains(
+              "is-open"
+            );
+
+
+          if (!pageIsOpen) {
+            /*
+              Do not let an old armed state survive invisibly. Whichever
+              geometry this page retains will be freshly armed on reopen.
+            */
+            cancelTabletNextGestureArm();
+            cancelTabletPreviousGestureArm();
+            return;
+          }
+
+
+          if (
+            gameFrameArea.classList.contains(
+              "is-tablet-info-geometry"
+            )
+          ) {
+            cancelTabletPreviousGestureArm();
+            scheduleTabletNextGestureArm();
+          }
+
+          else {
+            cancelTabletNextGestureArm();
+            scheduleTabletPreviousGestureArm();
+          }
+        }
+      );
+
+
+    tabletPageOpenObserver.observe(
+      gamePageFrame,
+      {
+        attributes: true,
+        attributeFilter: [
+          "class"
+        ]
+      }
+    );
+
 
     const tabletGestureCanRun =
       () => (
@@ -16455,39 +17272,118 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         /*
-          Down only has meaning from media -> info.
-          Up only has meaning from info -> media.
+          DOWN:
+            collapsed -> open info
+            expanded + freshly armed gesture -> next page
+
+          UP:
+            expanded -> collapse info
+
+          The existing page switch remains the only implementation used to
+          close/open pages; this controller merely requests it.
         */
         if (
           direction > 0 &&
           !infoIsOpen
         ) {
+          cancelTabletPreviousGestureArm();
+
+
           setTabletGeometryState(
             true
           );
+
+
+          tabletGestureLockedUntil =
+            performance.now() +
+            780;
+
+
+          /*
+            Do not arm "next" yet. The wheel handler will keep pushing this
+            quiet-window timer while inertia from the opening gesture arrives.
+          */
+          scheduleTabletNextGestureArm();
+        }
+
+        else if (
+          direction > 0 &&
+          infoIsOpen &&
+          tabletNextGestureArmed
+        ) {
+          const switched =
+            requestNextPage(
+              pageName
+            );
+
+
+          if (!switched) {
+            return false;
+          }
+
+
+          cancelTabletNextGestureArm();
+          cancelTabletPreviousGestureArm();
+
+
+          tabletGestureLockedUntil =
+            performance.now() +
+            780;
         }
 
         else if (
           direction < 0 &&
           infoIsOpen
         ) {
+          cancelTabletNextGestureArm();
+
+
           setTabletGeometryState(
             false
           );
+
+
+          tabletGestureLockedUntil =
+            performance.now() +
+            780;
+
+
+          /*
+            Mirror the forward path: the gesture that collapses info is fully
+            consumed. Only a fresh upward gesture may navigate to the
+            previous page.
+          */
+          scheduleTabletPreviousGestureArm();
+        }
+
+        else if (
+          direction < 0 &&
+          !infoIsOpen &&
+          tabletPreviousGestureArmed
+        ) {
+          const switched =
+            requestPreviousPage(
+              pageName
+            );
+
+
+          if (!switched) {
+            return false;
+          }
+
+
+          cancelTabletNextGestureArm();
+          cancelTabletPreviousGestureArm();
+
+
+          tabletGestureLockedUntil =
+            performance.now() +
+            780;
         }
 
         else {
           return false;
         }
-
-
-        /*
-          720ms is the frame animation duration. Keep momentum input from
-          retriggering until just after that physical transformation finishes.
-        */
-        tabletGestureLockedUntil =
-          performance.now() +
-          780;
 
 
         tabletWheelIntent =
@@ -16516,6 +17412,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const handleTabletWheel =
       (event) => {
+        /*
+          While waiting to arm expanded-info -> next-page, EVERY continuing
+          wheel event belongs to the gesture that opened info. Push the quiet
+          window back even if the visual transition is still locked.
+        */
+        if (
+          (
+            tabletNextGestureArmPending ||
+            tabletPreviousGestureArmPending
+          ) &&
+          Math.abs(event.deltaY) >= 1
+        ) {
+          if (
+            tabletNextGestureArmPending
+          ) {
+            scheduleTabletNextGestureArm();
+          }
+
+
+          if (
+            tabletPreviousGestureArmPending
+          ) {
+            scheduleTabletPreviousGestureArm();
+          }
+
+
+          event.preventDefault();
+
+          return;
+        }
+
+
         if (
           !tabletGestureCanRun()
         ) {
@@ -16557,11 +17485,33 @@ document.addEventListener("DOMContentLoaded", () => {
         const gestureCanChangeState =
           (
             direction > 0 &&
-            !infoIsOpen
+            (
+              !infoIsOpen ||
+              (
+                infoIsOpen &&
+                tabletNextGestureArmed &&
+                Boolean(
+                  getNextPageName(
+                    pageName
+                  )
+                )
+              )
+            )
           ) ||
           (
             direction < 0 &&
-            infoIsOpen
+            (
+              infoIsOpen ||
+              (
+                !infoIsOpen &&
+                tabletPreviousGestureArmed &&
+                Boolean(
+                  getPreviousPageName(
+                    pageName
+                  )
+                )
+              )
+            )
           );
 
 
@@ -16699,6 +17649,8 @@ document.addEventListener("DOMContentLoaded", () => {
       (event) => {
         if (
           !tabletGestureCanRun() ||
+          tabletNextGestureArmPending ||
+          tabletPreviousGestureArmPending ||
           event.touches.length !== 1
         ) {
           clearTabletTouch();
@@ -16793,7 +17745,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     gamePageFrame?.addEventListener(
       "touchend",
-      clearTabletTouch,
+      () => {
+        clearTabletTouch();
+
+
+        if (
+          tabletNextGestureArmPending
+        ) {
+          scheduleTabletNextGestureArm();
+        }
+
+
+        if (
+          tabletPreviousGestureArmPending
+        ) {
+          scheduleTabletPreviousGestureArm();
+        }
+      },
       {
         passive: true
       }
