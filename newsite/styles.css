@@ -25298,3 +25298,21 @@ body.is-media-lightbox-open {
   }
 }
 
+
+
+/* =========================================================
+   MOBILE HERO IMAGE — RESERVE DOUBLE TAP FOR LIGHTBOX
+   =========================================================
+   `touch-action: manipulation` keeps normal touch interaction while telling
+   mobile browsers not to use double-tap as their built-in page zoom gesture.
+   Pinch zoom remains available.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-image {
+    touch-action: manipulation;
+  }
+}
+

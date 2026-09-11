@@ -12846,6 +12846,32 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
+      /*
+        Chrome device emulation can deliver mouse dblclick rather than a real
+        touchstart/touchend pair. Handle that explicitly so mobile lightbox
+        behavior is testable on desktop too.
+      */
+      image.addEventListener(
+        "dblclick",
+        (event) => {
+          if (iconButtonMode.matches) {
+            return;
+          }
+
+
+          event.preventDefault();
+
+
+          openMediaLightbox(
+            item.dataset.mediaSrc,
+            item.dataset.mediaTitle ||
+            "Game screenshot",
+            image
+          );
+        }
+      );
+
+
       let mobileTapStartX =
         0;
 
@@ -12985,6 +13011,18 @@ document.addEventListener("DOMContentLoaded", () => {
     return null;
   };
 
+
+
+  /*
+    Direct media-browser render access for lightbox synchronization.
+
+    Switching screenshots while fullscreen should update the hidden in-page
+    hero WITHOUT pretending the user clicked a thumbnail. On mobile, that
+    synthetic click was starting the hero wipe and the lightbox then captured
+    the temporary outgoing image as its return target.
+  */
+  const mediaBrowserRenderers =
+    new WeakMap();
 
 
   let mediaLightboxState = {
@@ -13233,10 +13271,18 @@ document.addEventListener("DOMContentLoaded", () => {
         viewer?.closest(
           "[data-game-frame]"
         )
-      ) &&
-      window.matchMedia(
-        "(min-width: 841px)"
-      ).matches;
+      );
+
+
+    /*
+      Mobile uses the same framed COVER hero concept as tablet/desktop.
+      The old breakpoint gate meant mobile fell back to the raw <img> box,
+      which can be much smaller than the actual visible hero aperture
+      (especially after the mobile wipe wrapper is involved).
+
+      Reconstruct the painted COVER rectangle on mobile too so opening and
+      closing lightbox morphs begin/end on the exact hero image the user sees.
+    */
 
 
     if (
@@ -14228,9 +14274,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
       /*
         Keep the normal gallery synchronized with the fullscreen view.
-        That preserves the existing close-to-current-preview behavior.
+
+        IMPORTANT:
+        Do this through the browser's real renderer rather than nextItem.click().
+        A synthetic thumbnail click on mobile starts the hero wipe. The
+        lightbox was then grabbing the temporary outgoing image as its return
+        target, so closing could morph to the wrong/small geometry and leave
+        the new hero in a broken interaction state.
       */
-      nextItem.click();
+      const mediaBrowserRenderer =
+        mediaBrowserRenderers.get(
+          mediaLightboxState.mediaBrowser
+        );
+
+
+      if (mediaBrowserRenderer) {
+        mediaBrowserRenderer(
+          nextItem,
+          nextIndex
+        );
+      }
+
+      else {
+        /*
+          Safe fallback for any browser that predates registration.
+        */
+        nextItem.click();
+      }
 
 
       image.style.opacity =
@@ -14260,24 +14330,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       /*
-        renderItem() has replaced the in-page viewer image. Capture that
-        new element as the destination for the existing close animation.
+        The synchronized render above deliberately skips the mobile wipe, so
+        after layout settles there is exactly one real hero image to target.
+        Capture it after two frames so its responsive cover geometry is final.
       */
       requestAnimationFrame(() => {
-        const currentViewerImage =
-          mediaLightboxState.mediaBrowser
-            ?.querySelector(
-              "[data-media-viewer-stage] .media-viewer-image"
-            );
+        requestAnimationFrame(() => {
+          const currentViewerImage =
+            mediaLightboxState.mediaBrowser
+              ?.querySelector(
+                "[data-media-viewer-stage] .media-viewer-image"
+              );
 
 
-        if (currentViewerImage) {
-          mediaLightboxState.sourceImage =
-            currentViewerImage;
+          if (currentViewerImage) {
+            mediaLightboxState.sourceImage =
+              currentViewerImage;
 
-          currentViewerImage.style.visibility =
-            "hidden";
-        }
+            currentViewerImage.style.visibility =
+              "hidden";
+          }
+        });
       });
 
 
@@ -15867,7 +15940,8 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         focusThumbnail = false,
         scrollBehavior = "smooth",
-        transitionDirection = 0
+        transitionDirection = 0,
+        syncFromLightbox = false
       } = {}
     ) => {
       const clampedIndex =
@@ -15931,6 +16005,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       const mobileImageWipe =
+        !syncFromLightbox &&
         !iconButtonMode.matches &&
         resolvedTransitionDirection !== 0 &&
         mediaElement instanceof HTMLImageElement &&
@@ -16237,6 +16312,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateArrowState();
     };
+
+
+    /*
+      Give the shared lightbox a clean way to synchronize this browser while
+      fullscreen. The lightbox supplies the exact image item/index and we
+      intentionally skip hero wipe animation for that hidden background sync.
+    */
+    mediaBrowserRenderers.set(
+      browser,
+      (
+        item,
+        index
+      ) => {
+        if (
+          !item ||
+          index < 0 ||
+          index >= items.length
+        ) {
+          return;
+        }
+
+
+        renderItem(
+          index,
+          {
+            scrollBehavior: "auto",
+            transitionDirection: 0,
+            syncFromLightbox: true
+          }
+        );
+      }
+    );
 
 
     items.forEach(
@@ -17122,6 +17229,182 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
+  /* =======================================================
+     Mobile fixed frame-piece device-pixel snapping
+     =======================================================
+
+     Some mobile Chromium devices appear to rasterize a few of the small
+     fixed WebP corner pieces at an intermediate fractional size.
+
+     Keep this intentionally conservative:
+       - fixed corner pieces only
+       - width / height only
+       - NO position snapping, transforms, or stretcher changes
+
+     Width/height are rounded to the nearest physical device pixel, then
+     written through the existing --brobots-piece-live-w/h substrate.
+
+     The overrides are cleared before responsive / tablet geometry changes
+     and re-applied only after layout has settled, so they do not freeze the
+     720ms media <-> info transition.
+     ======================================================= */
+
+  const mobileFramePixelSnapMode =
+    window.matchMedia(
+      "(max-width: 840px)"
+    );
+
+
+  let mobileFramePixelSnapTimer =
+    null;
+
+
+  const clearMobileFramePiecePixelSnap =
+    (
+      frameArea = null
+    ) => {
+      const targets =
+        frameArea
+          ? [frameArea]
+          : gameFrameAreas;
+
+
+      targets.forEach(
+        (area) => {
+          area
+            ?.querySelectorAll(
+              "img[data-game-frame-piece]"
+            )
+            .forEach(
+              (piece) => {
+                piece.style.removeProperty(
+                  "--brobots-piece-live-w"
+                );
+
+                piece.style.removeProperty(
+                  "--brobots-piece-live-h"
+                );
+              }
+            );
+        }
+      );
+    };
+
+
+  const snapMobileFramePiecePixels =
+    (
+      frameArea
+    ) => {
+      if (
+        !mobileFramePixelSnapMode.matches ||
+        !frameArea
+      ) {
+        return;
+      }
+
+
+      const dpr =
+        Math.max(
+          1,
+          window.devicePixelRatio || 1
+        );
+
+
+      frameArea
+        .querySelectorAll(
+          "img[data-game-frame-piece]"
+        )
+        .forEach(
+          (piece) => {
+            /*
+              Read the unsnapped responsive result first.
+            */
+            piece.style.removeProperty(
+              "--brobots-piece-live-w"
+            );
+
+            piece.style.removeProperty(
+              "--brobots-piece-live-h"
+            );
+
+
+            const rect =
+              piece.getBoundingClientRect();
+
+
+            if (
+              rect.width <= 0 ||
+              rect.height <= 0
+            ) {
+              return;
+            }
+
+
+            const snappedWidth =
+              Math.round(
+                rect.width * dpr
+              ) /
+              dpr;
+
+            const snappedHeight =
+              Math.round(
+                rect.height * dpr
+              ) /
+              dpr;
+
+
+            piece.style.setProperty(
+              "--brobots-piece-live-w",
+              `${snappedWidth}px`
+            );
+
+            piece.style.setProperty(
+              "--brobots-piece-live-h",
+              `${snappedHeight}px`
+            );
+          }
+        );
+    };
+
+
+  const scheduleMobileFramePiecePixelSnap =
+    (
+      frameArea = null,
+      delay = 0
+    ) => {
+      window.clearTimeout(
+        mobileFramePixelSnapTimer
+      );
+
+
+      mobileFramePixelSnapTimer =
+        window.setTimeout(
+          () => {
+            requestAnimationFrame(
+              () => {
+                requestAnimationFrame(
+                  () => {
+                    if (frameArea) {
+                      snapMobileFramePiecePixels(
+                        frameArea
+                      );
+                    }
+
+                    else {
+                      gameFrameAreas.forEach(
+                        snapMobileFramePiecePixels
+                      );
+                    }
+                  }
+                );
+              }
+            );
+          },
+          delay
+        );
+    };
+
+
   const measureImageSource = (
     src
   ) => {
@@ -17951,10 +18234,44 @@ document.addEventListener("DOMContentLoaded", () => {
           applyGameFrameMeasuredDimensions(
             frameArea
           );
+
+
+          scheduleMobileFramePiecePixelSnap(
+            frameArea
+          );
         }
       )
     );
   }
+
+
+  const refreshMobileFramePiecePixelSnap =
+    () => {
+      clearMobileFramePiecePixelSnap();
+
+      scheduleMobileFramePiecePixelSnap(
+        null,
+        80
+      );
+    };
+
+
+  window.addEventListener(
+    "resize",
+    refreshMobileFramePiecePixelSnap,
+    {
+      passive: true
+    }
+  );
+
+
+  window.addEventListener(
+    "orientationchange",
+    refreshMobileFramePiecePixelSnap,
+    {
+      passive: true
+    }
+  );
 
 
   /* =======================================================
@@ -18288,9 +18605,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
+        clearMobileFramePiecePixelSnap(
+          gameFrameArea
+        );
+
+
         gameFrameArea.classList.toggle(
           "is-tablet-info-geometry",
           infoGeometry
+        );
+
+
+        scheduleMobileFramePiecePixelSnap(
+          gameFrameArea,
+          760
         );
 
 
