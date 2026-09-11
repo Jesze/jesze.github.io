@@ -15629,9 +15629,19 @@ document.addEventListener("DOMContentLoaded", () => {
           null;
 
 
-        outgoingMedia?.classList.add(
-          "media-viewer-image--outgoing"
-        );
+        if (outgoingMedia) {
+          outgoingMedia.classList.remove(
+            "media-viewer-image--incoming",
+            "is-wipe-forward",
+            "is-wipe-backward",
+            "is-wipe-running"
+          );
+
+
+          outgoingMedia.classList.add(
+            "media-viewer-image--outgoing"
+          );
+        }
       }
 
       else {
@@ -15674,7 +15684,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (mediaElement) {
         if (mobileImageWipe) {
           mediaElement.classList.add(
-            "media-viewer-image--incoming"
+            "media-viewer-image--incoming",
+            resolvedTransitionDirection > 0
+              ? "is-wipe-forward"
+              : "is-wipe-backward"
           );
         }
 
@@ -15738,13 +15751,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     incoming.classList.remove(
-                      "media-viewer-image--incoming"
-                    );
-
-
-                    stage.classList.remove(
-                      "is-mobile-wipe-forward",
-                      "is-mobile-wipe-backward"
+                      "media-viewer-image--incoming",
+                      "is-wipe-forward",
+                      "is-wipe-backward",
+                      "is-wipe-running"
                     );
                   },
                   {
@@ -15754,18 +15764,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 /*
-                  Force one painted frame with A + fully-loaded B stacked
-                  before adding the animation class. This guarantees that the
-                  wipe animates B itself rather than animating an empty image
-                  slot and snapping afterward.
+                  B already entered the DOM in its fully hidden directional
+                  mask state. Force that state to paint, then animate B itself
+                  across A. No stage-level wipe class is involved anymore.
                 */
                 incoming.getBoundingClientRect();
 
 
-                stage.classList.add(
-                  resolvedTransitionDirection > 0
-                    ? "is-mobile-wipe-forward"
-                    : "is-mobile-wipe-backward"
+                requestAnimationFrame(
+                  () => {
+                    incoming.classList.add(
+                      "is-wipe-running"
+                    );
+                  }
                 );
               }
             }

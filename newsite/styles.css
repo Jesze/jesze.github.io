@@ -24124,3 +24124,152 @@ body.is-media-lightbox-open {
   }
 }
 
+
+
+/* =========================================================
+   MOBILE MEDIA WIPE — DIRECT INCOMING-IMAGE ANIMATION
+   =========================================================
+
+   The previous implementation put the animation state on the stage. That
+   made it too easy for the outgoing clone / inherited classes to participate
+   in the wipe.
+
+   This version is intentionally literal:
+     A = static outgoing image underneath
+     B = incoming image, hidden by its own mask BEFORE insertion
+     B alone animates its mask across A
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-image--outgoing {
+    z-index: 1 !important;
+
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-image--incoming {
+    z-index: 2 !important;
+
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
+
+    -webkit-mask-size: 220% 100% !important;
+    mask-size: 220% 100% !important;
+  }
+
+
+  /* B starts completely hidden off the RIGHT and reveals right -> left. */
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-image--incoming.is-wipe-forward {
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        #000 0%,
+        #000 68%,
+        rgba(0, 0, 0, 0.72) 78%,
+        rgba(0, 0, 0, 0.18) 92%,
+        transparent 100%
+      ) !important;
+
+    mask-image:
+      linear-gradient(
+        90deg,
+        #000 0%,
+        #000 68%,
+        rgba(0, 0, 0, 0.72) 78%,
+        rgba(0, 0, 0, 0.18) 92%,
+        transparent 100%
+      ) !important;
+
+    -webkit-mask-position: -120% 0 !important;
+    mask-position: -120% 0 !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-image--incoming.is-wipe-forward.is-wipe-running {
+    animation:
+      mobile-incoming-wipe-forward
+      380ms
+      cubic-bezier(0.22, 0.72, 0.24, 1)
+      both !important;
+  }
+
+
+  /* B starts completely hidden off the LEFT and reveals left -> right. */
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-image--incoming.is-wipe-backward {
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.18) 8%,
+        rgba(0, 0, 0, 0.72) 22%,
+        #000 32%,
+        #000 100%
+      ) !important;
+
+    mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.18) 8%,
+        rgba(0, 0, 0, 0.72) 22%,
+        #000 32%,
+        #000 100%
+      ) !important;
+
+    -webkit-mask-position: 120% 0 !important;
+    mask-position: 120% 0 !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .media-viewer-image--incoming.is-wipe-backward.is-wipe-running {
+    animation:
+      mobile-incoming-wipe-backward
+      380ms
+      cubic-bezier(0.22, 0.72, 0.24, 1)
+      both !important;
+  }
+
+
+  @keyframes mobile-incoming-wipe-forward {
+    from {
+      -webkit-mask-position: -120% 0;
+      mask-position: -120% 0;
+    }
+
+    to {
+      -webkit-mask-position: 100% 0;
+      mask-position: 100% 0;
+    }
+  }
+
+
+  @keyframes mobile-incoming-wipe-backward {
+    from {
+      -webkit-mask-position: 120% 0;
+      mask-position: 120% 0;
+    }
+
+    to {
+      -webkit-mask-position: -100% 0;
+      mask-position: -100% 0;
+    }
+  }
+}
+
