@@ -17160,7 +17160,7 @@ body.is-media-lightbox-open {
   Tablet keeps the original stacked layout and SVG frame.
   The raster border simply scales with the full available content box.
 */
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
   .prototype-page-frame[data-game-frame-page] .game-frame-area {
     width: 100%;
 
@@ -17412,7 +17412,7 @@ body.is-media-lightbox-open {
   It fills whatever interior rectangle the existing SVG/page layout gives
   it; the native canvas then uniformly contains itself inside that area.
 */
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
   .prototype-page-frame[data-game-frame-page] .game-frame-area {
     width: 100%;
     height: 100%;
@@ -17729,7 +17729,7 @@ body.is-media-lightbox-open {
 }
 
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
   .prototype-page-frame[data-game-frame-page] .game-frame-area {
     width: 100%;
     height: 100%;
@@ -19509,7 +19509,7 @@ body.is-media-lightbox-open {
 }
 
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page] .game-frame-area {
     --brobots-tablet-info-split-ratio:
@@ -19794,7 +19794,7 @@ body.is-media-lightbox-open {
    animation timeline.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   /*
     Use the existing master 0 -> 1 frame progress as the media handoff
@@ -19889,7 +19889,7 @@ body.is-media-lightbox-open {
    interaction tree explicitly.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-frame-area.is-tablet-info-geometry
@@ -19934,7 +19934,7 @@ body.is-media-lightbox-open {
 }
 
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page] .game-tablet-info-host {
     position: absolute;
@@ -20114,8 +20114,7 @@ body.is-media-lightbox-open {
 
 
 /* Outside tablet mode the cloned surface does not participate at all. */
-@media (max-width: 840px),
-       (min-width: 1401px) {
+@media (min-width: 1401px) {
   .prototype-page-frame[data-game-frame-page] .game-tablet-info-host {
     display: none !important;
   }
@@ -20127,7 +20126,7 @@ body.is-media-lightbox-open {
    Shared crowding logic + layered glass motif
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   /*
     The tablet clone now runs through the exact same
@@ -20327,7 +20326,7 @@ body.is-media-lightbox-open {
    Stronger glass + visible screenshot + rounded panes
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   /*
     The generic responsive rule hides decorative popout images below
@@ -20524,7 +20523,7 @@ body.is-media-lightbox-open {
    through the settled state.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-info-host
@@ -20616,7 +20615,7 @@ body.is-media-lightbox-open {
    - settled state
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-info-host
@@ -20668,7 +20667,7 @@ body.is-media-lightbox-open {
 }
 
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   /*
     The thumbnail area remains part of the physical frame geometry, but its
@@ -21002,7 +21001,7 @@ body.is-media-lightbox-open {
    complete landing composition scales together during manual resize.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-landing-identity {
@@ -21138,7 +21137,7 @@ body.is-media-lightbox-open {
    self-contained layout.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-landing-identity {
@@ -21284,7 +21283,7 @@ body.is-media-lightbox-open {
    The "Scroll for more" cue remains in place and simply fades out.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-landing-identity {
@@ -21461,7 +21460,7 @@ body.is-media-lightbox-open {
 }
 
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-media-zone--hero
@@ -21815,7 +21814,7 @@ body.is-media-lightbox-open {
    the READY media stage rather than .media-viewer itself so the frame/border
    and navigation overlay are not faded with the image/video.
 */
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
   .prototype-page-frame[data-game-frame-page]
   .game-media-zone--hero
   .media-viewer-stage.is-ready {
@@ -21901,7 +21900,7 @@ body.is-media-lightbox-open {
    Desktop -> tablet
    ------------------------- */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
   .prototype-page-frame[data-game-frame-page]
   .game-frame-area.is-tablet-breakpoint-entering
   .game-media-zone--thumbs
@@ -22649,7 +22648,7 @@ body.is-media-lightbox-open {
    the previous pass.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-info-host
@@ -22793,7 +22792,7 @@ body.is-media-lightbox-open {
    to .desktop-secondary-panel only, allowing the tablet clone to participate.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-info-host
@@ -22884,7 +22883,7 @@ body.is-media-lightbox-open {
    into the tablet glass stack. No inset:0, no width:100%, no alternate crop.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]:not(.is-layout-transitioning)
   .game-tablet-info-host
@@ -22967,7 +22966,7 @@ body.is-media-lightbox-open {
    visual language remains consistent across the site.
    ========================================================= */
 
-@media (min-width: 841px) and (max-width: 1400px) {
+@media (max-width: 1400px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-info-host
@@ -23460,5 +23459,297 @@ body.is-media-lightbox-open {
 .prototype-page-frame[data-game-frame-page]
 .game-frame-stretcher--separator {
   display: none !important;
+}
+
+
+
+/* =========================================================
+   MOBILE PROTOTYPE — INHERIT TABLET GAME-PAGE COMPOSITION
+   =========================================================
+   Exploratory pass only.
+
+   Phones now use the same raster-frame/media composition and the same
+   media <-> info state machine as tablet. The old mobile gallery rules are
+   left in place above for easy rollback, then neutralized here.
+
+   We are intentionally NOT doing phone-specific formatting yet. The point
+   of this checkpoint is to expose exactly what the tablet composition does
+   when squeezed into a phone aspect ratio.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  /* Tablet/game raster frame becomes the visible page shell on mobile too. */
+  .prototype-page-frame[data-game-frame-page]
+  .prototype-page-frame-shell {
+    opacity: 0;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .prototype-page-frame-content {
+    top:
+      clamp(
+        6px,
+        0.65cqw,
+        12px
+      );
+
+    right:
+      clamp(
+        6px,
+        0.65cqw,
+        12px
+      );
+
+    bottom:
+      clamp(
+        6px,
+        0.65cqw,
+        12px
+      );
+
+    left:
+      clamp(
+        6px,
+        0.65cqw,
+        12px
+      );
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area {
+    display: block !important;
+
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    aspect-ratio: auto;
+
+    margin: 0;
+
+    overflow: hidden;
+
+    container-type: size;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > .game-frame-piece,
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > .game-frame-stretcher {
+    display: block !important;
+  }
+
+
+  /* Restore the shared frame-controlled media canvas. */
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > .media-browser {
+    position: absolute !important;
+
+    z-index: 1;
+
+    inset: 0;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: none;
+
+    margin: 0;
+    padding: 0;
+
+    display: block;
+
+    overflow: visible;
+
+    pointer-events: none;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone {
+    position: absolute;
+
+    display: grid;
+    place-items: center;
+
+    min-width: 0;
+    min-height: 0;
+
+    container-type: size;
+
+    pointer-events: none;
+  }
+
+
+  /* Undo the former mobile "contained generic gallery" hero treatment. */
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
+  .media-viewer {
+    width: 100cqw !important;
+    height: 100cqh !important;
+
+    max-width: none;
+    max-height: none;
+
+    aspect-ratio: auto !important;
+
+    margin: 0;
+
+    justify-self: stretch;
+    align-self: stretch;
+
+    transform:
+      scale(1.04);
+
+    transform-origin:
+      50% 50%;
+
+    pointer-events: auto;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
+  .media-viewer-stage {
+    position: absolute;
+
+    inset: 0;
+
+    display: block;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
+  .media-viewer-image,
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
+  .media-viewer-video {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    transform:
+      translate(-50%, -50%);
+
+    object-fit: cover !important;
+    object-position: 50% 50% !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
+  .media-viewer-youtube {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width:
+      max(
+        100%,
+        calc(100cqh * 16 / 9)
+      );
+
+    height:
+      max(
+        100%,
+        calc(100cqw * 9 / 16)
+      );
+
+    max-width: none;
+    max-height: none;
+
+    aspect-ratio: 16 / 9;
+
+    transform:
+      translate(-50%, -50%);
+  }
+
+
+  /* Restore the frame-controlled thumbnail aperture too. */
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--thumbs
+  .media-strip {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: none;
+
+    display: block;
+
+    margin: 0;
+
+    pointer-events: auto;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE PROTOTYPE — REAL PAGE FRAMES STAY ACTIVE
+   =========================================================
+   Older mobile CSS deliberately removed .prototype-page-frame entirely.
+   Mobile now shares the tablet page internals, so the real frame must remain
+   present and interactive below 840px.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame {
+    display: block !important;
+  }
+
+
+  /*
+    Use the normal fixed page rectangle for this first functional prototype.
+    Phone-specific proportions come next once we can actually inspect the
+    shared tablet treatment on a live mobile page.
+  */
+  .prototype-page-frame[data-game-frame-page] {
+    --page-frame-shift-y: 0px;
+
+    --page-frame-side-padding:
+      clamp(
+        10px,
+        3vw,
+        18px
+      );
+
+    top:
+      calc(
+        clamp(82px, calc(64px + 3.9vw), 120px)
+        +
+        (clamp(6px, 0.7vw, 10px) * 2)
+        +
+        10px
+      );
+
+    right:
+      var(--page-frame-side-padding);
+
+    bottom:
+      clamp(
+        10px,
+        3vw,
+        18px
+      );
+
+    left:
+      var(--page-frame-side-padding);
+  }
 }
 

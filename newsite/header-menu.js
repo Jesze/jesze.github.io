@@ -8471,6 +8471,116 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  const requestMobilePageDirect =
+    (name) => {
+      const frame =
+        getPageFrame(
+          name
+        );
+
+
+      if (!frame) {
+        return;
+      }
+
+
+      /*
+        Mobile prototype:
+        the hamburger remains the mobile navigation surface, but once a
+        destination is chosen we commit the SAME real page frame directly
+        instead of trying to run the desktop/tablet button -> page morph.
+
+        This keeps the game-page internals identical to tablet while we work
+        out the eventual mobile-specific opening choreography later.
+      */
+      cancelIncomingPageOverlap();
+
+      hideMorph();
+
+      pageFrameIsAnimating =
+        false;
+
+      pageFrameTargetOpen =
+        true;
+
+      pageFrameProgress =
+        1;
+
+
+      /*
+        Match desktop/tablet toggle semantics if the currently-open page is
+        chosen again from the hamburger.
+      */
+      if (
+        activePageName === name &&
+        frame.classList.contains(
+          "is-open"
+        )
+      ) {
+        frame.classList.remove(
+          "is-open"
+        );
+
+        frame.style.transition =
+          "";
+
+        activePageName =
+          null;
+
+        setSelectedPageIntent(
+          null
+        );
+
+        setActivePageButtonState(
+          null
+        );
+
+        pageFrameTargetOpen =
+          false;
+
+        pageFrameProgress =
+          0;
+
+        return;
+      }
+
+
+      activePageName =
+        name;
+
+      setSelectedPageIntent(
+        name
+      );
+
+      setActivePageButtonState(
+        name
+      );
+
+
+      enforceSingleRealPage(
+        name
+      );
+
+
+      updatePrototypePageFrameGeometry(
+        frame
+      );
+
+
+      frame.style.transition =
+        "";
+
+      frame.classList.add(
+        "is-open"
+      );
+
+
+      requestAnimationFrame(() => {
+        rememberStablePageRect();
+      });
+    };
+
+
   const requestPage = (
     name
   ) => {
@@ -8483,10 +8593,16 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    if (
-      !iconButtonMode.matches ||
-      !pageFrames.has(name)
-    ) {
+    if (!pageFrames.has(name)) {
+      return;
+    }
+
+
+    if (!iconButtonMode.matches) {
+      requestMobilePageDirect(
+        name
+      );
+
       return;
     }
 
@@ -9245,9 +9361,41 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach((link) => {
       link.addEventListener(
         "click",
-        () => {
+        (event) => {
           if (!menuInteractive) {
+            event.preventDefault();
+
             return;
+          }
+
+
+          const href =
+            link.getAttribute(
+              "href"
+            ) ||
+            "";
+
+          const pageName =
+            href.startsWith("#")
+              ? href.slice(1)
+              : "";
+
+
+          if (
+            pageFrames.has(
+              pageName
+            )
+          ) {
+            /*
+              The page-frame system owns these five destinations on mobile
+              now, so do not let the browser's hash jump compete with it.
+            */
+            event.preventDefault();
+
+
+            requestPage(
+              pageName
+            );
           }
 
 
@@ -9255,8 +9403,6 @@ document.addEventListener("DOMContentLoaded", () => {
             If the real menu is already interactive while the decorative
             opening morph is still finishing, reverse that morph from its
             current frame rather than hard-resetting it.
-
-            The link itself still performs its normal navigation.
           */
           if (
             isAnimating &&
@@ -11792,19 +11938,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleIconModeChange = (
     event
   ) => {
-    if (!event.matches) {
-      /*
-        Entering mobile: visually retract whatever is open before performing
-        the same clean-state reset mobile already used.
-      */
-      collapseDesktopUiIntoMobile();
-
-      return;
-    }
-
-
     /*
-      Returning to tablet/desktop invalidates any stale collapse callback.
+      Mobile now keeps the same real page alive as tablet, so crossing 840px
+      is a layout handoff rather than a page-close event.
+
+      Invalidate the old mobile-collapse experiment in either direction and
+      let responsive CSS + the shared game controller take ownership.
     */
     mobileUiCollapseRunId += 1;
 
@@ -11812,8 +11951,39 @@ document.addEventListener("DOMContentLoaded", () => {
       false;
 
 
+    if (!event.matches) {
+      hideMorph();
+    }
+
+
     requestAnimationFrame(() => {
       updateAllPrototypePageFrameGeometry();
+
+
+      if (
+        activePageName
+      ) {
+        const frame =
+          getPageFrame(
+            activePageName
+          );
+
+
+        if (frame) {
+          frame.classList.add(
+            "is-open"
+          );
+
+          pageFrameProgress =
+            1;
+
+          pageFrameTargetOpen =
+            true;
+
+          pageFrameIsAnimating =
+            false;
+        }
+      }
     });
   };
 
@@ -16563,9 +16733,15 @@ document.addEventListener("DOMContentLoaded", () => {
      Reusable game-frame tablet controller
      ======================================================= */
 
+  /*
+    First mobile prototype:
+    use the exact same game-page interaction/state controller from phones
+    through tablet. Page opening/closing itself still keeps the existing
+    mobile navigation/morph system; only the game-page internals are shared.
+  */
   const gameFrameTabletMode =
     window.matchMedia(
-      "(min-width: 841px) and (max-width: 1400px)"
+      "(max-width: 1400px)"
     );
 
 
