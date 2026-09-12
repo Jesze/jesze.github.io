@@ -25768,3 +25768,353 @@ body.is-media-lightbox-open {
   }
 }
 
+
+
+/* =========================================================
+   TABLET / MOBILE LANDING IDENTITY — FIT + AMBIENT ACCENT GLOW
+   =========================================================
+   Collapsed game pages keep the existing composition:
+     logo
+     "Scroll for more"
+     animated arrow
+
+   The layout now treats the cue as a guaranteed bottom row and gives the logo
+   only the remaining space. This prevents either piece from escaping the
+   lower frame aperture on short / awkward viewport dimensions.
+
+   A faint page-accent glow sits behind the complete identity treatment while
+   collapsed. It disappears as soon as info mode is selected.
+   ========================================================= */
+
+@media (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-identity {
+    /*
+      The lower aperture itself is already positioned correctly by the frame
+      geometry. Grid makes the available height explicit:
+        row 1 = logo, allowed to shrink
+        row 2 = cue, always retained
+    */
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr);
+
+    grid-template-rows:
+      minmax(0, 1fr)
+      auto;
+
+    align-items: center;
+    justify-items: center;
+
+    align-content: stretch;
+
+    gap:
+      clamp(
+        4px,
+        1.5cqh,
+        14px
+      );
+
+    padding:
+      clamp(
+        6px,
+        2.0cqh,
+        18px
+      )
+      clamp(
+        10px,
+        2.4cqw,
+        24px
+      );
+
+    min-width: 0;
+    min-height: 0;
+
+    isolation: isolate;
+  }
+
+
+  /*
+    Soft colored atmosphere behind BOTH the logo and cue.
+
+    Keep this deliberately restrained: it is not a solid panel, just a broad
+    radial bloom using the current page accent.
+  */
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-identity::before {
+    content: "";
+
+    position: absolute;
+
+    /*
+      Fill the ENTIRE lower aperture instead of drawing a smaller bloom in the
+      middle. Slight negative bleed avoids leaving a dark rim around the glow.
+    */
+    inset: -2% -1%;
+
+    z-index: 0;
+
+    pointer-events: none;
+
+    border-radius:
+      inherit;
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.20
+        )
+        0%,
+        rgba(
+          var(--page-accent-rgb),
+          0.34
+        )
+        50%,
+        rgba(
+          var(--page-accent-rgb),
+          0.20
+        )
+        100%
+      );
+
+    box-shadow:
+      inset 0 0
+      clamp(
+        34px,
+        9cqh,
+        88px
+      )
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      ),
+      0 0
+      clamp(
+        20px,
+        5cqh,
+        56px
+      )
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      );
+
+    opacity: 0.86;
+
+    transform: scale(0.992);
+
+    animation:
+      game-tablet-landing-glow-pulse
+      2.6s
+      ease-in-out
+      infinite;
+
+    will-change:
+      opacity,
+      transform,
+      filter;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-logo,
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue {
+    position: relative;
+    z-index: 1;
+  }
+
+
+  /*
+    Info mode owns the lower aperture now, so the ambient landing glow should
+    leave immediately with the identity state rather than lingering behind the
+    info surface.
+  */
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area.is-tablet-info-geometry
+  .game-tablet-landing-identity::before {
+    opacity: 0 !important;
+    animation: none !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-logo {
+    /*
+      The logo occupies ONLY row 1. height:100% + object-fit:contain means it
+      can become smaller whenever the cue needs more room, while preserving the
+      authored aspect ratio and existing centered placement.
+    */
+    grid-row: 1;
+
+    align-self: center;
+    justify-self: center;
+
+    width:
+      min(
+        78%,
+        560px
+      );
+
+    max-width: 78%;
+
+    height: 100%;
+    max-height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    object-fit: contain;
+
+    margin: 0;
+
+    /*
+      Keep the existing info-mode travel behavior from STEP 1e.
+    */
+    flex: none;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue {
+    grid-row: 2;
+
+    align-self: end;
+    justify-self: center;
+
+    min-width: 0;
+    max-width: 100%;
+
+    /*
+      Remove hard minimums that can become too tall for very short apertures.
+      cqh follows this exact lower landing area.
+    */
+    gap:
+      clamp(
+        1px,
+        0.55cqh,
+        5px
+      );
+
+    padding:
+      clamp(
+        2px,
+        0.65cqh,
+        6px
+      )
+      clamp(
+        6px,
+        1.4cqw,
+        14px
+      );
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue-text {
+    font-size:
+      clamp(
+        9px,
+        min(
+          1.35cqw,
+          4.4cqh
+        ),
+        15px
+      );
+
+    line-height: 1.08;
+
+    white-space: nowrap;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-scroll-cue-arrow {
+    font-size:
+      clamp(
+        14px,
+        min(
+          2.5cqw,
+          7.5cqh
+        ),
+        28px
+      );
+
+    line-height: 0.72;
+  }
+}
+
+
+@keyframes game-tablet-landing-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(0.992);
+    filter: brightness(0.92) saturate(1.00);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.006);
+    filter: brightness(1.26) saturate(1.18);
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-identity::before {
+    animation: none;
+    opacity: 0.64;
+    transform: none;
+    filter: none;
+  }
+}
+
+
+
+/* =========================================================
+   TABLET / MOBILE LANDING IDENTITY — FRAME ABOVE PANEL
+   =========================================================
+   Keep the working v167 landing layout/glow exactly as-is, but move the
+   complete landing identity underneath the raster frame artwork.
+
+   Existing hierarchy:
+     media content  = 1
+     landing panel  = 4   <-- was incorrectly above the frame
+     frame artwork  = 3
+
+   New hierarchy:
+     media content  = 1
+     landing panel  = 2
+     frame artwork  = 3
+
+   This lets the real frame corners/bars naturally mask the glow at the edges
+   without changing the glow's own internal stacking or clipping.
+   ========================================================= */
+
+@media (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-landing-identity {
+    z-index: 2 !important;
+  }
+
+
+  /*
+    Reassert the frame artwork above the landing panel. Keep this scoped to
+    the direct frame assets so it does not disturb hero/media controls.
+  */
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > [data-game-frame-piece],
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-frame-area > [data-game-frame-stretcher] {
+    z-index: 3 !important;
+  }
+}
+
