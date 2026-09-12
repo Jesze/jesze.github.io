@@ -30285,3 +30285,92 @@ body.is-media-lightbox-open {
   }
 }
 
+
+/* =========================================================
+   LIVE GAME ACTIONS — CLEAN CLIPPED EDGES
+   =========================================================
+   Native CSS borders do not follow the chamfered clip-path diagonals, which
+   leaves the store / trailer buttons looking like their outline is missing
+   pieces. The live CTAs read more cleanly without that partial perimeter.
+   Keep their fills, hover gradients, lift and glow behavior unchanged.
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page]
+.game-info-action[href] {
+  border: 0 !important;
+}
+
+
+.prototype-page-frame[data-game-frame-page]
+.game-info-action[href]:hover,
+
+.prototype-page-frame[data-game-frame-page]
+.game-info-action[href]:focus-visible {
+  border: 0 !important;
+}
+
+
+/* =========================================================
+   BROBOTS STATUS BLOCKS — ROUNDED RECTANGLES
+   =========================================================
+   These are informational status blocks rather than live links. Keep the
+   real Etherian / Halodoom CTAs in their existing chamfered style, and only
+   simplify the two Brobots placeholders.
+   ========================================================= */
+
+#brobots-page-frame
+.game-info-action:not([href]) {
+  clip-path: none !important;
+
+  border: 0 !important;
+
+  border-radius:
+    clamp(
+      8px,
+      0.7cqw,
+      12px
+    ) !important;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   GAME INFO ACTIONS — UNIVERSAL ROUNDED RECTANGLE TREATMENT
+   =========================================================
+   Apply the same rounded-rectangle silhouette to all game info action
+   blocks and links:
+   - Brobots placeholders
+   - Etherian store/trailer buttons
+   - Halodoom store/trailer buttons
+
+   Keep the existing fills, hover gradients, lift, glow, and text treatment.
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page]
+.game-info-action {
+  clip-path: none !important;
+  border: 0 !important;
+  border-radius:
+    clamp(
+      8px,
+      0.7cqw,
+      12px
+    ) !important;
+  overflow: hidden;
+}
+
+.prototype-page-frame[data-game-frame-page]
+.game-info-action:hover,
+
+.prototype-page-frame[data-game-frame-page]
+.game-info-action:focus-visible {
+  border: 0 !important;
+  border-radius:
+    clamp(
+      8px,
+      0.7cqw,
+      12px
+    ) !important;
+}
+

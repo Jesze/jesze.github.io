@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
        - Simulacrum logo / nav icons
        - all three reusable game-frame skins
        - game logos
-       - first screenshot for each game
+       - all local screenshots for Brobots, Etherian, and Halodoom
 
-     The rest of each screenshot gallery and the videos are allowed to load
-     normally in the background.
+     Videos and externally hosted imagery are still allowed to load normally
+     in the background.
 
      Failed files still count as complete and there is a hard timeout, so a
      weak cellular connection can never trap the visitor on this screen.
@@ -50,6 +50,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const sitePreloaderPercent =
     sitePreloader?.querySelector(
       ".site-preloader-percent"
+    );
+
+
+  let resolveSitePreloaderReady;
+
+
+  const sitePreloaderReady =
+    new Promise(
+      (resolve) => {
+        resolveSitePreloaderReady =
+          resolve;
+      }
     );
 
 
@@ -90,7 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "assets/brobots/frame/thumb-bottom-left.webp",
     "assets/brobots/frame/thumb-bottom-right.webp",
     "assets/brobots/brobots-logo.png",
-    "assets/brobots/brobots-screenshot-0.jpg",
     "assets/brobots/brobots-info-background.jpg",
 
     /* Etherian frame + first media */
@@ -103,7 +114,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "assets/etherian/frame/thumb-bottom-left.webp",
     "assets/etherian/frame/thumb-bottom-right.webp",
     "assets/etherian/etherian-logo.png",
-    "assets/etherian/etherian-screenshot-0.jpg",
     "assets/etherian/etherian-info-background.jpg",
 
     /* Halodoom frame + first media */
@@ -116,8 +126,38 @@ document.addEventListener("DOMContentLoaded", () => {
     "assets/halodoom/frame/thumb-bottom-left.webp",
     "assets/halodoom/frame/thumb-bottom-right.webp",
     "assets/halodoom/halodoom-logo.png",
+    "assets/halodoom/halodoom-info-background.jpg",
+
+    /* Full screenshot galleries */
+    "assets/brobots/brobots-screenshot-0.jpg",
+    "assets/brobots/brobots-screenshot-1.jpg",
+    "assets/brobots/brobots-screenshot-2.jpg",
+    "assets/brobots/brobots-screenshot-3.jpg",
+    "assets/brobots/brobots-screenshot-4.jpg",
+    "assets/brobots/brobots-screenshot-5.jpg",
+    "assets/etherian/etherian-screenshot-0.jpg",
+    "assets/etherian/etherian-screenshot-1.jpg",
+    "assets/etherian/etherian-screenshot-2.jpg",
+    "assets/etherian/etherian-screenshot-3.jpg",
+    "assets/etherian/etherian-screenshot-4.jpg",
+    "assets/etherian/etherian-screenshot-5.jpg",
+    "assets/etherian/etherian-screenshot-6.jpg",
+    "assets/etherian/etherian-screenshot-7.jpg",
+    "assets/etherian/etherian-screenshot-8.jpg",
     "assets/halodoom/halodoom-screenshot-0.jpg",
-    "assets/halodoom/halodoom-info-background.jpg"
+    "assets/halodoom/halodoom-screenshot-1.jpg",
+    "assets/halodoom/halodoom-screenshot-2.jpg",
+    "assets/halodoom/halodoom-screenshot-3.jpg",
+    "assets/halodoom/halodoom-screenshot-4.jpg",
+    "assets/halodoom/halodoom-screenshot-5.jpg",
+    "assets/halodoom/halodoom-screenshot-6.jpg",
+    "assets/halodoom/halodoom-screenshot-7.jpg",
+    "assets/halodoom/halodoom-screenshot-8.jpg",
+    "assets/halodoom/halodoom-screenshot-9.jpg",
+    "assets/halodoom/halodoom-screenshot-10.jpg",
+    "assets/halodoom/halodoom-screenshot-11.jpg",
+    "assets/halodoom/halodoom-screenshot-12.jpg",
+    "assets/halodoom/halodoom-screenshot-13.jpg"
   ];
 
 
@@ -230,6 +270,9 @@ document.addEventListener("DOMContentLoaded", () => {
       window.setTimeout(
         () => {
           sitePreloader.remove();
+
+
+          resolveSitePreloaderReady?.();
         },
         520
       );
@@ -313,6 +356,10 @@ document.addEventListener("DOMContentLoaded", () => {
       dismissOnce,
       5500
     );
+  }
+
+  else {
+    resolveSitePreloaderReady?.();
   }
 
 
@@ -12874,22 +12921,26 @@ document.addEventListener("DOMContentLoaded", () => {
   /*
     Always begin the site on About, regardless of responsive mode.
 
-    requestPage() already routes to the correct implementation:
-      - desktop/tablet -> normal page opening morph
-      - mobile         -> normal direct mobile page open
-
-    Wait one animation frame so the initial responsive layout and frame
-    geometry are settled before About measures its opening target.
+    Do not begin the About opening sequence underneath the loading screen.
+    Wait until the critical assets are ready AND the loader has completely
+    faded/been removed, then let About perform its normal opening behavior.
   */
-  requestAnimationFrame(() => {
-    requestPage(
-      "about"
-    );
+  sitePreloaderReady.then(
+    () => {
+      requestAnimationFrame(
+        () => {
+          requestPage(
+            "about"
+          );
 
-    requestAnimationFrame(
-      syncPageInputOwnership
-    );
-  });
+
+          requestAnimationFrame(
+            syncPageInputOwnership
+          );
+        }
+      );
+    }
+  );
 
 
   /* =======================================================
