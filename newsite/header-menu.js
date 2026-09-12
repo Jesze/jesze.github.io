@@ -9092,6 +9092,95 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
+  /*
+    Settled mobile ownership repair
+    --------------------------------
+    A mobile page transition temporarily allows two real page frames to exist
+    at once. If any interrupted lightbox/page handoff leaves stale .is-open,
+    z-index, transform, or selection state behind, that invisible old frame
+    can still sit above the new hero and receive touches.
+
+    Commit ONE authoritative page after every settled handoff:
+      - activePageName and selectedPageName agree
+      - only that frame is open
+      - every other frame loses temporary mobile animation styles
+  */
+  const commitSettledMobilePage =
+    (
+      pageName
+    ) => {
+      const currentFrame =
+        getPageFrame(
+          pageName
+        );
+
+
+      if (!currentFrame) {
+        return;
+      }
+
+
+      activePageName =
+        pageName;
+
+      setSelectedPageIntent(
+        pageName
+      );
+
+      setActivePageButtonState(
+        pageName
+      );
+
+
+      pageFrames.forEach(
+        (
+          frame,
+          name
+        ) => {
+          if (name === pageName) {
+            frame.classList.add(
+              "is-open"
+            );
+
+            clearMobilePageAnimationStyles(
+              frame
+            );
+
+            return;
+          }
+
+
+          frame.classList.remove(
+            "is-open"
+          );
+
+          closeSecondaryPanel(
+            frame
+          );
+
+          clearMobilePageAnimationStyles(
+            frame
+          );
+        }
+      );
+
+
+      pageFrameProgress =
+        1;
+
+      pageFrameTargetOpen =
+        true;
+
+      pageFrameIsAnimating =
+        false;
+
+      mobileDirectionalPageSwitchActive =
+        false;
+
+      syncPageInputOwnership();
+    };
+
+
   const finalizeMobileOutgoingFrame =
     (
       frame
@@ -10526,6 +10615,8 @@ document.addEventListener("DOMContentLoaded", () => {
       mobileDirectionalPageSwitchActive =
         true;
 
+      syncPageInputOwnership();
+
       mobileDirectionalPageAnimationRunId +=
         1;
 
@@ -10733,30 +10824,12 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            nextFrame.classList.add(
-              "is-open"
-            );
-
-
-            clearMobilePageAnimationStyles(
-              nextFrame
-            );
-
-
-            activePageName =
-              nextName;
-
-            pageFrameProgress =
-              1;
-
-            pageFrameTargetOpen =
-              true;
-
-            pageFrameIsAnimating =
-              false;
-
-
-            setActivePageButtonState(
+            /*
+              Hard-commit ownership after the visual handoff. This also clears
+              any stale invisible page that may have survived an earlier
+              lightbox/page race and could otherwise intercept the new hero.
+            */
+            commitSettledMobilePage(
               nextName
             );
 
@@ -10776,10 +10849,6 @@ document.addEventListener("DOMContentLoaded", () => {
             hideMorph();
 
             morphEngine.clearActive();
-
-
-            mobileDirectionalPageSwitchActive =
-              false;
           }
         );
 
@@ -10858,6 +10927,8 @@ document.addEventListener("DOMContentLoaded", () => {
         pageFrameProgress =
           0;
 
+        syncPageInputOwnership();
+
         return;
       }
 
@@ -10890,6 +10961,8 @@ document.addEventListener("DOMContentLoaded", () => {
       frame.classList.add(
         "is-open"
       );
+
+      syncPageInputOwnership();
 
 
       requestAnimationFrame(() => {
@@ -11948,13 +12021,7 @@ document.addEventListener("DOMContentLoaded", () => {
     (event) => {
       if (
         !gameFrameTabletMode.matches ||
-        !activePageName ||
-        !getPageFrame(
-          activePageName
-        )?.classList.contains(
-          "is-open"
-        ) ||
-        isMediaLightboxBusy() ||
+        !getInteractivePageName() ||
         event.touches.length !== 1
       ) {
         clearMobilePageSwipeLock();
@@ -12101,12 +12168,9 @@ document.addEventListener("DOMContentLoaded", () => {
       (event) => {
         if (
           !gameFrameTabletMode.matches ||
-          activePageName !== pageName ||
-          !frame.classList.contains(
-            "is-open"
+          !pageOwnsInput(
+            pageName
           ) ||
-          pageFrameIsAnimating ||
-          isMediaLightboxBusy() ||
           event.touches.length !== 1
         ) {
           clearTouch();
@@ -12273,6 +12337,10 @@ document.addEventListener("DOMContentLoaded", () => {
   requestAnimationFrame(() => {
     requestPage(
       "about"
+    );
+
+    requestAnimationFrame(
+      syncPageInputOwnership
     );
   });
 
@@ -14542,6 +14610,8 @@ document.addEventListener("DOMContentLoaded", () => {
     mediaLightboxState.isAnimating =
       true;
 
+    syncPageInputOwnership();
+
 
     const imageRect =
       copyRect(
@@ -14558,8 +14628,9 @@ document.addEventListener("DOMContentLoaded", () => {
       !imageRect ||
       !xRect
     ) {
-      mediaLightboxState.isAnimating =
-        false;
+      finalizeMediaLightboxClosedState(
+        lightbox
+      );
 
       return false;
     }
@@ -14829,31 +14900,9 @@ document.addEventListener("DOMContentLoaded", () => {
       "";
 
 
-    lightbox.classList.remove(
-      "is-closing"
+    finalizeMediaLightboxClosedState(
+      lightbox
     );
-
-
-    mediaLightboxState.isAnimating =
-      false;
-
-    mediaLightboxState.sourceImage =
-      null;
-
-    mediaLightboxState.sourceButton =
-      null;
-
-    mediaLightboxState.imageItems =
-      [];
-
-    mediaLightboxState.imageIndex =
-      -1;
-
-    mediaLightboxState.mediaBrowser =
-      null;
-
-    mediaLightboxState.pageAccentRgb =
-      "";
 
 
     return (
@@ -14964,6 +15013,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     requestAnimationFrame(() => {
       updateAllPrototypePageFrameGeometry();
+
+      syncPageInputOwnership();
 
 
       if (
@@ -15189,128 +15240,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-      let mobileTapStartX =
-        0;
-
-      let mobileTapStartY =
-        0;
-
-      image.addEventListener(
-        "touchstart",
-        (event) => {
-          if (
-            iconButtonMode.matches ||
-            event.touches.length !== 1
-          ) {
-            return;
-          }
-
-
-          const touch =
-            event.touches[0];
-
-
-          mobileTapStartX =
-            touch.clientX;
-
-          mobileTapStartY =
-            touch.clientY;
-        },
-        {
-          passive: true
-        }
-      );
-
-
-      image.addEventListener(
-        "touchend",
-        (event) => {
-          if (
-            iconButtonMode.matches ||
-            event.changedTouches.length !== 1 ||
-            isMediaLightboxBusy() ||
-            mobileDirectionalPageSwitchActive ||
-            pageFrameIsAnimating
-          ) {
-            return;
-          }
-
-
-          const owningPageFrame =
-            image.closest(
-              ".prototype-page-frame"
-            );
-
-          const owningPageName =
-            (
-              Array.from(
-                pageFrames.entries()
-              ).find(
-                (
-                  [
-                    ,
-                    frame
-                  ]
-                ) =>
-                  frame ===
-                  owningPageFrame
-              )
-              ?.[0]
-            ) ||
-            owningPageFrame?.dataset.page ||
-            null;
-
-
-          if (
-            !owningPageName ||
-            activePageName !== owningPageName ||
-            selectedPageName !== owningPageName
-          ) {
-            return;
-          }
-
-
-          const touch =
-            event.changedTouches[0];
-
-          const moved =
-            Math.hypot(
-              touch.clientX -
-                mobileTapStartX,
-              touch.clientY -
-                mobileTapStartY
-            );
-
-
-          /*
-            Ignore a swipe that happened to end on the image.
-
-            A stationary / near-stationary single press opens the lightbox.
-            Because this decision happens on touchend AFTER measuring travel,
-            vertical page swipes and horizontal hero swipes remain free to use
-            the same image area.
-          */
-          if (moved > 14) {
-            return;
-          }
-
-
-          event.preventDefault();
-
-
-          openMediaLightbox(
-            item.dataset.mediaSrc,
-            item.dataset.mediaTitle ||
-            "Game screenshot",
-            image
-          );
-        },
-        {
-          passive: false
-        }
-      );
-
-
       return image;
     }
 
@@ -15378,12 +15307,194 @@ document.addEventListener("DOMContentLoaded", () => {
     the return morph/proxy cleanup is actually finished.
   */
   const isMediaLightboxBusy =
-    () => (
-      mediaLightboxState.isAnimating ||
-      document.body.classList.contains(
-        "is-media-lightbox-open"
-      )
+    () => {
+      const lightbox =
+        document.querySelector(
+          "[data-media-lightbox]"
+        );
+
+
+      return Boolean(
+        document.body.classList.contains(
+          "is-media-lightbox-open"
+        ) ||
+        lightbox?.classList.contains(
+          "is-open"
+        ) ||
+        lightbox?.classList.contains(
+          "is-closing"
+        )
+      );
+    };
+
+
+  /*
+    =========================================================
+    CENTRAL PAGE INPUT OWNERSHIP
+    =========================================================
+
+    All tablet/mobile taps and swipes ask ONE controller which real page is
+    interactive. During any ambiguous handoff there is deliberately NO owner.
+
+    This replaces the old pattern where each gesture controller independently
+    interpreted activePageName, selectedPageName, .is-open and animation flags.
+  */
+  const getInteractivePageName =
+    () => {
+      if (
+        isMediaLightboxBusy() ||
+        mobileDirectionalPageSwitchActive ||
+        pageFrameIsAnimating ||
+        !activePageName ||
+        selectedPageName !== activePageName
+      ) {
+        return null;
+      }
+
+
+      const frame =
+        getPageFrame(
+          activePageName
+        );
+
+
+      if (
+        !frame ||
+        !frame.classList.contains(
+          "is-open"
+        )
+      ) {
+        return null;
+      }
+
+
+      return activePageName;
+    };
+
+
+  const pageOwnsInput =
+    (
+      pageName
+    ) => (
+      Boolean(
+        pageName
+      ) &&
+      getInteractivePageName() ===
+        pageName
     );
+
+
+  const syncPageInputOwnership =
+    () => {
+      /*
+        Desktop keeps its established pointer behavior. On tablet/mobile,
+        non-owning real pages cannot physically intercept a touch even if an
+        interrupted animation accidentally leaves one visually stacked above
+        the current page.
+      */
+      if (!gameFrameTabletMode.matches) {
+        pageFrames.forEach(
+          (frame) => {
+            frame.style.removeProperty(
+              "pointer-events"
+            );
+          }
+        );
+
+        return;
+      }
+
+
+      const owner =
+        getInteractivePageName();
+
+
+      pageFrames.forEach(
+        (
+          frame,
+          pageName
+        ) => {
+          frame.style.pointerEvents =
+            (
+              owner === pageName
+            )
+              ? "auto"
+              : "none";
+        }
+      );
+    };
+
+
+  /*
+    One authoritative terminal CLOSED state for the lightbox.
+
+    This is safe to call repeatedly. It removes every logical/visual modal
+    marker, clears stale state references, releases pointer capture, and
+    re-evaluates which page may receive input.
+  */
+  const finalizeMediaLightboxClosedState =
+    (
+      lightbox = document.querySelector(
+        "[data-media-lightbox]"
+      )
+    ) => {
+      if (!lightbox) {
+        return;
+      }
+
+
+      document.body.classList.remove(
+        "is-media-lightbox-open"
+      );
+
+      lightbox.classList.remove(
+        "is-open",
+        "is-settled",
+        "is-closing"
+      );
+
+      lightbox.style.pointerEvents =
+        "none";
+
+
+      const activeElement =
+        document.activeElement;
+
+
+      if (
+        activeElement &&
+        lightbox.contains(
+          activeElement
+        )
+      ) {
+        activeElement.blur?.();
+      }
+
+
+      mediaLightboxState.isAnimating =
+        false;
+
+      mediaLightboxState.sourceImage =
+        null;
+
+      mediaLightboxState.sourceButton =
+        null;
+
+      mediaLightboxState.imageItems =
+        [];
+
+      mediaLightboxState.imageIndex =
+        -1;
+
+      mediaLightboxState.mediaBrowser =
+        null;
+
+      mediaLightboxState.pageAccentRgb =
+        "";
+
+
+      syncPageInputOwnership();
+    };
 
 
   const getMediaLightboxTiming = () => {
@@ -16814,6 +16925,8 @@ document.addEventListener("DOMContentLoaded", () => {
     mediaLightboxState.isAnimating =
       true;
 
+    syncPageInputOwnership();
+
 
     const image =
       lightbox.querySelector(
@@ -16974,6 +17087,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       if (!closeRect) {
+        imageProxy.remove();
+
+        buttonMorph?.proxy.remove();
+
+        finalizeMediaLightboxClosedState(
+          lightbox
+        );
+
         return;
       }
 
@@ -17247,37 +17368,24 @@ document.addEventListener("DOMContentLoaded", () => {
     image.alt = "";
 
 
-    lightbox.classList.remove(
-      "is-closing"
+    const lastFocusedElement =
+      mediaLightboxState.lastFocusedElement;
+
+
+    finalizeMediaLightboxClosedState(
+      lightbox
     );
 
 
-    mediaLightboxState.isAnimating =
-      false;
-
-    mediaLightboxState.sourceImage =
-      null;
-
-    mediaLightboxState.sourceButton =
-      null;
-
-    mediaLightboxState.imageItems =
-      [];
-
-    mediaLightboxState.imageIndex =
-      -1;
-
-    mediaLightboxState.mediaBrowser =
-      null;
-
-    mediaLightboxState.pageAccentRgb =
-      "";
-
-
-    mediaLightboxState.lastFocusedElement
-      ?.focus?.({
-        preventScroll: true
-      });
+    if (
+      lastFocusedElement &&
+      lastFocusedElement.isConnected
+    ) {
+      lastFocusedElement
+        .focus?.({
+          preventScroll: true
+        });
+    }
   };
 
 
@@ -17318,6 +17426,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     mediaLightboxState.isAnimating =
       true;
+
+    syncPageInputOwnership();
 
 
     lightbox.classList.remove(
@@ -17455,6 +17565,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.add(
       "is-media-lightbox-open"
     );
+
+    lightbox.style.pointerEvents =
+      "";
 
     lightbox.classList.add(
       "is-open"
@@ -17803,6 +17916,8 @@ document.addEventListener("DOMContentLoaded", () => {
     mediaLightboxState.isAnimating =
       false;
 
+    syncPageInputOwnership();
+
 
     closeButton?.focus({
       preventScroll: true
@@ -17826,6 +17941,40 @@ document.addEventListener("DOMContentLoaded", () => {
       browser.querySelector(
         ".media-viewer"
       );
+
+
+    /*
+      Stable owner for all mobile hero interaction.
+
+      Important: mobile touch ownership belongs to the fixed hero STAGE, not
+      to whichever <img> happens to be inside the current wipe wrapper.
+      Completed wipe images can deliberately retain unusual geometry to avoid
+      visual snapping; they should never define the interactive hit area.
+    */
+    const owningGamePage =
+      browser.closest(
+        ".prototype-page-frame"
+      );
+
+
+    const owningGamePageName =
+      (
+        Array.from(
+          pageFrames.entries()
+        ).find(
+          (
+            [
+              ,
+              frame
+            ]
+          ) =>
+            frame ===
+            owningGamePage
+        )
+        ?.[0]
+      ) ||
+      owningGamePage?.dataset.page ||
+      null;
 
 
     const setViewerAspectRatio = (
@@ -18043,6 +18192,127 @@ document.addEventListener("DOMContentLoaded", () => {
             )
         )
       );
+
+
+    /*
+      Mobile single-tap lightbox
+      --------------------------
+      The hero stage is the interaction surface. This keeps the tappable area
+      exactly equal to the visible hero cavity even when a completed wipe
+      wrapper contains an oversized/repositioned image element.
+
+      Horizontal/vertical swipes still win because we only open after touchend
+      when total movement stayed below the tap threshold.
+    */
+    let mobileHeroTapStartX =
+      0;
+
+    let mobileHeroTapStartY =
+      0;
+
+
+    stage.addEventListener(
+      "touchstart",
+      (event) => {
+        if (
+          iconButtonMode.matches ||
+          event.touches.length !== 1 ||
+          !pageOwnsInput(
+            owningGamePageName
+          )
+        ) {
+          return;
+        }
+
+
+        const touch =
+          event.touches[0];
+
+
+        mobileHeroTapStartX =
+          touch.clientX;
+
+        mobileHeroTapStartY =
+          touch.clientY;
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    stage.addEventListener(
+      "touchend",
+      (event) => {
+        if (
+          iconButtonMode.matches ||
+          event.changedTouches.length !== 1 ||
+          !pageOwnsInput(
+            owningGamePageName
+          )
+        ) {
+          return;
+        }
+
+
+        const touch =
+          event.changedTouches[0];
+
+        const moved =
+          Math.hypot(
+            touch.clientX -
+              mobileHeroTapStartX,
+            touch.clientY -
+              mobileHeroTapStartY
+          );
+
+
+        if (moved > 14) {
+          return;
+        }
+
+
+        const activeItem =
+          items[activeIndex];
+
+
+        if (
+          !activeItem ||
+          activeItem.dataset.mediaType !==
+            "image"
+        ) {
+          return;
+        }
+
+
+        const sourceImage =
+          stage.querySelector(
+            ".mobile-media-wipe-layer.is-wipe-complete:not(.is-wipe-outgoing) > .media-viewer-image"
+          ) ||
+          stage.querySelector(
+            ".media-viewer-image"
+          );
+
+
+        if (!(sourceImage instanceof HTMLImageElement)) {
+          return;
+        }
+
+
+        event.preventDefault();
+
+
+        openMediaLightbox(
+          activeItem.dataset.mediaSrc,
+          activeItem.dataset.mediaTitle ||
+            "Game screenshot",
+          sourceImage
+        );
+      },
+      {
+        passive: false
+      }
+    );
 
 
     const updateArrowState = () => {
@@ -18785,29 +19055,10 @@ document.addEventListener("DOMContentLoaded", () => {
       state machine can own them.
     */
     const owningGamePageForSwipe =
-      browser.closest(
-        ".prototype-page-frame"
-      );
-
+      owningGamePage;
 
     const owningGamePageNameForSwipe =
-      (
-        Array.from(
-          pageFrames.entries()
-        ).find(
-          (
-            [
-              ,
-              frame
-            ]
-          ) =>
-            frame ===
-            owningGamePageForSwipe
-        )
-        ?.[0]
-      ) ||
-      owningGamePageForSwipe?.dataset.page ||
-      null;
+      owningGamePageName;
 
 
     let mediaSwipeStartX =
@@ -18841,14 +19092,9 @@ document.addEventListener("DOMContentLoaded", () => {
           !owningGamePageForSwipe.classList.contains(
             "is-open"
           ) ||
-          !owningGamePageNameForSwipe ||
-          activePageName !==
-            owningGamePageNameForSwipe ||
-          selectedPageName !==
-            owningGamePageNameForSwipe ||
-          mobileDirectionalPageSwitchActive ||
-          pageFrameIsAnimating ||
-          isMediaLightboxBusy() ||
+          !pageOwnsInput(
+            owningGamePageNameForSwipe
+          ) ||
           event.touches.length !== 1
         ) {
           clearMediaSwipe();
@@ -21804,11 +22050,9 @@ document.addEventListener("DOMContentLoaded", () => {
         gamePageFrame?.classList.contains(
           "is-open"
         ) &&
-        selectedPageName === pageName &&
-        activePageName === pageName &&
-        !mobileDirectionalPageSwitchActive &&
-        !pageFrameIsAnimating &&
-        !isMediaLightboxBusy() &&
+        pageOwnsInput(
+          pageName
+        ) &&
         performance.now() >=
           tabletGestureLockedUntil
       );

@@ -25385,14 +25385,29 @@ body.is-media-lightbox-open {
 
   .prototype-page-frame[data-game-frame-page]
   .mobile-media-wipe-layer.is-wipe-complete:not(.is-wipe-outgoing) {
-    pointer-events: auto !important;
+    /*
+      The completed wrapper is visual-only.
+
+      Its retained geometry is intentionally optimized for a seamless wipe
+      endpoint and can be larger than the visible hero cavity. Let the fixed
+      .media-viewer-stage own all mobile touch interaction instead.
+    */
+    pointer-events: none !important;
   }
 
 
   .prototype-page-frame[data-game-frame-page]
   .mobile-media-wipe-layer.is-wipe-complete:not(.is-wipe-outgoing)
   > .media-viewer-image {
-    pointer-events: auto !important;
+    pointer-events: none !important;
+    touch-action: none;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-media-zone--hero
+  .media-viewer-stage {
+    pointer-events: auto;
     touch-action: none;
   }
 }
