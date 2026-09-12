@@ -12268,6 +12268,23 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
+  /*
+    Always begin the site on About, regardless of responsive mode.
+
+    requestPage() already routes to the correct implementation:
+      - desktop/tablet -> normal page opening morph
+      - mobile         -> normal direct mobile page open
+
+    Wait one animation frame so the initial responsive layout and frame
+    geometry are settled before About measures its opening target.
+  */
+  requestAnimationFrame(() => {
+    requestPage(
+      "about"
+    );
+  });
+
+
   /* =======================================================
      Interactions
      ======================================================= */
@@ -15157,8 +15174,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       /*
         Desktop/tablet keep the established single-click lightbox behavior.
-        Mobile reserves a single tap for touch interaction and requires a
-        deliberate double tap instead.
+
+        Mobile opens from touchend only after verifying that the finger did
+        not travel far enough to count as a swipe. That lets a normal single
+        press open the lightbox without stealing vertical/horizontal gestures.
       */
       image.addEventListener(
         "click",
@@ -15178,41 +15197,11 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-      /*
-        Chrome device emulation can deliver mouse dblclick rather than a real
-        touchstart/touchend pair. Handle that explicitly so mobile lightbox
-        behavior is testable on desktop too.
-      */
-      image.addEventListener(
-        "dblclick",
-        (event) => {
-          if (iconButtonMode.matches) {
-            return;
-          }
-
-
-          event.preventDefault();
-
-
-          openMediaLightbox(
-            item.dataset.mediaSrc,
-            item.dataset.mediaTitle ||
-            "Game screenshot",
-            image
-          );
-        }
-      );
-
-
       let mobileTapStartX =
         0;
 
       let mobileTapStartY =
         0;
-
-      let mobileLastTapAt =
-        0;
-
 
       image.addEventListener(
         "touchstart",
@@ -15266,42 +15255,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
           /*
             Ignore a swipe that happened to end on the image.
+
+            A stationary / near-stationary single press opens the lightbox.
+            Because this decision happens on touchend AFTER measuring travel,
+            vertical page swipes and horizontal hero swipes remain free to use
+            the same image area.
           */
           if (moved > 14) {
-            mobileLastTapAt =
-              0;
-
             return;
           }
 
 
-          const now =
-            performance.now();
+          event.preventDefault();
 
 
-          if (
-            mobileLastTapAt > 0 &&
-            now - mobileLastTapAt <= 320
-          ) {
-            mobileLastTapAt =
-              0;
-
-            event.preventDefault();
-
-
-            openMediaLightbox(
-              item.dataset.mediaSrc,
-              item.dataset.mediaTitle ||
-              "Game screenshot",
-              image
-            );
-
-            return;
-          }
-
-
-          mobileLastTapAt =
-            now;
+          openMediaLightbox(
+            item.dataset.mediaSrc,
+            item.dataset.mediaTitle ||
+            "Game screenshot",
+            image
+          );
         },
         {
           passive: false

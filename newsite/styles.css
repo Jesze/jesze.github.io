@@ -25301,18 +25301,22 @@ body.is-media-lightbox-open {
 
 
 /* =========================================================
-   MOBILE HERO IMAGE — RESERVE DOUBLE TAP FOR LIGHTBOX
+   MOBILE HERO IMAGE — CUSTOM GESTURE OWNERSHIP
    =========================================================
-   `touch-action: manipulation` keeps normal touch interaction while telling
-   mobile browsers not to use double-tap as their built-in page zoom gesture.
-   Pinch zoom remains available.
+   The hero already has custom handlers for:
+     - vertical page swipes
+     - horizontal media swipes
+     - stationary double-tap lightbox opening
+
+   Give those handlers full ownership of gestures that begin on the hero
+   instead of letting the browser claim the touch sequence first.
    ========================================================= */
 
 @media (max-width: 840px) {
 
   .prototype-page-frame[data-game-frame-page]
   .media-viewer-image {
-    touch-action: manipulation;
+    touch-action: none;
   }
 }
 
@@ -25389,7 +25393,7 @@ body.is-media-lightbox-open {
   .mobile-media-wipe-layer.is-wipe-complete:not(.is-wipe-outgoing)
   > .media-viewer-image {
     pointer-events: auto !important;
-    touch-action: manipulation;
+    touch-action: none;
   }
 }
 
@@ -25690,6 +25694,77 @@ body.is-media-lightbox-open {
       !important;
 
     transition: none !important;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE LIGHTBOX — EDGE-TO-EDGE MEDIA
+   =========================================================
+   On mobile, the screenshot no longer reserves side gutters for the nav
+   arrows. The image gets the full viewport width and the arrows overlap it.
+   Vertical clearance for the close button remains unchanged.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .media-lightbox {
+    --media-lightbox-side-gutter: 0px;
+  }
+
+
+  .media-lightbox-image {
+    max-width: 100vw;
+  }
+
+
+  /*
+    Let navigation float over the image instead of consuming image width.
+    Keep the controls comfortably reachable without pulling the media inward.
+  */
+  .media-lightbox-arrow {
+    z-index: 2;
+
+    /*
+      Center on the lightbox's IMAGE AREA rather than the viewport.
+
+      The image is centered inside the usable region between the top and
+      bottom gutters, so this is its true vertical center even when the large
+      close-button gutter makes that region asymmetrical.
+    */
+    top:
+      calc(
+        50% +
+        (
+          var(--media-lightbox-top-gutter) -
+          var(--media-lightbox-bottom-gutter)
+        ) / 2
+      );
+
+    width:
+      clamp(44px, 12vw, 56px);
+
+    height:
+      clamp(60px, 16vw, 78px);
+  }
+
+
+  .media-lightbox-arrow--previous {
+    left:
+      max(
+        4px,
+        env(safe-area-inset-left)
+      );
+  }
+
+
+  .media-lightbox-arrow--next {
+    right:
+      max(
+        4px,
+        env(safe-area-inset-right)
+      );
   }
 }
 
