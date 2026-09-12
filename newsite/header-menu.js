@@ -11570,9 +11570,7 @@ document.addEventListener("DOMContentLoaded", () => {
         )?.classList.contains(
           "is-open"
         ) ||
-        document.body.classList.contains(
-          "is-media-lightbox-open"
-        )
+        isMediaLightboxBusy()
       ) {
         return;
       }
@@ -11782,9 +11780,7 @@ document.addEventListener("DOMContentLoaded", () => {
         )?.classList.contains(
           "is-open"
         ) ||
-        document.body.classList.contains(
-          "is-media-lightbox-open"
-        )
+        isMediaLightboxBusy()
       ) {
         return;
       }
@@ -11958,9 +11954,7 @@ document.addEventListener("DOMContentLoaded", () => {
         )?.classList.contains(
           "is-open"
         ) ||
-        document.body.classList.contains(
-          "is-media-lightbox-open"
-        ) ||
+        isMediaLightboxBusy() ||
         event.touches.length !== 1
       ) {
         clearMobilePageSwipeLock();
@@ -12112,9 +12106,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "is-open"
           ) ||
           pageFrameIsAnimating ||
-          document.body.classList.contains(
-            "is-media-lightbox-open"
-          ) ||
+          isMediaLightboxBusy() ||
           event.touches.length !== 1
         ) {
           clearTouch();
@@ -15235,7 +15227,44 @@ document.addEventListener("DOMContentLoaded", () => {
         (event) => {
           if (
             iconButtonMode.matches ||
-            event.changedTouches.length !== 1
+            event.changedTouches.length !== 1 ||
+            isMediaLightboxBusy() ||
+            mobileDirectionalPageSwitchActive ||
+            pageFrameIsAnimating
+          ) {
+            return;
+          }
+
+
+          const owningPageFrame =
+            image.closest(
+              ".prototype-page-frame"
+            );
+
+          const owningPageName =
+            (
+              Array.from(
+                pageFrames.entries()
+              ).find(
+                (
+                  [
+                    ,
+                    frame
+                  ]
+                ) =>
+                  frame ===
+                  owningPageFrame
+              )
+              ?.[0]
+            ) ||
+            owningPageFrame?.dataset.page ||
+            null;
+
+
+          if (
+            !owningPageName ||
+            activePageName !== owningPageName ||
+            selectedPageName !== owningPageName
           ) {
             return;
           }
@@ -15341,6 +15370,20 @@ document.addEventListener("DOMContentLoaded", () => {
     mediaBrowser: null,
     pageAccentRgb: ""
   };
+
+
+  /*
+    Input ownership follows the full lightbox state machine, not just the
+    visible backdrop class. During close, the body class is removed before
+    the return morph/proxy cleanup is actually finished.
+  */
+  const isMediaLightboxBusy =
+    () => (
+      mediaLightboxState.isAnimating ||
+      document.body.classList.contains(
+        "is-media-lightbox-open"
+      )
+    );
 
 
   const getMediaLightboxTiming = () => {
@@ -18747,6 +18790,26 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
+    const owningGamePageNameForSwipe =
+      (
+        Array.from(
+          pageFrames.entries()
+        ).find(
+          (
+            [
+              ,
+              frame
+            ]
+          ) =>
+            frame ===
+            owningGamePageForSwipe
+        )
+        ?.[0]
+      ) ||
+      owningGamePageForSwipe?.dataset.page ||
+      null;
+
+
     let mediaSwipeStartX =
       0;
 
@@ -18778,9 +18841,14 @@ document.addEventListener("DOMContentLoaded", () => {
           !owningGamePageForSwipe.classList.contains(
             "is-open"
           ) ||
-          document.body.classList.contains(
-            "is-media-lightbox-open"
-          ) ||
+          !owningGamePageNameForSwipe ||
+          activePageName !==
+            owningGamePageNameForSwipe ||
+          selectedPageName !==
+            owningGamePageNameForSwipe ||
+          mobileDirectionalPageSwitchActive ||
+          pageFrameIsAnimating ||
+          isMediaLightboxBusy() ||
           event.touches.length !== 1
         ) {
           clearMediaSwipe();
@@ -18887,8 +18955,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         const swipePageName =
-          owningGamePageForSwipe?.dataset.page ||
-          activePageName;
+          owningGamePageNameForSwipe;
 
 
         playMobileHorizontalSwipeFeedback(
@@ -21737,13 +21804,11 @@ document.addEventListener("DOMContentLoaded", () => {
         gamePageFrame?.classList.contains(
           "is-open"
         ) &&
-        (
-          selectedPageName === pageName ||
-          activePageName === pageName
-        ) &&
-        !document.body.classList.contains(
-          "is-media-lightbox-open"
-        ) &&
+        selectedPageName === pageName &&
+        activePageName === pageName &&
+        !mobileDirectionalPageSwitchActive &&
+        !pageFrameIsAnimating &&
+        !isMediaLightboxBusy() &&
         performance.now() >=
           tabletGestureLockedUntil
       );
