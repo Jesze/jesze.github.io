@@ -188,8 +188,36 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
 
+          const finishAfterDecode =
+            async () => {
+              /*
+                onload means the bytes are available, but the first onscreen
+                use can still hitch while the browser decodes them.
+
+                Ask for decode now, underneath the loading screen. A decode
+                failure is harmless here; the ordinary image element can
+                still make its own attempt later.
+              */
+              if (
+                typeof image.decode ===
+                  "function"
+              ) {
+                try {
+                  await image.decode();
+                }
+
+                catch (error) {
+                  /* Continue; loading must never be blocked by decode(). */
+                }
+              }
+
+
+              finish();
+            };
+
+
           image.onload =
-            finish;
+            finishAfterDecode;
 
           image.onerror =
             finish;
@@ -202,8 +230,120 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
           if (image.complete) {
-            finish();
+            if (
+              image.naturalWidth > 0
+            ) {
+              finishAfterDecode();
+            }
+
+            else {
+              finish();
+            }
           }
+        }
+      );
+    };
+
+
+  const prewarmSiteAnimationLayers =
+    async () => {
+      /*
+        This deliberately does NOT play any real site transition.
+
+        It only gives the browser a chance to:
+          - finish font setup
+          - calculate the important animation geometry once
+          - create compositor-ready transform/opacity layers
+          - paint those layers for a couple of frames
+
+        No page classes, navigation state, timers, or morph controllers are
+        touched, so the real first About transition still starts from the
+        normal pristine state.
+      */
+      if (
+        document.fonts?.ready
+      ) {
+        try {
+          await document.fonts.ready;
+        }
+
+        catch (error) {
+          /* Font readiness is an optimization only. */
+        }
+      }
+
+
+      const prewarmElements =
+        Array.from(
+          document.querySelectorAll(
+            [
+              ".site-header",
+              ".viewport-frame",
+              ".site-background",
+              ".prototype-page-frame",
+              ".game-frame-area",
+              ".simple-glass-page",
+              ".desktop-secondary-panel",
+              ".media-viewer",
+              ".viewport-frame-piece--left-center",
+              ".viewport-frame-piece--right-center"
+            ].join(",")
+          )
+        );
+
+
+      const previousWillChange =
+        prewarmElements.map(
+          (element) => {
+            return [
+              element,
+              element.style.willChange
+            ];
+          }
+        );
+
+
+      prewarmElements.forEach(
+        (element) => {
+          element.style.willChange =
+            "transform, opacity";
+        }
+      );
+
+
+      /*
+        Force one geometry read while the loader is still covering the site.
+        This warms layout/style calculation without changing any state.
+      */
+      prewarmElements.forEach(
+        (element) => {
+          element.getBoundingClientRect();
+        }
+      );
+
+
+      await new Promise(
+        (resolve) => {
+          requestAnimationFrame(
+            () => {
+              requestAnimationFrame(
+                resolve
+              );
+            }
+          );
+        }
+      );
+
+
+      previousWillChange.forEach(
+        (
+          [
+            element,
+            previousValue
+          ]
+        ) => {
+          element.style.willChange =
+            previousValue;
         }
       );
     };
@@ -244,7 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
         percent >= 100
       ) {
         sitePreloaderStatus.textContent =
-          "Ready";
+          "Preparing interface";
       }
     };
 
@@ -260,6 +400,12 @@ document.addEventListener("DOMContentLoaded", () => {
         criticalImageSources.length,
         criticalImageSources.length
       );
+
+
+      if (sitePreloaderStatus) {
+        sitePreloaderStatus.textContent =
+          "Ready";
+      }
 
 
       sitePreloader.classList.add(
@@ -331,10 +477,18 @@ document.addEventListener("DOMContentLoaded", () => {
     Promise
       .all(preloadJobs)
       .then(
-        () => {
+        async () => {
           /*
-            One paint at 100% feels much cleaner than immediately removing
-            the loader on the exact same task completion tick.
+            The files are loaded and decoded. Use the remaining covered time
+            for a conservative animation/font/compositor prewarm before the
+            first real About transition is allowed to begin.
+          */
+          await prewarmSiteAnimationLayers();
+
+
+          /*
+            One small covered paint at 100% feels cleaner than removing the
+            loader on the same task-completion tick.
           */
           requestAnimationFrame(
             () => {
