@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Michroma&display=swap");
+
 
 /*
   The lightbox button morph changes height, so its horizontal shear run
@@ -36,9 +38,9 @@
   --accent-about-rgb: 255, 114, 2;
   --accent-contact-rgb: 255, 114, 2;
 
-  --accent-brobots-rgb: 222, 170, 42;
+  --accent-brobots-rgb: 224, 255, 38;   /* #e0ff26 */
   --accent-etherian-rgb: 54, 232, 232;
-  --accent-halodoom-rgb: 69, 173, 245;
+  --accent-halodoom-rgb: 0, 187, 63;     /* #00bb3f */
 
   /*
     Current-page button darkness.
@@ -423,7 +425,7 @@ body {
       * var(--mobile-menu-height-scale)
     );
 
-  --mobile-menu-shell-color: rgba(28, 30, 32, 0.3);
+  --mobile-menu-shell-color: rgba(28, 30, 32, 0.65);
   --mobile-menu-shell-border-color: rgba(232, 236, 240, 0.2);
   --mobile-menu-shell-inner-border-color: rgba(120, 126, 132, 0.3);
 
@@ -622,7 +624,7 @@ body {
     MERGE TRANSITION
 
     Normal spacing is 10px.
-    From 1000px -> 840px, that spacing smoothly closes to 0.
+    From 1000px -> 700px, that spacing smoothly closes to 0.
 
       1000px = 10px
        920px =  5px
@@ -808,7 +810,7 @@ body {
     clamp(65px, calc(var(--frame-height) * 0.32), 80px);
 
   padding-right: 12px;
-  padding-bottom: 8px;
+  padding-bottom: 0;
 
   min-width: 0;
   overflow: visible;
@@ -819,7 +821,7 @@ body {
 .brand-logo {
   display: block;
 
-  height: calc(var(--frame-height) * 0.66);
+  height: calc(var(--frame-height) * 0.561);
   width: auto;
 
   max-width: none;
@@ -912,7 +914,7 @@ body {
   The diagonal sections overlap each other.
 
   --button-spacing controls the visible gap between button faces.
-  Because --button-spacing becomes 0 near 840px, the five icon
+  Because --button-spacing becomes 0 near 700px, the five icon
   buttons smoothly "zip together" immediately before the menu swap.
 */
 .nav-button + .nav-button {
@@ -1202,11 +1204,11 @@ body {
   isolation: isolate;
 
   /*
-    At exactly 840px:
+    At exactly 750px:
       27vw - 226.8px = 0
     so this resolves to exactly --button-group-width.
 
-    Below 840px it removes about 0.27px of width for every 1px
+    Below 750px it removes about 0.27px of width for every 1px
     the viewport shrinks, until it reaches --menu-min-width.
 
     This gives:
@@ -1219,7 +1221,7 @@ body {
   width:
     clamp(
       var(--menu-min-width),
-      calc(var(--button-group-width) + 27vw - 226.8px),
+      calc(var(--button-group-width) + 27vw - 202.5px),
       var(--button-group-width)
     );
 
@@ -1343,7 +1345,7 @@ body {
    Mobile state / merge point
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   .main-nav {
     /*
       Fade the five-button group without shrinking it.
@@ -1356,7 +1358,7 @@ body {
 
   .menu-toggle {
     /*
-      At 840px this starts at the collective width of the five
+      At 750px this starts at the collective width of the five
       collapsed icon buttons. From here it contracts continuously
       as the viewport narrows.
     */
@@ -1405,7 +1407,14 @@ body {
     at the 485px breakpoint.
   */
   .menu-toggle {
-    width: 100.78px;
+    /*
+      Match the live hamburger width at exactly 485px.
+
+      With the new 750px collapse origin, the responsive formula resolves
+      to ~125.08px here. Freezing to the old 100.78px value caused the
+      visible size pop as the header entered its uniform-scaling mode.
+    */
+    width: 125.08px;
   }
 
   /*
@@ -3532,7 +3541,7 @@ body.is-media-lightbox-open {
 /*
   Page frames only participate in the middle/icon-button mode for now.
 */
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   .prototype-page-frame {
     display: none;
   }
@@ -4701,7 +4710,7 @@ body.is-media-lightbox-open {
   Keeping display:none outside this breakpoint prevents the hidden
   dropdown from catching focus or interfering with desktop layout.
 */
-@media (min-width: 841px) {
+@media (min-width: 751px) {
   .mobile-menu {
     display: none;
   }
@@ -17187,7 +17196,7 @@ body.is-media-lightbox-open {
 /*
   Mobile remains untouched for now.
 */
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   .prototype-page-frame[data-game-frame-page] .game-frame-area {
     display: contents;
   }
@@ -17429,7 +17438,7 @@ body.is-media-lightbox-open {
 }
 
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   #brobots-page-frame .brobots-inner-frame-canvas {
     display: none;
   }
@@ -17746,7 +17755,7 @@ body.is-media-lightbox-open {
 }
 
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   .prototype-page-frame[data-game-frame-page]
   .game-frame-area > .game-frame-piece {
     display: none;
@@ -18166,7 +18175,7 @@ body.is-media-lightbox-open {
 
 
 /* Hide the raster frame experiment on mobile exactly as before. */
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   .prototype-page-frame[data-game-frame-page] .game-frame-stretcher {
     display: none;
   }
@@ -19301,7 +19310,7 @@ body.is-media-lightbox-open {
    Mobile base layout
    --------------------------------------------------------- */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   /*
     Mobile currently uses the generic gallery rather than the 17-piece
@@ -19428,7 +19437,7 @@ body.is-media-lightbox-open {
    Outgoing tablet/desktop -> mobile handoff hold — simplified
    --------------------------------------------------------- */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   /*
     The old hold block reconstructed the entire desktop/tablet media browser
@@ -19776,7 +19785,7 @@ body.is-media-lightbox-open {
 }
 
 
-@media (max-width: 840px),
+@media (max-width: 750px),
        (min-width: 1401px) {
 }
 
@@ -21428,7 +21437,7 @@ body.is-media-lightbox-open {
    media UI.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   .prototype-page-frame[data-game-frame-page].is-mobile-collapse-hold
   .game-frame-area > .media-browser {
     display: none !important;
@@ -23477,7 +23486,7 @@ body.is-media-lightbox-open {
    when squeezed into a phone aspect ratio.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   /* Tablet/game raster frame becomes the visible page shell on mobile too. */
   .prototype-page-frame[data-game-frame-page]
@@ -23704,10 +23713,10 @@ body.is-media-lightbox-open {
    =========================================================
    Older mobile CSS deliberately removed .prototype-page-frame entirely.
    Mobile now shares the tablet page internals, so the real frame must remain
-   present and interactive below 840px.
+   present and interactive below 750px.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame {
     display: block !important;
@@ -23760,14 +23769,14 @@ body.is-media-lightbox-open {
    =========================================================
 
    v121 gave mobile its own top/bottom rectangle. That changed the frame's
-   vertical center exactly at 840px, which is the visible downward "pop"
+   vertical center exactly at 750px, which is the visible downward "pop"
    during tablet -> mobile resizing.
 
    Mobile can still use tighter horizontal side padding, but the vertical
    rectangle should remain continuous across the breakpoint.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   .prototype-page-frame[data-game-frame-page] {
     /*
       Match the shared tablet/desktop vertical composition.
@@ -23816,10 +23825,10 @@ body.is-media-lightbox-open {
    the breakpoint added ~20px of total frame width in one frame.
 
    Start mobile at the exact same 28px inset, then let it decrease smoothly
-   with the viewport instead of stepping at 840px.
+   with the viewport instead of stepping at 750px.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   .prototype-page-frame[data-game-frame-page] {
     --page-frame-side-padding:
       clamp(
@@ -23845,7 +23854,7 @@ body.is-media-lightbox-open {
    of defense; the JS handler is the fallback/interaction-level lock.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   html,
   body {
     overscroll-behavior-y: none;
@@ -23866,7 +23875,7 @@ body.is-media-lightbox-open {
    - Image-to-image changes use a directional soft-edge gradient wipe.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .media-hero-navigation {
@@ -24016,7 +24025,7 @@ body.is-media-lightbox-open {
    JS now starts these animations only after the incoming image is ready.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .media-viewer-stage
@@ -24140,7 +24149,7 @@ body.is-media-lightbox-open {
      B alone animates its mask across A
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .media-viewer-image--outgoing {
@@ -24291,7 +24300,7 @@ body.is-media-lightbox-open {
    Neither image translates, mirrors, fades, or animates.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .mobile-media-wipe-layer {
@@ -24460,7 +24469,7 @@ body.is-media-lightbox-open {
    layer until the next media render replaces the stage.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .mobile-media-wipe-layer.is-wipe-complete {
@@ -24485,7 +24494,7 @@ body.is-media-lightbox-open {
    This keeps A in the exact same positioning context at swipe start.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .mobile-media-wipe-layer.is-wipe-outgoing {
@@ -24537,7 +24546,7 @@ body.is-media-lightbox-open {
    Only stacking / interactivity are changed here.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .mobile-media-wipe-layer.is-wipe-outgoing {
@@ -24578,7 +24587,7 @@ body.is-media-lightbox-open {
 }
 
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
   .mobile-swipe-feedback {
     display: block;
 
@@ -24804,7 +24813,7 @@ body.is-media-lightbox-open {
    wash across the opaque border/bezel around the video.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .site-background
   .mobile-swipe-feedback-clip {
@@ -24865,7 +24874,7 @@ body.is-media-lightbox-open {
    video aperture.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .site-background
   .mobile-swipe-feedback-clip
@@ -24964,7 +24973,7 @@ body.is-media-lightbox-open {
    Horizontal feedback always uses the currently-open page accent color.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .site-background
   .mobile-swipe-feedback-clip
@@ -25160,7 +25169,7 @@ body.is-media-lightbox-open {
    dimensions" fix is already present and does not need a second sizing system.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-frame-area > [data-game-frame-piece],
@@ -25312,7 +25321,7 @@ body.is-media-lightbox-open {
    instead of letting the browser claim the touch sequence first.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .media-viewer-image {
@@ -25332,7 +25341,7 @@ body.is-media-lightbox-open {
    pixels are moved well outside the visible content box.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   html.is-mobile-safari-frame-renderer
   .prototype-page-frame[data-game-frame-page]
@@ -25381,7 +25390,7 @@ body.is-media-lightbox-open {
    Outgoing transition snapshots remain non-interactive.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .mobile-media-wipe-layer.is-wipe-complete:not(.is-wipe-outgoing) {
@@ -25564,7 +25573,7 @@ body.is-media-lightbox-open {
    creating transient document scrollbars.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   html,
   body {
@@ -25589,7 +25598,7 @@ body.is-media-lightbox-open {
    This is scoped ONLY to the swipe-up outgoing-page class.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-info-host::after {
@@ -25658,7 +25667,7 @@ body.is-media-lightbox-open {
      - final panel is only ~25% opaque
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .prototype-page-frame[data-game-frame-page]
   .game-tablet-info-host::after {
@@ -25722,7 +25731,7 @@ body.is-media-lightbox-open {
    Vertical clearance for the close button remains unchanged.
    ========================================================= */
 
-@media (max-width: 840px) {
+@media (max-width: 750px) {
 
   .media-lightbox {
     --media-lightbox-side-gutter: 0px;
@@ -26130,6 +26139,4149 @@ body.is-media-lightbox-open {
   .prototype-page-frame[data-game-frame-page]
   .game-frame-area > [data-game-frame-stretcher] {
     z-index: 3 !important;
+  }
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — SIMPLE COLORED GLASS STACK
+   =========================================================
+   These two non-game pages use one compact responsive treatment across
+   desktop, tablet, and mobile. The authored content consumes the central
+   ~90% of the page opening while the old structural page frame remains the
+   morph/layout container.
+
+   The glass intentionally carries more page accent than the game-info glass.
+   ========================================================= */
+
+.prototype-page-frame[data-page="about"]
+.prototype-page-frame-shell,
+
+.prototype-page-frame[data-page="contact"]
+.prototype-page-frame-shell {
+  /*
+    About/Contact visually resolve into the glass stack rather than the
+    detailed chrome page shell. Keep the SVG in DOM because the shared page
+    geometry/morph system still measures this frame container.
+  */
+  opacity: 0;
+}
+
+
+.prototype-page-frame[data-page="about"]
+.prototype-page-frame-content.simple-page-content,
+
+.prototype-page-frame[data-page="contact"]
+.prototype-page-frame-content.simple-page-content {
+  display: grid;
+  place-items: center;
+
+  overflow: visible;
+
+  padding:
+    clamp(
+      8px,
+      min(1.8cqw, 1.8cqh),
+      18px
+    );
+}
+
+
+.simple-glass-page {
+  position: relative;
+
+  width: 90%;
+  height: 90%;
+
+  min-width: 0;
+  min-height: 0;
+
+  display: grid;
+  place-items: center;
+
+  container-type: size;
+  container-name: simple-glass-page;
+
+  isolation: isolate;
+}
+
+
+.simple-glass-layer {
+  position: absolute;
+
+  pointer-events: none;
+
+  border:
+    1px solid
+    rgba(
+      var(--page-accent-rgb),
+      0.34
+    );
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.24
+      ),
+      rgba(
+        16,
+        20,
+        25,
+        0.66
+      )
+      42%,
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      )
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 44px
+      rgba(
+        var(--page-accent-rgb),
+        0.09
+      ),
+    0 18px 48px rgba(0, 0, 0, 0.30),
+    0 0 34px
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      );
+
+  backdrop-filter:
+    blur(14px)
+    saturate(1.12);
+
+  -webkit-backdrop-filter:
+    blur(14px)
+    saturate(1.12);
+
+  clip-path:
+    polygon(
+      4% 0,
+      100% 0,
+      100% 92%,
+      96% 100%,
+      0 100%,
+      0 8%
+    );
+}
+
+
+.simple-glass-layer--back {
+  inset: 5.5% 1.5% 0 5%;
+
+  opacity: 0.54;
+
+  transform:
+    translate3d(
+      -1.4%,
+      1.8%,
+      0
+    );
+}
+
+
+.simple-glass-layer--middle {
+  inset: 2.8% 3.2% 2.8% 2.5%;
+
+  opacity: 0.70;
+
+  transform:
+    translate3d(
+      1.2%,
+      -0.8%,
+      0
+    );
+}
+
+
+.simple-glass-layer--front {
+  inset: 0;
+
+  opacity: 0.92;
+
+  background:
+    linear-gradient(
+      150deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.29
+      ),
+      rgba(
+        17,
+        21,
+        27,
+        0.70
+      )
+      38%,
+      rgba(
+        var(--page-accent-rgb),
+        0.19
+      )
+      100%
+    );
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.52
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 52px
+      rgba(
+        var(--page-accent-rgb),
+        0.12
+      ),
+    0 22px 58px rgba(0, 0, 0, 0.34),
+    0 0 42px
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      );
+}
+
+
+.simple-glass-content {
+  position: relative;
+  z-index: 2;
+
+  width:
+    min(
+      82%,
+      760px
+    );
+
+  max-height: 82%;
+
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
+  gap:
+    clamp(
+      8px,
+      min(2.1cqw, 2.1cqh),
+      20px
+    );
+
+  color: rgba(244, 247, 250, 0.94);
+}
+
+
+.simple-page-kicker {
+  font-size:
+    clamp(
+      9px,
+      min(1.6cqw, 2.0cqh),
+      13px
+    );
+
+  line-height: 1;
+
+  letter-spacing: 0.22em;
+
+  font-weight: 700;
+
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      0.90
+    );
+}
+
+
+.simple-page-title {
+  margin: 0;
+
+  font-size:
+    clamp(
+      28px,
+      min(7.5cqw, 9.0cqh),
+      64px
+    );
+
+  line-height: 0.95;
+
+  letter-spacing: -0.035em;
+
+  font-weight: 800;
+
+  text-wrap: balance;
+}
+
+
+.simple-page-pronunciation {
+  display: inline-flex;
+  align-items: center;
+
+  max-width: 100%;
+
+  padding:
+    clamp(5px, 1.0cqh, 8px)
+    clamp(9px, 1.8cqw, 14px);
+
+  border:
+    1px solid
+    rgba(
+      var(--page-accent-rgb),
+      0.42
+    );
+
+  background:
+    rgba(
+      var(--page-accent-rgb),
+      0.14
+    );
+
+  box-shadow:
+    inset 0 0 18px
+      rgba(
+        var(--page-accent-rgb),
+        0.08
+      );
+
+  clip-path:
+    polygon(
+      8px 0,
+      100% 0,
+      100% calc(100% - 8px),
+      calc(100% - 8px) 100%,
+      0 100%,
+      0 8px
+    );
+
+  color: rgba(241, 245, 248, 0.80);
+
+  font-size:
+    clamp(
+      10px,
+      min(1.8cqw, 2.2cqh),
+      14px
+    );
+
+  font-style: italic;
+
+  letter-spacing: 0.05em;
+}
+
+
+.simple-page-blurb {
+  margin: 0;
+
+  max-width: 68ch;
+
+  font-size:
+    clamp(
+      12px,
+      min(2.5cqw, 3.0cqh),
+      18px
+    );
+
+  line-height: 1.52;
+
+  color: rgba(239, 243, 246, 0.82);
+
+  text-wrap: pretty;
+}
+
+
+.simple-page-blurb strong {
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      0.98
+    );
+
+  font-weight: 800;
+}
+
+
+.simple-page-facts {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    clamp(
+      6px,
+      min(1.8cqw, 1.8cqh),
+      14px
+    );
+
+  margin-top:
+    clamp(
+      2px,
+      0.8cqh,
+      8px
+    );
+}
+
+
+.simple-page-fact {
+  min-width: 0;
+
+  padding:
+    clamp(
+      8px,
+      1.8cqh,
+      14px
+    )
+    clamp(
+      8px,
+      1.8cqw,
+      14px
+    );
+
+  border-top:
+    1px solid
+    rgba(
+      var(--page-accent-rgb),
+      0.48
+    );
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      ),
+      rgba(
+        var(--page-accent-rgb),
+        0.025
+      )
+    );
+}
+
+
+.simple-page-fact span,
+.simple-page-fact strong {
+  display: block;
+}
+
+
+.simple-page-fact span {
+  margin-bottom:
+    clamp(
+      3px,
+      0.8cqh,
+      6px
+    );
+
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      0.78
+    );
+
+  font-size:
+    clamp(
+      8px,
+      min(1.35cqw, 1.7cqh),
+      11px
+    );
+
+  line-height: 1;
+
+  letter-spacing: 0.16em;
+
+  font-weight: 700;
+}
+
+
+.simple-page-fact strong {
+  color: rgba(246, 248, 250, 0.92);
+
+  font-size:
+    clamp(
+      10px,
+      min(1.9cqw, 2.3cqh),
+      14px
+    );
+
+  line-height: 1.25;
+
+  font-weight: 650;
+}
+
+
+.simple-glass-content--contact {
+  max-width: 620px;
+}
+
+
+/*
+  Very narrow/short openings keep the same visual hierarchy but let the
+  snapshot cards wrap so the prose never gets squeezed out.
+*/
+@container simple-glass-page (max-width: 560px) {
+  .simple-glass-content {
+    width: 84%;
+  }
+
+
+  .simple-page-facts {
+    grid-template-columns:
+      1fr;
+  }
+}
+
+
+@container simple-glass-page (max-height: 500px) {
+  .simple-glass-content {
+    max-height: 88%;
+
+    gap:
+      clamp(
+        5px,
+        1.3cqh,
+        10px
+      );
+  }
+
+
+  .simple-page-pronunciation {
+    padding:
+      4px
+      9px;
+  }
+
+
+  .simple-page-facts {
+    gap: 5px;
+  }
+
+
+  .simple-page-fact {
+    padding:
+      6px
+      9px;
+  }
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — FULL-WIDTH DESKTOP + LOCKED MASTER ANGLE
+   ========================================================= */
+
+/*
+  Derive every glass chamfer from the SAME global angle used by the header,
+  media viewer, and other Y2K geometry. Only the vertical rise changes with
+  size; the slope itself never changes.
+*/
+.simple-glass-page {
+  --simple-glass-corner-angle:
+    calc(
+      var(--button-shear-angle)
+      * -1
+    );
+
+  --simple-glass-corner-rise:
+    clamp(
+      10px,
+      min(2.5cqw, 2.5cqh),
+      24px
+    );
+
+  --simple-glass-corner-run:
+    calc(
+      var(--simple-glass-corner-rise)
+      *
+      tan(
+        var(--simple-glass-corner-angle)
+      )
+    );
+}
+
+
+.simple-glass-layer {
+  clip-path:
+    polygon(
+      var(--simple-glass-corner-run) 0,
+      100% 0,
+      100%
+        calc(
+          100%
+          -
+          var(--simple-glass-corner-rise)
+        ),
+      calc(
+        100%
+        -
+        var(--simple-glass-corner-run)
+      )
+        100%,
+      0 100%,
+      0
+        var(--simple-glass-corner-rise)
+    );
+}
+
+
+.simple-page-pronunciation {
+  --simple-tag-corner-rise:
+    clamp(
+      5px,
+      min(1.1cqw, 1.1cqh),
+      9px
+    );
+
+  --simple-tag-corner-run:
+    calc(
+      var(--simple-tag-corner-rise)
+      *
+      tan(
+        var(--simple-glass-corner-angle)
+      )
+    );
+
+  clip-path:
+    polygon(
+      var(--simple-tag-corner-run) 0,
+      100% 0,
+      100%
+        calc(
+          100%
+          -
+          var(--simple-tag-corner-rise)
+        ),
+      calc(
+        100%
+        -
+        var(--simple-tag-corner-run)
+      )
+        100%,
+      0 100%,
+      0
+        var(--simple-tag-corner-rise)
+    );
+}
+
+
+/*
+  Desktop About / Contact do NOT use the game's left-frame + right-popout
+  composition. They occupy the same broad central canvas as the smaller modes.
+*/
+@media (min-width: 1401px) {
+
+  .prototype-page-frame[data-page="about"],
+  .prototype-page-frame[data-page="contact"] {
+    --simple-desktop-top:
+      var(
+        --desktop-page-area-top,
+        calc(
+          clamp(82px, calc(64px + 3.9vw), 120px)
+          + (clamp(6px, 0.7vw, 10px) * 2)
+          + 18px
+        )
+      );
+
+    /*
+      Use roughly 90% of the available viewport in BOTH axes, centered below
+      the header. The inner glass then uses 90% of this page opening as before.
+    */
+    width: 90vw;
+
+    height:
+      calc(
+        (
+          100vh
+          -
+          var(--simple-desktop-top)
+          -
+          var(--desktop-page-gap)
+        )
+        * 0.90
+      );
+
+    max-width: none;
+
+    left: 5vw;
+    right: auto;
+
+    top:
+      calc(
+        var(--simple-desktop-top)
+        +
+        (
+          (
+            100vh
+            -
+            var(--simple-desktop-top)
+            -
+            var(--desktop-page-gap)
+          )
+          -
+          (
+            (
+              100vh
+              -
+              var(--simple-desktop-top)
+              -
+              var(--desktop-page-gap)
+            )
+            * 0.90
+          )
+        ) / 2
+        +
+        var(--page-frame-shift-y)
+      );
+
+    bottom: auto;
+  }
+
+
+  /*
+    These pages are intentionally single-surface pages on desktop too.
+    Keep the old shared popout markup inert so the game-page system remains
+    untouched.
+  */
+  .prototype-page-frame[data-page="about"]
+  .desktop-secondary-panel,
+
+  .prototype-page-frame[data-page="contact"]
+  .desktop-secondary-panel {
+    display: none !important;
+  }
+
+
+  .prototype-page-frame[data-page="about"]
+  .prototype-page-frame-content.simple-page-content,
+
+  .prototype-page-frame[data-page="contact"]
+  .prototype-page-frame-content.simple-page-content {
+    /*
+      With the SVG shell hidden, let the content use the full desktop page box
+      instead of inheriting the old generated frame-window insets.
+    */
+    inset: 0;
+
+    width: auto;
+    height: auto;
+  }
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — GLASS FILLS THE ACTUAL MORPH TARGET
+   =========================================================
+   The shared page morph has always targeted the full .prototype-page-frame.
+   The visible About/Contact glass was still inset inside that hidden frame,
+   which is why the reverse morph appeared to "grab" a noticeably larger box.
+
+   For these two simple pages, make the glass itself occupy that full target.
+   The CONTENT inside remains comfortably inset, so this changes the visible
+   surface size without turning the text into an edge-to-edge layout.
+   ========================================================= */
+
+.prototype-page-frame[data-page="about"]
+.prototype-page-frame-content.simple-page-content,
+
+.prototype-page-frame[data-page="contact"]
+.prototype-page-frame-content.simple-page-content {
+  /*
+    Ignore the generated transparent-window offsets used by the old chrome
+    shell. These pages no longer show that shell, so their glass should match
+    the full rectangle that the morph system already targets.
+  */
+  inset: 0;
+
+  width: auto;
+  height: auto;
+
+  padding:
+    clamp(
+      8px,
+      min(1.4cqw, 1.4cqh),
+      16px
+    );
+}
+
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-page,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-page {
+  width: 100%;
+  height: 100%;
+}
+
+
+/*
+  Keep a small visual breathing room INSIDE the glass rather than shrinking
+  the glass itself. This preserves the original comfortable composition while
+  making the visible page and the morph target read as the same object.
+*/
+.prototype-page-frame[data-page="about"]
+.simple-glass-content,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-content {
+  width:
+    min(
+      78%,
+      860px
+    );
+
+  max-height: 82%;
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — REMOVE BACKDROP-FILTER COMPOSITOR POP
+   =========================================================
+   The simple glass stack was fading as a child of the morphing/fading page
+   while each layer also owned backdrop-filter. Browsers often promote that
+   combination to a separate compositor surface only when the parent reaches
+   its final opaque state, which creates the little "snap" after the visible
+   fade has otherwise finished.
+
+   Keep the exact translucent/tinted glass look, but make these particular
+   layers purely painted glass. The background video still shows through the
+   alpha; gradients, borders and inset highlights provide the depth without a
+   late compositor handoff.
+   ========================================================= */
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
+  /*
+    Slightly strengthen the painted depth now that there is no live blur.
+    These are static from frame one, so the parent page fade remains the only
+    opacity animation involved.
+  */
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.27
+      ),
+      rgba(
+        16,
+        20,
+        25,
+        0.69
+      )
+      42%,
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      )
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 0 46px
+      rgba(
+        var(--page-accent-rgb),
+        0.10
+      ),
+    0 18px 48px rgba(0, 0, 0, 0.30),
+    0 0 34px
+      rgba(
+        var(--page-accent-rgb),
+        0.11
+      );
+}
+
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer--front,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer--front {
+  background:
+    linear-gradient(
+      150deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.31
+      ),
+      rgba(
+        17,
+        21,
+        27,
+        0.72
+      )
+      38%,
+      rgba(
+        var(--page-accent-rgb),
+        0.21
+      )
+      100%
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.19),
+    inset 0 0 54px
+      rgba(
+        var(--page-accent-rgb),
+        0.13
+      ),
+    0 22px 58px rgba(0, 0, 0, 0.34),
+    0 0 42px
+      rgba(
+        var(--page-accent-rgb),
+        0.17
+      );
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — SYMMETRIC NESTED GLASS STACK
+   =========================================================
+   Replace the previous offset/parallax-style stack with five centered
+   concentric panes. Each layer shares the exact same master-angle chamfer;
+   only its inset, opacity, and tint strength change.
+   ========================================================= */
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer {
+  transform: none;
+  margin: 0;
+
+  /*
+    All layers remain perfectly centered. Individual variants only adjust
+    inset symmetrically, so the stack reads as nested glass instead of cards
+    slipping past one another.
+  */
+}
+
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer--outer,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer--outer {
+  inset: 0;
+
+  opacity: 0.38;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      ),
+      rgba(14, 18, 23, 0.54) 48%,
+      rgba(
+        var(--page-accent-rgb),
+        0.11
+      )
+    );
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.30
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 16px 42px rgba(0, 0, 0, 0.22),
+    0 0 28px
+      rgba(
+        var(--page-accent-rgb),
+        0.08
+      );
+}
+
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer--back,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer--back {
+  inset: 4%;
+
+  opacity: 0.50;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      ),
+      rgba(15, 19, 24, 0.60) 46%,
+      rgba(
+        var(--page-accent-rgb),
+        0.14
+      )
+    );
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.36
+    );
+}
+
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer--middle,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer--middle {
+  inset: 8%;
+
+  opacity: 0.62;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.25
+      ),
+      rgba(16, 20, 25, 0.64) 44%,
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      )
+    );
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.42
+    );
+}
+
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer--inner,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer--inner {
+  inset: 12%;
+
+  opacity: 0.76;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.28
+      ),
+      rgba(16, 20, 25, 0.68) 42%,
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      )
+    );
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.48
+    );
+}
+
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer--front,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer--front {
+  inset: 16%;
+
+  opacity: 0.94;
+
+  background:
+    linear-gradient(
+      150deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.32
+      ),
+      rgba(17, 21, 27, 0.73) 38%,
+      rgba(
+        var(--page-accent-rgb),
+        0.22
+      )
+      100%
+    );
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.56
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 52px
+      rgba(
+        var(--page-accent-rgb),
+        0.12
+      ),
+    0 18px 48px rgba(0, 0, 0, 0.26),
+    0 0 38px
+      rgba(
+        var(--page-accent-rgb),
+        0.15
+      );
+}
+
+
+/*
+  Keep the authored content comfortably inside the innermost pane.
+  The pane nesting itself provides the visual interest, so the copy can stay
+  relatively calm and centered within the composition.
+*/
+.prototype-page-frame[data-page="about"]
+.simple-glass-content,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-content {
+  width:
+    min(
+      60%,
+      760px
+    );
+
+  max-height: 62%;
+}
+
+
+@container simple-glass-page (max-width: 560px) {
+  .prototype-page-frame[data-page="about"]
+  .simple-glass-layer--back,
+
+  .prototype-page-frame[data-page="contact"]
+  .simple-glass-layer--back {
+    inset: 3%;
+  }
+
+
+  .prototype-page-frame[data-page="about"]
+  .simple-glass-layer--middle,
+
+  .prototype-page-frame[data-page="contact"]
+  .simple-glass-layer--middle {
+    inset: 6%;
+  }
+
+
+  .prototype-page-frame[data-page="about"]
+  .simple-glass-layer--inner,
+
+  .prototype-page-frame[data-page="contact"]
+  .simple-glass-layer--inner {
+    inset: 9%;
+  }
+
+
+  .prototype-page-frame[data-page="about"]
+  .simple-glass-layer--front,
+
+  .prototype-page-frame[data-page="contact"]
+  .simple-glass-layer--front {
+    inset: 12%;
+  }
+
+
+  .prototype-page-frame[data-page="about"]
+  .simple-glass-content,
+
+  .prototype-page-frame[data-page="contact"]
+  .simple-glass-content {
+    width: 68%;
+    max-height: 70%;
+  }
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — NESTED GLASS FORMATION / COLLAPSE
+   =========================================================
+   Closed / transitioning-away state:
+     every pane occupies the full outer glass footprint.
+
+   Open state:
+     the four inner panes smoothly contract to their final nested sizes.
+
+   Because this keys directly from the real page's .is-open class, the same
+   transition automatically reverses when the page closes or hands off to the
+   next page. No JS choreography is needed.
+   ========================================================= */
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer {
+  /*
+    Use one common physical footprint for every pane. Their final nesting is
+    produced by scale rather than inset, so they can all begin/end at exactly
+    the same outer boundary.
+  */
+  inset: 0;
+
+  transform-origin: center center;
+
+  transform:
+    scale(1);
+
+  transition:
+    transform
+    var(
+      --prototype-page-frame-fade-duration,
+      850ms
+    )
+    cubic-bezier(0.20, 0.72, 0.22, 1);
+}
+
+
+/*
+  Outer pane is the reference/background footprint and therefore does not
+  move. The remaining four panes contract concentrically.
+*/
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--outer,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--outer {
+  transform:
+    scale(1);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--back,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--back {
+  transform:
+    scale(0.92);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--middle,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--middle {
+  transform:
+    scale(0.84);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--inner,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--inner {
+  transform:
+    scale(0.76);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--front,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--front {
+  transform:
+    scale(0.68);
+}
+
+
+/*
+  The earlier narrow-container pass adjusted the final insets. Since nesting
+  now comes from scale, use slightly gentler target scales on narrow layouts
+  instead of changing physical offsets.
+*/
+@container simple-glass-page (max-width: 560px) {
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--back,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--back {
+    transform:
+      scale(0.94);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--middle,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--middle {
+    transform:
+      scale(0.88);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--inner,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--inner {
+    transform:
+      scale(0.82);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--front,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--front {
+    transform:
+      scale(0.76);
+  }
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — DENSER 8-PANE NEST + LARGE CHAMFERS
+   =========================================================
+   Three additional panes bring the stack to eight total. The overall depth
+   remains almost identical to the previous five-pane version, but the scale
+   steps are smaller so the panes sit much closer together.
+
+   The glass chamfer is also 3x larger while still deriving its slope from the
+   global --button-shear-angle.
+   ========================================================= */
+
+.simple-glass-page {
+  --simple-glass-corner-rise:
+    clamp(
+      30px,
+      min(7.5cqw, 7.5cqh),
+      72px
+    );
+}
+
+
+/*
+  Intermediate pane styling. These intentionally interpolate between the
+  neighboring authored panes rather than introducing a new visual language.
+*/
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer--ring-1,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer--ring-1 {
+  opacity: 0.44;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.20
+      ),
+      rgba(15, 19, 24, 0.57) 47%,
+      rgba(
+        var(--page-accent-rgb),
+        0.125
+      )
+    );
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.33
+    );
+}
+
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer--ring-2,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer--ring-2 {
+  opacity: 0.56;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.235
+      ),
+      rgba(16, 20, 25, 0.62) 45%,
+      rgba(
+        var(--page-accent-rgb),
+        0.15
+      )
+    );
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.39
+    );
+}
+
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer--ring-3,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer--ring-3 {
+  opacity: 0.69;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.265
+      ),
+      rgba(16, 20, 25, 0.66) 43%,
+      rgba(
+        var(--page-accent-rgb),
+        0.17
+      )
+    );
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.45
+    );
+}
+
+
+/*
+  Eight evenly-spaced target scales. All panes still begin at scale(1), so
+  the existing open/close formation effect remains intact.
+*/
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--outer,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--outer {
+  transform:
+    scale(1);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--ring-1,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--ring-1 {
+  transform:
+    scale(0.955);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--back,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--back {
+  transform:
+    scale(0.91);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--ring-2,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--ring-2 {
+  transform:
+    scale(0.865);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--middle,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--middle {
+  transform:
+    scale(0.82);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--ring-3,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--ring-3 {
+  transform:
+    scale(0.775);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--inner,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--inner {
+  transform:
+    scale(0.73);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--front,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--front {
+  transform:
+    scale(0.685);
+}
+
+
+/*
+  On narrow layouts keep the same denser rhythm, just slightly shallower so
+  the innermost pane leaves enough room for the copy.
+*/
+@container simple-glass-page (max-width: 560px) {
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--ring-1,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--ring-1 {
+    transform:
+      scale(0.96);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--back,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--back {
+    transform:
+      scale(0.92);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--ring-2,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--ring-2 {
+    transform:
+      scale(0.88);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--middle,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--middle {
+    transform:
+      scale(0.84);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--ring-3,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--ring-3 {
+    transform:
+      scale(0.80);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--inner,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--inner {
+    transform:
+      scale(0.76);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--front,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--front {
+    transform:
+      scale(0.72);
+  }
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — TIGHTER STACK + FASTER FORMATION
+   =========================================================
+   Halve the distance each pane travels away from scale(1), keeping the same
+   eight-pane ordering but making the final nest roughly twice as tight.
+
+   Also halve the existing formation/collapse duration so the pane movement
+   resolves noticeably faster than the page fade.
+   ========================================================= */
+
+.prototype-page-frame[data-page="about"]
+.simple-glass-layer,
+
+.prototype-page-frame[data-page="contact"]
+.simple-glass-layer {
+  transition:
+    transform
+    calc(
+      var(
+        --prototype-page-frame-fade-duration,
+        850ms
+      )
+      * 0.5
+    )
+    cubic-bezier(0.20, 0.72, 0.22, 1);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--outer,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--outer {
+  transform:
+    scale(1);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--ring-1,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--ring-1 {
+  transform:
+    scale(0.9775);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--back,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--back {
+  transform:
+    scale(0.955);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--ring-2,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--ring-2 {
+  transform:
+    scale(0.9325);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--middle,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--middle {
+  transform:
+    scale(0.91);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--ring-3,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--ring-3 {
+  transform:
+    scale(0.8875);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--inner,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--inner {
+  transform:
+    scale(0.865);
+}
+
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--front,
+
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--front {
+  transform:
+    scale(0.8425);
+}
+
+
+@container simple-glass-page (max-width: 560px) {
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--ring-1,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--ring-1 {
+    transform:
+      scale(0.98);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--back,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--back {
+    transform:
+      scale(0.96);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--ring-2,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--ring-2 {
+    transform:
+      scale(0.94);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--middle,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--middle {
+    transform:
+      scale(0.92);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--ring-3,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--ring-3 {
+    transform:
+      scale(0.90);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--inner,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--inner {
+    transform:
+      scale(0.88);
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--front,
+
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--front {
+    transform:
+      scale(0.86);
+  }
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — RESTORE PREVIOUS DEPTH, KEEP FAST TIMING
+   =========================================================
+   v178's 0.5x duration felt right, but the pane spacing was too compressed.
+   Restore the v177 target scales while leaving the faster transition intact.
+   ========================================================= */
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--outer,
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--outer {
+  transform: scale(1);
+}
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--ring-1,
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--ring-1 {
+  transform: scale(0.955);
+}
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--back,
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--back {
+  transform: scale(0.91);
+}
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--ring-2,
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--ring-2 {
+  transform: scale(0.865);
+}
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--middle,
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--middle {
+  transform: scale(0.82);
+}
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--ring-3,
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--ring-3 {
+  transform: scale(0.775);
+}
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--inner,
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--inner {
+  transform: scale(0.73);
+}
+
+.prototype-page-frame[data-page="about"].is-open
+.simple-glass-layer--front,
+.prototype-page-frame[data-page="contact"].is-open
+.simple-glass-layer--front {
+  transform: scale(0.685);
+}
+
+
+@container simple-glass-page (max-width: 560px) {
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--ring-1,
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--ring-1 {
+    transform: scale(0.96);
+  }
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--back,
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--back {
+    transform: scale(0.92);
+  }
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--ring-2,
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--ring-2 {
+    transform: scale(0.88);
+  }
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--middle,
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--middle {
+    transform: scale(0.84);
+  }
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--ring-3,
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--ring-3 {
+    transform: scale(0.80);
+  }
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--inner,
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--inner {
+    transform: scale(0.76);
+  }
+
+  .prototype-page-frame[data-page="about"].is-open
+  .simple-glass-layer--front,
+  .prototype-page-frame[data-page="contact"].is-open
+  .simple-glass-layer--front {
+    transform: scale(0.72);
+  }
+}
+
+
+/* =========================================================
+   MOBILE SIMPLE PAGES — FAST COPY EXIT
+   =========================================================
+   On About/Contact only, get the readable content out of the way almost
+   immediately when a directional page transition begins. The glass itself
+   continues its normal collapse/slide choreography.
+   ========================================================= */
+
+@media (max-width: 750px) {
+  .prototype-page-frame[data-page="about"]
+  .simple-glass-content,
+  .prototype-page-frame[data-page="contact"]
+  .simple-glass-content {
+    opacity: 1;
+
+    transition:
+      opacity
+      220ms
+      ease-out;
+  }
+
+
+  .prototype-page-frame[data-page="about"].is-mobile-simple-page-exiting
+  .simple-glass-content,
+  .prototype-page-frame[data-page="contact"].is-mobile-simple-page-exiting
+  .simple-glass-content {
+    opacity: 0;
+  }
+}
+
+
+
+/* =========================================================
+   CONTACT PAGE — STANDARD CONTACT / SOCIAL LAYOUT
+   ========================================================= */
+
+.simple-glass-content--contact {
+  width:
+    min(
+      62%,
+      780px
+    );
+
+  max-height: 68%;
+}
+
+
+.contact-page-intro {
+  max-width: 58ch;
+}
+
+
+.contact-email-card,
+.contact-social-card {
+  position: relative;
+
+  width: 100%;
+
+  display: grid;
+  align-items: center;
+
+  color: rgba(247, 249, 251, 0.94);
+  text-decoration: none;
+
+  border:
+    1px solid
+    rgba(
+      var(--page-accent-rgb),
+      0.34
+    );
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.17
+      ),
+      rgba(13, 17, 22, 0.48)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+
+.contact-email-card {
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+
+  gap:
+    clamp(
+      10px,
+      min(2.0cqw, 2.0cqh),
+      18px
+    );
+
+  padding:
+    clamp(
+      12px,
+      min(2.5cqw, 2.5cqh),
+      20px
+    )
+    clamp(
+      14px,
+      min(3.0cqw, 3.0cqh),
+      24px
+    );
+
+  /*
+    Same slope as the rest of the site; only the cut size varies.
+  */
+  --contact-card-corner-rise:
+    clamp(
+      8px,
+      min(1.6cqw, 1.6cqh),
+      14px
+    );
+
+  --contact-card-corner-run:
+    calc(
+      var(--contact-card-corner-rise)
+      *
+      tan(
+        calc(
+          var(--button-shear-angle)
+          * -1
+        )
+      )
+    );
+
+  clip-path:
+    polygon(
+      var(--contact-card-corner-run) 0,
+      100% 0,
+      100%
+        calc(
+          100%
+          -
+          var(--contact-card-corner-rise)
+        ),
+      calc(
+        100%
+        -
+        var(--contact-card-corner-run)
+      )
+        100%,
+      0 100%,
+      0
+        var(--contact-card-corner-rise)
+    );
+}
+
+
+.contact-email-icon {
+  display: grid;
+  place-items: center;
+
+  width:
+    clamp(
+      30px,
+      min(5.5cqw, 6.2cqh),
+      42px
+    );
+
+  aspect-ratio: 1;
+
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      0.96
+    );
+
+  font-size:
+    clamp(
+      17px,
+      min(3.4cqw, 3.8cqh),
+      24px
+    );
+
+  line-height: 1;
+}
+
+
+.contact-email-copy,
+.contact-social-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap:
+    clamp(
+      3px,
+      0.6cqh,
+      6px
+    );
+}
+
+
+.contact-email-copy small,
+.contact-social-heading,
+.contact-social-copy small {
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      0.76
+    );
+
+  font-size:
+    clamp(
+      8px,
+      min(1.35cqw, 1.7cqh),
+      11px
+    );
+
+  line-height: 1.1;
+
+  letter-spacing: 0.15em;
+
+  font-weight: 700;
+}
+
+
+.contact-email-copy strong {
+  overflow-wrap: anywhere;
+
+  font-size:
+    clamp(
+      12px,
+      min(2.35cqw, 2.8cqh),
+      18px
+    );
+
+  line-height: 1.22;
+}
+
+
+.contact-link-arrow {
+  color:
+    rgba(
+      var(--page-accent-rgb),
+      0.90
+    );
+
+  font-size:
+    clamp(
+      22px,
+      min(4.3cqw, 5cqh),
+      32px
+    );
+
+  line-height: 1;
+
+  transform: translateX(0);
+
+  transition:
+    transform 160ms ease;
+}
+
+
+.contact-social-section {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap:
+    clamp(
+      7px,
+      min(1.4cqw, 1.4cqh),
+      12px
+    );
+}
+
+
+.contact-social-heading {
+  padding-left:
+    clamp(
+      2px,
+      0.5cqw,
+      5px
+    );
+}
+
+
+.contact-social-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    clamp(
+      7px,
+      min(1.4cqw, 1.4cqh),
+      12px
+    );
+}
+
+
+.contact-social-card {
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+
+  gap:
+    clamp(
+      7px,
+      min(1.1cqw, 1.1cqh),
+      10px
+    );
+
+  min-width: 0;
+
+  padding:
+    clamp(
+      9px,
+      min(1.8cqw, 2.0cqh),
+      14px
+    );
+}
+
+
+.contact-social-icon {
+  display: block;
+
+  width:
+    clamp(
+      20px,
+      min(3.8cqw, 4.2cqh),
+      28px
+    );
+
+  aspect-ratio: 1;
+
+  /*
+    Simple Icons ships these as black SVGs. Invert them into the site's
+    light-on-glass treatment while keeping the official silhouettes intact.
+  */
+  filter:
+    invert(1)
+    opacity(0.88);
+}
+
+
+.contact-social-copy strong {
+  color: rgba(247, 249, 251, 0.94);
+
+  font-size:
+    clamp(
+      10px,
+      min(1.8cqw, 2.2cqh),
+      14px
+    );
+
+  line-height: 1.1;
+}
+
+
+.contact-social-copy small {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  letter-spacing: 0.02em;
+
+  color: rgba(230, 235, 239, 0.58);
+}
+
+
+.contact-email-card:hover,
+.contact-email-card:focus-visible,
+.contact-social-card:hover,
+.contact-social-card:focus-visible {
+  outline: none;
+
+  border-color:
+    rgba(
+      var(--page-accent-rgb),
+      0.68
+    );
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(
+        var(--page-accent-rgb),
+        0.27
+      ),
+      rgba(14, 18, 23, 0.58)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 18px
+      rgba(
+        var(--page-accent-rgb),
+        0.11
+      );
+
+  transform:
+    translateY(-1px);
+}
+
+
+.contact-email-card:hover
+.contact-link-arrow,
+.contact-email-card:focus-visible
+.contact-link-arrow,
+.contact-social-card:hover
+.contact-link-arrow,
+.contact-social-card:focus-visible
+.contact-link-arrow {
+  transform:
+    translateX(3px);
+}
+
+
+@container simple-glass-page (max-width: 750px) {
+  .simple-glass-content--contact {
+    width: 68%;
+    max-height: 72%;
+  }
+
+
+  .contact-social-grid {
+    grid-template-columns:
+      1fr;
+  }
+}
+
+
+@container simple-glass-page (max-height: 560px) {
+  .simple-glass-content--contact {
+    max-height: 76%;
+
+    gap:
+      clamp(
+        5px,
+        1.0cqh,
+        9px
+      );
+  }
+
+
+  .contact-email-card {
+    padding:
+      9px
+      12px;
+  }
+
+
+  .contact-social-card {
+    padding:
+      7px
+      9px;
+  }
+}
+
+
+
+/* =========================================================
+   GAME INFO GLASS — MOVE FOREGROUND PANE ABOVE LOGO
+   =========================================================
+   The fourth / foreground pane used to begin around the feature/facts area,
+   putting its top edge directly through readable information.
+
+   Keep the pane itself and its bottom/right geometry unchanged; simply move
+   its top edge upward so the line sits above the game identity/logo instead.
+   This is intentionally a fixed authored position rather than a measured one.
+   ========================================================= */
+
+/* Desktop popout info panels. */
+@media (min-width: 1401px) {
+  #brobots-page-frame
+  .desktop-secondary-panel
+  .etherian-popout-glass-layer--4,
+
+  #etherian-page-frame
+  .desktop-secondary-panel
+  .etherian-popout-glass-layer--4,
+
+  #halodoom-page-frame
+  .desktop-secondary-panel
+  .etherian-popout-glass-layer--4 {
+    top: 12% !important;
+  }
+}
+
+
+/* Tablet + mobile in-frame info panels. */
+@media (max-width: 1400px) {
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--4 {
+    top: 8% !important;
+  }
+}
+
+
+
+/* =========================================================
+   GAME INFO GLASS — LOWER FOREGROUND PANE SLIGHTLY ON DESKTOP
+   =========================================================
+   v182 moved the fourth pane high enough to clear the content, but on the
+   desktop popout it now sits too close to the pane above and the two surfaces
+   visually merge.
+
+   Drop only the desktop popout version a little so the layer spacing reads
+   clearly again. Tablet/mobile keep the v182 position.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+  #brobots-page-frame
+  .desktop-secondary-panel
+  .etherian-popout-glass-layer--4,
+
+  #etherian-page-frame
+  .desktop-secondary-panel
+  .etherian-popout-glass-layer--4,
+
+  #halodoom-page-frame
+  .desktop-secondary-panel
+  .etherian-popout-glass-layer--4 {
+    top: 18% !important;
+  }
+}
+
+
+
+/* =========================================================
+   TABLET / MOBILE GAME INFO — CLEANER PANE RHYTHM
+   =========================================================
+   The in-frame stack had accumulated unrelated left/right/top offsets, so the
+   sheets felt slightly accidental compared with the desktop popout.
+
+   Give all four panes one clear nesting rule:
+     - shared left edge
+     - progressively larger top/right/bottom inset
+     - even visual spacing between layers
+     - foreground pane still begins above the game logo
+
+   This affects only the tablet/mobile in-frame info stack.
+   ========================================================= */
+
+@media (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--1 {
+    inset:
+      0%
+      1.5%
+      2.5%
+      0% !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--2 {
+    inset:
+      3%
+      5%
+      6%
+      0% !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--3 {
+    inset:
+      6%
+      9%
+      9.5%
+      0% !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--4 {
+    left: 0% !important;
+    right: 13% !important;
+    top: 9% !important;
+    bottom: 13% !important;
+  }
+}
+
+
+
+/* =========================================================
+   TABLET / MOBILE GAME INFO — LOOSEN THE PANE RHYTHM
+   =========================================================
+   v184 became a little too mathematically nested. Keep the cleaner overall
+   flow, but reintroduce a small amount of asymmetry so the sheets feel layered
+   rather than diagrammed.
+
+   The offsets are still deliberate, just not perfectly incremental.
+   ========================================================= */
+
+@media (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--1 {
+    inset:
+      0%
+      1.5%
+      3%
+      0% !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--2 {
+    inset:
+      4%
+      5.5%
+      5.5%
+      1.2% !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--3 {
+    inset:
+      7%
+      10.5%
+      10%
+      2.6% !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-tablet-glass-stack
+  .etherian-popout-glass-layer--4 {
+    left: 1.4% !important;
+    right: 14.5% !important;
+    top: 10% !important;
+    bottom: 11.5% !important;
+  }
+}
+
+
+
+/* =========================================================
+   HEADER BANNER — INSET TO THE VIEWPORT FRAME STRETCH WIDTH
+   =========================================================
+   The viewport frame's straight stretch strips are authored at 21px when the
+   banner/header reference height is 120px.
+
+   Use that same ratio here so the banner always sits just INSIDE the outer
+   viewport frame:
+     - top buffer = outer stretch-strip thickness
+     - left/right buffer = outer stretch-strip thickness
+     - the fixed corner art can still overlap the banner naturally because the
+       viewport frame is layered above the header
+     - the straight stretch bars no longer sit on top of the banner
+
+   Header content uses the exact same inset box, so logo + nav/hamburger move
+   together with the banner instead of needing individual offsets.
+   ========================================================= */
+
+.site-header {
+  --banner-frame-buffer:
+    calc(
+      var(--frame-height)
+      * 21
+      / 120
+    );
+
+  /*
+    Keep the banner tight to its own lower edge; only the sides that touch the
+    viewport's top/side frame need the stretch-width clearance.
+  */
+  padding:
+    var(--banner-frame-buffer)
+    var(--banner-frame-buffer)
+    0;
+}
+
+
+.header-content {
+  top:
+    var(--banner-frame-buffer);
+
+  right:
+    var(--banner-frame-buffer);
+
+  bottom:
+    0;
+
+  left:
+    var(--banner-frame-buffer);
+}
+
+
+/*
+  The <=485px header is uniformly scaled as one frozen composition. Because
+  --banner-frame-buffer derives from the frozen --frame-height, it scales by
+  exactly the same factor as the viewport-frame stretch strips without a
+  second mobile-specific magic number.
+*/
+@media (max-width: 485px) {
+  .site-header {
+    --banner-frame-buffer:
+      calc(
+        var(--frame-height)
+        * 21
+        / 120
+      );
+  }
+}
+
+
+
+/* =========================================================
+   HEADER BANNER — NUDGE UP INTO OUTER FRAME
+   =========================================================
+   Keep the stretch-width side buffers, but pull the whole banner/header
+   content upward a few pixels so the top edge visually tucks under the
+   viewport frame instead of leaving a hairline gap.
+   ========================================================= */
+
+.site-header {
+  --banner-frame-overlap-y: 6px;
+
+  padding-top:
+    calc(
+      var(--banner-frame-buffer)
+      -
+      var(--banner-frame-overlap-y)
+    );
+}
+
+
+.header-content {
+  top:
+    calc(
+      var(--banner-frame-buffer)
+      -
+      var(--banner-frame-overlap-y)
+    );
+}
+
+
+
+/* =========================================================
+   HEADER / MENU TYPOGRAPHY — MICHROMA TEST PASS
+   =========================================================
+   Use Michroma for the navigation labels so the UI picks up more of the
+   wide, geometric Y2K character of the Simulacrum wordmark without changing
+   any button geometry or spacing yet.
+   ========================================================= */
+
+
+.nav-button,
+.mobile-menu-link {
+  font-family:
+    "Michroma",
+    system-ui,
+    sans-serif;
+}
+
+
+
+/* =========================================================
+   HEADER / MENU TYPOGRAPHY — SLIGHTLY SMALLER MICHROMA
+   =========================================================
+   Reduce only the readable text by 2px. Keep the tablet icon glyphs and
+   all button geometry unchanged.
+   ========================================================= */
+
+.nav-button .nav-label {
+  font-size:
+    clamp(
+      8px,
+      calc(0.68vw - 2px),
+      12px
+    );
+}
+
+.mobile-menu-link-text {
+  font-size:
+    clamp(
+      15px,
+      calc(3vw - 2px),
+      20px
+    );
+}
+
+
+
+/* =========================================================
+   ABOUT / CONTACT — MICHROMA DISPLAY TYPOGRAPHY
+   =========================================================
+   Carry the header's Michroma treatment into the simple pages for their
+   display/UI typography, while leaving paragraph copy in the existing body
+   font for readability.
+   ========================================================= */
+
+.prototype-page-frame[data-page="about"] .simple-page-title,
+.prototype-page-frame[data-page="contact"] .simple-page-title,
+.prototype-page-frame[data-page="about"] .simple-page-kicker,
+.prototype-page-frame[data-page="contact"] .simple-page-kicker,
+.prototype-page-frame[data-page="about"] .simple-page-pronunciation,
+.prototype-page-frame[data-page="about"] .simple-page-fact span,
+.prototype-page-frame[data-page="about"] .simple-page-fact strong,
+.prototype-page-frame[data-page="contact"] .contact-email-copy small,
+.prototype-page-frame[data-page="contact"] .contact-email-copy strong,
+.prototype-page-frame[data-page="contact"] .contact-social-heading,
+.prototype-page-frame[data-page="contact"] .contact-social-copy strong,
+.prototype-page-frame[data-page="contact"] .contact-social-copy small {
+  font-family:
+    "Michroma",
+    system-ui,
+    sans-serif;
+}
+
+
+
+/* =========================================================
+   GAME INFO PAGES — MICHROMA ONLY ON SMALL HEADERS
+   =========================================================
+   Keep the game info layouts stable by limiting Michroma to:
+     - the short descriptor directly under each game logo
+     - the three fact headers above the action buttons
+
+   Body copy, feature rows, fact values and buttons retain their existing
+   typography and sizing.
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page] .game-info-kicker,
+.prototype-page-frame[data-game-frame-page] .game-info-fact span {
+  font-family:
+    "Michroma",
+    system-ui,
+    sans-serif;
+}
+
+
+/* =========================================================
+   TABLET NAV ICONS — RASTER ASSETS
+   =========================================================
+   Use authored PNG icons from assets/header instead of the temporary
+   inline-SVG approximations. Keep the existing .nav-icon wrapper so the
+   tablet button layout and responsive behavior remain unchanged.
+   ========================================================= */
+
+.nav-icon {
+  width: 2.4em;
+  height: 2.4em;
+}
+
+.nav-icon-image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+
+  max-width: none;
+  max-height: none;
+
+  pointer-events: none;
+  user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+
+
+/* =========================================================
+   MOBILE MENU — USE PAGE ICON PNGS IN PLACE OF TRIANGLE MOTIFS
+   =========================================================
+   Reuse the same authored header icons as tablet nav. Keep the existing
+   .mobile-menu-link-motif wrapper so menu spacing/alignment stays intact.
+   ========================================================= */
+
+.mobile-menu-link-motif {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-link-icon-image {
+  display: block;
+
+  width: 2.1em;
+  height: 2.1em;
+
+  object-fit: contain;
+  object-position: center;
+
+  max-width: none;
+  max-height: none;
+
+  pointer-events: none;
+  user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+
+
+/* =========================================================
+   GAME INFO FEATURE DESCRIPTIONS — TWO-LINE WRAP
+   =========================================================
+   The feature descriptions were originally forced onto one line with an
+   ellipsis. Allow the existing text area to use a second line instead,
+   without changing the feature-grid proportions. This applies to every
+   game info page that uses the shared game-info structure.
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page]
+.game-info-feature-copy small {
+  overflow: visible;
+
+  white-space: normal;
+
+  text-overflow: clip;
+
+  /*
+    Reserve a consistent two-line text area so rows remain aligned even
+    when one description happens to fit on a single line.
+  */
+  min-height: 2.44em;
+}
+
+
+/* =========================================================
+   ETHERIAN + HALODOOM FEATURE DESCRIPTIONS — MATCH BROBOTS
+   =========================================================
+   Brobots already allows the mid-row description copy to breathe across
+   two lines. Etherian and Halodoom still had stronger page-specific rules
+   forcing a single-line ellipsis.
+
+   Override those more specific rules directly so all game pages share the
+   same behavior: same width/proportions, but description copy may wrap to
+   a second line instead of being cut off.
+   ========================================================= */
+
+#brobots-page-frame .game-info-feature-copy small,
+#etherian-page-frame .game-info-feature-copy small,
+#etherian-page-frame.is-info-compact .game-info-feature-copy small,
+#etherian-page-frame.is-info-tight .game-info-feature-copy small,
+#halodoom-page-frame .game-info-feature-copy small,
+#halodoom-page-frame.is-info-compact .game-info-feature-copy small,
+#halodoom-page-frame.is-info-tight .game-info-feature-copy small,
+.prototype-page-frame[data-game-frame-page] .game-info-feature-copy small {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+
+  overflow: hidden !important;
+  white-space: normal !important;
+  text-overflow: clip !important;
+
+  line-height: 1.22;
+  min-height: calc(1.22em * 2);
+}
+
+
+/* =========================================================
+   MOBILE GAME FACTS — FIT LONGER REAL CONTENT
+   =========================================================
+   The original metadata values were short placeholders, so the three-column
+   row could afford larger type plus ellipsis. Real values such as
+   "PC VR (Steam, Viveport)" and "Adventure / Platformer" need the type to
+   scale down instead of being visibly chopped.
+   ========================================================= */
+
+@media (max-width: 750px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-fact span {
+    font-size:
+      clamp(
+        6.5px,
+        1.65cqw,
+        8.5px
+      ) !important;
+
+    letter-spacing: 0.10em;
+
+    white-space: normal;
+    overflow-wrap: normal;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-fact strong {
+    font-size:
+      clamp(
+        6.5px,
+        1.70cqw,
+        8.75px
+      ) !important;
+
+    line-height: 1.18;
+
+    /*
+      Real metadata values are not guaranteed to fit on one line.
+      Let every game page use up to two lines here instead of shrinking
+      Brobots differently or clipping longer values.
+    */
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+
+    overflow-wrap: normal;
+    word-break: normal;
+
+    min-height: calc(1.18em * 2);
+  }
+}
+
+
+/* =========================================================
+   MOBILE GAME FACTS — SECOND LINE WITHOUT RESERVING HEIGHT
+   =========================================================
+   Let long metadata values wrap, but keep the metadata row sized as though
+   the value were one line tall. A second line is allowed to paint into the
+   existing breathing room below instead of making the entire facts row taller.
+   This is shared by Brobots, Etherian, and Halodoom.
+   ========================================================= */
+
+@media (max-width: 750px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-fact strong {
+    min-height: 0 !important;
+    height: 1.18em;
+
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+
+  /*
+    Let the two action buttons get shallower as the phone gets narrower.
+    Width/layout stays exactly the same; only their vertical footprint scales.
+  */
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action {
+    min-height:
+      clamp(
+        32px,
+        8vw,
+        46px
+      ) !important;
+
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE GAME BLURBS — SLIGHTLY SMALLER
+   =========================================================
+   The mobile blurb currently dominates the visual hierarchy a little too
+   much compared with the feature rows, facts, and actions. Reduce it gently
+   on all game pages while preserving the existing fitter behavior.
+   ========================================================= */
+
+@media (max-width: 750px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-blurb {
+    font-size:
+      clamp(
+        7px,
+        1.75vw,
+        9px
+      ) !important;
+
+    line-height: 1.38;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE GAME BLURB — ACTUAL FITTER CEILING
+   =========================================================
+   The earlier mobile size tweak was being beaten by the higher-specificity
+   shared fitter selector. Match that selector here so the JS fitter sees the
+   smaller mobile size as its STARTING / MAXIMUM size, then can still shrink
+   farther if the rest of the info panel needs room.
+   ========================================================= */
+
+@media (max-width: 750px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page].is-info-compact
+  .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page].is-info-tight
+  .game-info-blurb,
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-info-blurb {
+    --game-info-blurb-min-size: 8.5px;
+
+    font-size:
+      var(
+        --game-info-blurb-fit-size,
+        clamp(
+          10px,
+          2.35vw,
+          12px
+        )
+      )
+      !important;
+
+    line-height: 1.40;
+  }
+}
+
+
+
+/* =========================================================
+   TABLET GAME INFO — LARGER FOUR-PART FEATURE STRIP
+   =========================================================
+   The four feature rows were reading much smaller than the rest of the
+   tablet info panel. Increase only their icon/title/description typography;
+   keep the existing two-column proportions and spacing intact.
+   ========================================================= */
+
+@media (min-width: 751px) and (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-feature-icon,
+  .prototype-page-frame[data-game-frame-page].is-info-compact
+  .game-info-feature-icon,
+  .prototype-page-frame[data-game-frame-page].is-info-tight
+  .game-info-feature-icon {
+    font-size:
+      clamp(
+        17px,
+        1.18cqw,
+        23px
+      ) !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-feature-copy strong,
+  .prototype-page-frame[data-game-frame-page].is-info-compact
+  .game-info-feature-copy strong,
+  .prototype-page-frame[data-game-frame-page].is-info-tight
+  .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        9.5px,
+        0.64cqw,
+        11.5px
+      ) !important;
+
+    line-height: 1.16;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-feature-copy small,
+  .prototype-page-frame[data-game-frame-page].is-info-compact
+  .game-info-feature-copy small,
+  .prototype-page-frame[data-game-frame-page].is-info-tight
+  .game-info-feature-copy small {
+    font-size:
+      clamp(
+        8.5px,
+        0.58cqw,
+        10.5px
+      ) !important;
+
+    line-height: 1.25;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE GAME FEATURES — FIT LONG COPY INSTEAD OF CUTTING IT
+   =========================================================
+   The shared desktop/tablet rule intentionally caps feature descriptions
+   at two lines. On phones the columns are much narrower, so some real copy
+   needs a third line. Let the mobile feature copy use up to three lines and
+   scale a little smaller as the viewport narrows instead of clipping it.
+   ========================================================= */
+
+@media (max-width: 750px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-feature-copy strong,
+  .prototype-page-frame[data-game-frame-page].is-info-compact
+  .game-info-feature-copy strong,
+  .prototype-page-frame[data-game-frame-page].is-info-tight
+  .game-info-feature-copy strong {
+    font-size:
+      clamp(
+        7px,
+        1.75vw,
+        9px
+      ) !important;
+
+    line-height: 1.16;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-feature-copy small,
+  .prototype-page-frame[data-game-frame-page].is-info-compact
+  .game-info-feature-copy small,
+  .prototype-page-frame[data-game-frame-page].is-info-tight
+  .game-info-feature-copy small {
+    display: -webkit-box !important;
+
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 3 !important;
+    line-clamp: 3;
+
+    font-size:
+      clamp(
+        6.5px,
+        1.55vw,
+        8px
+      ) !important;
+
+    line-height: 1.18;
+
+    min-height: 0 !important;
+
+    overflow: hidden !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE LANDSCAPE GUARD — ALLOW AN OPEN LIGHTBOX THROUGH
+   =========================================================
+   Keep the existing portrait-only site lock. The one exception is the
+   screenshot lightbox: if it is already open, rotating a phone/tablet may
+   reveal and interact with the lightbox normally. Closing it in landscape
+   returns immediately to the existing rotate-to-portrait guard.
+   ========================================================= */
+
+@media
+  (orientation: landscape)
+  and (pointer: coarse)
+  and (max-height: 600px) {
+
+  body:has(> .media-lightbox.is-open)::before,
+  body:has(> .media-lightbox.is-closing)::before {
+    content: none !important;
+    display: none !important;
+  }
+
+
+  body:has(> .media-lightbox.is-open)
+  > .media-lightbox,
+
+  body:has(> .media-lightbox.is-closing)
+  > .media-lightbox {
+    pointer-events: auto !important;
+    user-select: auto !important;
+  }
+
+
+  /*
+    Landscape phones are often wider than the normal 840px mobile breakpoint.
+    Keep the fullscreen image edge-to-edge anyway, with compact vertical
+    gutters that suit the short landscape viewport.
+  */
+  .media-lightbox {
+    --media-lightbox-side-gutter: 0px;
+    --media-lightbox-top-gutter:
+      clamp(54px, 13vh, 72px);
+    --media-lightbox-bottom-gutter:
+      clamp(10px, 3vh, 22px);
+  }
+
+
+  .media-lightbox-image {
+    max-width: 100vw;
+  }
+
+
+  .media-lightbox-arrow {
+    z-index: 2;
+
+    top:
+      calc(
+        50% +
+        (
+          var(--media-lightbox-top-gutter) -
+          var(--media-lightbox-bottom-gutter)
+        ) / 2
+      );
+  }
+
+
+  .media-lightbox-arrow--previous {
+    left:
+      max(
+        4px,
+        env(safe-area-inset-left)
+      );
+  }
+
+
+  .media-lightbox-arrow--next {
+    right:
+      max(
+        4px,
+        env(safe-area-inset-right)
+      );
+  }
+}
+
+
+/* =========================================================
+   TABLET / MOBILE LIGHTBOX — TOUCH GESTURE OWNERSHIP
+   =========================================================
+   Fullscreen screenshots now own direct touch gestures:
+     swipe LEFT  -> next screenshot
+     swipe RIGHT -> previous screenshot
+     swipe UP/DOWN -> close lightbox
+   ========================================================= */
+
+@media (max-width: 1400px) {
+  .media-lightbox.is-open {
+    touch-action: none;
+  }
+
+  .media-lightbox-image {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+}
+
+
+/* =========================================================
+   TABLET / MOBILE LIGHTBOX — HERO-STYLE IMAGE WIPE
+   =========================================================
+   Horizontal lightbox swipes now use the same visual language as the mobile
+   hero: the outgoing screenshot stays still while the incoming screenshot is
+   revealed by a width-growing layer with a soft feathered leading edge.
+   ========================================================= */
+
+@media (max-width: 1400px) {
+
+  .media-lightbox-wipe-layer {
+    position: absolute;
+
+    top:
+      var(--media-lightbox-top-gutter);
+
+    bottom:
+      var(--media-lightbox-bottom-gutter);
+
+    width: 0;
+
+    overflow: hidden;
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    will-change: width;
+
+    animation: none;
+  }
+
+
+  /*
+    The inner canvas always retains the FULL safe lightbox width while the
+    outer wrapper clips it. That keeps the incoming screenshot centered at
+    its final geometry throughout the wipe instead of squashing/stretching.
+  */
+  .media-lightbox-wipe-canvas {
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+
+    width:
+      calc(
+        100vw -
+        (var(--media-lightbox-side-gutter) * 2)
+      );
+
+    display: grid;
+    place-items: center;
+
+    pointer-events: none;
+  }
+
+
+  .media-lightbox-wipe-image {
+    display: block;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+
+    box-shadow:
+      0 18px 60px
+      rgba(0, 0, 0, 0.58);
+
+    pointer-events: none;
+    user-select: none;
+
+    -webkit-user-drag: none;
+  }
+
+
+  /*
+    NEXT / finger swipes left:
+    reveal the incoming screenshot inward from the RIGHT edge.
+  */
+  .media-lightbox-wipe-layer.is-wipe-forward {
+    right:
+      var(--media-lightbox-side-gutter);
+
+    left: auto;
+
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0,
+        rgba(0, 0, 0, 0.18) 12px,
+        rgba(0, 0, 0, 0.72) 30px,
+        #000 52px,
+        #000 100%
+      );
+
+    mask-image:
+      linear-gradient(
+        90deg,
+        transparent 0,
+        rgba(0, 0, 0, 0.18) 12px,
+        rgba(0, 0, 0, 0.72) 30px,
+        #000 52px,
+        #000 100%
+      );
+  }
+
+
+  .media-lightbox-wipe-layer.is-wipe-forward
+  .media-lightbox-wipe-canvas {
+    right: 0;
+    left: auto;
+  }
+
+
+  /*
+    PREVIOUS / finger swipes right:
+    reveal the incoming screenshot inward from the LEFT edge.
+  */
+  .media-lightbox-wipe-layer.is-wipe-backward {
+    left:
+      var(--media-lightbox-side-gutter);
+
+    right: auto;
+
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        #000 0,
+        #000 calc(100% - 52px),
+        rgba(0, 0, 0, 0.72) calc(100% - 30px),
+        rgba(0, 0, 0, 0.18) calc(100% - 12px),
+        transparent 100%
+      );
+
+    mask-image:
+      linear-gradient(
+        90deg,
+        #000 0,
+        #000 calc(100% - 52px),
+        rgba(0, 0, 0, 0.72) calc(100% - 30px),
+        rgba(0, 0, 0, 0.18) calc(100% - 12px),
+        transparent 100%
+      );
+  }
+
+
+  .media-lightbox-wipe-layer.is-wipe-backward
+  .media-lightbox-wipe-canvas {
+    left: 0;
+    right: auto;
+  }
+
+
+  .media-lightbox-wipe-layer.is-wipe-running {
+    animation:
+      media-lightbox-layer-reveal
+      380ms
+      cubic-bezier(0.22, 0.72, 0.24, 1)
+      both;
+  }
+
+
+  @keyframes media-lightbox-layer-reveal {
+    from {
+      width: 0;
+    }
+
+    to {
+      width:
+        calc(
+          100vw -
+          (var(--media-lightbox-side-gutter) * 2)
+        );
+    }
+  }
+}
+
+
+/* =========================================================
+   GAME INFO ACTIONS — LIVE EXTERNAL LINKS + RESPONSIVE LABELS
+   =========================================================
+   Etherian / Halodoom actions are now real <a> elements. Desktop uses the
+   explicit "Download on ..." wording, while tablet/mobile use the shorter
+   "View on ..." label requested for the tighter layouts.
+   ========================================================= */
+
+.game-info-action[href] {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.game-info-action[href]:visited {
+  color: inherit;
+}
+
+.game-info-action-label {
+  min-width: 0;
+}
+
+.game-info-action-label--desktop {
+  display: none;
+}
+
+.game-info-action-label--compact {
+  display: inline;
+}
+
+@media (min-width: 1401px) {
+  .game-info-action-label--desktop {
+    display: inline;
+  }
+
+  .game-info-action-label--compact {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   ABOUT — INTERNAL PAGE JUMP LINK
+   =========================================================
+   "Latest Release — Halodoom" behaves like the normal Halodoom nav button
+   while retaining the visual treatment of the About facts.
+   ========================================================= */
+
+.simple-page-fact-link {
+  color: inherit;
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    color 160ms ease,
+    text-shadow 160ms ease;
+}
+
+.simple-page-fact-link:hover,
+.simple-page-fact-link:focus-visible {
+  color:
+    rgb(
+      var(--accent-halodoom-rgb)
+    );
+
+  text-shadow:
+    0 0 8px
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.28
+    );
+}
+
+.simple-page-fact-link:focus-visible {
+  outline:
+    1px solid
+    rgba(
+      var(--accent-halodoom-rgb),
+      0.62
+    );
+
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   DESKTOP GAME INFO BUTTONS — HOVER / FOCUS RESPONSE
+   =========================================================
+   Give the live Etherian / Halodoom CTA links the same kind of responsive
+   accent treatment as the main header buttons, while leaving tablet/mobile
+   touch presentation untouched.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href] {
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href]:hover,
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href]:focus-visible {
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.82
+      );
+
+    background:
+      color-mix(
+        in srgb,
+        rgb(var(--page-accent-rgb)) 24%,
+        rgba(15, 21, 25, 0.42)
+      );
+
+    box-shadow:
+      inset 0 0 0 1px
+      rgba(
+        var(--page-accent-rgb),
+        0.18
+      ),
+      0 0 16px
+      rgba(
+        var(--page-accent-rgb),
+        0.12
+      );
+
+    color:
+      rgba(
+        255,
+        255,
+        255,
+        0.98
+      );
+
+    transform:
+      translateY(-1px);
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href]:focus-visible {
+    outline:
+      2px solid
+      rgba(
+        var(--page-accent-rgb),
+        0.70
+      );
+
+    outline-offset: 2px;
+  }
+}
+
+
+/* =========================================================
+   DESKTOP GAME INFO BUTTONS — MATCH CONTACT CARD HOVER
+   =========================================================
+   Refine the previous CTA hover pass so these use the same interaction
+   language as the Contact-page cards: stronger accent border, diagonal
+   accent-to-dark glass fill, subtle inner highlight/glow, 1px lift, and
+   a small arrow nudge to the right.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href] {
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      transform 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href] > span[aria-hidden="true"] {
+    transform: translateX(0);
+
+    transition:
+      transform 160ms ease;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href]:hover,
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href]:focus-visible {
+    outline: none;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.68
+      );
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.27
+        ),
+        rgba(14, 18, 23, 0.58)
+      );
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 18px
+      rgba(
+        var(--page-accent-rgb),
+        0.11
+      );
+
+    transform:
+      translateY(-1px);
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href]:hover
+  > span[aria-hidden="true"],
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href]:focus-visible
+  > span[aria-hidden="true"] {
+    transform:
+      translateX(3px);
+  }
+}
+
+
+/* =========================================================
+   DESKTOP GAME INFO BUTTONS — CONTACT CARD HOVER, EXACT PASS
+   =========================================================
+   Match the Contact-page card interaction directly, but use each game's
+   own --page-accent-rgb. Also override the older cursor: default rule so
+   these live links show the normal pointer hand.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href] {
+    cursor: pointer !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href]:hover,
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action[href]:focus-visible {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(
+          var(--page-accent-rgb),
+          0.27
+        ),
+        rgba(
+          255,
+          255,
+          255,
+          0.18
+        )
+      ) !important;
+
+    border-color:
+      rgba(
+        var(--page-accent-rgb),
+        0.68
+      ) !important;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 18px
+      rgba(
+        var(--page-accent-rgb),
+        0.11
+      ) !important;
+
+    transform:
+      translateY(-1px);
+  }
+}
+
+
+/* =========================================================
+   DESKTOP SECONDARY INFO BUTTONS — DARK-TO-WHITE HOVER
+   =========================================================
+   "Watch Trailer" starts from the quieter dark glass treatment, so keep
+   that dark tone as the first side of its hover gradient rather than
+   introducing the page accent color. The primary store/download button
+   keeps the page-color -> white hover from the previous pass.
+   ========================================================= */
+
+@media (min-width: 1401px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action--secondary[href]:hover,
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-info-action--secondary[href]:focus-visible {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(15, 21, 25, 0.42),
+        rgba(
+          255,
+          255,
+          255,
+          0.18
+        )
+      ) !important;
+  }
+}
+
+
+/* =========================================================
+   INFO TEXT — BASIC DROP SHADOW
+   =========================================================
+   Apply a small, readable shadow to the text content on About, Contact,
+   and all game info panels without affecting frame art, media, or icons.
+   ========================================================= */
+
+.simple-glass-content,
+.prototype-page-frame[data-game-frame-page] .game-info-surface {
+  text-shadow:
+    0 2px 4px
+    rgba(0, 0, 0, 0.72),
+    0 0 2px
+    rgba(0, 0, 0, 0.48);
+}
+
+
+/*
+  A few nested elements define their own text rendering or are icon-like;
+  keep the shadow on actual textual content while avoiding unnecessary
+  glow on raster/SVG imagery.
+*/
+.simple-glass-content img,
+.simple-glass-content svg,
+.prototype-page-frame[data-game-frame-page] .game-info-surface img,
+.prototype-page-frame[data-game-frame-page] .game-info-surface svg {
+  text-shadow: none;
+}
+
+
+/* =========================================================
+   RESPONSIVE NAV MODE — AUTHORITATIVE FINAL HANDOFF
+   =========================================================
+   Phones use the hamburger at <=750px.
+   Tablet/compact desktop use the five icon buttons at >=751px.
+   These final rules intentionally own visibility so older header rules
+   cannot accidentally keep the hamburger active in tablet widths.
+   ========================================================= */
+
+@media (max-width: 750px) {
+  .main-nav {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .menu-toggle {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+}
+
+@media (min-width: 751px) {
+  .main-nav {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .menu-toggle {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .mobile-menu {
+    display: none !important;
+  }
+}
+
+
+/* =========================================================
+   STARTUP PRELOADER
+   =========================================================
+   Covers the site while critical UI/frame artwork is warming the browser
+   cache. The main page initializes normally underneath it, so removing the
+   loader does not introduce another responsive/layout handoff.
+   ========================================================= */
+
+.site-preloader {
+  position: fixed;
+  inset: 0;
+
+  z-index: 10000;
+
+  display: grid;
+  place-items: center;
+
+  padding:
+    clamp(24px, 6vw, 72px);
+
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(71, 72, 71, 0.72),
+      rgba(20, 21, 21, 0.96) 58%,
+      rgba(8, 9, 9, 1) 100%
+    );
+
+  opacity: 1;
+  visibility: visible;
+
+  pointer-events: auto;
+
+  transition:
+    opacity 420ms ease,
+    visibility 0s linear 420ms;
+}
+
+
+.site-preloader.is-preloader-leaving {
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+}
+
+
+.site-preloader-inner {
+  width:
+    min(
+      82vw,
+      420px
+    );
+
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    auto;
+
+  align-items: end;
+
+  gap:
+    8px
+    12px;
+}
+
+
+.site-preloader-logo {
+  grid-column: 1 / -1;
+
+  display: block;
+
+  width:
+    min(
+      76%,
+      310px
+    );
+
+  height: auto;
+
+  margin:
+    0
+    auto
+    clamp(14px, 3vh, 28px);
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 5px 14px
+      rgba(0, 0, 0, 0.52)
+    );
+}
+
+
+.site-preloader-label {
+  grid-column: 1 / -1;
+
+  color:
+    rgba(240, 240, 240, 0.82);
+
+  font-family:
+    "Michroma",
+    system-ui,
+    sans-serif;
+
+  font-size:
+    clamp(8px, 1.55vw, 11px);
+
+  letter-spacing:
+    0.28em;
+
+  text-align: center;
+}
+
+
+.site-preloader-track {
+  grid-column: 1 / -1;
+
+  position: relative;
+
+  height:
+    clamp(4px, 0.7vw, 6px);
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(240, 240, 240, 0.17);
+
+  background:
+    rgba(240, 240, 240, 0.055);
+
+  box-shadow:
+    inset 0 0 8px
+    rgba(0, 0, 0, 0.44);
+
+  clip-path:
+    polygon(
+      8px 0,
+      100% 0,
+      calc(100% - 8px) 100%,
+      0 100%
+    );
+}
+
+
+.site-preloader-fill {
+  width:
+    var(--site-preloader-progress, 0%);
+
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 114, 2, 0.56),
+      rgba(255, 114, 2, 1),
+      rgba(255, 255, 255, 0.82)
+    );
+
+  box-shadow:
+    0 0 12px
+    rgba(255, 114, 2, 0.38);
+
+  transition:
+    width 140ms ease-out;
+}
+
+
+.site-preloader-meta {
+  grid-column: 1 / -1;
+
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 16px;
+
+  color:
+    rgba(240, 240, 240, 0.58);
+
+  font-family:
+    "Michroma",
+    system-ui,
+    sans-serif;
+
+  font-size:
+    clamp(7px, 1.25vw, 9px);
+
+  letter-spacing:
+    0.10em;
+}
+
+
+.site-preloader-percent {
+  color:
+    rgba(255, 114, 2, 0.90);
+
+  min-width: 4ch;
+
+  text-align: right;
+}
+
+
+/*
+  On especially small phones, keep the loader compact and entirely inside
+  the same minimum-width assumptions as the rest of the site.
+*/
+@media (max-width: 485px) {
+  .site-preloader-inner {
+    width:
+      min(
+        82vw,
+        330px
+      );
+  }
+
+  .site-preloader-logo {
+    width: 72%;
+  }
+}
+
+
+/* =========================================================
+   VIEWPORT SIDE CHEVRONS — PASSIVE PAGE PROGRESS INDICATOR
+   =========================================================
+   The two existing side-center frame ornaments now double as a visual
+   "scroll position" marker. They remain decorative / non-interactive;
+   JS only updates --viewport-page-progress-y when page intent changes.
+
+   About    -> 18%
+   Brobots  -> 34%
+   Etherian -> 50%
+   Halodoom -> 66%
+   Contact  -> 82%
+   ========================================================= */
+
+.viewport-frame {
+  --viewport-page-progress-y: 18%;
+}
+
+
+.viewport-frame-piece--left-center,
+.viewport-frame-piece--right-center {
+  top:
+    var(
+      --viewport-page-progress-y,
+      50%
+    );
+
+  /*
+    The global structural-frame rule intentionally disables transitions on
+    .viewport-frame-piece with !important. These two ornaments are the one
+    exception now that they act as the passive page-position indicator.
+  */
+  transition:
+    top
+    420ms
+    cubic-bezier(
+      0.20,
+      0.72,
+      0.22,
+      1
+    ) !important;
+}
+
+
+/*
+  Respect reduced-motion without changing the indicator's final position.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .viewport-frame-piece--left-center,
+  .viewport-frame-piece--right-center {
+    transition: none !important;
   }
 }
 

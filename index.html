@@ -1,315 +1,879 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<link href="css/main.css" rel="stylesheet" type="text/css"  media="all" /><!-- Add icon library -->
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">	
-		<script src="js/jquery.min.js"></script>
-		<link rel="icon" href="images/favicon-1.ico">
-		<script>
-		
-			  var offset = window.pageXOffset;
-			$(window).scroll(function () {
-				if(offset != window.pageXOffset)
-					window.scrollTo(0, window.pageYOffset);
-			});
-		</script>
-		<!-- End of SMOOTH SCROLL -->
-		
-		<!-- Add font awesome icons -->
-		<title>Simulacrum Interactive</title>
-		
-	</head>
-	<body>
 
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Simulacrum Header Prototype</title>
+<link href="styles.css" rel="stylesheet"/>
+</head>
+<body><div aria-label="Loading Simulacrum Interactive" aria-live="polite" class="site-preloader" id="site-preloader" role="status"><div class="site-preloader-inner"><img alt="Simulacrum Interactive" class="site-preloader-logo" draggable="false" fetchpriority="high" src="assets/header/simulacrum-logo.png"/><div class="site-preloader-label">INITIALIZING</div><div aria-hidden="true" class="site-preloader-track"><div class="site-preloader-fill"></div></div><div class="site-preloader-meta"><span class="site-preloader-status">Loading interface</span><span class="site-preloader-percent">0%</span></div></div></div>
+<!-- =====================================================
+       Fixed viewport-frame anchor pieces
+       =====================================================
 
-		<main>
-		<section class="wrapper">				
-		
-			<!--  Top Navigation Bar -->
-			<section class="navbar" id="Home">
-			<ul>
-				<li class="navlistitem_right"><br></li>
-				<li class="navlistitem_right"><a href="https://www.youtube.com/channel/UCDXCygJa0T3DNcgfkC6TB4g" class="fa fa-youtube"></a></li>
-				<li class="navlistitem_right"><a href="https://www.instagram.com/simulacruminteractive/" class="fa fa-instagram"></a></li>
-				<li class="navlistitem_right"><a href="https://www.facebook.com/simulacruminteractive" class="fa fa-facebook"></a></li>
-				
-				<li class="navlistitem_right" style="width:50px"><br></li>
-				
-				<li class="navlistitem_right"><a href="#EndBar_Desktop">CONTACT</a></li>
-				<li class="navlistitem_right"><a href="#Services">SERVICES</a></li>
-				<li class="navlistitem_right"><a href="#About">ABOUT</a></li>
-				<li class="navlistitem_right"><a href="http://www.simulacruminteractive.ca/Presskits">PRESS</a></li>
-				<li class="navlistitem_right"><a class="active" href="#Home">HOME</a></li>
-				<img src="./images/Simulacrum_header_logo.png">
-			</ul>
-			</section>
-			<section class="section parallax2 bg2">
-				<section class="section parallax bg1">
-					<section>
-						<center><div id="MobileForeground"><img width="600" height="250" src="./images/Simulacrum_header_logo.png"></center></div>
-						<center><div id="MobileSpacer" style="height:50vh;"></div></center>
-						<center><div id="DesktopForeground"><img width="600" src="./images/Home_Text.png"></center></div>
-					</section>
-				</section>
-			</section>
-		
-			<section>
-				<section class="section static" id="About">
-					<center>
-						<h1>ABOUT US</h1>
-						<hr style="width:50%;color:#F68A20">
-						<h3>Simulacrum Interactive is a company of content creators based in Lethbridge, Alberta who know that the future waits for no one, and that the future of digital media is in the changing ways that we interact with it. Experiencing is the new believing, and at Simulacrum Interactive we use cutting edge technology to hand craft immersive, creative, and exciting experiences. </h3>
-						<br>
-						<h3>From marketing and promotional applications, to education, prototyping, entertainment and more- we work with you to make your ideas a reality! </h3>
-					</center>
-					
-				</section>
-			
-			
-				<section class="section static" id="Services">
-					<table style="width:100%" border=0 rules="rows" id="MobileServices">
-					
-						<!-- Virtual Reality Blurb -->
-						<tr style="height:50vh">						
-							<td><center>
-								<h1 style="color:#F68A20">Virtual Reality</h1>
-								<i><h3 style="width:80%">Using the latest in VR technology and peripherals, we create tailor-made immersive experiences.</h3></i>
-								<br> 	
-								<h3 style="width:80%">Imagine walking through your new home, testing out flooring and paint colors before it’s even built, or learning how to monitor your gages and keep your bearings as you dive deep into the sea from somewhere warm and dry - VR has the power to put you there. <br><br> From accessible portable viewers that require only a smartphone to use to immersive room-scale setups that are fully interactable, ask us how we can turn your ideas into reality. </h3>
-							</td></center>
-				
-							<td><center>
-								<iframe src="https://www.youtube.com/embed/CeDoKlk8jpE?modestbranding=1&showinfo=0&rel=0&color=white&autohide=0" width="90%" height="512px" frameborder="0"></iframe>
-							</td></center>
-							
-							<td><hr style="width:90%;background-color:#F68A20"></td>	
-							
-						</tr>
-						
-						<!-- Visualization & Interactive Media Blurb -->					
-						<tr style="height:50vh">		
-							
-							<td><center>
-								<h1 style="color:#F68A20">Visualization & Interactive Media</h1>
-								<i><h3 style="width:80%">Bringing your visualizations to the next level!</h3></i>
-								<br> 
-								<h3 style="width:80%">Using powerful game engine technology, we take 3D renders to the next level by merging cutting edge graphics with real time simulations and interactivity. <br><br> Whether you’re showcasing a new product or looking to visualize data in an engaging way, we’ll work with you to create content that goes beyond an image. </h3>
-							</td></center>
-						
-							<td><center>
-								<iframe src="https://www.youtube.com/embed/adDxWUQ-aDM?modestbranding=1&showinfo=0&rel=0&color=white&autohide=0" width="90%" height="512px" frameborder="0"></iframe>
-							</td></center>	
-							
-							<td><hr style="width:90%;background-color:#F68A20"></td>	
-							
-						</tr>
-						
-						<!-- Game Development Blurb -->
-						<tr style="height:50vh">						
-							<td><center>
-								<h1 style="color:#F68A20">Game Development</h1>
-								<i><h3 style="width:80%">Games made for VR.</h3></i>
-								<br> 
-								<h3 style="width:80%">Game developers at our core, we at Simulacrum strive to create exciting, fun, and unique experiences that are only possible in virtual reality. <br><br> 
-								If you would like to hear more about our current and upcoming titles or would like to have us develop a game for you, let us know!</h3>
-							</td></center>
-							
-							
-							<td><center>
-								<iframe src="https://www.youtube.com/embed/mz-zPOR3cC4?modestbranding=1&showinfo=0&rel=0&color=white&autohide=0" width="90%" height="512px" frameborder="0"></iframe>
-							</td></center>
-							
-							<td><hr style="width:90%;background-color:#F68A20"></td>	
-							
-							<td style="height:200px"></td>
-						</tr>
-						
-						
-						<!-- Tutorial Blurb -->
-						<tr style="height:50vh">						
-							<td><center>
-								<h1 style="color:#F68A20">Workshops</h1>
-								<!--<i><h3 style="width:80%">Games made for VR.</h3></i>
-								<br> --> 
-								
+       These eight anchor WebP pieces are intentionally rendered at their
+       intrinsic aspect ratios. The four stretch strips underneath them
+       use one reusable horizontal strip asset that can be rotated for
+       the other three sides.
+  -->
+<div aria-hidden="true" class="viewport-frame">
+<!-- Stretchable border fill strips.
+         Put the provided strip asset at: assets/header/border-stretch.webp -->
+<img alt="" class="viewport-frame-stretch viewport-frame-stretch--top" draggable="false" src="assets/header/border-stretch.webp"/>
+<img alt="" class="viewport-frame-stretch viewport-frame-stretch--right" draggable="false" src="assets/header/border-stretch.webp"/>
+<img alt="" class="viewport-frame-stretch viewport-frame-stretch--bottom" draggable="false" src="assets/header/border-stretch.webp"/>
+<img alt="" class="viewport-frame-stretch viewport-frame-stretch--left" draggable="false" src="assets/header/border-stretch.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--top-left" draggable="false" src="assets/header/border-topleft.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--top" draggable="false" src="assets/header/border-top.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--top-right" draggable="false" src="assets/header/border-topright.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--left-center" draggable="false" src="assets/header/border-centerleft.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--right-center" draggable="false" src="assets/header/border-centerright.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--bottom-left" draggable="false" src="assets/header/border-bottomleft.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--bottom" draggable="false" src="assets/header/border-bottom.webp"/>
+<img alt="" class="viewport-frame-piece viewport-frame-piece--bottom-right" draggable="false" src="assets/header/border-bottomright.webp"/>
+</div>
+<!-- Global blurred looping background video -->
+<div aria-hidden="true" class="site-background">
+<video aria-hidden="true" autoplay="" class="site-background-video site-background-video--a is-background-active" data-background-slot="a" data-background-src="assets/simulacrum-loop.mp4" disablepictureinpicture="" disableremoteplayback="" loop="" muted="" playsinline="" preload="auto" src="assets/simulacrum-loop.mp4" tabindex="-1" webkit-playsinline=""></video><video aria-hidden="true" autoplay="" class="site-background-video site-background-video--b" data-background-slot="b" disablepictureinpicture="" disableremoteplayback="" loop="" muted="" playsinline="" preload="auto" tabindex="-1" webkit-playsinline=""></video></div>
+<header class="site-header">
+<div aria-hidden="true" class="banner-frame">
+<div class="banner-piece banner-left"></div>
+<div class="banner-piece banner-left-stretch"></div>
+<div class="banner-piece banner-center"></div>
+<div class="banner-piece banner-right-stretch"></div>
+<div class="banner-piece banner-right"></div>
+</div>
+<div class="header-content">
+<a class="brand" href="#">
+<img alt="Simulacrum Interactive" class="brand-logo" src="assets/header/simulacrum-logo.png"/>
+</a>
+<nav aria-label="Main navigation" class="main-nav">
+<a class="nav-button" href="#about">
+<span aria-hidden="true" class="nav-icon"><img alt="" aria-hidden="true" class="nav-icon-image" draggable="false" src="assets/header/simulacrum-icon.png"/></span>
+<span class="nav-label">About</span>
+</a>
+<a class="nav-button" href="#brobots">
+<span aria-hidden="true" class="nav-icon"><img alt="" aria-hidden="true" class="nav-icon-image" draggable="false" src="assets/header/brobots-icon.png"/></span>
+<span class="nav-label">Brobots</span>
+</a>
+<a class="nav-button" href="#etherian">
+<span aria-hidden="true" class="nav-icon"><img alt="" aria-hidden="true" class="nav-icon-image" draggable="false" src="assets/header/etherian-icon.png"/></span>
+<span class="nav-label">Etherian</span>
+</a>
+<a class="nav-button" href="#halodoom">
+<span aria-hidden="true" class="nav-icon"><img alt="" aria-hidden="true" class="nav-icon-image" draggable="false" src="assets/header/halodoom-icon.png"/></span>
+<span class="nav-label">Halodoom</span>
+</a>
+<a class="nav-button" href="#contact">
+<span aria-hidden="true" class="nav-icon"><img alt="" aria-hidden="true" class="nav-icon-image" draggable="false" src="assets/header/mail-icon.png"/></span>
+<span class="nav-label">Contact</span>
+</a>
+</nav>
+<button aria-controls="mobile-menu" aria-expanded="false" aria-label="Open menu" class="menu-toggle" type="button">
+<span aria-hidden="true" class="menu-toggle-lines"></span>
+</button>
+<nav aria-label="Mobile navigation" class="mobile-menu" id="mobile-menu">
+<svg aria-hidden="true" class="mobile-menu-shell" preserveaspectratio="none" viewbox="0 0 320 420">
+<path class="mobile-menu-shell-path mobile-menu-shell-path--outer" d="
+            M 28 1
+            H 319
+            V 389
+            L 287 419
+            H 1
+            V 29
+            Z
+          "></path>
+<path class="mobile-menu-shell-path mobile-menu-shell-path--inner" d="
+            M 36 11
+            H 309
+            V 383
+            L 281 409
+            H 11
+            V 35
+            Z
+          "></path>
+<path class="mobile-menu-shell-accent mobile-menu-shell-accent--top" d="M 35 11 H 132"></path>
+<path class="mobile-menu-shell-accent mobile-menu-shell-accent--bottom" d="M 11 408 H 122"></path>
+<path class="mobile-menu-shell-accent mobile-menu-shell-accent--corner" d="M 282 408 L 309 382"></path>
+</svg>
+<div class="mobile-menu-links">
+<a class="mobile-menu-link" href="#about">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "></path>
+</svg>
+<span aria-hidden="true" class="mobile-menu-link-motif"><img alt="" aria-hidden="true" class="mobile-menu-link-icon-image" draggable="false" src="assets/header/simulacrum-icon.png"/></span>
+<span class="mobile-menu-link-text">About</span>
+</a>
+<a class="mobile-menu-link" href="#brobots">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "></path>
+</svg>
+<span class="mobile-menu-link-text">Brobots</span>
+<span aria-hidden="true" class="mobile-menu-link-motif"><img alt="" aria-hidden="true" class="mobile-menu-link-icon-image" draggable="false" src="assets/header/brobots-icon.png"/></span>
+</a>
+<a class="mobile-menu-link" href="#etherian">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "></path>
+</svg>
+<span class="mobile-menu-link-text">Etherian</span>
+<span aria-hidden="true" class="mobile-menu-link-motif"><img alt="" aria-hidden="true" class="mobile-menu-link-icon-image" draggable="false" src="assets/header/etherian-icon.png"/></span>
+</a>
+<a class="mobile-menu-link" href="#halodoom">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "></path>
+</svg>
+<span class="mobile-menu-link-text">Halodoom</span>
+<span aria-hidden="true" class="mobile-menu-link-motif"><img alt="" aria-hidden="true" class="mobile-menu-link-icon-image" draggable="false" src="assets/header/halodoom-icon.png"/></span>
+</a>
+<a class="mobile-menu-link" href="#contact">
+<svg aria-hidden="true" class="mobile-menu-link-shell" preserveaspectratio="none" viewbox="0 0 280 62">
+<path class="mobile-menu-link-shell-path" d="
+                M 10 1
+                H 279
+                V 47
+                L 264 61
+                H 1
+                V 11
+                Z
+              "></path>
+</svg>
+<span class="mobile-menu-link-text">Contact</span>
+<span aria-hidden="true" class="mobile-menu-link-motif"><img alt="" aria-hidden="true" class="mobile-menu-link-icon-image" draggable="false" src="assets/header/mail-icon.png"/></span>
+</a>
+</div>
+</nav>
+</div>
+</header>
+<main class="page-demo">
+<!--
+    Temporary page-frame targets for the five middle/icon-mode buttons.
 
-								<h3 style="width:60%">We are currently offering a range of workshops for mid-level developers looking to learn more about a specific area or transfer their skills into game & VR development:<br><br>
-								Design for VR<br>
-								Intro to Blueprints for VR<br>
-								Development for VR<br>
-								Optimization for Games<br>
-								Intro to Characters in UE4<br><br>
-								
-								Workshops start at $250 per session for up to 8 people
-								<br><br> 
+    They intentionally all share the same visual shell for now. The
+    current task is to establish page-to-page transition behavior before
+    introducing unique content/designs.
+  -->
+<section aria-hidden="true" class="prototype-page-frame" data-page="about" id="about-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+<div aria-label="About page content" class="prototype-page-frame-content simple-page-content">
+<div class="simple-glass-page">
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--outer"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--ring-1"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--back"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--ring-2"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--middle"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--ring-3"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--inner"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--front"></div>
+<div class="simple-glass-content">
+<div class="simple-page-kicker">SIMULACRUM INTERACTIVE</div>
+<h1 class="simple-page-title">About us</h1>
+<div class="simple-page-pronunciation"><span>Sim-you-lah-kruhm</span></div>
+<p class="simple-page-blurb">Simulacrum Interactive is an indie game studio based in Lethbridge, Alberta focused on making non-traditional games across a variety of styles, genres, and platforms.</p>
+<p class="simple-page-blurb">Currently working on <strong>Brobots</strong>: a kinetic multiplayer battler with deckbuilding, retrofuturistic Y2K aesthetics, and anime-inspired over-the-top battles.</p>
+<div aria-label="Studio snapshot" class="simple-page-facts">
+<div class="simple-page-fact">
+<span>BASED IN</span>
+<strong>Lethbridge, Alberta</strong>
+</div>
+<div class="simple-page-fact">
+<span>FOCUS</span>
+<strong>Non-traditional games</strong>
+</div>
+<div class="simple-page-fact">
+<span>LATEST RELEASE</span>
+<strong><a class="simple-page-fact-link page-jump-link" data-page-jump="halodoom" href="#halodoom">Halodoom</a></strong>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-hidden="true" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div>
+<div class="desktop-secondary-panel-content"></div>
+</div>
+</section>
+<section aria-hidden="true" class="prototype-page-frame" data-game-frame-page="" data-page="brobots" id="brobots-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+<div aria-label="Brobots page content" class="prototype-page-frame-content"><div class="game-page game-page--brobots">
+<!--
+          Step 1 prototype:
+          structural media-browser shell only.
 
-								<h1 style="color:#F68A20">Mentorships</h1>
-								
-								<h3 style="width:60%">
-								Mentorships are available by request and can be paired with the workshop series. These are intended to help you learn through completing a focus project of your own design and can range from 4 to 12 weeks. 90 minute meetings are held weekly and can include one or both available instructors based on need and area of interest.<br><br>
-								Mentor Meetings are $150 per 45 min session 
+          No real media or carousel behavior yet; these temporary regions
+          let us verify sizing in tablet and desktop frame layouts first.
+        -->
+<div class="game-frame-area" data-game-frame="brobots"><section aria-label="Brobots media gallery" class="media-browser" data-media-browser="">
+<div class="game-media-zone game-media-zone--hero" data-game-frame-zone="hero"><div aria-live="polite" class="media-viewer" data-media-viewer="">
+<div class="media-viewer-stage" data-media-viewer-stage=""></div>
+</div></div>
+<div class="game-media-zone game-media-zone--thumbs" data-game-frame-zone="thumbs"><div class="media-strip">
+<button aria-label="Previous media" class="media-arrow media-arrow--previous" data-media-prev="" type="button">
+              ‹
+            </button>
+<div aria-label="Brobots media thumbnails" class="media-thumbnails" data-media-thumbnails=""><button aria-label="Show Brobots Screenshot 1" aria-pressed="true" class="media-thumbnail is-selected" data-media-item="" data-media-src="assets/brobots/brobots-screenshot-0.jpg" data-media-thumb="assets/brobots/brobots-screenshot-0.jpg" data-media-title="Brobots Screenshot 1" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/brobots/brobots-screenshot-0.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Brobots Screenshot 2" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/brobots/brobots-screenshot-1.jpg" data-media-thumb="assets/brobots/brobots-screenshot-1.jpg" data-media-title="Brobots Screenshot 2" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/brobots/brobots-screenshot-1.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Brobots Screenshot 3" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/brobots/brobots-screenshot-2.jpg" data-media-thumb="assets/brobots/brobots-screenshot-2.jpg" data-media-title="Brobots Screenshot 3" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/brobots/brobots-screenshot-2.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Brobots Screenshot 4" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/brobots/brobots-screenshot-3.jpg" data-media-thumb="assets/brobots/brobots-screenshot-3.jpg" data-media-title="Brobots Screenshot 4" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/brobots/brobots-screenshot-3.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Brobots Screenshot 5" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/brobots/brobots-screenshot-4.jpg" data-media-thumb="assets/brobots/brobots-screenshot-4.jpg" data-media-title="Brobots Screenshot 5" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/brobots/brobots-screenshot-4.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Brobots Screenshot 6" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/brobots/brobots-screenshot-5.jpg" data-media-thumb="assets/brobots/brobots-screenshot-5.jpg" data-media-title="Brobots Screenshot 6" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/brobots/brobots-screenshot-5.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Brobots Gameplay Clips — March 2026" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/cmWDojiUVS4/hqdefault.jpg" data-media-title="Brobots Gameplay Clips — March 2026" data-media-type="youtube" data-youtube-id="cmWDojiUVS4" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/cmWDojiUVS4/hqdefault.jpg"/><span class="media-thumbnail-overlay"><span aria-hidden="true" class="media-thumbnail-play">▶</span><span class="media-thumbnail-type">GAMEPLAY</span></span></button><button aria-label="Show Brobots Machinima Sequence — March 2026" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/j8HsNKyN4pI/hqdefault.jpg" data-media-title="Brobots Machinima Sequence — March 2026" data-media-type="youtube" data-youtube-id="j8HsNKyN4pI" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/j8HsNKyN4pI/hqdefault.jpg"/><span class="media-thumbnail-overlay"><span aria-hidden="true" class="media-thumbnail-play">▶</span><span class="media-thumbnail-type">MACHINIMA</span></span></button></div>
+<button aria-label="Next media" class="media-arrow media-arrow--next" data-media-next="" type="button">
+              ›
+            </button>
+</div></div>
+</section><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-top-left" data-game-frame-piece="hero-top-left" src="assets/brobots/frame/top-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-top-right" data-game-frame-piece="hero-top-right" src="assets/brobots/frame/top-right.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-bottom-left" data-game-frame-piece="hero-bottom-left" src="assets/brobots/frame/bottom-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-bottom-right" data-game-frame-piece="hero-bottom-right" src="assets/brobots/frame/bottom-right.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-top-left" data-game-frame-piece="thumb-top-left" src="assets/brobots/frame/thumb-top-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-top-right" data-game-frame-piece="thumb-top-right" src="assets/brobots/frame/thumb-top-right.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-bottom-left" data-game-frame-piece="thumb-bottom-left" src="assets/brobots/frame/thumb-bottom-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-bottom-right" data-game-frame-piece="thumb-bottom-right" src="assets/brobots/frame/thumb-bottom-right.webp"/><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-top" data-game-frame-stretcher="hero-stretch-top" style='--brobots-stretcher-image: url("assets/brobots/frame/stretch-top.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-bottom" data-game-frame-stretcher="hero-stretch-bottom" style='--brobots-stretcher-image: url("assets/brobots/frame/stretch-bottom.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-left" data-game-frame-stretcher="hero-stretch-left" style='--brobots-stretcher-image: url("assets/brobots/frame/stretch-left.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-right" data-game-frame-stretcher="hero-stretch-right" style='--brobots-stretcher-image: url("assets/brobots/frame/stretch-right.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-top" data-game-frame-stretcher="thumb-stretch-top" style='--brobots-stretcher-image: url("assets/brobots/frame/thumb-stretch-top.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-bottom" data-game-frame-stretcher="thumb-stretch-bottom" style='--brobots-stretcher-image: url("assets/brobots/frame/thumb-stretch-bottom.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-left" data-game-frame-stretcher="thumb-stretch-left" style='--brobots-stretcher-image: url("assets/brobots/frame/thumb-stretch-left.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-right" data-game-frame-stretcher="thumb-stretch-right" style='--brobots-stretcher-image: url("assets/brobots/frame/thumb-stretch-right.webp");'></div></div>
+</div></div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-label="Brobots game information" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div><div aria-hidden="true" class="etherian-popout-layer-stack">
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--1"><img alt="" aria-hidden="true" class="etherian-popout-layer-image brobots-popout-layer-image" decoding="async" loading="lazy" src="assets/brobots/brobots-info-background.jpg"/></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--2"></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--3"></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--4"></div>
+</div>
+<div class="desktop-secondary-panel-content">
+<div class="game-info game-info--brobots">
+<div aria-hidden="true" class="game-info-background">
+<img alt="" class="game-info-background-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-0.jpg"/>
+</div>
+<div aria-hidden="true" class="game-info-layer game-info-layer--rear"></div>
+<div aria-hidden="true" class="game-info-layer game-info-layer--mid"></div>
+<div class="game-info-surface">
+<div class="game-info-top-zone"><header class="game-info-header">
+<img alt="Brobots" class="game-info-logo" src="assets/brobots/brobots-logo.png"/>
+<p class="game-info-kicker">MULTIPLAYER ARENA BATTLER – IN DEVELOPMENT</p>
+</header><p class="game-info-blurb">Inspired by the fast-paced movement and escalation of an epic anime battle, Brobots is a kinetic multiplayer brawler game centered around the Brobots: a color coded cast of friends with their own unique abilities. Customize your playstyle with cards that grant abilities, buffs, gadgets, traps and more as you fight for the favor of the Cybergod in a retrofuturistic Y2K inspired world.</p></div>
+<div aria-label="Brobots highlights" class="game-info-features">
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">✦</span>
+<span class="game-info-feature-copy">
+<strong>Kinetic Movement</strong>
+<small>Defy gravity and move like an anime character from wall running to flips and mid-air battles.</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">↗</span>
+<span class="game-info-feature-copy">
+<strong>Escalating Action</strong>
+<small>Power scales from the beginning of the match to the end with cards that grant buffs, abilities, traps, equipment and more.</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">◇</span>
+<span class="game-info-feature-copy">
+<strong>Retrofuturistic Y2K Aesthetic</strong>
+<small>A fresh take on the ‘look of the future’ as imagined at the turn of the millennium.</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">◉</span>
+<span class="game-info-feature-copy">
+<strong>Multiplayer Mayhem</strong>
+<small>Casual ‘drop in and play’ fun with elements of mechanical depth and strategic deck building.</small>
+</span>
+</div>
+</div>
+<div class="game-info-bottom-zone"><div class="game-info-facts">
+<div class="game-info-fact">
+<span>PLATFORMS</span>
+<strong>PC</strong>
+</div>
+<div class="game-info-fact">
+<span>RELEASE DATE</span>
+<strong>TBD</strong>
+</div>
+<div class="game-info-fact">
+<span>GENRE</span>
+<strong>MULTIPLAYER ARENA BRAWLER</strong>
+</div>
+</div><div aria-label="Brobots development status" class="game-info-actions">
+<div class="game-info-action game-info-action--primary" type="button">IN DEVELOPMENT</div>
+<div class="game-info-action game-info-action--secondary" type="button">MORE SOON</div>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section aria-hidden="true" class="prototype-page-frame" data-game-frame-page="" data-page="etherian" id="etherian-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
+      Etherian page module.
 
-								</h3>
-								</center>
-							</td>
-							
-							<td><hr style="width:90%;background-color:#F68A20"></td>	
-							
-							<td style="height:200px"></td>
-						</tr>
-						
-						
-					</table>
-						
-					<table style="width:100%" rules="cols" class="DesktopServices" cellspacing="0" cellpadding="0"><center>
-					
-						<!-- Virtual Reality Blurb -->
-						<tr style="height:100vh">						
-							<td><center>
-								<h1 style="color:#F68A20">Virtual Reality</h1>
-								<i><h3 style="width:80%">Using the latest in VR technology and peripherals, we create tailor-made immersive experiences.</h3></i>
-								<br> 	
-								<h3 style="width:80%">Imagine walking through your new home, testing out flooring and paint colors before it’s even built, or learning how to monitor your gages and keep your bearings as you dive deep into the sea from somewhere warm and dry - VR has the power to put you there. <br><br> From accessible portable viewers that require only a smartphone to use to immersive room-scale setups that are fully interactable, ask us how we can turn your ideas into reality. </h3>
-							</td></center>
-							
-							<td style="width:1px"><div class="vl"></div></td>
-							
-							<td><center>
-								<iframe src="https://www.youtube.com/embed/CeDoKlk8jpE?modestbranding=1&showinfo=0&rel=0&color=white&autohide=0" width="90%" height="400px" frameborder="0"></iframe>
-							</td></center>
-						</tr>
-						
-						<!-- Visualization & Interactive Media Blurb -->					
-						<tr style="height:100vh">	
-							<td><center>
-								<iframe src="https://www.youtube.com/embed/adDxWUQ-aDM?modestbranding=1&showinfo=0&rel=0&color=white&autohide=0" width="90%" height="400px" frameborder="0"></iframe>
-							</td></center>		
-							
-							<td style="width:1px"><div class="vl"></div></td>			
-							
-							<td><center>
-								<h1 style="color:#F68A20">Visualization & Interactive Media</h1>
-								<i><h3 style="width:80%">Bringing your visualizations to the next level!</h3></i>
-								<br> 
-								<h3 style="width:80%">Using powerful game engine technology, we take 3D renders to the next level by merging cutting edge graphics with real time simulations and interactivity. <br><br> Whether you’re showcasing a new product or looking to visualize data in an engaging way, we’ll work with you to create content that goes beyond an image. </h3>
-							</td></center>
-						</tr>
-						
-						<!-- Game Development Blurb -->
-						<tr style="height:100vh">						
-							<td><center>
-								<h1 style="color:#F68A20">Game Development</h1>
-								<i><h3 style="width:80%">Games made for VR.</h3></i>
-								<br> 
-								<h3 style="width:80%">Game developers at our core, we at Simulacrum strive to create exciting, fun, and unique experiences that are only possible in virtual reality. <br><br> 
-								If you would like to hear more about our current and upcoming titles or would like to have us develop a game for you, let us know!</h3>
-							</td></center>
-						
-							<td style="width:1px"><div class="vl"></div></td>
-							
-							<td><center>
-								<iframe src="https://www.youtube.com/embed/mz-zPOR3cC4?modestbranding=1&showinfo=0&rel=0&color=white&autohide=0" width="90%" height="400px" frameborder="0"></iframe>
-							</td></center>
-						</tr>
-						
-						
-						
-						<!-- Tutorials Blurb -->
-						<tr style="height:100vh">						
-							<td><center>
-								<h1 style="color:#F68A20">Workshops</h1>
-								<!--<i><h3 style="width:80%">Games made for VR.</h3></i>
-								<br> --> 
-								
+      The outer .prototype-page-frame-content remains owned by the global
+      frame/morph system. Everything inside .game-page is page-specific and
+      can later be swapped independently of the frame itself.
+    -->
+<div aria-label="Etherian page content" class="prototype-page-frame-content">
+<div class="game-page game-page--etherian">
+<!--
+          Step 1 prototype:
+          structural media-browser shell only.
 
-								<h3 style="width:60%">We are currently offering a range of workshops for mid-level developers looking to learn more about a specific area or transfer their skills into game & VR development:<br><br>
-								Design for VR<br>
-								Intro to Blueprints for VR<br>
-								Development for VR<br>
-								Optimization for Games<br>
-								Intro to Characters in UE4<br><br>
-								
-								Workshops start at $250 per session for up to 8 people
-								<br><br> 
+          No real media or carousel behavior yet; these temporary regions
+          let us verify sizing in tablet and desktop frame layouts first.
+        -->
+<div class="game-frame-area" data-game-frame="etherian"><section aria-label="Etherian media gallery" class="media-browser" data-media-browser="">
+<div class="game-media-zone game-media-zone--hero" data-game-frame-zone="hero"><div aria-live="polite" class="media-viewer" data-media-viewer="">
+<div class="media-viewer-stage" data-media-viewer-stage=""></div>
+</div></div>
+<div class="game-media-zone game-media-zone--thumbs" data-game-frame-zone="thumbs"><div class="media-strip">
+<button aria-label="Previous media" class="media-arrow media-arrow--previous" data-media-prev="" type="button">
+              ‹
+            </button>
+<div aria-label="Etherian media thumbnails" class="media-thumbnails" data-media-thumbnails="">
+<button aria-label="Show Etherian Screenshot 1" aria-pressed="true" class="media-thumbnail is-selected" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-0.jpg" data-media-thumb="assets/etherian/etherian-screenshot-0.jpg" data-media-title="Etherian Screenshot 1" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-0.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button><button aria-label="Show Etherian Screenshot 2" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-1.jpg" data-media-thumb="assets/etherian/etherian-screenshot-1.jpg" data-media-title="Etherian Screenshot 2" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-1.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button><button aria-label="Show Etherian Screenshot 3" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-2.jpg" data-media-thumb="assets/etherian/etherian-screenshot-2.jpg" data-media-title="Etherian Screenshot 3" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-2.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button><button aria-label="Show Etherian Screenshot 4" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-3.jpg" data-media-thumb="assets/etherian/etherian-screenshot-3.jpg" data-media-title="Etherian Screenshot 4" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-3.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button><button aria-label="Show Etherian Screenshot 5" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-4.jpg" data-media-thumb="assets/etherian/etherian-screenshot-4.jpg" data-media-title="Etherian Screenshot 5" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-4.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button><button aria-label="Show Etherian Screenshot 6" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-5.jpg" data-media-thumb="assets/etherian/etherian-screenshot-5.jpg" data-media-title="Etherian Screenshot 6" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-5.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button><button aria-label="Show Etherian Screenshot 7" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-6.jpg" data-media-thumb="assets/etherian/etherian-screenshot-6.jpg" data-media-title="Etherian Screenshot 7" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-6.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button><button aria-label="Show Etherian Screenshot 8" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-7.jpg" data-media-thumb="assets/etherian/etherian-screenshot-7.jpg" data-media-title="Etherian Screenshot 8" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-7.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button><button aria-label="Show Etherian Screenshot 9" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/etherian/etherian-screenshot-8.jpg" data-media-thumb="assets/etherian/etherian-screenshot-8.jpg" data-media-title="Etherian Screenshot 9" data-media-type="image" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-8.jpg"/>
+<span class="media-thumbnail-overlay">
+<span class="media-thumbnail-type">IMAGE</span>
+</span>
+</button><button aria-label="Show Local Video Test" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/simulacrum-loop.mp4" data-media-title="Local Video Test" data-media-type="video" type="button">
+<span class="media-thumbnail-local-video">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">LOCAL VIDEO</span>
+</span>
+</button><button aria-label="Show Announcement Trailer" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg" data-media-title="Announcement Trailer" data-media-type="youtube" data-youtube-id="f1XcuUs06lQ" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/f1XcuUs06lQ/hqdefault.jpg"/>
+<span class="media-thumbnail-overlay">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">VIDEO</span>
+</span>
+</button><button aria-label="Show Release Trailer" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg" data-media-title="Release Trailer" data-media-type="youtube" data-youtube-id="mz-zPOR3cC4" type="button">
+<img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/mz-zPOR3cC4/hqdefault.jpg"/>
+<span class="media-thumbnail-overlay">
+<span aria-hidden="true" class="media-thumbnail-play">▶</span>
+<span class="media-thumbnail-type">VIDEO</span>
+</span>
+</button></div>
+<button aria-label="Next media" class="media-arrow media-arrow--next" data-media-next="" type="button">
+              ›
+            </button>
+</div>
+</div>
+</section><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-top-left" data-game-frame-piece="hero-top-left" src="assets/etherian/frame/top-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-top-right" data-game-frame-piece="hero-top-right" src="assets/etherian/frame/top-right.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-bottom-left" data-game-frame-piece="hero-bottom-left" src="assets/etherian/frame/bottom-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-bottom-right" data-game-frame-piece="hero-bottom-right" src="assets/etherian/frame/bottom-right.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-top-left" data-game-frame-piece="thumb-top-left" src="assets/etherian/frame/thumb-top-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-top-right" data-game-frame-piece="thumb-top-right" src="assets/etherian/frame/thumb-top-right.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-bottom-left" data-game-frame-piece="thumb-bottom-left" src="assets/etherian/frame/thumb-bottom-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-bottom-right" data-game-frame-piece="thumb-bottom-right" src="assets/etherian/frame/thumb-bottom-right.webp"/><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-top" data-game-frame-stretcher="hero-stretch-top" style='--brobots-stretcher-image: url("assets/etherian/frame/stretch-top.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-bottom" data-game-frame-stretcher="hero-stretch-bottom" style='--brobots-stretcher-image: url("assets/etherian/frame/stretch-bottom.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-left" data-game-frame-stretcher="hero-stretch-left" style='--brobots-stretcher-image: url("assets/etherian/frame/stretch-left.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-right" data-game-frame-stretcher="hero-stretch-right" style='--brobots-stretcher-image: url("assets/etherian/frame/stretch-right.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-top" data-game-frame-stretcher="thumb-stretch-top" style='--brobots-stretcher-image: url("assets/etherian/frame/thumb-stretch-top.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-bottom" data-game-frame-stretcher="thumb-stretch-bottom" style='--brobots-stretcher-image: url("assets/etherian/frame/thumb-stretch-bottom.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-left" data-game-frame-stretcher="thumb-stretch-left" style='--brobots-stretcher-image: url("assets/etherian/frame/thumb-stretch-left.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-right" data-game-frame-stretcher="thumb-stretch-right" style='--brobots-stretcher-image: url("assets/etherian/frame/thumb-stretch-right.webp");'></div></div>
+</div></div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-label="Etherian game information" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div><div aria-hidden="true" class="etherian-popout-layer-stack">
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--1"><img alt="" aria-hidden="true" class="etherian-popout-layer-image" decoding="async" loading="lazy" src="assets/etherian/etherian-info-background.jpg"/></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--2"></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--3"></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--4"></div>
+</div>
+<div class="desktop-secondary-panel-content">
+<div class="game-info game-info--etherian">
+<div aria-hidden="true" class="game-info-background">
+<img alt="" class="game-info-background-image" decoding="async" loading="lazy" src="assets/etherian/etherian-screenshot-0.jpg"/>
+</div>
+<div aria-hidden="true" class="game-info-layer game-info-layer--rear"></div>
+<div aria-hidden="true" class="game-info-layer game-info-layer--mid"></div>
+<div class="game-info-surface">
+<div class="game-info-top-zone"><header class="game-info-header">
+<img alt="Etherian" class="game-info-logo" src="assets/etherian/etherian-logo.png"/>
+<p class="game-info-kicker">VR ADVENTURE PLATFORMER - 2018</p>
+</header><p class="game-info-blurb">Traverse the fractured scapes to test your skills, uncover the stories of the ancients, or explore the mystical world around you in search of secrets. Etherian is a zen VR adventure / platformer where the player is free to explore at their own pace. Focus on the puzzles and obstacle courses, hunt for hidden secrets, or uncover the story behind the fractured scapes of Etheria.</p></div>
+<div aria-label="Etherian highlights" class="game-info-features">
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">↗</span>
+<span class="game-info-feature-copy">
+<strong>VR Physicality</strong>
+<small>Climb, swim, jump, zip-line – interactions are physical, using VR to the fullest.</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">◇</span>
+<span class="game-info-feature-copy">
+<strong>Fractured Scapes of Etheria</strong>
+<small>Travel through the zen, liminal biomes of an ancient land from fire and ice to greenery and sand.</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">◉</span>
+<span class="game-info-feature-copy">
+<strong>Exploration</strong>
+<small>Follow the path or veer from it to see what you can find.</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">△</span>
+<span class="game-info-feature-copy">
+<strong>Mystery</strong>
+<small>What happened to Etheria and its inhabitants? What lessons can be learned from the past?</small>
+</span>
+</div>
+</div>
+<div class="game-info-bottom-zone"><div class="game-info-facts">
+<div class="game-info-fact">
+<span>PLATFORMS</span>
+<strong>PC VR (Steam, Viveport)</strong>
+</div>
+<div class="game-info-fact">
+<span>RELEASE DATE</span>
+<strong>2018</strong>
+</div>
+<div class="game-info-fact">
+<span>GENRE</span>
+<strong>Adventure / Platformer</strong>
+</div>
+</div><div aria-label="Etherian links" class="game-info-actions">
+<a class="game-info-action game-info-action--primary" href="https://store.steampowered.com/app/836460/Etherian/" rel="noopener noreferrer" target="_blank"><span class="game-info-action-label game-info-action-label--desktop">DOWNLOAD ON STEAM</span><span class="game-info-action-label game-info-action-label--compact">VIEW ON STEAM</span><span aria-hidden="true">›</span></a>
+<a class="game-info-action game-info-action--secondary" href="https://www.youtube.com/watch?v=mz-zPOR3cC4" rel="noopener noreferrer" target="_blank"><span class="game-info-action-label">WATCH TRAILER</span><span aria-hidden="true">›</span></a>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section aria-hidden="true" class="prototype-page-frame" data-game-frame-page="" data-page="halodoom" id="halodoom-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+<div aria-label="Halodoom page content" class="prototype-page-frame-content"><div class="game-page game-page--halodoom">
+<!--
+          Step 1 prototype:
+          structural media-browser shell only.
 
-								<h1 style="color:#F68A20">Mentorships</h1>
-								
-								<h3 style="width:60%">
-								Mentorships are available by request and can be paired with the workshop series. These are intended to help you learn through completing a focus project of your own design and can range from 4 to 12 weeks. 90 minute meetings are held weekly and can include one or both available instructors based on need and area of interest.<br><br>
-								Mentor Meetings are $150 per 45 min session 
-
-								</h3>
-								</center>
-							</td>
-						
-							<td><div class="vl"></div></td>
-							<td><center>
-							<h2  style="width:80%">	
-							<i>Growing the Industry.</i><br><br>
-							Interested in getting to game or XR development or in need of some guidance on your project? <br>
-
-							We offer consultations by request and tailor made training packages and mentorships to help you learn through hands-on experience. Contact us for more information.
-							</td></center>
-							</tr>
-					</table>
-				</section>
-<!-- 				<section class="section static" id="ContactUs">
-				<center>
-					<h1>Contact Us</h1>
-						<form id=contact_form action=#>
-							<p>
-								<input id=contact_name type=text onfocus="if(this.value=='Your Full Name')this.value=''" placeholder="Your Full Name" value="Your Full Name" name=name />
-							</p>
-							<p>
-								<input id=contact_email type=text onfocus="if(this.value=='Your Email Address')this.value=''" placeholder="Your Email Address" value="Your Email Address" name=email />
-							</p>
-							<p>
-								<textarea id=contact_message onfocus="if(this.value=='Your Message')this.value=''" placeholder="Your Message" name=message rows=8>Your Message</textarea>
-							</p>
-							
-							<div id=response></div>
-							<p class=contact-submit>
-								
-								<h2><a id=contact-submit class=submit href=#>Send</a></h2>
-							</p>
-						</form>
-				</center>
-				
-				</section> -->
-			</section>
-			
-			<section class="endbar"  id="EndBar_Desktop">
-				<ul style="height:108px">
-					<li class="endlistitem_right"><br></li>
-					<li class="endlistitem_right"><a href="https://www.youtube.com/channel/UCDXCygJa0T3DNcgfkC6TB4g" class="fa fa-youtube"></a></li>
-					<li class="endlistitem_right"><a href="https://www.instagram.com/simulacruminteractive/" class="fa fa-instagram"></a></li>
-					<li class="endlistitem_right"><a href="https://www.facebook.com/simulacruminteractive" class="fa fa-facebook"></a></li>
-					<li class="endlistitem_left"><a href="#Home"><img style="height:100px;margin:4px 0px 0px 12px;float:left" src="./images/Logo_Footer.png"></a></li>
-
-					<a href="mailto:info@simulacruminteractive.ca?subject=Mail from Simulacrum Website" style="float: right;line-height: 104px;vertical-align: middle;text-align: center;margin:0">info@simulacruminteractive.ca</a>
-				</ul>
-			</section>
-			
-			
-			<section class="endbar"  id="EndBar_Mobile">
-				<center>
-				<ul style="height:108px;">
-					<li><a href="https://www.youtube.com/channel/UCDXCygJa0T3DNcgfkC6TB4g" class="fa fa-youtube"></a></li>
-					<li><a href="https://www.instagram.com/simulacruminteractive/" class="fa fa-instagram"></a></li>
-					<li><a href="https://www.facebook.com/simulacruminteractive" class="fa fa-facebook"></a></li>
-				</ul>
-				
-					<a href="mailto:info@simulacruminteractive.ca?subject=Mail from Simulacrum Website" style="font-size:3em; line-height:60px">info@simulacruminteractive.ca</a>
-				</center>
-			</section>
-			
-			<section style="background-color: #262525;height:32px"><br></section>
-
-		</section>	
-
-		
-		</main>
-		  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
-		  <script  src="js/scroll.js"></script>
-	</body>
+          No real media or carousel behavior yet; these temporary regions
+          let us verify sizing in tablet and desktop frame layouts first.
+        -->
+<div class="game-frame-area" data-game-frame="halodoom"><section aria-label="Halodoom media gallery" class="media-browser" data-media-browser="">
+<div class="game-media-zone game-media-zone--hero" data-game-frame-zone="hero"><div aria-live="polite" class="media-viewer" data-media-viewer="">
+<div class="media-viewer-stage" data-media-viewer-stage=""></div>
+</div></div>
+<div class="game-media-zone game-media-zone--thumbs" data-game-frame-zone="thumbs"><div class="media-strip">
+<button aria-label="Previous media" class="media-arrow media-arrow--previous" data-media-prev="" type="button">
+              ‹
+            </button>
+<div aria-label="Halodoom media thumbnails" class="media-thumbnails" data-media-thumbnails=""><button aria-label="Show Halodoom Screenshot 1" aria-pressed="true" class="media-thumbnail is-selected" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-0.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-0.jpg" data-media-title="Halodoom Screenshot 1" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-0.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 2" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-1.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-1.jpg" data-media-title="Halodoom Screenshot 2" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-1.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 3" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-2.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-2.jpg" data-media-title="Halodoom Screenshot 3" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-2.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 4" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-3.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-3.jpg" data-media-title="Halodoom Screenshot 4" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-3.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 5" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-4.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-4.jpg" data-media-title="Halodoom Screenshot 5" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-4.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 6" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-5.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-5.jpg" data-media-title="Halodoom Screenshot 6" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-5.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 7" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-6.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-6.jpg" data-media-title="Halodoom Screenshot 7" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-6.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 8" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-7.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-7.jpg" data-media-title="Halodoom Screenshot 8" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-7.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 9" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-8.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-8.jpg" data-media-title="Halodoom Screenshot 9" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-8.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 10" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-9.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-9.jpg" data-media-title="Halodoom Screenshot 10" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-9.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 11" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-10.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-10.jpg" data-media-title="Halodoom Screenshot 11" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-10.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 12" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-11.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-11.jpg" data-media-title="Halodoom Screenshot 12" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-11.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 13" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-12.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-12.jpg" data-media-title="Halodoom Screenshot 13" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-12.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Screenshot 14" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-src="assets/halodoom/halodoom-screenshot-13.jpg" data-media-thumb="assets/halodoom/halodoom-screenshot-13.jpg" data-media-title="Halodoom Screenshot 14" data-media-type="image" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-13.jpg"/><span class="media-thumbnail-overlay"><span class="media-thumbnail-type">IMAGE</span></span></button><button aria-label="Show Halodoom Trailer" aria-pressed="false" class="media-thumbnail" data-media-item="" data-media-thumb="https://i.ytimg.com/vi/hrzpMg4NwdE/hqdefault.jpg" data-media-title="Halodoom Trailer" data-media-type="youtube" data-youtube-id="hrzpMg4NwdE" type="button"><img alt="" class="media-thumbnail-image" decoding="async" loading="lazy" src="https://i.ytimg.com/vi/hrzpMg4NwdE/hqdefault.jpg"/><span class="media-thumbnail-overlay"><span aria-hidden="true" class="media-thumbnail-play">▶</span><span class="media-thumbnail-type">VIDEO</span></span></button></div>
+<button aria-label="Next media" class="media-arrow media-arrow--next" data-media-next="" type="button">
+              ›
+            </button>
+</div>
+</div>
+</section><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-top-left" data-game-frame-piece="hero-top-left" src="assets/halodoom/frame/top-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-top-right" data-game-frame-piece="hero-top-right" src="assets/halodoom/frame/top-right.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-bottom-left" data-game-frame-piece="hero-bottom-left" src="assets/halodoom/frame/bottom-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--hero-bottom-right" data-game-frame-piece="hero-bottom-right" src="assets/halodoom/frame/bottom-right.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-top-left" data-game-frame-piece="thumb-top-left" src="assets/halodoom/frame/thumb-top-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-top-right" data-game-frame-piece="thumb-top-right" src="assets/halodoom/frame/thumb-top-right.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-bottom-left" data-game-frame-piece="thumb-bottom-left" src="assets/halodoom/frame/thumb-bottom-left.webp"/><img alt="" aria-hidden="true" class="game-frame-piece game-frame-piece--thumb-bottom-right" data-game-frame-piece="thumb-bottom-right" src="assets/halodoom/frame/thumb-bottom-right.webp"/><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-top" data-game-frame-stretcher="hero-stretch-top" style='--brobots-stretcher-image: url("assets/halodoom/frame/stretch-top.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-bottom" data-game-frame-stretcher="hero-stretch-bottom" style='--brobots-stretcher-image: url("assets/halodoom/frame/stretch-bottom.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-left" data-game-frame-stretcher="hero-stretch-left" style='--brobots-stretcher-image: url("assets/halodoom/frame/stretch-left.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--hero-right" data-game-frame-stretcher="hero-stretch-right" style='--brobots-stretcher-image: url("assets/halodoom/frame/stretch-right.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-top" data-game-frame-stretcher="thumb-stretch-top" style='--brobots-stretcher-image: url("assets/halodoom/frame/thumb-stretch-top.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-bottom" data-game-frame-stretcher="thumb-stretch-bottom" style='--brobots-stretcher-image: url("assets/halodoom/frame/thumb-stretch-bottom.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-left" data-game-frame-stretcher="thumb-stretch-left" style='--brobots-stretcher-image: url("assets/halodoom/frame/thumb-stretch-left.webp");'></div><div aria-hidden="true" class="game-frame-stretcher game-frame-stretcher--thumb-right" data-game-frame-stretcher="thumb-stretch-right" style='--brobots-stretcher-image: url("assets/halodoom/frame/thumb-stretch-right.webp");'></div></div>
+</div></div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-label="Halodoom game information" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div><div aria-hidden="true" class="etherian-popout-layer-stack halodoom-popout-layer-stack">
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--1 halodoom-popout-glass-layer halodoom-popout-glass-layer--1"><img alt="" aria-hidden="true" class="etherian-popout-layer-image halodoom-popout-layer-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-info-background.jpg"/></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--2 halodoom-popout-glass-layer halodoom-popout-glass-layer--2"></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--3 halodoom-popout-glass-layer halodoom-popout-glass-layer--3"></div>
+<div class="etherian-popout-glass-layer etherian-popout-glass-layer--4 halodoom-popout-glass-layer halodoom-popout-glass-layer--4"></div>
+</div>
+<div class="desktop-secondary-panel-content">
+<div class="game-info game-info--halodoom">
+<div aria-hidden="true" class="game-info-background">
+<img alt="" class="game-info-background-image" decoding="async" loading="lazy" src="assets/halodoom/halodoom-screenshot-0.jpg"/>
+</div>
+<div aria-hidden="true" class="game-info-layer game-info-layer--rear"></div>
+<div aria-hidden="true" class="game-info-layer game-info-layer--mid"></div>
+<div class="game-info-surface">
+<div class="game-info-top-zone"><header class="game-info-header">
+<img alt="Halodoom" class="game-info-logo" src="assets/halodoom/halodoom-logo.png"/>
+<p class="game-info-kicker">HALO FANGAME – 2022 / ONGOING</p>
+</header><p class="game-info-blurb">Built in the original DOOM engine and constructed with a mix of captured, recreated, and hand-crafted elements from the Halo titles, Halodoom is a mosaic of the imagery and feel of early Halo games. Rather than a 'demake' of any one Halo game, Halodoom is a standalone game that pays homage to the entire franchise while bringing new content to the universe. Offline multiplayer (bots) only with full multiplayer and campaign planned for the future.</p></div>
+<div aria-label="Halodoom highlights" class="game-info-features">
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">↗</span>
+<span class="game-info-feature-copy">
+<strong>Time Capsule of Halo</strong>
+<small>Maps, weapons, textures and skyboxes that harken back to and sample from all eras of the Halo franchise.</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">◇</span>
+<span class="game-info-feature-copy">
+<strong>The Halo Feel</strong>
+<small>Each part of the game is made to feel and play like Halo, but through the limitations of a much more primitive game engine, something new emerges!</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">◉</span>
+<span class="game-info-feature-copy">
+<strong>Customization</strong>
+<small>Customize your Spartan with 8 different armor coatings combined with a slider system for primary color, customize your firefight experience with hidden skulls.</small>
+</span>
+</div>
+<div class="game-info-feature">
+<span aria-hidden="true" class="game-info-feature-icon">△</span>
+<span class="game-info-feature-copy">
+<strong>Slayer</strong>
+<small>Try out 72 different gamemode combinations including Slayer, SWAT, Oddball and many others against custom bots made to simulate a competitive online multiplayer environment.</small>
+</span>
+</div>
+</div>
+<div class="game-info-bottom-zone"><div class="game-info-facts">
+<div class="game-info-fact">
+<span>PLATFORMS</span>
+<strong>PC</strong>
+</div>
+<div class="game-info-fact">
+<span>RELEASE DATE</span>
+<strong>2022 / Ongoing</strong>
+</div>
+<div class="game-info-fact">
+<span>GENRE</span>
+<strong>FPS / Fangame</strong>
+</div>
+</div><div aria-label="Halodoom links" class="game-info-actions">
+<a class="game-info-action game-info-action--primary" href="https://jesze.itch.io/halodoom" rel="noopener noreferrer" target="_blank"><span class="game-info-action-label game-info-action-label--desktop">DOWNLOAD ON ITCH</span><span class="game-info-action-label game-info-action-label--compact">VIEW ON ITCH</span><span aria-hidden="true">›</span></a>
+<a class="game-info-action game-info-action--secondary" href="https://www.youtube.com/watch?v=hrzpMg4NwdE" rel="noopener noreferrer" target="_blank"><span class="game-info-action-label">WATCH TRAILER</span><span aria-hidden="true">›</span></a>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section aria-hidden="true" class="prototype-page-frame" data-page="contact" id="contact-page-frame">
+<svg aria-hidden="true" class="prototype-page-frame-shell" preserveaspectratio="none">
+<!--
+        Structural frame layers.
+        JavaScript redraws these from the same live rectangle used by
+        the morph target, so the real frame stays aligned to the fake one.
+      -->
+<path class="page-frame-ring" clip-rule="evenodd" fill-rule="evenodd"></path>
+<path class="page-frame-edge page-frame-edge--outer"></path>
+<path class="page-frame-edge page-frame-edge--chrome"></path>
+<path class="page-frame-edge page-frame-edge--inner"></path>
+<path class="page-frame-orange-rail"></path>
+<path class="page-frame-orange-highlight"></path>
+<!-- Decorative rails / micro-HUD details -->
+<g class="page-frame-side-details page-frame-side-details--left">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<g class="page-frame-side-details page-frame-side-details--right">
+<line class="page-frame-detail-line page-frame-detail-line--long"></line>
+<line class="page-frame-detail-line page-frame-detail-line--short"></line>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+<circle class="page-frame-detail-dot" r="1.4"></circle>
+</g>
+<!-- Bottom-center notch / indicator treatment -->
+<path class="page-frame-bottom-notch"></path>
+<g class="page-frame-bottom-dots">
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+<circle r="1.5"></circle>
+</g>
+</svg>
+<!--
+      Real HTML page content will eventually live here.
+      It is intentionally empty for now.
+    -->
+<div aria-label="Contact page content" class="prototype-page-frame-content simple-page-content">
+<div class="simple-glass-page">
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--outer"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--ring-1"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--back"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--ring-2"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--middle"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--ring-3"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--inner"></div>
+<div aria-hidden="true" class="simple-glass-layer simple-glass-layer--front"></div>
+<div class="simple-glass-content simple-glass-content--contact">
+<div class="simple-page-kicker">SIMULACRUM INTERACTIVE</div>
+<h1 class="simple-page-title">Contact</h1>
+<p class="simple-page-blurb contact-page-intro">For general inquiries, collaborations, press, or anything else, email us directly or find us on social media.</p>
+<a class="contact-email-card" href="mailto:info@simulacruminteractive.ca">
+<span aria-hidden="true" class="contact-email-icon">✉</span>
+<span class="contact-email-copy">
+<small>EMAIL</small>
+<strong>info@simulacruminteractive.ca</strong>
+</span>
+<span aria-hidden="true" class="contact-link-arrow">›</span>
+</a>
+<div class="contact-social-section">
+<div class="contact-social-heading">ELSEWHERE</div>
+<div class="contact-social-grid">
+<a class="contact-social-card" href="https://www.instagram.com/simulacruminteractive/" rel="noopener noreferrer" target="_blank">
+<img alt="" class="contact-social-icon" src="https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/instagram.svg"/>
+<span class="contact-social-copy">
+<strong>Instagram</strong>
+<small>@simulacruminteractive</small>
+</span>
+<span aria-hidden="true" class="contact-link-arrow">›</span>
+</a>
+<a class="contact-social-card" href="https://www.linkedin.com/company/simulacrum-interactive" rel="noopener noreferrer" target="_blank">
+<img alt="" class="contact-social-icon" src="https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/linkedin.svg"/>
+<span class="contact-social-copy">
+<strong>LinkedIn</strong>
+<small>Simulacrum Interactive</small>
+</span>
+<span aria-hidden="true" class="contact-link-arrow">›</span>
+</a>
+<a class="contact-social-card" href="https://www.youtube.com/@simulacruminteractive7629" rel="noopener noreferrer" target="_blank">
+<img alt="" class="contact-social-icon" src="https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/youtube.svg"/>
+<span class="contact-social-copy">
+<strong>YouTube</strong>
+<small>@simulacruminteractive7629</small>
+</span>
+<span aria-hidden="true" class="contact-link-arrow">›</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Desktop-only secondary glass panel -->
+<div aria-hidden="true" class="desktop-secondary-panel">
+<div class="desktop-secondary-panel-glass"></div>
+<div class="desktop-secondary-panel-content"></div>
+</div>
+</section>
+</main>
+<script src="header-menu.js"></script>
+</body>
 </html>

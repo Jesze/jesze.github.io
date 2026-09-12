@@ -9,6 +9,313 @@
 */
 
 document.addEventListener("DOMContentLoaded", () => {
+  /* =======================================================
+     Startup critical-asset preloader
+     =======================================================
+
+     Deliberately NOT a "download the whole website before showing it"
+     loader. We only block on the artwork that makes the site shell and the
+     first state of each game feel complete:
+
+       - viewport + banner frame artwork
+       - Simulacrum logo / nav icons
+       - all three reusable game-frame skins
+       - game logos
+       - first screenshot for each game
+
+     The rest of each screenshot gallery and the videos are allowed to load
+     normally in the background.
+
+     Failed files still count as complete and there is a hard timeout, so a
+     weak cellular connection can never trap the visitor on this screen.
+  */
+  const sitePreloader =
+    document.querySelector(
+      "#site-preloader"
+    );
+
+
+  const sitePreloaderFill =
+    sitePreloader?.querySelector(
+      ".site-preloader-fill"
+    );
+
+
+  const sitePreloaderStatus =
+    sitePreloader?.querySelector(
+      ".site-preloader-status"
+    );
+
+
+  const sitePreloaderPercent =
+    sitePreloader?.querySelector(
+      ".site-preloader-percent"
+    );
+
+
+  const criticalImageSources = [
+    /* Viewport border */
+    "assets/header/border-stretch.webp",
+    "assets/header/border-topleft.webp",
+    "assets/header/border-top.webp",
+    "assets/header/border-topright.webp",
+    "assets/header/border-centerleft.webp",
+    "assets/header/border-centerright.webp",
+    "assets/header/border-bottomleft.webp",
+    "assets/header/border-bottom.webp",
+    "assets/header/border-bottomright.webp",
+
+    /* Header banner */
+    "assets/header/banner-left.webp",
+    "assets/header/banner-leftstretch.webp",
+    "assets/header/banner-center.webp",
+    "assets/header/banner-rightstretch.webp",
+    "assets/header/banner-right.webp",
+
+    /* Header identity / navigation */
+    "assets/header/simulacrum-logo.png",
+    "assets/header/simulacrum-icon.png",
+    "assets/header/brobots-icon.png",
+    "assets/header/etherian-icon.png",
+    "assets/header/halodoom-icon.png",
+    "assets/header/mail-icon.png",
+
+    /* Brobots frame + first media */
+    "assets/brobots/frame/top-left.webp",
+    "assets/brobots/frame/top-right.webp",
+    "assets/brobots/frame/bottom-left.webp",
+    "assets/brobots/frame/bottom-right.webp",
+    "assets/brobots/frame/thumb-top-left.webp",
+    "assets/brobots/frame/thumb-top-right.webp",
+    "assets/brobots/frame/thumb-bottom-left.webp",
+    "assets/brobots/frame/thumb-bottom-right.webp",
+    "assets/brobots/brobots-logo.png",
+    "assets/brobots/brobots-screenshot-0.jpg",
+    "assets/brobots/brobots-info-background.jpg",
+
+    /* Etherian frame + first media */
+    "assets/etherian/frame/top-left.webp",
+    "assets/etherian/frame/top-right.webp",
+    "assets/etherian/frame/bottom-left.webp",
+    "assets/etherian/frame/bottom-right.webp",
+    "assets/etherian/frame/thumb-top-left.webp",
+    "assets/etherian/frame/thumb-top-right.webp",
+    "assets/etherian/frame/thumb-bottom-left.webp",
+    "assets/etherian/frame/thumb-bottom-right.webp",
+    "assets/etherian/etherian-logo.png",
+    "assets/etherian/etherian-screenshot-0.jpg",
+    "assets/etherian/etherian-info-background.jpg",
+
+    /* Halodoom frame + first media */
+    "assets/halodoom/frame/top-left.webp",
+    "assets/halodoom/frame/top-right.webp",
+    "assets/halodoom/frame/bottom-left.webp",
+    "assets/halodoom/frame/bottom-right.webp",
+    "assets/halodoom/frame/thumb-top-left.webp",
+    "assets/halodoom/frame/thumb-top-right.webp",
+    "assets/halodoom/frame/thumb-bottom-left.webp",
+    "assets/halodoom/frame/thumb-bottom-right.webp",
+    "assets/halodoom/halodoom-logo.png",
+    "assets/halodoom/halodoom-screenshot-0.jpg",
+    "assets/halodoom/halodoom-info-background.jpg"
+  ];
+
+
+  const preloadCriticalImage =
+    (src) => {
+      return new Promise(
+        (resolve) => {
+          const image =
+            new Image();
+
+
+          let settled =
+            false;
+
+
+          const finish =
+            () => {
+              if (settled) {
+                return;
+              }
+
+
+              settled =
+                true;
+
+
+              resolve();
+            };
+
+
+          image.onload =
+            finish;
+
+          image.onerror =
+            finish;
+
+          image.decoding =
+            "async";
+
+          image.src =
+            src;
+
+
+          if (image.complete) {
+            finish();
+          }
+        }
+      );
+    };
+
+
+  const updateSitePreloader =
+    (
+      completed,
+      total
+    ) => {
+      const progress =
+        total > 0
+          ? completed / total
+          : 1;
+
+      const percent =
+        Math.round(
+          progress * 100
+        );
+
+
+      if (sitePreloaderFill) {
+        sitePreloaderFill.style.setProperty(
+          "--site-preloader-progress",
+          `${percent}%`
+        );
+      }
+
+
+      if (sitePreloaderPercent) {
+        sitePreloaderPercent.textContent =
+          `${percent}%`;
+      }
+
+
+      if (
+        sitePreloaderStatus &&
+        percent >= 100
+      ) {
+        sitePreloaderStatus.textContent =
+          "Ready";
+      }
+    };
+
+
+  const dismissSitePreloader =
+    () => {
+      if (!sitePreloader) {
+        return;
+      }
+
+
+      updateSitePreloader(
+        criticalImageSources.length,
+        criticalImageSources.length
+      );
+
+
+      sitePreloader.classList.add(
+        "is-preloader-leaving"
+      );
+
+
+      window.setTimeout(
+        () => {
+          sitePreloader.remove();
+        },
+        520
+      );
+    };
+
+
+  if (sitePreloader) {
+    let completedCriticalImages =
+      0;
+
+    let preloaderDismissed =
+      false;
+
+
+    const dismissOnce =
+      () => {
+        if (preloaderDismissed) {
+          return;
+        }
+
+
+        preloaderDismissed =
+          true;
+
+
+        dismissSitePreloader();
+      };
+
+
+    updateSitePreloader(
+      0,
+      criticalImageSources.length
+    );
+
+
+    const preloadJobs =
+      criticalImageSources.map(
+        async (src) => {
+          await preloadCriticalImage(
+            src
+          );
+
+
+          completedCriticalImages +=
+            1;
+
+
+          updateSitePreloader(
+            completedCriticalImages,
+            criticalImageSources.length
+          );
+        }
+      );
+
+
+    Promise
+      .all(preloadJobs)
+      .then(
+        () => {
+          /*
+            One paint at 100% feels much cleaner than immediately removing
+            the loader on the exact same task completion tick.
+          */
+          requestAnimationFrame(
+            () => {
+              window.setTimeout(
+                dismissOnce,
+                120
+              );
+            }
+          );
+        }
+      );
+
+
+    /*
+      Absolute failsafe for slow/broken mobile connections. The cache warming
+      continues after this; only the blocking overlay is released.
+    */
+    window.setTimeout(
+      dismissOnce,
+      5500
+    );
+  }
+
+
   const setActivePageButtonState = (
     name = null,
     preserveName = null
@@ -1193,11 +1500,125 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 
+  const updateViewportFramePageProgress = (
+    name,
+    infoGeometryOverride = null
+  ) => {
+    const viewportFrame =
+      document.querySelector(
+        ".viewport-frame"
+      );
+
+
+    if (!viewportFrame) {
+      return;
+    }
+
+
+    const pageIndex =
+      pageNames.indexOf(
+        name
+      );
+
+
+    if (pageIndex < 0) {
+      return;
+    }
+
+
+    /*
+      Keep the decorative chevrons comfortably clear of the top/bottom
+      corner artwork while still making all five page positions distinct.
+    */
+    const pageProgressStops = [
+      18,
+      34,
+      50,
+      66,
+      82
+    ];
+
+
+    let progressY =
+      pageProgressStops[
+        pageIndex
+      ];
+
+
+    /*
+      Tablet/mobile game pages have a genuine second vertical stop:
+      media -> info -> next page.
+
+      Reflect that by moving the frame chevrons halfway toward the next page
+      while the info geometry is open. Desktop remains one stop per page
+      because its info panel is presented beside the media instead of as a
+      second scroll step.
+    */
+    const isGamePage =
+      (
+        name === "brobots" ||
+        name === "etherian" ||
+        name === "halodoom"
+      );
+
+
+    if (
+      isGamePage &&
+      gameFrameTabletMode.matches &&
+      pageIndex <
+        pageProgressStops.length - 1
+    ) {
+      const gameFrame =
+        pageFrames.get(
+          name
+        );
+
+
+      const gameFrameArea =
+        gameFrame?.querySelector(
+          ".game-frame-area"
+        );
+
+
+      const infoIsOpen =
+        infoGeometryOverride ??
+        gameFrameArea?.classList.contains(
+          "is-tablet-info-geometry"
+        );
+
+
+      if (infoIsOpen) {
+        progressY =
+          (
+            pageProgressStops[
+              pageIndex
+            ] +
+            pageProgressStops[
+              pageIndex + 1
+            ]
+          ) /
+          2;
+      }
+    }
+
+
+    viewportFrame.style.setProperty(
+      "--viewport-page-progress-y",
+      `${progressY}%`
+    );
+  };
+
+
   const setSelectedPageIntent = (
     name
   ) => {
     selectedPageName =
       name;
+
+
+    updateViewportFramePageProgress(
+      selectedPageName
+    );
 
 
     requestBackgroundVideo(
@@ -5893,14 +6314,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /*
     One page-morph interaction system now covers BOTH:
-      841–1400px  compact icon-button mode
+      751–1400px  compact icon-button mode
       1401px+     full text-button desktop mode
 
     The destination layout itself is breakpoint-specific CSS.
   */
   const iconButtonMode =
     window.matchMedia(
-      "(min-width: 841px)"
+      "(min-width: 751px)"
     );
 
 
@@ -8562,13 +8983,49 @@ document.addEventListener("DOMContentLoaded", () => {
     menuMorph.style.transition =
       "none";
 
+
+    const simplePageMorphCrossfade =
+      (
+        name === "about" ||
+        name === "contact"
+      );
+
+
+    /*
+      About / Contact should visually crossfade from the REAL page into the
+      temporary reverse-morph frame. Game pages keep the established immediate
+      opaque morph behavior.
+    */
     menuMorph.style.opacity =
-      "1";
+      simplePageMorphCrossfade
+        ? "0"
+        : "1";
+
+
+    /*
+      About / Contact are broad translucent glass compositions rather than
+      dense game frames. Their normal shared real-frame fade (~150ms) is so
+      short that the page appears to vanish as soon as the reverse morph
+      begins.
+
+      Give only these two simple pages a longer desktop/tablet retraction
+      fade. Game pages retain the established timing unchanged.
+    */
+    const simplePageCloseFadeDuration =
+      (
+        name === "about" ||
+        name === "contact"
+      )
+        ? Math.min(
+            duration,
+            840
+          )
+        : geometry.settings.realMenuFadeDuration;
 
 
     frame.style.transition =
       `opacity ${
-        geometry.settings.realMenuFadeDuration
+        simplePageCloseFadeDuration
       }ms ease`;
 
     frame.classList.remove(
@@ -8589,6 +9046,38 @@ document.addEventListener("DOMContentLoaded", () => {
       ) => {
         pageFrameProgress =
           progress;
+
+
+        if (simplePageMorphCrossfade) {
+          /*
+            Fade the temporary morph IN over roughly the first half of the
+            reverse animation. It is fully opaque well before it reaches the
+            nav button, so the final button landing keeps the same solidity as
+            the existing morph system.
+          */
+          const morphFadeRaw =
+            clamp(
+              rawProgress / 1.04,
+              0,
+              1
+            );
+
+
+          const morphFadeT =
+            morphFadeRaw *
+            morphFadeRaw *
+            (
+              3 -
+              2 *
+              morphFadeRaw
+            );
+
+
+          menuMorph.style.opacity =
+            String(
+              morphFadeT
+            );
+        }
 
 
         /*
@@ -8622,6 +9111,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         pageFrameTargetOpen =
           false;
+
+
+        if (simplePageMorphCrossfade) {
+          menuMorph.style.opacity =
+            "1";
+        }
 
 
         frame.classList.remove(
@@ -9088,6 +9583,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       frame.classList.remove(
         "is-mobile-outgoing-info-glow"
+      );
+
+      frame.classList.remove(
+        "is-mobile-simple-page-exiting"
       );
     };
 
@@ -9859,7 +10358,12 @@ document.addEventListener("DOMContentLoaded", () => {
         "none";
 
       menuMorph.style.opacity =
-        "1";
+        (
+          name === "about" ||
+          name === "contact"
+        )
+          ? "0"
+          : "1";
 
 
       /*
@@ -9970,15 +10474,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
               /*
-                Keep the hamburger-collapse morph fully visible.
+                About / Contact need the reverse of their mobile open
+                crossfade here:
 
-                Fade ONLY the real outgoing page underneath it so the visual
-                handoff becomes a proper crossfade instead of an abrupt
-                disappearance. Complete this fairly early, before the morph
-                has become substantially smaller than the half-height page.
+                  real page fades OUT
+                  hamburger morph fades IN
+
+                The morph still reaches full opacity early in the collapse
+                and remains fully opaque all the way into the final burger.
+                Game pages keep their established always-opaque morph.
               */
-              menuMorph.style.opacity =
-                "1";
+              const simplePageCrossfade =
+                (
+                  name === "about" ||
+                  name === "contact"
+                );
 
 
               const outgoingFadeRaw =
@@ -9996,6 +10506,15 @@ document.addEventListener("DOMContentLoaded", () => {
                   2 *
                   outgoingFadeRaw
                 );
+
+
+              menuMorph.style.opacity =
+                simplePageCrossfade
+                  ? String(
+                      outgoingFadeT
+                    )
+                  : "1";
+
 
               frame.style.opacity =
                 String(
@@ -10312,14 +10831,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
               /*
-                Keep the hamburger morph visually unchanged.
+                Game pages keep the established fully-opaque hamburger morph.
 
-                Only fade the REAL incoming page in underneath it during the
-                latter part of the expansion. This restores page fade-in
-                without altering the morph animation itself.
+                About / Contact are deliberately simpler glass pages, so let
+                their temporary hamburger morph crossfade away while the real
+                page fades in. This matches the handoff used by their other
+                responsive modes without changing Brobots/Etherian/Halodoom.
               */
-              menuMorph.style.opacity =
-                "1";
+              const simplePageCrossfade =
+                (
+                  name === "about" ||
+                  name === "contact"
+                );
 
 
               /*
@@ -10362,6 +10885,15 @@ document.addEventListener("DOMContentLoaded", () => {
                   2 *
                   pageFadeRaw
                 );
+
+
+              menuMorph.style.opacity =
+                simplePageCrossfade
+                  ? String(
+                      1 -
+                      pageFadeT
+                    )
+                  : "1";
 
 
               frame.style.opacity =
@@ -10632,6 +11164,21 @@ document.addEventListener("DOMContentLoaded", () => {
       closeSecondaryPanel(
         previousFrame
       );
+
+
+      /*
+        About / Contact have readable copy sitting directly on their glass
+        stack. Fade that copy away quickly as soon as an animated mobile page
+        handoff begins, while leaving the glass/page choreography untouched.
+      */
+      if (
+        previousName === "about" ||
+        previousName === "contact"
+      ) {
+        previousFrame.classList.add(
+          "is-mobile-simple-page-exiting"
+        );
+      }
 
 
       /*
@@ -12349,6 +12896,44 @@ document.addEventListener("DOMContentLoaded", () => {
      Interactions
      ======================================================= */
 
+  /*
+    Internal content links can opt into the exact same page controller used
+    by the header/mobile navigation. This avoids a browser hash jump and
+    keeps the normal morph/background/active-button behavior intact.
+  */
+  document
+    .querySelectorAll(
+      ".page-jump-link[data-page-jump]"
+    )
+    .forEach((link) => {
+      link.addEventListener(
+        "click",
+        (event) => {
+          const pageName =
+            link.dataset.pageJump ||
+            "";
+
+
+          if (
+            !pageFrames.has(
+              pageName
+            )
+          ) {
+            return;
+          }
+
+
+          event.preventDefault();
+
+
+          requestPage(
+            pageName
+          );
+        }
+      );
+    });
+
+
   pageNames.forEach((name) => {
     const button =
       pageNavButtons.get(name);
@@ -12371,6 +12956,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         event.preventDefault();
+
+
+        /*
+          PC + tablet: the currently open/selected page button is inert.
+          The active class is already the page controller's source of truth
+          for the pressed nav state, so reuse it instead of introducing a
+          second responsive-state check here.
+
+          Mobile hamburger-menu links are intentionally unaffected.
+        */
+        if (
+          button.classList.contains(
+            "is-page-active"
+          )
+        ) {
+          return;
+        }
 
 
         requestPage(
@@ -12525,7 +13127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const desktopQuery =
     window.matchMedia(
-      "(min-width: 841px)"
+      "(min-width: 751px)"
     );
 
 
@@ -14177,7 +14779,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /*
     PAGE -> live hamburger
 
-    The real page becomes display:none at <=840px, so use the last stable
+    The real page becomes display:none at <=750px, so use the last stable
     desktop/tablet rectangle as a temporary visual shell. Unlike the first
     experiment, the hamburger/source geometry is rebuilt EVERY FRAME.
   */
@@ -14224,7 +14826,7 @@ document.addEventListener("DOMContentLoaded", () => {
       disappear instantly at the breakpoint.
 
       IMPORTANT:
-      The viewport has already crossed <=840px at this point, so child
+      The viewport has already crossed <=750px at this point, so child
       elements would normally reflow into their mobile layout BEFORE the
       real page fades. Freeze the outgoing Brobots interior in its
       tablet/desktop composition for the duration of this handoff.
@@ -14994,7 +15596,7 @@ document.addEventListener("DOMContentLoaded", () => {
     event
   ) => {
     /*
-      Mobile now keeps the same real page alive as tablet, so crossing 840px
+      Mobile now keeps the same real page alive as tablet, so crossing 750px
       is a layout handoff rather than a page-close event.
 
       Invalidate the old mobile-collapse experiment in either direction and
@@ -16704,7 +17306,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const showLightboxImageAt = async (
-      nextIndex
+      nextIndex,
+      useSwipeWipe = false
     ) => {
       if (
         mediaLightboxState.isAnimating ||
@@ -16725,6 +17328,16 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!nextItem) {
         return;
       }
+
+
+      const previousLightboxIndex =
+        mediaLightboxState.imageIndex;
+
+      const lightboxWipeDirection =
+        nextIndex >
+        previousLightboxIndex
+          ? 1
+          : -1;
 
 
       mediaLightboxState.imageIndex =
@@ -16762,30 +17375,186 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
 
-      image.style.opacity =
-        "0";
+      const shouldUseLightboxSwipeWipe =
+        useSwipeWipe &&
+        window.matchMedia(
+          "(max-width: 1400px)"
+        ).matches &&
+        lightbox.classList.contains(
+          "is-settled"
+        );
 
-      image.src =
-        nextItem.dataset.mediaSrc;
 
-      image.alt =
-        nextItem.dataset.mediaTitle ||
-        "Game screenshot";
+      if (shouldUseLightboxSwipeWipe) {
+        mediaLightboxState.isAnimating =
+          true;
 
 
-      try {
-        await image.decode();
+        const wipeLayer =
+          document.createElement(
+            "div"
+          );
+
+        wipeLayer.className =
+          "media-lightbox-wipe-layer " +
+          (
+            lightboxWipeDirection > 0
+              ? "is-wipe-forward"
+              : "is-wipe-backward"
+          );
+
+
+        const wipeCanvas =
+          document.createElement(
+            "div"
+          );
+
+        wipeCanvas.className =
+          "media-lightbox-wipe-canvas";
+
+
+        const incomingImage =
+          document.createElement(
+            "img"
+          );
+
+        incomingImage.className =
+          "media-lightbox-wipe-image";
+
+        incomingImage.src =
+          nextItem.dataset.mediaSrc;
+
+        incomingImage.alt =
+          nextItem.dataset.mediaTitle ||
+          "Game screenshot";
+
+        incomingImage.decoding =
+          "async";
+
+
+        wipeCanvas.appendChild(
+          incomingImage
+        );
+
+        wipeLayer.appendChild(
+          wipeCanvas
+        );
+
+        lightbox.appendChild(
+          wipeLayer
+        );
+
+
+        try {
+          await incomingImage.decode();
+        }
+
+        catch {
+          // Cached/local images may already be ready.
+        }
+
+
+        /*
+          Paint the zero-width layer first, then reveal it exactly like the
+          mobile hero wipe.
+        */
+        wipeLayer
+          .getBoundingClientRect();
+
+
+        await new Promise(
+          (resolve) => {
+            const finishWipe =
+              () => {
+                resolve();
+              };
+
+
+            wipeLayer.addEventListener(
+              "animationend",
+              finishWipe,
+              {
+                once: true
+              }
+            );
+
+
+            requestAnimationFrame(
+              () => {
+                wipeLayer.classList.add(
+                  "is-wipe-running"
+                );
+              }
+            );
+          }
+        );
+
+
+        /*
+          The fully revealed temporary image now covers the old lightbox image.
+          Swap the real image underneath to the already-loaded source, then
+          remove the reveal layer on the next paint so there is no end snap.
+        */
+        image.src =
+          nextItem.dataset.mediaSrc;
+
+        image.alt =
+          nextItem.dataset.mediaTitle ||
+          "Game screenshot";
+
+
+        try {
+          await image.decode();
+        }
+
+        catch {
+          // The incoming image already decoded this source above.
+        }
+
+
+        await new Promise(
+          (resolve) => {
+            requestAnimationFrame(
+              () => {
+                wipeLayer.remove();
+
+                resolve();
+              }
+            );
+          }
+        );
+
+
+        mediaLightboxState.isAnimating =
+          false;
       }
 
-      catch {
-        // Cached/local images may already be ready.
-      }
-
-
-      requestAnimationFrame(() => {
+      else {
         image.style.opacity =
-          "";
-      });
+          "0";
+
+        image.src =
+          nextItem.dataset.mediaSrc;
+
+        image.alt =
+          nextItem.dataset.mediaTitle ||
+          "Game screenshot";
+
+
+        try {
+          await image.decode();
+        }
+
+        catch {
+          // Cached/local images may already be ready.
+        }
+
+
+        requestAnimationFrame(() => {
+          image.style.opacity =
+            "";
+        });
+      }
 
 
       /*
@@ -16851,6 +17620,215 @@ document.addEventListener("DOMContentLoaded", () => {
         if (event.target === lightbox) {
           closeMediaLightbox();
         }
+      }
+    );
+
+
+    /*
+      Tablet / mobile lightbox gestures
+      ---------------------------------
+      Keep the existing arrows and keyboard controls, but let a fullscreen
+      screenshot behave like the mobile hero:
+
+        finger LEFT  -> next screenshot
+        finger RIGHT -> previous screenshot
+        finger UP/DOWN -> close fullscreen
+
+      Button presses are deliberately excluded so a slightly sloppy tap on
+      the X / arrows can never also count as a swipe.
+    */
+    let lightboxSwipeStartX =
+      0;
+
+    let lightboxSwipeStartY =
+      0;
+
+    let lightboxSwipeTracking =
+      false;
+
+
+    const clearLightboxSwipe =
+      () => {
+        lightboxSwipeTracking =
+          false;
+      };
+
+
+    lightbox.addEventListener(
+      "touchstart",
+      (event) => {
+        if (
+          !window.matchMedia(
+            "(max-width: 1400px)"
+          ).matches ||
+          !lightbox.classList.contains(
+            "is-settled"
+          ) ||
+          mediaLightboxState.isAnimating ||
+          event.touches.length !== 1 ||
+          event.target.closest(
+            "button"
+          )
+        ) {
+          clearLightboxSwipe();
+
+          return;
+        }
+
+
+        const touch =
+          event.touches[0];
+
+
+        lightboxSwipeStartX =
+          touch.clientX;
+
+        lightboxSwipeStartY =
+          touch.clientY;
+
+        lightboxSwipeTracking =
+          true;
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    lightbox.addEventListener(
+      "touchmove",
+      (event) => {
+        if (
+          !lightboxSwipeTracking ||
+          event.touches.length !== 1
+        ) {
+          return;
+        }
+
+
+        const touch =
+          event.touches[0];
+
+        const deltaX =
+          touch.clientX -
+          lightboxSwipeStartX;
+
+        const deltaY =
+          touch.clientY -
+          lightboxSwipeStartY;
+
+
+        /*
+          Once intent is obvious, keep browser history navigation / page
+          scrolling from stealing the fullscreen gesture.
+        */
+        if (
+          Math.abs(deltaX) >= 8 ||
+          Math.abs(deltaY) >= 8
+        ) {
+          event.preventDefault();
+        }
+      },
+      {
+        passive: false
+      }
+    );
+
+
+    lightbox.addEventListener(
+      "touchend",
+      (event) => {
+        if (
+          !lightboxSwipeTracking ||
+          event.changedTouches.length !== 1 ||
+          !lightbox.classList.contains(
+            "is-settled"
+          ) ||
+          mediaLightboxState.isAnimating
+        ) {
+          clearLightboxSwipe();
+
+          return;
+        }
+
+
+        const touch =
+          event.changedTouches[0];
+
+        const deltaX =
+          touch.clientX -
+          lightboxSwipeStartX;
+
+        const deltaY =
+          touch.clientY -
+          lightboxSwipeStartY;
+
+        const absX =
+          Math.abs(
+            deltaX
+          );
+
+        const absY =
+          Math.abs(
+            deltaY
+          );
+
+        const swipeThreshold =
+          46;
+
+
+        clearLightboxSwipe();
+
+
+        if (
+          Math.max(
+            absX,
+            absY
+          ) < swipeThreshold
+        ) {
+          return;
+        }
+
+
+        const horizontalIntent =
+          absX >
+          absY * 1.1;
+
+        const verticalIntent =
+          absY >
+          absX * 1.1;
+
+
+        if (horizontalIntent) {
+          showLightboxImageAt(
+            mediaLightboxState.imageIndex +
+            (
+              deltaX < 0
+                ? 1
+                : -1
+            ),
+            true
+          );
+
+          return;
+        }
+
+
+        if (verticalIntent) {
+          closeMediaLightbox();
+        }
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    lightbox.addEventListener(
+      "touchcancel",
+      clearLightboxSwipe,
+      {
+        passive: true
       }
     );
 
@@ -20873,7 +21851,7 @@ document.addEventListener("DOMContentLoaded", () => {
       */
       if (
         window.matchMedia(
-          "(max-width: 840px)"
+          "(max-width: 750px)"
         ).matches
       ) {
         const viewportWidth =
@@ -20881,13 +21859,13 @@ document.addEventListener("DOMContentLoaded", () => {
             320,
             Math.min(
               window.innerWidth,
-              840
+              750
             )
           );
 
 
         /*
-          840px -> 100% of authored size
+          750px -> 100% of authored size
           320px -> ~88% of authored size
         */
         const mobileScale =
@@ -20896,7 +21874,7 @@ document.addEventListener("DOMContentLoaded", () => {
             (
               viewportWidth - 320
             ) /
-            520
+            430
           ) *
           0.12;
 
@@ -21703,6 +22681,24 @@ document.addEventListener("DOMContentLoaded", () => {
             ? "false"
             : "true"
         );
+
+
+        /*
+          Treat the tablet/mobile info state as the halfway point between
+          this page and the next page on the decorative side-frame progress
+          indicator.
+        */
+        if (
+          selectedPageName ===
+            pageName ||
+          activePageName ===
+            pageName
+        ) {
+          updateViewportFramePageProgress(
+            pageName,
+            infoGeometry
+          );
+        }
       };
 
 
