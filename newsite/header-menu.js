@@ -8711,6 +8711,2083 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  /* =======================================================
+     Mobile directional page-to-page transitions
+     =======================================================
+
+     Mobile keeps hamburger-menu opening separate for now.
+
+     Gesture page switches use a direction-specific hybrid:
+
+       Swipe UP / move forward:
+         outgoing page -> standard reverse page morph -> hamburger
+         incoming page -> slides up from below the viewport
+
+       Swipe DOWN / move backward:
+         outgoing page -> slides down below the viewport
+         incoming page -> standard page morph from hamburger
+
+     The morph geometry is the SAME page morph system already used on
+     tablet/desktop; only its source is the visible mobile hamburger.
+     ======================================================= */
+
+  let mobileDirectionalPageSwitchActive =
+    false;
+
+  let mobileDirectionalPageAnimationRunId =
+    0;
+
+
+  const getMobileGameFinalEightPoints =
+    (
+      geometry
+    ) => {
+      const {
+        menuRect,
+        settings
+      } = geometry;
+
+
+      const targetElement =
+        geometry?.target
+          ?.getTargetElement?.();
+
+
+      const visibleFrameElement =
+        targetElement
+          ?.querySelector(
+            ".prototype-page-frame-content"
+          );
+
+
+      const measuredVisibleRect =
+        visibleFrameElement
+          ?.getBoundingClientRect();
+
+
+      const targetRect =
+        (
+          measuredVisibleRect &&
+          measuredVisibleRect.width > 0 &&
+          measuredVisibleRect.height > 0
+        )
+          ? measuredVisibleRect
+          : menuRect;
+
+
+      /*
+        Desktop/tablet intentionally use enlarged game-page chamfers.
+
+        On a phone that same absolute treatment becomes enormous relative to
+        the collapsing page. Scale the vertical corner rise from the ACTUAL
+        visible page width instead, so the temporary morph keeps the same
+        visual proportion as the smaller mobile window.
+      */
+      const topRise =
+        Math.min(
+          targetRect.height * 0.30,
+          targetRect.width * 0.055
+        );
+
+      const bottomRise =
+        Math.min(
+          targetRect.height * 0.30,
+          targetRect.width * 0.055
+        );
+
+
+      const topRun =
+        topRise *
+        settings.slope;
+
+      const bottomRun =
+        bottomRise *
+        settings.slope;
+
+
+      return [
+        {
+          x:
+            targetRect.left +
+            topRun,
+          y:
+            targetRect.top
+        },
+
+        {
+          x:
+            targetRect.right -
+            topRun,
+          y:
+            targetRect.top
+        },
+
+        {
+          x:
+            targetRect.right,
+          y:
+            targetRect.top +
+            topRise
+        },
+
+        {
+          x:
+            targetRect.right,
+          y:
+            targetRect.bottom -
+            bottomRise
+        },
+
+        {
+          x:
+            targetRect.right -
+            bottomRun,
+          y:
+            targetRect.bottom
+        },
+
+        {
+          x:
+            targetRect.left +
+            bottomRun,
+          y:
+            targetRect.bottom
+        },
+
+        {
+          x:
+            targetRect.left,
+          y:
+            targetRect.bottom -
+            bottomRise
+        },
+
+        {
+          x:
+            targetRect.left,
+          y:
+            targetRect.top +
+            topRise
+        }
+      ];
+    };
+
+
+  const getMobileGameMorphPoints =
+    (
+      geometry,
+      progress
+    ) => {
+      const startPoints =
+        getGameLaunchEightPoints(
+          geometry
+        );
+
+      const finalPoints =
+        getMobileGameFinalEightPoints(
+          geometry
+        );
+
+      const t =
+        easeInOutCubic(
+          progress
+        );
+
+
+      return startPoints.map(
+        (
+          point,
+          index
+        ) => {
+          return {
+            x:
+              lerp(
+                point.x,
+                finalPoints[index].x,
+                t
+              ),
+
+            y:
+              lerp(
+                point.y,
+                finalPoints[index].y,
+                t
+              )
+          };
+        }
+      );
+    };
+
+
+  const buildMobileGameFormPath =
+    (
+      geometry,
+      progress
+    ) => {
+      return gameEightPointsToPath(
+        getMobileGameMorphPoints(
+          geometry,
+          progress
+        )
+      );
+    };
+
+
+  const getMobilePageMorphGeometry =
+    (
+      name
+    ) => {
+      const frame =
+        getPageFrame(
+          name
+        );
+
+
+      if (
+        !frame ||
+        !menuToggle
+      ) {
+        return null;
+      }
+
+
+      updatePrototypePageFrameGeometry(
+        frame
+      );
+
+
+      /*
+        The page morph normally inherits its accent from the nav button.
+        Mobile uses the hamburger instead, so temporarily give the hamburger
+        the page accent before asking the shared geometry engine to build it.
+      */
+      const pageAccent =
+        getComputedStyle(
+          frame
+        )
+          .getPropertyValue(
+            "--page-accent-rgb"
+          )
+          .trim();
+
+
+      if (pageAccent) {
+        menuToggle.style.setProperty(
+          "--nav-accent-rgb",
+          pageAccent
+        );
+      }
+
+
+      return getMorphGeometry(
+        {
+          getSourceElement: () =>
+            menuToggle,
+
+          getTargetElement: () =>
+            frame,
+
+          getFinalRect:
+            getFinalElementRect,
+
+          buildFormPath:
+            (
+              name === "brobots" ||
+              name === "etherian" ||
+              name === "halodoom"
+            )
+              ? buildMobileGameFormPath
+              : buildFormPath,
+
+          settingsFamily:
+            "page",
+
+          shapeType:
+            (
+              name === "brobots" ||
+              name === "etherian" ||
+              name === "halodoom"
+            )
+              ? "game-page"
+              : "page"
+        }
+      );
+    };
+
+
+  const getMobilePageSlideDistance =
+    (
+      frame
+    ) => {
+      const rect =
+        frame.getBoundingClientRect();
+
+
+      /*
+        "Offscreen below" only requires the page's TOP edge to sit just below
+        the viewport.
+
+        The previous formula also added the page's full height, which placed
+        the incoming page an entire extra page-length below the screen. That
+        meant our synchronized first phase was technically running, but the new
+        page remained invisible until the old page had almost finished
+        shrinking.
+
+        Start / finish just beyond the bottom edge instead. Now 50% travel
+        actually means the page is visibly about halfway into the viewport.
+      */
+      return Math.max(
+        40,
+        window.innerHeight -
+          rect.top +
+          24
+      );
+    };
+
+
+  const clearMobilePageAnimationStyles =
+    (
+      frame
+    ) => {
+      if (!frame) {
+        return;
+      }
+
+
+      frame.style.removeProperty(
+        "transform"
+      );
+
+      frame.style.removeProperty(
+        "opacity"
+      );
+
+      frame.style.removeProperty(
+        "transition"
+      );
+
+      frame.style.removeProperty(
+        "z-index"
+      );
+
+      frame.style.removeProperty(
+        "will-change"
+      );
+
+      frame.style.removeProperty(
+        "transform-origin"
+      );
+
+      frame.style.removeProperty(
+        "height"
+      );
+
+      frame.style.removeProperty(
+        "--mobile-outgoing-info-glow-progress"
+      );
+
+      frame.classList.remove(
+        "is-mobile-outgoing-info-glow"
+      );
+    };
+
+
+  const finalizeMobileOutgoingFrame =
+    (
+      frame
+    ) => {
+      if (!frame) {
+        return;
+      }
+
+
+      /*
+        IMPORTANT:
+        Do not simply remove .is-open and then clear the temporary transform.
+
+        The normal page CSS fades opacity when .is-open disappears. If we also
+        remove the offscreen translate in that same moment, the old page jumps
+        back into its resting position and performs that fade in full view.
+
+        Hard-commit the hidden state with transitions disabled FIRST, then
+        release the temporary animation styles. The base closed-page CSS is
+        already opacity:0, so once this frame is committed there is nothing
+        left to visibly fade.
+      */
+      frame.style.transition =
+        "none";
+
+      frame.style.opacity =
+        "0";
+
+
+      frame.classList.remove(
+        "is-open"
+      );
+
+
+      /*
+        Force Safari/Chromium to commit the closed state before we remove the
+        outgoing slide transform.
+      */
+      frame.getBoundingClientRect();
+
+
+      frame.style.removeProperty(
+        "transform"
+      );
+
+      frame.style.removeProperty(
+        "z-index"
+      );
+
+      frame.style.removeProperty(
+        "will-change"
+      );
+
+      frame.style.removeProperty(
+        "height"
+      );
+
+      frame.style.removeProperty(
+        "--mobile-outgoing-info-glow-progress"
+      );
+
+      frame.classList.remove(
+        "is-mobile-outgoing-info-glow"
+      );
+
+
+      /*
+        Another layout read ensures the base closed opacity has taken over
+        before normal CSS transitions are restored.
+      */
+      frame.getBoundingClientRect();
+
+
+      frame.style.removeProperty(
+        "opacity"
+      );
+
+      frame.style.removeProperty(
+        "transition"
+      );
+    };
+
+
+  const animateMobilePageSlide =
+    (
+      frame,
+      {
+        fromY,
+        toY,
+        duration,
+        easing =
+          "cubic-bezier(0.22, 0.72, 0.24, 1)",
+        keepOpen = true,
+        holdFinal = false,
+        fromOpacity = 1,
+        toOpacity = 1
+      }
+    ) => {
+      if (!frame) {
+        return Promise.resolve();
+      }
+
+
+      frame.style.transition =
+        "none";
+
+      frame.style.willChange =
+        "transform";
+
+      frame.style.opacity =
+        "1";
+
+
+      if (keepOpen) {
+        frame.classList.add(
+          "is-open"
+        );
+      }
+
+
+      const animation =
+        frame.animate(
+          [
+            {
+              transform:
+                `translate3d(0, ${fromY}px, 0)`,
+
+              opacity:
+                fromOpacity
+            },
+            {
+              transform:
+                `translate3d(0, ${toY}px, 0)`,
+
+              opacity:
+                toOpacity
+            }
+          ],
+          {
+            duration:
+              Math.max(
+                1,
+                duration
+              ),
+
+            easing,
+
+            fill:
+              "forwards"
+          }
+        );
+
+
+      return animation.finished
+        .catch(
+          () => {}
+        )
+        .then(
+          () => {
+            /*
+              WAAPI fill:"forwards" only persists while the Animation object
+              remains active. Calling cancel() immediately used to snap an
+              outgoing page back to translateY(0) for one frame before the
+              switch cleanup removed it — the visible "reappear then fade".
+
+              Commit the final transform as an inline style first when this is
+              an outgoing slide, then cancel the temporary animation.
+            */
+            if (holdFinal) {
+              frame.style.transform =
+                `translate3d(0, ${toY}px, 0)`;
+            }
+
+
+            animation.cancel();
+          }
+        );
+    };
+
+
+  const animateMobileForwardPush =
+    async (
+      previousFrame,
+      nextFrame,
+      {
+        nextDistance,
+        pushDuration,
+        collapseDuration,
+        runId,
+        previousName
+      }
+    ) => {
+      if (
+        !previousFrame ||
+        !nextFrame
+      ) {
+        return;
+      }
+
+
+      /*
+        Phase 1 uses the REAL page sizing rules, not transform: scaleY().
+
+        The old page's inline height is animated down to half its starting
+        height while updatePrototypePageFrameGeometry() runs every frame.
+        That means:
+          - frame corners / rails resize naturally
+          - media + info geometry reacts as though the viewport/page height
+            itself were being reduced
+          - text / container-query behavior follows the existing responsive
+            rules instead of being visually squashed
+
+        The incoming page's first half of travel is driven by this SAME RAF,
+        so the two motions are guaranteed to happen simultaneously.
+      */
+      const previousStartRect =
+        previousFrame.getBoundingClientRect();
+
+      const startHeight =
+        previousStartRect.height;
+
+      const nextFinalRect =
+        nextFrame.getBoundingClientRect();
+
+
+      /*
+        At the handoff point, put the incoming page's TOP edge at roughly the
+        middle of the viewport.
+      */
+      const halfwayY =
+        Math.max(
+          0,
+          window.innerHeight * 0.50 -
+            nextFinalRect.top
+        );
+
+
+      /*
+        Do not independently guess "half height" for the old page.
+
+        Derive its final first-phase height from the exact place where the
+        incoming page will be at the handoff. That makes the old page's bottom
+        edge and the new page's top edge meet cleanly instead of occasionally
+        leaving a gap or awkward overlap.
+
+        A tiny 2px overlap is intentional; the incoming page is layered above
+        the outgoing geometry, so this hides antialiasing seams.
+      */
+      const incomingHalfwayTop =
+        nextFinalRect.top +
+        halfwayY;
+
+
+      /*
+        Leave a small intentional gap between the old page's shrunken bottom
+        edge and the incoming page's top edge.
+
+        The previous version used a 2px overlap to hide antialias seams.
+        In motion, the outgoing resize can visually trail the incoming page by
+        a few pixels, so a modest buffer reads cleaner and avoids the collision
+        without changing the timing/choreography.
+      */
+      const mobilePushBuffer =
+        Math.max(
+          24,
+          Math.min(
+            54,
+            window.innerHeight * 0.036
+          )
+        );
+
+
+      const targetHeight =
+        Math.max(
+          1,
+          Math.min(
+            startHeight,
+            incomingHalfwayTop -
+              previousStartRect.top -
+              mobilePushBuffer
+          )
+        );
+
+
+      previousFrame.style.transition =
+        "none";
+
+      previousFrame.style.opacity =
+        "1";
+
+      previousFrame.style.willChange =
+        "height, opacity";
+
+
+      /*
+        Mobile swipe-up only:
+        wash the outgoing INFO region into the page accent as the page loses
+        height. This hides the copy before the cavity becomes too small for it.
+      */
+      previousFrame.classList.add(
+        "is-mobile-outgoing-info-glow"
+      );
+
+      previousFrame.style.setProperty(
+        "--mobile-outgoing-info-glow-progress",
+        "0"
+      );
+
+
+      nextFrame.style.transition =
+        "none";
+
+      nextFrame.style.opacity =
+        "0";
+
+      nextFrame.style.willChange =
+        "transform, opacity";
+
+      nextFrame.classList.add(
+        "is-open"
+      );
+
+      nextFrame.style.transform =
+        `translate3d(0, ${nextDistance}px, 0)`;
+
+
+      await new Promise(
+        (resolve) => {
+          const startTime =
+            performance.now();
+
+
+          const step =
+            (now) => {
+              if (
+                runId !==
+                mobileDirectionalPageAnimationRunId
+              ) {
+                resolve();
+
+                return;
+              }
+
+
+              const raw =
+                clamp(
+                  (
+                    now -
+                    startTime
+                  ) /
+                  Math.max(
+                    1,
+                    pushDuration
+                  ),
+                  0,
+                  1
+                );
+
+
+              const t =
+                easeInOutCubic(
+                  raw
+                );
+
+
+              const currentHeight =
+                lerp(
+                  startHeight,
+                  targetHeight,
+                  t
+                );
+
+
+              /*
+                Let the incoming page lead the old-page compression by a hair.
+                The difference is subtle, but it makes the motion read as
+                "new page pushes old page away" rather than two unrelated
+                animations arriving at the same endpoint.
+              */
+              const incomingT =
+                clamp(
+                  t * 1.08,
+                  0,
+                  1
+                );
+
+              const currentY =
+                lerp(
+                  nextDistance,
+                  halfwayY,
+                  incomingT
+                );
+
+
+              previousFrame.style.height =
+                `${currentHeight}px`;
+
+              nextFrame.style.transform =
+                `translate3d(0, ${currentY}px, 0)`;
+
+
+              /*
+                Restore the old page crossfade as a SECONDARY effect, without
+                replacing the physical push motion.
+
+                Keep plenty of solidity during phase 1 so the movement still
+                reads clearly; the stronger fade happens during collapse.
+              */
+              previousFrame.style.opacity =
+                String(
+                  lerp(
+                    1,
+                    0.78,
+                    t
+                  )
+                );
+
+              nextFrame.style.opacity =
+                String(
+                  lerp(
+                    0,
+                    0.82,
+                    incomingT
+                  )
+                );
+
+
+              /*
+                Glow quickly rather than linearly. By the time the outgoing
+                page reaches the halfway handoff the info region is completely
+                page-colored, so the text never gets a chance to look cramped.
+              */
+              const infoGlowProgress =
+                1 -
+                Math.pow(
+                  1 -
+                  t,
+                  2.35
+                );
+
+
+              previousFrame.style.setProperty(
+                "--mobile-outgoing-info-glow-progress",
+                String(
+                  infoGlowProgress
+                )
+              );
+
+
+              /*
+                Rebuild the actual frame SVG / game-frame geometry from the
+                newly-resized page rectangle on every animation frame.
+              */
+              updatePrototypePageFrameGeometry(
+                previousFrame
+              );
+
+              syncMediaRailsForLayout();
+
+
+              if (raw < 1) {
+                requestAnimationFrame(
+                  step
+                );
+
+                return;
+              }
+
+
+              resolve();
+            };
+
+
+          requestAnimationFrame(
+            step
+          );
+        }
+      );
+
+
+      if (
+        runId !==
+        mobileDirectionalPageAnimationRunId
+      ) {
+        return;
+      }
+
+
+      /*
+        Commit the exact halfway state. At this moment:
+          - old page genuinely occupies half its original height
+          - new page is halfway into the viewport
+
+        NOW begin the hamburger collapse using the resized page itself as the
+        morph's target geometry.
+      */
+      previousFrame.style.height =
+        `${targetHeight}px`;
+
+      nextFrame.style.transform =
+        `translate3d(0, ${halfwayY}px, 0)`;
+
+
+      previousFrame.style.setProperty(
+        "--mobile-outgoing-info-glow-progress",
+        "1"
+      );
+
+
+      updatePrototypePageFrameGeometry(
+        previousFrame
+      );
+
+      syncMediaRailsForLayout();
+
+
+      const resizedStartRect =
+        previousFrame.getBoundingClientRect();
+
+
+      /*
+        Do not override stacking here.
+
+        The old incoming-page z-index boost was only introduced to hide the
+        earlier overlap with the collapse morph. That overlap is now solved by
+        the geometry/tethering, and the boost can put the page/banner into a
+        stacking context above the hamburger morph.
+
+        Leaving both real pages at their normal stacking order mirrors the
+        swipe-down path, where the morph already renders correctly.
+      */
+      nextFrame.style.removeProperty(
+        "z-index"
+      );
+
+      previousFrame.style.removeProperty(
+        "z-index"
+      );
+
+
+      /*
+        Phase 2 is now physically linked instead of time-linked.
+
+        The incoming page no longer runs an independent "second half" slide.
+        animateMobileForwardDynamicCollapse() drives BOTH:
+          - the old-page collapse toward hamburger
+          - the incoming page upward
+
+        The incoming page's top edge is tethered just below the current bottom
+        edge of the collapse morph. If the morph spends a few frames changing
+        width/chamfer before its bottom edge rises, the new page simply waits
+        for that clearance instead of passing through it.
+      */
+      await animateMobileForwardDynamicCollapse(
+        previousName,
+        runId,
+        {
+          startRect:
+            resizedStartRect,
+
+          duration:
+            Math.max(
+              320,
+              collapseDuration * 0.50
+            ),
+
+          incomingFrame:
+            nextFrame,
+
+          incomingFinalTop:
+            nextFinalRect.top,
+
+          incomingStartY:
+            halfwayY,
+
+          /*
+            Keep a modest clearance during the collapse itself. The larger
+            phase-1 buffer has already established separation at handoff.
+          */
+          incomingBuffer:
+            Math.max(
+              10,
+              Math.min(
+                22,
+                window.innerHeight * 0.016
+              )
+            )
+        }
+      );
+    };
+
+
+  const animateMobileForwardDynamicCollapse =
+    (
+      name,
+      runId,
+      {
+        startRect,
+        duration = 520,
+        incomingFrame = null,
+        incomingFinalTop = null,
+        incomingStartY = 0,
+        incomingBuffer = 14
+      } = {}
+    ) => {
+      const frame =
+        getPageFrame(
+          name
+        );
+
+
+      if (
+        !frame ||
+        !startRect
+      ) {
+        return Promise.resolve();
+      }
+
+
+      const geometry =
+        getMobilePageMorphGeometry(
+          name
+        );
+
+
+      if (!geometry) {
+        return Promise.resolve();
+      }
+
+
+      /*
+        MOBILE SWIPE-UP ONLY.
+
+        Do not modify the standard page morph animation used elsewhere.
+        Instead, create a temporary geometry object whose FINAL page rect is
+        the already-resized half-height frame. The collapse then runs from
+        that exact shape back to the hamburger.
+
+        This preserves every other caller of buildGameFormPath /
+        renderMorph / requestPage.
+      */
+      const dynamicGeometry = {
+        ...geometry,
+
+        menuRect: {
+          left:
+            startRect.left,
+
+          top:
+            startRect.top,
+
+          right:
+            startRect.right,
+
+          bottom:
+            startRect.bottom,
+
+          width:
+            startRect.width,
+
+          height:
+            startRect.height
+        }
+      };
+
+
+      showMorph();
+
+      renderMorph(
+        dynamicGeometry,
+        1
+      );
+
+
+      menuMorph.style.transition =
+        "none";
+
+      menuMorph.style.opacity =
+        "1";
+
+
+      /*
+        Match the swipe-down path exactly.
+
+        menuMorph is created with inline z-index: 1001 so it sits above the
+        main Simulacrum header (z-index: 1000). The previous swipe-up cleanup
+        accidentally REMOVED that original inline z-index, which dropped the
+        collapse morph behind the banner.
+
+        Keep the morph at its normal baseline layer instead of inventing a
+        forward-only stacking order.
+      */
+      menuMorph.style.zIndex =
+        "1001";
+
+
+      /*
+        Keep the real resized outgoing page visible at the handoff.
+
+        Previously we killed it immediately with opacity:0 as soon as the
+        hamburger-collapse morph appeared. That made the page visibly vanish
+        instead of crossfading into the morph.
+
+        The morph itself remains fully opaque / unchanged; we only fade the
+        REAL outgoing page away during the opening portion of phase 2.
+      */
+      frame.style.transition =
+        "none";
+
+
+      /*
+        True page -> morph crossfade.
+
+        Keep the hamburger morph fully opaque at its normal 1001 layer, but
+        temporarily place the REAL outgoing page one layer above it. As the
+        real page fades to 0, it reveals the already-running morph underneath.
+
+        This avoids the brightness/pop at the exact handoff without fading the
+        hamburger morph itself.
+      */
+      frame.style.zIndex =
+        "1002";
+
+
+      return new Promise(
+        (resolve) => {
+          const startTime =
+            performance.now();
+
+
+          /*
+            The collapse polygon can change shape quite aggressively from one
+            frame to the next. Keep a separate smoothed Y for the incoming
+            page so it follows the collapse rather than snapping exactly to
+            every instantaneous geometry change.
+          */
+          let smoothedIncomingY =
+            incomingStartY;
+
+
+          const step =
+            (now) => {
+              if (
+                runId !==
+                mobileDirectionalPageAnimationRunId
+              ) {
+                resolve();
+
+                return;
+              }
+
+
+              const raw =
+                clamp(
+                  (
+                    now -
+                    startTime
+                  ) /
+                  Math.max(
+                    1,
+                    duration
+                  ),
+                  0,
+                  1
+                );
+
+
+              /*
+                Faster/aggressive second stage. The first push phase already
+                established the shrinking motion, so this should feel like a
+                continuation rather than a fresh slow animation.
+              */
+              const t =
+                1 -
+                Math.pow(
+                  1 -
+                  raw,
+                  3
+                );
+
+
+              renderMorph(
+                dynamicGeometry,
+                1 -
+                  t
+              );
+
+
+              /*
+                Keep the hamburger-collapse morph fully visible.
+
+                Fade ONLY the real outgoing page underneath it so the visual
+                handoff becomes a proper crossfade instead of an abrupt
+                disappearance. Complete this fairly early, before the morph
+                has become substantially smaller than the half-height page.
+              */
+              menuMorph.style.opacity =
+                "1";
+
+
+              const outgoingFadeRaw =
+                clamp(
+                  raw / 0.38,
+                  0,
+                  1
+                );
+
+              const outgoingFadeT =
+                outgoingFadeRaw *
+                outgoingFadeRaw *
+                (
+                  3 -
+                  2 *
+                  outgoingFadeRaw
+                );
+
+              frame.style.opacity =
+                String(
+                  lerp(
+                    0.78,
+                    0,
+                    outgoingFadeT
+                  )
+                );
+
+
+              if (incomingFrame) {
+                incomingFrame.style.opacity =
+                  String(
+                    lerp(
+                      0.82,
+                      1,
+                      t
+                    )
+                  );
+              }
+
+
+              /*
+                Tether the incoming page to the actual rendered collapse
+                silhouette, not to the collapse timer.
+
+                This fixes the awkward moment where the standard morph begins
+                by changing width/chamfers while its bottom edge barely moves:
+                the new page can no longer run ahead and overlap it.
+              */
+              if (
+                incomingFrame &&
+                Number.isFinite(
+                  incomingFinalTop
+                )
+              ) {
+                /*
+                  Follow the ACTUAL bottom edge of the visible collapse polygon.
+
+                  menuMorph.getBoundingClientRect() only reports the shell's
+                  static DOM box, so it remained essentially unchanged during
+                  the clip-path morph and made the incoming page stall at the
+                  halfway point.
+
+                  These points are the same interpolated geometry used by
+                  buildMobileGameFormPath(), so this tracks exactly what the
+                  user sees on screen.
+                */
+                const currentMorphProgress =
+                  1 -
+                  t;
+
+                const currentMorphPoints =
+                  getMobileGameMorphPoints(
+                    dynamicGeometry,
+                    currentMorphProgress
+                  );
+
+                const currentMorphBottom =
+                  Math.max(
+                    ...currentMorphPoints.map(
+                      (point) =>
+                        point.y
+                    )
+                  );
+
+
+                const desiredIncomingTop =
+                  Math.max(
+                    incomingFinalTop,
+                    currentMorphBottom +
+                      incomingBuffer
+                  );
+
+
+                const desiredIncomingY =
+                  clamp(
+                    desiredIncomingTop -
+                      incomingFinalTop,
+                    0,
+                    incomingStartY
+                  );
+
+
+                /*
+                  Smoothly chase the morph edge instead of matching it 1:1.
+
+                  The follow strength ramps up near the end so we retain the
+                  softer motion through the snappy part of the collapse but
+                  still land cleanly at the final page position.
+                */
+                const followStrength =
+                  lerp(
+                    0.18,
+                    0.46,
+                    Math.pow(
+                      raw,
+                      1.7
+                    )
+                  );
+
+
+                smoothedIncomingY =
+                  lerp(
+                    smoothedIncomingY,
+                    desiredIncomingY,
+                    followStrength
+                  );
+
+
+                /*
+                  Guarantee a smooth landing.
+
+                  The smoothed follower can intentionally lag a few pixels
+                  behind the collapse edge. Previously we snapped that final
+                  remainder to 0 when the morph completed, which caused the
+                  visible end-pop.
+
+                  During the final ~28% of the collapse, progressively blend
+                  the follower toward its true resting position. The blend
+                  uses smoothstep, so both the start and end of the correction
+                  have zero-ish slope instead of feeling like another snap.
+                */
+                const landingRaw =
+                  clamp(
+                    (
+                      raw -
+                      0.72
+                    ) /
+                    0.28,
+                    0,
+                    1
+                  );
+
+                const landingT =
+                  landingRaw *
+                  landingRaw *
+                  (
+                    3 -
+                    2 *
+                    landingRaw
+                  );
+
+                const renderedIncomingY =
+                  lerp(
+                    smoothedIncomingY,
+                    0,
+                    landingT
+                  );
+
+
+                incomingFrame.style.transform =
+                  `translate3d(0, ${renderedIncomingY}px, 0)`;
+              }
+
+
+              if (raw < 1) {
+                requestAnimationFrame(
+                  step
+                );
+
+                return;
+              }
+
+
+              frame.classList.remove(
+                "is-open"
+              );
+
+
+              if (incomingFrame) {
+                incomingFrame.style.transform =
+                  "translate3d(0, 0, 0)";
+
+                incomingFrame.style.opacity =
+                  "1";
+              }
+
+
+              hideMorph();
+
+
+              menuMorph.style.zIndex =
+                "1001";
+
+
+              /*
+                Keep the real outgoing frame hidden until the page-switch
+                finalizer runs.
+              */
+              frame.style.transition =
+                "none";
+
+              frame.style.opacity =
+                "0";
+
+
+              resolve();
+            };
+
+
+          requestAnimationFrame(
+            step
+          );
+        }
+      );
+    };
+
+
+  const animateMobilePageMorphOpen =
+    (
+      name,
+      runId
+    ) => {
+      const frame =
+        getPageFrame(
+          name
+        );
+
+      const geometry =
+        getMobilePageMorphGeometry(
+          name
+        );
+
+
+      if (
+        !frame ||
+        !geometry
+      ) {
+        return Promise.resolve();
+      }
+
+
+      const duration =
+        Math.max(
+          1,
+          geometry.settings.openDuration
+        );
+
+
+      showMorph();
+
+      menuMorph.style.transition =
+        "none";
+
+      menuMorph.style.opacity =
+        "0";
+
+
+      /*
+        Mobile directional navigation keeps the geometry animation primary,
+        with opacity layered on top as a secondary fade.
+        Keep the real destination frame fully hidden while the temporary morph
+        grows out of the hamburger, then swap them at the completed geometry.
+      */
+      frame.style.transition =
+        "none";
+
+      frame.style.opacity =
+        "0";
+
+
+      /*
+        True morph -> page crossfade.
+
+        The morph remains fully opaque at z-index 1001. Put the REAL incoming
+        page just above it while its opacity rises, so the fade is actually
+        visible instead of happening underneath an opaque morph and then
+        appearing to pop when the morph is removed.
+      */
+      frame.style.zIndex =
+        "1002";
+
+      frame.classList.add(
+        "is-open"
+      );
+
+
+      return new Promise(
+        (resolve) => {
+          const startTime =
+            performance.now();
+
+
+          const step =
+            (now) => {
+              if (
+                runId !==
+                mobileDirectionalPageAnimationRunId
+              ) {
+                resolve();
+
+                return;
+              }
+
+
+              const raw =
+                clamp(
+                  (
+                    now -
+                    startTime
+                  ) /
+                  duration,
+                  0,
+                  1
+                );
+
+
+              renderMorph(
+                geometry,
+                raw
+              );
+
+
+              /*
+                Keep the hamburger morph visually unchanged.
+
+                Only fade the REAL incoming page in underneath it during the
+                latter part of the expansion. This restores page fade-in
+                without altering the morph animation itself.
+              */
+              menuMorph.style.opacity =
+                "1";
+
+
+              /*
+                Finish the REAL page fade before the morph reaches its final
+                frame.
+
+                When the fade was mapped all the way to raw === 1, the page
+                could still be visually a little shy of full opacity on the
+                last painted animation frame, then appear to pop when the
+                temporary morph was removed.
+
+                Giving the page a short fully-opaque "settle" window underneath
+                the morph makes the final morph removal visually neutral.
+              */
+              const pageFadeStart =
+                0.54;
+
+              const pageFadeEnd =
+                0.86;
+
+              const pageFadeRaw =
+                clamp(
+                  (
+                    raw -
+                    pageFadeStart
+                  ) /
+                  (
+                    pageFadeEnd -
+                    pageFadeStart
+                  ),
+                  0,
+                  1
+                );
+
+              const pageFadeT =
+                pageFadeRaw *
+                pageFadeRaw *
+                (
+                  3 -
+                  2 *
+                  pageFadeRaw
+                );
+
+
+              frame.style.opacity =
+                String(
+                  pageFadeT
+                );
+
+
+              if (raw < 1) {
+                requestAnimationFrame(
+                  step
+                );
+
+                return;
+              }
+
+
+              /*
+                The morph and real page now occupy the same final geometry.
+                Swap instantly instead of fading one over the other.
+              */
+              frame.style.opacity =
+                "1";
+
+              frame.getBoundingClientRect();
+
+
+              menuMorph.style.opacity =
+                "0";
+
+              hideMorph();
+
+
+              frame.style.removeProperty(
+                "opacity"
+              );
+
+              frame.style.removeProperty(
+                "transition"
+              );
+
+              frame.style.removeProperty(
+                "z-index"
+              );
+
+
+              resolve();
+            };
+
+
+          requestAnimationFrame(
+            step
+          );
+        }
+      );
+    };
+
+
+  const animateMobilePageMorphClose =
+    (
+      name,
+      runId,
+      {
+        noCrossfade = true
+      } = {}
+    ) => {
+      const frame =
+        getPageFrame(
+          name
+        );
+
+      const geometry =
+        getMobilePageMorphGeometry(
+          name
+        );
+
+
+      if (
+        !frame ||
+        !geometry
+      ) {
+        return Promise.resolve();
+      }
+
+
+      const duration =
+        Math.max(
+          1,
+          geometry.settings.closeDuration
+        );
+
+
+      showMorph();
+
+      renderMorph(
+        geometry,
+        1
+      );
+
+
+      menuMorph.style.transition =
+        "none";
+
+      menuMorph.style.opacity =
+        "1";
+
+
+      /*
+        Mobile directional navigation uses a hard visual handoff:
+        the morph is first rendered at the CURRENT real-frame geometry, then
+        the real frame is hidden instantly underneath it.
+
+        That removes the competing opacity fade and, importantly for the
+        forward push, lets a compressed page become the exact starting shape
+        of the hamburger collapse.
+      */
+      frame.style.transition =
+        "none";
+
+
+      if (noCrossfade) {
+        frame.style.opacity =
+          "0";
+      }
+
+      else {
+        frame.style.transition =
+          `opacity ${
+            geometry.settings.realMenuFadeDuration
+          }ms ease`;
+      }
+
+
+      return new Promise(
+        (resolve) => {
+          const startTime =
+            performance.now();
+
+
+          const step =
+            (now) => {
+              if (
+                runId !==
+                mobileDirectionalPageAnimationRunId
+              ) {
+                resolve();
+
+                return;
+              }
+
+
+              const raw =
+                clamp(
+                  (
+                    now -
+                    startTime
+                  ) /
+                  duration,
+                  0,
+                  1
+                );
+
+              const progress =
+                1 -
+                raw;
+
+
+              renderMorph(
+                geometry,
+                progress
+              );
+
+
+              if (raw < 1) {
+                requestAnimationFrame(
+                  step
+                );
+
+                return;
+              }
+
+
+              frame.classList.remove(
+                "is-open"
+              );
+
+              hideMorph();
+
+
+              /*
+                Keep the real outgoing page hidden until the final page-switch
+                cleanup. Do not restore opacity here or it can flash back in.
+              */
+              frame.style.transition =
+                "none";
+
+              frame.style.opacity =
+                "0";
+
+
+              resolve();
+            };
+
+
+          requestAnimationFrame(
+            step
+          );
+        }
+      );
+    };
+
+
+  const requestMobileDirectionalPage =
+    (
+      nextName,
+      direction
+    ) => {
+      if (
+        iconButtonMode.matches ||
+        mobileDirectionalPageSwitchActive ||
+        !activePageName ||
+        !nextName ||
+        nextName === activePageName
+      ) {
+        return false;
+      }
+
+
+      const previousName =
+        activePageName;
+
+      const previousFrame =
+        getPageFrame(
+          previousName
+        );
+
+      const nextFrame =
+        getPageFrame(
+          nextName
+        );
+
+
+      if (
+        !previousFrame ||
+        !nextFrame
+      ) {
+        return false;
+      }
+
+
+      mobileDirectionalPageSwitchActive =
+        true;
+
+      mobileDirectionalPageAnimationRunId +=
+        1;
+
+      const runId =
+        mobileDirectionalPageAnimationRunId;
+
+
+      cancelIncomingPageOverlap();
+
+      hideMorph();
+
+
+      closeSecondaryPanel(
+        previousFrame
+      );
+
+
+      /*
+        Keep only these two real frames eligible during the handoff.
+      */
+      pageFrames.forEach(
+        (
+          frame,
+          pageName
+        ) => {
+          if (
+            pageName !== previousName &&
+            pageName !== nextName
+          ) {
+            frame.classList.remove(
+              "is-open"
+            );
+
+            clearMobilePageAnimationStyles(
+              frame
+            );
+          }
+        }
+      );
+
+
+      updatePrototypePageFrameGeometry(
+        previousFrame
+      );
+
+      updatePrototypePageFrameGeometry(
+        nextFrame
+      );
+
+
+      setSelectedPageIntent(
+        nextName
+      );
+
+      setActivePageButtonState(
+        nextName,
+        previousName
+      );
+
+
+      const previousDistance =
+        getMobilePageSlideDistance(
+          previousFrame
+        );
+
+      const nextDistance =
+        getMobilePageSlideDistance(
+          nextFrame
+        );
+
+
+      /*
+        Direction > 0 = finger swiped up / navigating forward.
+      */
+      let outgoingPromise;
+      let incomingPromise;
+
+
+      if (direction > 0) {
+        previousFrame.style.zIndex =
+          "22";
+
+        nextFrame.style.zIndex =
+          "21";
+
+
+        const closeDuration =
+          getMobilePageMorphGeometry(
+            previousName
+          )
+            ?.settings
+            ?.closeDuration ||
+          850;
+
+
+        /*
+          Let the incoming page spend a short first phase physically pushing
+          the outgoing page smaller. Once the newcomer reaches halfway, the
+          compressed old page begins the standard collapse-to-hamburger morph.
+        */
+        const pushDuration =
+          Math.max(
+            220,
+            closeDuration * 0.44
+          );
+
+
+        outgoingPromise =
+          animateMobileForwardPush(
+            previousFrame,
+            nextFrame,
+            {
+              nextDistance,
+              pushDuration,
+              collapseDuration:
+                closeDuration,
+
+              runId,
+              previousName
+            }
+          );
+
+
+        /*
+          The helper owns both halves of the incoming slide, so there is no
+          separate incoming promise in the forward direction.
+        */
+        incomingPromise =
+          Promise.resolve();
+      }
+
+      else {
+        previousFrame.style.zIndex =
+          "22";
+
+        nextFrame.style.zIndex =
+          "21";
+
+
+        outgoingPromise =
+          animateMobilePageSlide(
+            previousFrame,
+            {
+              fromY:
+                0,
+
+              toY:
+                previousDistance,
+
+              duration:
+                getMobilePageMorphGeometry(
+                  nextName
+                )
+                  ?.settings
+                  ?.openDuration ||
+                900,
+
+              /*
+                Keep the old page physically below the viewport until the
+                final handoff removes it. Do not let WAAPI snap it home.
+              */
+              holdFinal:
+                true,
+
+              fromOpacity:
+                1,
+
+              toOpacity:
+                0
+            }
+          );
+
+
+        incomingPromise =
+          animateMobilePageMorphOpen(
+            nextName,
+            runId
+          );
+      }
+
+
+      Promise.all(
+        [
+          outgoingPromise,
+          incomingPromise
+        ]
+      )
+        .then(
+          () => {
+            if (
+              runId !==
+              mobileDirectionalPageAnimationRunId
+            ) {
+              return;
+            }
+
+
+            /*
+              Commit the outgoing frame as CLOSED before removing its temporary
+              offscreen transform. This prevents the normal page fade-out CSS
+              from becoming visible at the resting position.
+            */
+            finalizeMobileOutgoingFrame(
+              previousFrame
+            );
+
+
+            nextFrame.classList.add(
+              "is-open"
+            );
+
+
+            clearMobilePageAnimationStyles(
+              nextFrame
+            );
+
+
+            activePageName =
+              nextName;
+
+            pageFrameProgress =
+              1;
+
+            pageFrameTargetOpen =
+              true;
+
+            pageFrameIsAnimating =
+              false;
+
+
+            setActivePageButtonState(
+              nextName
+            );
+
+
+            scheduleSecondaryPanelOpen(
+              nextFrame
+            );
+
+
+            requestAnimationFrame(
+              () => {
+                rememberStablePageRect();
+              }
+            );
+
+
+            hideMorph();
+
+            morphEngine.clearActive();
+
+
+            mobileDirectionalPageSwitchActive =
+              false;
+          }
+        );
+
+
+      return true;
+    };
+
+
   const requestMobilePageDirect =
     (name) => {
       const frame =
@@ -9020,9 +11097,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
 
+      if (!iconButtonMode.matches) {
+        return requestMobileDirectionalPage(
+          nextPageName,
+          1
+        );
+      }
+
+
       /*
-        Reuse the exact same page-switch path as clicking another header
-        button. Gesture code only decides WHEN to request the switch.
+        Tablet/desktop keep the existing page-switch path unchanged.
       */
       requestPage(
         nextPageName
@@ -9062,6 +11146,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!previousPageName) {
         return false;
+      }
+
+
+      if (!iconButtonMode.matches) {
+        return requestMobileDirectionalPage(
+          previousPageName,
+          -1
+        );
       }
 
 

@@ -25535,3 +25535,161 @@ body.is-media-lightbox-open {
   overflow: visible !important;
 }
 
+
+
+/* =========================================================
+   MOBILE DIRECTIONAL PAGE SWITCH — MOTION GUARD
+   =========================================================
+   Page frames temporarily translate below the viewport during swipe-driven
+   navigation. Keep that motion visually clipped to the site rather than
+   creating transient document scrollbars.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  html,
+  body {
+    overflow: hidden;
+  }
+
+
+  .prototype-page-frame {
+    will-change: auto;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE SWIPE-UP — OUTGOING INFO ACCENT WASH
+   =========================================================
+   As the outgoing page is compressed, its information cavity quickly washes
+   into that page's accent color. By the half-height handoff it is fully
+   covered, hiding copy before the responsive cavity becomes visually cramped.
+
+   This is scoped ONLY to the swipe-up outgoing-page class.
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 50;
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    background:
+      radial-gradient(
+        ellipse at 50% 42%,
+        rgba(
+          var(--page-accent-rgb),
+          1
+        )
+        0%,
+        rgba(
+          var(--page-accent-rgb),
+          0.96
+        )
+        58%,
+        rgba(
+          var(--page-accent-rgb),
+          0.88
+        )
+        100%
+      );
+
+    box-shadow:
+      inset 0 0 42px
+      rgba(
+        var(--page-accent-rgb),
+        0.42
+      );
+
+    transition: none;
+
+    will-change: opacity;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page].is-mobile-outgoing-info-glow
+  .game-tablet-info-host::after {
+    opacity:
+      var(
+        --mobile-outgoing-info-glow-progress,
+        0
+      );
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE SWIPE-UP — INFO -> TRANSLUCENT ACCENT PANEL
+   =========================================================
+   Refine the outgoing info treatment:
+     - info content fades OUT
+     - accent panel fades IN
+     - final panel is only ~25% opaque
+   ========================================================= */
+
+@media (max-width: 840px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host::after {
+    background:
+      rgba(
+        var(--page-accent-rgb),
+        0.25
+      )
+      !important;
+
+    box-shadow:
+      inset 0 0 34px
+      rgba(
+        var(--page-accent-rgb),
+        0.16
+      )
+      !important;
+  }
+
+
+  .prototype-page-frame[data-game-frame-page].is-mobile-outgoing-info-glow
+  .game-tablet-info-host::after {
+    opacity:
+      var(
+        --mobile-outgoing-info-glow-progress,
+        0
+      )
+      !important;
+  }
+
+
+  /*
+    Crossfade the authored info away at the same rate the translucent panel
+    comes in. The host itself remains present so its geometry continues to
+    resize normally during the push.
+  */
+  .prototype-page-frame[data-game-frame-page].is-mobile-outgoing-info-glow
+  .game-tablet-info-host
+  .game-info-surface {
+    opacity:
+      calc(
+        1 -
+        var(
+          --mobile-outgoing-info-glow-progress,
+          0
+        )
+      )
+      !important;
+
+    transition: none !important;
+  }
+}
+
