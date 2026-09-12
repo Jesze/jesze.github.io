@@ -25393,3 +25393,145 @@ body.is-media-lightbox-open {
   }
 }
 
+
+
+/* =========================================================
+   GAME INFO BLURB — RESPONSIVE CENTERED TEXT BLOCK
+   =========================================================
+   The blurb used to hold a hard 64ch width so its line breaks would not jump
+   while the game-info cavity resized. That kept transitions visually stable,
+   but it becomes a liability once the cavity is genuinely narrower on mobile.
+
+   Keep the useful part of that behavior:
+     - desktop / roomy tablet: remain capped at 64ch, so wrapping stays stable
+     - narrow tablet / mobile: shrink naturally with the available cavity
+     - center the text BLOCK within the info surface
+     - keep the text itself left-aligned for readability
+
+   This means reflow only begins once the available space is actually smaller
+   than the preferred 64ch measure, rather than continuously tracking every
+   intermediate frame size.
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page]
+.game-info-blurb,
+.prototype-page-frame[data-game-frame-page].is-info-compact
+.game-info-blurb,
+.prototype-page-frame[data-game-frame-page].is-info-tight
+.game-info-blurb {
+  inline-size:
+    min(
+      64ch,
+      100%
+    ) !important;
+
+  width:
+    min(
+      64ch,
+      100%
+    ) !important;
+
+  max-inline-size: 100% !important;
+  max-width: 100% !important;
+
+  margin-inline: auto !important;
+
+  text-align: left;
+}
+
+
+/*
+  Tablet/mobile clones have their own padded cavity. Use its actual content
+  width rather than the page-level cqw fallback that previously let the 64ch
+  block extend beyond the visible info frame.
+*/
+@media (max-width: 1400px) {
+
+  .prototype-page-frame[data-game-frame-page]
+  .game-tablet-info-host
+  .game-info-blurb {
+    inline-size:
+      min(
+        64ch,
+        100%
+      ) !important;
+
+    width:
+      min(
+        64ch,
+        100%
+      ) !important;
+
+    max-inline-size: 100% !important;
+    max-width: 100% !important;
+
+    margin-inline: auto !important;
+  }
+}
+
+
+
+/* =========================================================
+   GAME INFO BLURB — ONE SHARED FLUID MEASURE
+   =========================================================
+   Same rule at every scale:
+
+     - left aligned with the rest of the info content
+     - use all available width on narrow layouts
+     - stop growing at a medium readable measure on wide layouts
+     - JS may reduce font size only when the next section would be encroached
+
+   76ch is intentionally between the old ~64ch block and the full-width
+   treatment. No breakpoint-specific width behavior is required.
+   ========================================================= */
+
+.prototype-page-frame[data-game-frame-page]
+.game-info-blurb,
+.prototype-page-frame[data-game-frame-page].is-info-compact
+.game-info-blurb,
+.prototype-page-frame[data-game-frame-page].is-info-tight
+.game-info-blurb,
+.prototype-page-frame[data-game-frame-page]
+.game-tablet-info-host
+.game-info-blurb {
+  inline-size:
+    min(
+      76ch,
+      100%
+    )
+    !important;
+
+  width:
+    min(
+      76ch,
+      100%
+    )
+    !important;
+
+  max-inline-size: 100% !important;
+  max-width: 100% !important;
+
+  margin-inline: 0 !important;
+
+  --game-info-blurb-min-size: 9.5px;
+
+  font-size:
+    var(
+      --game-info-blurb-fit-size,
+      inherit
+    )
+    !important;
+
+  text-align: left;
+}
+
+
+/*
+  Do not clip the blurb itself. The fitter now uses the actual gap to the next
+  visible section and reduces type before overlap can occur.
+*/
+.prototype-page-frame[data-game-frame-page]
+.game-info-blurb {
+  overflow: visible !important;
+}
+

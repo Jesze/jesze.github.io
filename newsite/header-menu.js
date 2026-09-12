@@ -18399,6 +18399,492 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =======================================================
+     Shared game-info blurb fitting
+     =======================================================
+
+     One layout paradigm at every scale:
+
+       - the game-info surface gives the top zone whatever vertical space is
+         left after the features + facts/actions zones claim their space
+       - the blurb always spans the full width of that top zone
+       - if longer copy no longer fits the remaining height, only the blurb
+         type scales down
+       - desktop, tablet, and mobile use the exact same fitter
+
+     This replaces breakpoint-specific copy widths / mobile-only crowding.
+     ======================================================= */
+
+  const gameInfoBlurbFitState =
+    new WeakMap();
+
+  const gameInfoBlurbFitLockedFrames =
+    new WeakSet();
+
+  let gameInfoBlurbFitRaf =
+    0;
+
+
+  const fitGameInfoBlurb =
+    (
+      blurb
+    ) => {
+      if (
+        !blurb ||
+        !blurb.isConnected
+      ) {
+        return;
+      }
+
+
+      const surface =
+        blurb.closest(
+          ".game-info-surface"
+        );
+
+      const frameArea =
+        blurb.closest(
+          ".game-frame-area"
+        );
+
+
+      if (
+        !surface ||
+        (
+          frameArea &&
+          gameInfoBlurbFitLockedFrames.has(
+            frameArea
+          )
+        )
+      ) {
+        return;
+      }
+
+
+      /*
+        This pass deliberately leaves the v134 / v153 layout completely alone.
+
+        We only intervene when the EXISTING info surface actually overflows its
+        fixed cavity. That means desktop/tablet formatting remains untouched
+        while small mobile layouts can sacrifice blurb type size instead of
+        pushing the facts/actions below the frame.
+      */
+      blurb.style.removeProperty(
+        "--game-info-blurb-fit-size"
+      );
+
+
+      const computed =
+        getComputedStyle(
+          blurb
+        );
+
+      let maxFontSize =
+        parseFloat(
+          computed.fontSize
+        ) ||
+        16;
+
+
+      /*
+        On small mobile frames, the surrounding labels / facts / buttons have
+        already scaled down more aggressively than the authored blurb size.
+        Nudge the blurb's natural ceiling down too so its visual hierarchy
+        stays balanced even before true overflow forces further fitting.
+
+        Desktop/tablet are deliberately untouched.
+      */
+      if (
+        window.matchMedia(
+          "(max-width: 840px)"
+        ).matches
+      ) {
+        const viewportWidth =
+          Math.max(
+            320,
+            Math.min(
+              window.innerWidth,
+              840
+            )
+          );
+
+
+        /*
+          840px -> 100% of authored size
+          320px -> ~88% of authored size
+        */
+        const mobileScale =
+          0.88 +
+          (
+            (
+              viewportWidth - 320
+            ) /
+            520
+          ) *
+          0.12;
+
+
+        maxFontSize *=
+          Math.max(
+            0.88,
+            Math.min(
+              1,
+              mobileScale
+            )
+          );
+      }
+
+      const minFontSize =
+        Math.min(
+          maxFontSize,
+          parseFloat(
+            computed.getPropertyValue(
+              "--game-info-blurb-min-size"
+            )
+          ) ||
+          9.5
+        );
+
+
+      const surfaceFits =
+        () => {
+          /*
+            scrollHeight still reports the content that extends beyond an
+            overflow:hidden surface, so this directly detects the failure we
+            care about: lower elements being pushed outside the info cavity.
+          */
+          return (
+            surface.scrollHeight <=
+            surface.clientHeight + 0.75
+          );
+        };
+
+
+      const fitsAt =
+        (fontSize) => {
+          blurb.style.setProperty(
+            "--game-info-blurb-fit-size",
+            `${fontSize}px`
+          );
+
+
+          return surfaceFits();
+        };
+
+
+      /*
+        Critical behavior:
+        if the authored v134/v153 layout already fits, keep it exactly as-is.
+        No alternate width, grid, spacing, alignment, or responsive rules.
+      */
+      if (
+        fitsAt(
+          maxFontSize
+        )
+      ) {
+        return;
+      }
+
+
+      let low =
+        minFontSize;
+
+      let high =
+        maxFontSize;
+
+
+      /*
+        Find the largest blurb size that lets the complete existing info layout
+        remain inside its cavity.
+      */
+      for (
+        let iteration = 0;
+        iteration < 8;
+        iteration += 1
+      ) {
+        const midpoint =
+          (
+            low +
+            high
+          ) /
+          2;
+
+
+        if (
+          fitsAt(
+            midpoint
+          )
+        ) {
+          low =
+            midpoint;
+        }
+
+        else {
+          high =
+            midpoint;
+        }
+      }
+
+
+      blurb.style.setProperty(
+        "--game-info-blurb-fit-size",
+        `${low}px`
+      );
+
+
+      gameInfoBlurbFitState.set(
+        blurb,
+        low
+      );
+    };
+
+
+  const measureFinalInfoBlurbFontSize =
+    (
+      gameFrameArea
+    ) => {
+      if (
+        !gameFrameArea ||
+        !gameFrameArea.parentElement
+      ) {
+        return null;
+      }
+
+
+      /*
+        Measure the REAL final info geometry without touching the visible frame.
+
+        A hidden clone is inserted beside the live frame with:
+          - final info-state class already present
+          - frame progress forced to 1
+          - transitions/animations disabled
+
+        Because the clone enters the document already in its final state,
+        ResizeObserver / transition timing cannot trick the fitter into
+        measuring an intermediate cavity.
+      */
+      const probe =
+        gameFrameArea.cloneNode(
+          true
+        );
+
+
+      probe.classList.add(
+        "is-tablet-info-geometry",
+        "is-game-info-fit-probe"
+      );
+
+
+      probe.style.setProperty(
+        "--brobots-tablet-frame-progress",
+        "1"
+      );
+
+      probe.style.setProperty(
+        "position",
+        "absolute",
+        "important"
+      );
+
+      probe.style.setProperty(
+        "visibility",
+        "hidden",
+        "important"
+      );
+
+      probe.style.setProperty(
+        "pointer-events",
+        "none",
+        "important"
+      );
+
+      probe.style.setProperty(
+        "transition",
+        "none",
+        "important"
+      );
+
+      probe.style.setProperty(
+        "animation",
+        "none",
+        "important"
+      );
+
+      probe.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+
+      probe
+        .querySelectorAll(
+          "*"
+        )
+        .forEach(
+          (element) => {
+            element.style.setProperty(
+              "transition",
+              "none",
+              "important"
+            );
+
+            element.style.setProperty(
+              "animation",
+              "none",
+              "important"
+            );
+          }
+        );
+
+
+      gameFrameArea.parentElement.appendChild(
+        probe
+      );
+
+
+      const probeBlurb =
+        probe.querySelector(
+          ".game-tablet-info-host .game-info-blurb"
+        ) ||
+        probe.querySelector(
+          ".game-info-blurb"
+        );
+
+
+      let result =
+        null;
+
+
+      if (probeBlurb) {
+        fitGameInfoBlurb(
+          probeBlurb
+        );
+
+
+        result =
+          probeBlurb.style.getPropertyValue(
+            "--game-info-blurb-fit-size"
+          ).trim();
+
+
+        /*
+          If no shrink was required, preserve the final authored size as an
+          explicit pixel value while the live frame animates.
+        */
+        if (!result) {
+          result =
+            getComputedStyle(
+              probeBlurb
+            ).fontSize;
+        }
+      }
+
+
+      probe.remove();
+
+
+      return result ||
+        null;
+    };
+
+
+  const fitAllGameInfoBlurbs =
+    () => {
+      document
+        .querySelectorAll(
+          ".prototype-page-frame[data-game-frame-page] .game-info-blurb"
+        )
+        .forEach(
+          fitGameInfoBlurb
+        );
+    };
+
+
+  const scheduleGameInfoBlurbFit =
+    () => {
+      cancelAnimationFrame(
+        gameInfoBlurbFitRaf
+      );
+
+
+      gameInfoBlurbFitRaf =
+        requestAnimationFrame(
+          () => {
+            requestAnimationFrame(
+              fitAllGameInfoBlurbs
+            );
+          }
+        );
+    };
+
+
+  const gameInfoBlurbResizeObserver =
+    new ResizeObserver(
+      scheduleGameInfoBlurbFit
+    );
+
+
+  const observeGameInfoFitTargets =
+    () => {
+      document
+        .querySelectorAll(
+          ".prototype-page-frame[data-game-frame-page] .game-info-surface, " +
+          ".prototype-page-frame[data-game-frame-page] .game-info-top-zone, " +
+          ".prototype-page-frame[data-game-frame-page] .game-info-bottom-zone, " +
+          ".prototype-page-frame[data-game-frame-page] .game-info-blurb"
+        )
+        .forEach(
+          (element) => {
+            if (
+              element.dataset.gameInfoFitObserved ===
+              "true"
+            ) {
+              return;
+            }
+
+
+            element.dataset.gameInfoFitObserved =
+              "true";
+
+
+            gameInfoBlurbResizeObserver.observe(
+              element
+            );
+          }
+        );
+
+
+      scheduleGameInfoBlurbFit();
+    };
+
+
+  const gameInfoBlurbMutationObserver =
+    new MutationObserver(
+      observeGameInfoFitTargets
+    );
+
+
+  gameInfoBlurbMutationObserver.observe(
+    document.body,
+    {
+      childList: true,
+      subtree: true
+    }
+  );
+
+
+  window.addEventListener(
+    "resize",
+    scheduleGameInfoBlurbFit,
+    {
+      passive: true
+    }
+  );
+
+
+  observeGameInfoFitTargets();
+
+
+  /* =======================================================
      Reusable game-frame tablet controller
      ======================================================= */
 
@@ -18726,6 +19212,104 @@ document.addEventListener("DOMContentLoaded", () => {
         */
         if (infoGeometry) {
           updateTabletLogoTarget();
+        }
+
+
+        /*
+          Before OPENING the info state, calculate the blurb size against the
+          final geometry offscreen and lock that size for the whole morph.
+
+          This fixes the actual bug: ResizeObserver was repeatedly fitting
+          against intermediate frame sizes during the 720ms transition.
+        */
+        const liveBlurb =
+          tabletInfoHost.querySelector(
+            ".game-info-blurb"
+          );
+
+
+        if (
+          infoGeometry &&
+          liveBlurb
+        ) {
+          const finalBlurbFontSize =
+            measureFinalInfoBlurbFontSize(
+              gameFrameArea
+            );
+
+
+          if (finalBlurbFontSize) {
+            liveBlurb.style.setProperty(
+              "--game-info-blurb-fit-size",
+              finalBlurbFontSize
+            );
+          }
+
+
+          gameInfoBlurbFitLockedFrames.add(
+            gameFrameArea
+          );
+
+
+          const unlockBlurbFit =
+            (event) => {
+              if (
+                event &&
+                (
+                  event.target !==
+                    gameFrameArea ||
+                  event.propertyName !==
+                    "--brobots-tablet-frame-progress"
+                )
+              ) {
+                return;
+              }
+
+
+              gameFrameArea.removeEventListener(
+                "transitionend",
+                unlockBlurbFit
+              );
+
+              gameInfoBlurbFitLockedFrames.delete(
+                gameFrameArea
+              );
+            };
+
+
+          gameFrameArea.addEventListener(
+            "transitionend",
+            unlockBlurbFit
+          );
+
+
+          /*
+            Safety only for browsers that fail to emit transitionend for a
+            registered custom property. It no longer causes a visual pop,
+            because the correct final font size was applied BEFORE animation.
+          */
+          window.setTimeout(
+            () => {
+              if (
+                gameInfoBlurbFitLockedFrames.has(
+                  gameFrameArea
+                )
+              ) {
+                unlockBlurbFit(
+                  null
+                );
+              }
+            },
+            900
+          );
+        }
+
+        else if (
+          !infoGeometry
+        ) {
+          gameInfoBlurbFitLockedFrames.delete(
+            gameFrameArea
+          );
         }
 
 
